@@ -196,13 +196,26 @@ async function readWallet(cfg) {
   return { totalUsd, holdings, ethPrice: price };
 }
 
-/** Snapshot dari bot (scripts/sync.mjs). Sudah termasuk posisi LP. */
-async function readSnapshot() {
-  const res = await fetch(LIVE_URL + '?t=' + Date.now(), { cache: 'no-store' });
-  if (!res.ok) throw new Error('tidak ada snapshot');
-  const j = await res.json();
-  if (!Number.isFinite(Number(j.totalUsd))) throw new Error('snapshot tanpa totalUsd');
-  return j;
+/**
+ * Snapshot dari bot (scripts/sync.mjs) — nilai tiap posisi LP.
+ *
+ * Dicoba dari `snapshotUrl` dulu (raw.githubusercontent) karena file di sana
+ * ikut berubah begitu di-push, tanpa nunggu GitHub Pages build ulang. Kalau
+ * gagal, jatuh ke salinan yang ikut ke-deploy bareng situsnya.
+ */
+async function readSnapshot(cfg) {
+  const urls = [cfg?.app?.snapshotUrl, LIVE_URL].filter(Boolean);
+  let lastErr;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const j = await res.json();
+      if (!Number.isFinite(Number(j.totalUsd))) throw new Error('snapshot tanpa totalUsd');
+      return j;
+    } catch (err) { lastErr = err; }
+  }
+  throw lastErr || new Error('tidak ada snapshot');
 }
 
 async function resolveNav(cfg, { force = false } = {}) {
@@ -212,8 +225,8 @@ async function resolveNav(cfg, { force = false } = {}) {
     return { totalUsd: manual, source: 'manual', label: 'angka manual dari config.json', fetchedAt: Date.now(), holdings: [], positions: [] };
   }
 
-  // 2. cache — supaya buka-tutup halaman tidak menghajar rate limit
-  const ttl = (Number(cfg.app?.refreshMinutes) || 60) * 60000;
+  // 2. cache pendek — cuma buat nahan reload beruntun, bukan buat nunda data
+  const ttl = (Number(cfg.app?.refreshMinutes) || 5) * 60000;
   if (!force) {
     try {
       const hit = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
@@ -221,34 +234,52 @@ async function resolveNav(cfg, { force = false } = {}) {
     } catch { /* cache rusak, abaikan */ }
   }
 
-  // 3. snapshot bot, kalau ada dan masih segar
-  let out = null;
-  try {
-    const snap = await readSnapshot();
-    const age = Date.now() - (Number(snap.updatedAt) || 0);
+  // 3. Dua sumber, digabung.
+  //
+  //    Saldo token dibaca LANGSUNG dari chain tiap kali halaman dibuka — itu
+  //    yang bikin angkanya ikut wallet detik itu juga. Yang tidak bisa dibaca
+  //    browser adalah nilai posisi LP: hitungannya butuh tick math + quoter
+  //    per posisi, jadi bagian itu diambil dari snapshot yang ditulis bot.
+  const [live, snap] = await Promise.all([
+    readWallet(cfg).catch(() => null),
+    readSnapshot(cfg).catch(() => null),
+  ]);
+
+  if (!live && !snap) throw new Error('RPC dan snapshot dua-duanya tidak bisa dibaca');
+
+  const positions = snap?.positions || [];
+  const lpUsd = positions.reduce((s, p) => s + (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), 0);
+  const snapAge = snap ? Date.now() - (Number(snap.updatedAt) || 0) : null;
+
+  let out;
+  if (live) {
+    out = {
+      totalUsd: live.totalUsd + lpUsd,
+      source: positions.length ? 'live+lp' : 'rpc',
+      label: positions.length
+        ? `token live dari chain + ${positions.length} posisi LP dari snapshot`
+        : 'token live dari chain — tidak ada posisi LP terbaca',
+      holdings: live.holdings,
+      positions,
+      lpUsd,
+      liveUsd: live.totalUsd,
+      updatedAt: snap ? Number(snap.updatedAt) : null,
+      lpStale: snapAge != null && snapAge > 45 * 60e3,
+      partial: !positions.length,
+      fetchedAt: Date.now(),
+    };
+  } else {
+    // RPC lagi ngambek — pakai snapshot apa adanya
     out = {
       totalUsd: Number(snap.totalUsd),
       source: 'snapshot',
-      label: 'snapshot bot (termasuk posisi LP)',
-      updatedAt: Number(snap.updatedAt) || null,
-      stale: age > 6 * 3600e3,
+      label: 'RPC tidak jalan — pakai snapshot bot',
       holdings: snap.holdings || [],
-      positions: snap.positions || [],
+      positions,
+      lpUsd,
+      updatedAt: Number(snap.updatedAt) || null,
+      lpStale: snapAge != null && snapAge > 45 * 60e3,
       fetchedAt: Date.now(),
-    };
-  } catch { /* jatuh ke RPC */ }
-
-  // 4. baca langsung dari chain
-  if (!out) {
-    const live = await readWallet(cfg);
-    out = {
-      totalUsd: live.totalUsd,
-      source: 'rpc',
-      label: 'RPC publik — hanya saldo token di wallet',
-      holdings: live.holdings,
-      positions: [],
-      fetchedAt: Date.now(),
-      partial: true,
     };
   }
 
@@ -276,7 +307,9 @@ function renderSummary(ledger, nav) {
   const pnlPct = ledger.deposited > 0 ? (pnl / ledger.deposited) * 100 : 0;
 
   $('#kpiNav').textContent = usd(nav.totalUsd);
-  $('#kpiNavSub').textContent = nav.label + (nav.cached ? ' · dari cache' : '');
+  $('#kpiNavSub').textContent = nav.lpUsd > 0
+    ? `${usd(nav.liveUsd ?? 0, 0)} token + ${usd(nav.lpUsd, 0)} di LP`
+    : nav.label;
   $('#kpiDeposit').textContent = usd(ledger.deposited);
   $('#kpiWithdraw').textContent = usd(ledger.withdrawn);
   const el = $('#kpiPnl');
@@ -284,7 +317,12 @@ function renderSummary(ledger, nav) {
   el.className = 'big ' + cls(pnl);
   $('#kpiPnlSub').textContent = (pnl >= 0 ? '+' : '') + pct(pnlPct) + ' dari modal';
   $('#donutVal').textContent = usd(nav.totalUsd, 0);
-  $('#footSrc').textContent = nav.source === 'snapshot' ? 'snapshot bot' : nav.source === 'manual' ? 'config manual' : 'RPC publik';
+  $('#footSrc').textContent = {
+    'live+lp': 'RPC publik (live) + snapshot LP',
+    rpc: 'RPC publik (live)',
+    snapshot: 'snapshot bot',
+    manual: 'config manual',
+  }[nav.source] || 'RPC publik';
   $('#footTime').textContent = 'diperbarui ' + ago(nav.fetchedAt);
 }
 
@@ -339,9 +377,11 @@ function renderHoldings(nav) {
         <td class="num">${r.usd == null ? '<span class="dim">?</span>' : usd(r.usd)}</td>
       </tr>`).join('');
   }
-  $('#holdHint').textContent = nav.partial
-    ? 'hanya token di wallet — posisi LP belum terhitung'
-    : nav.source === 'manual' ? 'NAV dikunci manual di config.json' : 'wallet + posisi LP';
+  $('#holdHint').textContent = nav.source === 'manual'
+    ? 'NAV dikunci manual di config.json'
+    : nav.partial
+      ? 'token dibaca live dari chain — posisi LP belum terhitung'
+      : `token live dari chain · nilai LP dihitung ${ago(nav.updatedAt)}`;
 }
 
 function renderHistory(ledger) {
@@ -420,8 +460,8 @@ async function load({ force = false } = {}) {
   try {
     state.nav = await resolveNav(state.cfg, { force });
     const msgs = [...state.ledger.warnings];
-    if (state.nav.partial) msgs.push('Nilai yang tampil hanya token di dalam wallet — posisi LP belum ikut dihitung. Jalankan scripts/sync.mjs biar angkanya lengkap.');
-    if (state.nav.stale) msgs.push('Snapshot bot sudah lebih dari 6 jam. Angka bisa ketinggalan.');
+    if (state.nav.partial) msgs.push('Nilai posisi LP belum ikut dihitung — yang tampil cuma token di dalam wallet. Jalankan scripts/sync.mjs biar lengkap.');
+    if (state.nav.lpStale) msgs.push(`Nilai posisi LP terakhir dihitung ${ago(state.nav.updatedAt)} — bagian itu bisa ketinggalan. Saldo token tetap live.`);
     banner(msgs.join(' · '));
     renderAll();
   } catch (err) {

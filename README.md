@@ -99,19 +99,28 @@ Bukan `setoran gue ÷ total setoran`, tapi sistem unit seperti reksa dana:
 
 ## Dari mana angka saldonya
 
-Tiga sumber, dipakai berurutan:
+Nilai wallet dirakit dari dua bagian:
 
-1. **`navOverrideUsd`** di `config.json` — kalau diisi angka, itu yang dipakai. Buat kunci manual.
-2. **`data/live.json`** — snapshot dari bot. Ini yang paling akurat karena
-   **termasuk nilai posisi LP**, bukan cuma token nganggur di wallet.
-3. **RPC publik** `https://rpc.mainnet.chain.robinhood.com` — dibaca langsung dari
-   browser, gratis, tanpa API key. Harga ETH dari CoinGecko (cadangan: DexScreener).
-   Kekurangannya: **posisi LP tidak kehitung**, jadi angkanya cuma saldo token di wallet.
+| Bagian | Sumber | Sesegar apa |
+|---|---|---|
+| Saldo token (ETH, USDG, WETH) | RPC publik, dibaca browser langsung dari address | **live** — tiap halaman dibuka, lalu tiap 5 menit |
+| Nilai posisi LP | `data/live.json`, ditulis bot | tiap 10 menit lewat cron |
 
-Hasilnya di-cache 1 jam di browser biar tidak kena rate limit. Tombol **refresh**
-memaksa ambil ulang. Ganti intervalnya di `app.refreshMinutes`.
+Kenapa LP tidak ikut live: nilainya tidak bisa dibaca dengan satu panggilan
+RPC. Butuh tick math + quoter per posisi — itu kerjaan bot, bukan browser.
+Jadi bagian itu dititip di snapshot.
 
-### Bikin `live.json` (biar posisi LP ikut kehitung)
+Situsnya baca snapshot dari `raw.githubusercontent.com` (diatur di
+`app.snapshotUrl`), bukan dari file yang ikut ke-deploy — begitu bot push,
+angkanya langsung kepakai tanpa nunggu GitHub Pages build ulang.
+
+Kalau RPC lagi mati, situs pakai snapshot bulat-bulat. Kalau snapshot yang
+hilang, situs tetap jalan dengan saldo token saja dan kasih peringatan bahwa
+LP belum kehitung. `navOverrideUsd` di config selalu menang di atas keduanya.
+
+Harga ETH dari CoinGecko, cadangan DexScreener. Dua-duanya gratis, tanpa API key.
+
+### Bikin `live.json`
 
 ```bash
 RR_HOME=/root/robinhood node scripts/sync.mjs
@@ -121,13 +130,17 @@ Script ini baca kode bot yang sudah ada (`bookValueUsd` + `readBook`) dan nulis
 `data/live.json`. Isinya cuma angka — total USD, saldo token, dan nilai tiap
 posisi LP. Tidak ada key yang ikut tertulis.
 
-Otomatis tiap jam + auto-push:
+### Auto-update
 
-```bash
-crontab -e
-# tambahkan:
-0 * * * * /root/cashood/scripts/publish.sh >> /tmp/cashood.log 2>&1
+Sudah terpasang di cron:
+
 ```
+*/10 * * * * /root/cashood/scripts/publish.sh >> /root/cashood/sync.log 2>&1
+```
+
+`publish.sh` = sync + commit + push, dan diam saja kalau angkanya tidak berubah.
+Jangan dibikin lebih rapat dari 10 menit: GitHub Pages punya batas lunak
+10 build per jam.
 
 ---
 
