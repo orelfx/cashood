@@ -75,6 +75,33 @@ if (!Number.isFinite(navUsd) || navUsd <= 0) {
   console.log(`nilai wallet: $${navUsd.toFixed(2)} (snapshot ${ageMin.toFixed(0)} menit lalu)`);
 }
 
+// ─── apakah duitnya sudah masuk sebelum snapshot ini? ────────────────────
+//
+// `navBefore` harus nilai wallet SEBELUM setoran mendarat. Kalau transfernya
+// sampai lebih dulu, snapshot terbaru sudah memuat uang itu, dan menghitung
+// harga unit dari situ berarti si penyetor membeli unit dengan uangnya sendiri
+// yang sudah dihitung — dia dapat lebih sedikit dari yang dia setor, dan
+// selisihnya pindah diam-diam ke pemilik lama. Ini pernah kejadian: Abil
+// setor $1000 jam 03:17, snapshot jam 03:18, dan porsinya turun jadi $900.
+//
+// Deret nilai wallet menyimpan komponen token terpisah dari LP, jadi lonjakan
+// saldo token sebesar setoran itu tanda yang cukup jelas.
+if (type === 'deposit' && !flag('force')) {
+  try {
+    const points = JSON.parse(readFileSync(resolve(ROOT, 'data/nav.json'), 'utf8')).points || [];
+    const [prev, last] = points.slice(-2);
+    if (prev && last) {
+      const tokenJump = (last.usd - (last.lp ?? 0)) - (prev.usd - (prev.lp ?? 0));
+      if (Math.abs(tokenJump - amount) < Math.max(5, amount * 0.05)) {
+        die(`saldo token naik $${tokenJump.toFixed(2)} tepat sebelum snapshot ini — sepertinya $${amount.toFixed(2)} itu SUDAH masuk wallet.\n`
+          + `  Kalau benar, navBefore yang betul adalah $${(navUsd - amount).toFixed(2)}:\n`
+          + `      node scripts/record.mjs ${argv.join(' ')} --nav ${(navUsd - amount).toFixed(2)}\n`
+          + '  Kalau uangnya memang belum masuk, ulangi dengan --force.');
+      }
+    }
+  } catch { /* tidak ada deret; lanjut tanpa pemeriksaan */ }
+}
+
 // ─── siapkan event ────────────────────────────────────────────────────────
 const before = buildLedger(cfg);
 const unitPrice = before.totalUnits > 0 ? navUsd / before.totalUnits : 1;

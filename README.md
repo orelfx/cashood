@@ -93,6 +93,11 @@ node scripts/record.mjs withdraw --prorata 800 --push
 - `--nav <angka>` kalau mau paksa nilai wallet sendiri
 - nolak kalau jumlahnya lebih besar dari jatah orangnya, atau kalau snapshot
   sudah lebih tua dari 30 menit
+- nolak kalau saldo token baru saja naik sebesar setorannya — tandanya duitnya
+  **sudah** masuk wallet, jadi `navBefore` yang dipakai kelebihan sebesar
+  setoran itu. Kejadian beneran: Abil setor $1.000 jam 03:17, snapshot jam
+  03:18, dan porsinya jadi $900 — $100 pindah diam-diam ke pemilik lama.
+  Lewati dengan `--force` kalau memang duitnya belum masuk
 
 Hitungannya bukan salinan: script ini menjalankan mesin ledger di
 `assets/app.js` apa adanya, jadi angkanya pasti sama dengan yang di situs.
