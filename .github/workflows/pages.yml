@@ -1,0 +1,36 @@
+# Situsnya file statis apa adanya — tidak ada yang perlu dibangun.
+#
+# Dulu memakai pembangun Pages bawaan; batas build-nya bikin setiap deploy
+# gagal begitu jatah per jam habis, dengan pesan "Page build failed." tanpa
+# keterangan apa pun. Lewat Actions, isi repo diunggah langsung dan lognya
+# kelihatan kalau ada yang salah.
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4
