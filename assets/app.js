@@ -584,6 +584,19 @@ function renderHeartbeat(hb) {
     + (hb.source === 'rendered' ? ' · disusun ulang di luar proses bot (uptime & mode tidak ikut)' : '');
 }
 
+let hbLoaded = false;
+let hbLoading = null;
+
+async function refreshHeartbeat({ force = false } = {}) {
+  if (hbLoading) return hbLoading;
+  if (hbLoaded && !force) return null;
+  hbLoading = loadHeartbeat(state.cfg)
+    .then((hb) => { hbLoaded = true; renderHeartbeat(hb); return hb; })
+    .catch(() => { $('#hbHint').textContent = 'laporan tidak bisa diambil'; return null; })
+    .finally(() => { hbLoading = null; });
+  return hbLoading;
+}
+
 async function loadHeartbeat(cfg) {
   const urls = [cfg?.app?.heartbeatUrl, 'data/heartbeat.json'].filter(Boolean);
   for (const url of urls) {
@@ -609,6 +622,7 @@ function showTab(name) {
     b.setAttribute('aria-selected', String(on));
   });
   if (location.hash.slice(1) !== name) history.replaceState(null, '', bot ? '#bot' : location.pathname);
+  if (bot) refreshHeartbeat();
 }
 
 /* ── nilai wallet dari waktu ke waktu ────────────────────────────────────
@@ -1023,14 +1037,16 @@ async function load({ force = false } = {}) {
   btn.disabled = true;
   btn.textContent = 'memuat…';
   try {
-    const [nav, series, hb] = await Promise.all([
+    const [nav, series] = await Promise.all([
       resolveNav(state.cfg, { force }),
       readNavSeries(state.cfg),
-      loadHeartbeat(state.cfg),
     ]);
     state.nav = nav;
     if (series.length) navPoints = series;
-    renderHeartbeat(hb);
+
+    // Laporan bot dengan arsipnya berukuran puluhan kilobyte dan cuma dipakai
+    // di satu tab. Diambil waktu tabnya dibuka, bukan tiap halaman dimuat.
+    if (hbLoaded) refreshHeartbeat({ force });
     const msgs = [...state.ledger.warnings];
     if (state.nav.partial) msgs.push('Nilai posisi LP belum ikut dihitung — yang tampil cuma token di dalam wallet. Jalankan scripts/sync.mjs biar lengkap.');
     if (state.nav.lpStale) msgs.push(`Nilai posisi LP terakhir dihitung ${ago(state.nav.updatedAt)} — bagian itu bisa ketinggalan. Saldo token tetap live.`);
