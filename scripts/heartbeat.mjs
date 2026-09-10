@@ -47,6 +47,16 @@ if (existsSync(MIRROR)) {
 // milik proses yang merender — proses ini baru hidup beberapa detik, jadi
 // uptime, mode dan hitungan panggilan RPC-nya akan bohong kalau ikut terbit.
 if (!text) {
+  // .env memegang nilai lama (RR_MAX_OPEN_POSITIONS=1); yang dipakai proses bot
+  // adalah env dari ecosystem pm2 (=11). Tanpa ini laporan cadangan menulis
+  // "Positions: 8/1" — batas yang tidak pernah dipakai siapa pun.
+  try {
+    const { createRequire } = await import('node:module');
+    const req = createRequire(resolve(RR_HOME, 'ecosystem.config.cjs'));
+    const app = (req('./ecosystem.config.cjs').apps || []).find((a) => a.name === 'reborn-rich');
+    for (const [k, v] of Object.entries(app?.env || {})) if (v !== '') process.env[k] = String(v);
+  } catch { /* pakai apa adanya */ }
+
   const { gather, renderReport } = await load('heartbeat.js');
   const state = await gather();        // baca-saja: tidak menutup posisi, tidak menyapu dompet
   const PROCESS_LINES = [/^Agent: /, /^⏱️ Uptime:/, /^RPC calls:/, /^Model: /];
@@ -75,13 +85,29 @@ for (const [pattern, what] of LEAKS) {
   if (hit) throw new Error(`laporan memuat ${what} (${hit[0].slice(0, 12)}…) — tidak diterbitkan`);
 }
 
+// Simpan juga laporan-laporan sebelumnya, sepuluh terakhir. Satu laporan itu
+// potret satu jam: tanpa arsip, alasan bot menutup sesuatu tadi malam hilang
+// begitu denyut berikutnya datang.
+const KEEP = 10;
+let archive = [];
+if (existsSync(OUT)) {
+  try {
+    const old = JSON.parse(readFileSync(OUT, 'utf8'));
+    const previous = old.text ? [{ updatedAt: old.updatedAt, generatedAt: old.generatedAt, source: old.source, text: old.text }] : [];
+    archive = [...previous, ...(old.archive || [])]
+      .filter((row, i, all) => row.text !== text && all.findIndex((r) => r.generatedAt === row.generatedAt) === i)
+      .slice(0, KEEP);
+  } catch { archive = []; }
+}
+
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify({
   updatedAt: Date.now(),
   generatedAt,
   source,
   text,
+  archive,
 }, null, 2) + '\n');
 
-console.log(`[cashood] heartbeat ${text.length} karakter (${source}) -> ${OUT}`);
+console.log(`[cashood] heartbeat ${text.length} karakter (${source}) · arsip ${archive.length} -> ${OUT}`);
 process.exit(0);

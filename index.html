@@ -6,7 +6,13 @@
 <title>cashood — shared wallet tracker</title>
 <meta name="description" content="Pantau saldo wallet bersama dan pembagian saham tiap pemilik.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
-<link rel="stylesheet" href="assets/style.css?v=3">
+<script>
+  // Sama alasannya dengan app.js di bawah: Pages menahan aset 600 detik, dan
+  // nomor versi yang ditulis tangan gampang lupa dinaikkan — CSS baru tidak
+  // terpakai dan halamannya tampil tanpa gaya yang baru ditulis.
+  document.write('<link rel="stylesheet" href="assets/style.css?v='
+    + Math.floor(Date.now() / 600000) + '">');
+</script>
 </head>
 <body>
 

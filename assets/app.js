@@ -177,24 +177,28 @@ async function readWallet(cfg) {
   const price = await ethPrice();
   const pad = address.toLowerCase().replace('0x', '').padStart(64, '0');
 
+  // Satu pembacaan yang gagal TIDAK boleh dilewat diam-diam.
+  //
+  // Versi sebelumnya `continue` waktu RPC error: kalau semua panggilan gagal,
+  // saldo token terbaca $0, dan halamannya menampilkan nilai wallet minus
+  // seluruh isi dompet — dengan label "live", tanpa peringatan apa pun. Lebih
+  // baik seluruh pembacaan dianggap gagal supaya jatuh ke snapshot yang utuh.
   const holdings = [];
   for (const t of tokens || []) {
-    let raw;
-    try {
-      raw = t.address === 'native'
-        ? await rpcCall(rpc, 'eth_getBalance', [address, 'latest'])
-        : await rpcCall(rpc, 'eth_call', [{ to: t.address, data: '0x70a08231' + pad }, 'latest']);
-    } catch { continue; }
+    const raw = t.address === 'native'
+      ? await rpcCall(rpc, 'eth_getBalance', [address, 'latest'])
+      : await rpcCall(rpc, 'eth_call', [{ to: t.address, data: '0x70a08231' + pad }, 'latest']);
 
     const amount = Number(BigInt(raw || '0x0')) / 10 ** t.decimals;
     const unit = t.priceId === 'ethereum' ? price : Number(t.priceUsd ?? 0);
+    if (amount > 0 && unit == null) throw new Error(`harga ${t.symbol} tidak terbaca`);
     // Debu sisa swap — 1e-18 WETH itu $0,0000000000000025. Barisnya cuma bikin
     // tabel ramai tanpa menambah apa-apa.
-    if (amount <= 0 || (unit != null && amount * unit < 0.01)) continue;
-    holdings.push({ symbol: t.symbol, amount, price: unit, usd: unit == null ? null : amount * unit });
+    if (amount <= 0 || amount * unit < 0.01) continue;
+    holdings.push({ symbol: t.symbol, amount, price: unit, usd: amount * unit });
   }
 
-  const totalUsd = holdings.reduce((s, h) => s + (h.usd || 0), 0);
+  const totalUsd = holdings.reduce((s, h) => s + h.usd, 0);
   return { totalUsd, holdings, ethPrice: price };
 }
 
@@ -285,6 +289,7 @@ async function resolveNav(cfg, { force = false } = {}) {
       history,
       stats,
       lpUsd,
+      liveUsd: (snap.holdings || []).reduce((sum, h) => sum + (Number(h.usd) || 0), 0),
       updatedAt: Number(snap.updatedAt) || null,
       lpStale: snapAge != null && snapAge > 45 * 60e3,
       fetchedAt: Date.now(),
@@ -504,6 +509,57 @@ function splitSections(text) {
   return { lead, sections };
 }
 
+/**
+ * Baris lanjutan digabung ke barisnya sendiri.
+ *
+ * Satu posisi ditulis bot dalam empat baris: judul, nilai, tick, lalu alasan.
+ * Di Telegram itu enak dibaca karena lebarnya tetap; di halaman yang bisa
+ * selebar apa saja, empat baris menjorok itu jadi tangga yang berantakan dan
+ * memaksa scroll ke samping. Digabung jadi satu kalimat, teksnya membungkus
+ * sendiri mengikuti lebar layar.
+ */
+function foldEntries(lines) {
+  const out = [];
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    if (/^\s/.test(line) && out.length) out[out.length - 1] += ' · ' + line.trim();
+    else out.push(line.trim());
+  }
+  return out;
+}
+
+function rowsHtml(lines) {
+  return foldEntries(lines)
+    .map((l) => `<div class="hb-row ${lineClass(l)}">${esc(l)}</div>`)
+    .join('');
+}
+
+function reportHtml(text) {
+  const { lead, sections } = splitSections(text);
+  const head = lead.filter((l) => l.trim());
+  const title = head.shift() || '💓 REBORN-RICH HEARTBEAT';
+  const uptime = head.find((l) => /Uptime/.test(l)) || '';
+  const subs = head.filter((l) => l !== uptime);
+
+  // Baris terakhir laporan adalah ringkasan jadwal, bukan isi bagian mana pun.
+  const lastSection = sections[sections.length - 1];
+  const tail = lastSection?.lines.filter((l) => l.trim()).slice(-1)[0];
+  const foot = tail && /position\(s\) active/.test(tail)
+    ? lastSection.lines.splice(lastSection.lines.lastIndexOf(tail), 1)[0]
+    : null;
+
+  return `<div class="hb-lead">
+      <div class="t">${esc(title)}</div>
+      ${subs.map((l) => `<div class="s">${esc(l)}</div>`).join('')}
+      ${uptime ? `<div class="u">${esc(uptime.trim())}</div>` : ''}
+    </div>`
+    + sections.map((sec) => {
+      const rows = rowsHtml(sec.lines);
+      return rows ? `<div class="hb-sec"><h3>${esc(sec.title)}</h3><div class="hb-body">${rows}</div></div>` : '';
+    }).join('')
+    + (foot ? `<div class="hb-foot">${esc(foot.trim())}</div>` : '');
+}
+
 function renderHeartbeat(hb) {
   const body = $('#hbBody');
   if (!hb?.text) {
@@ -512,29 +568,16 @@ function renderHeartbeat(hb) {
     return;
   }
 
-  const { lead, sections } = splitSections(hb.text);
-  const head = lead.filter((l) => l.trim());
-  const title = head.shift() || '💓 REBORN-RICH HEARTBEAT';
-  const uptime = head.find((l) => /Uptime/.test(l)) || '';
-  const subs = head.filter((l) => l !== uptime);
+  const archive = (hb.archive || []).filter((r) => r?.text).slice(0, 10);
 
-  // Baris terakhir laporan adalah ringkasan jadwal, bukan isi bagian mana pun.
-  const tail = sections.length && sections[sections.length - 1].lines.slice(-1)[0];
-  const foot = tail && /position\(s\) active/.test(tail) ? sections[sections.length - 1].lines.pop() : null;
-
-  body.innerHTML = `<div class="hb-lead">
-      <div class="t">${esc(title)}</div>
-      ${subs.map((l) => `<div class="s">${esc(l)}</div>`).join('')}
-      ${uptime ? `<div class="u">${esc(uptime.trim())}</div>` : ''}
-    </div>`
-    + sections.map((sec) => {
-      const rows = sec.lines.filter((l, i, a) => l.trim() || (i && a[i - 1].trim()));
-      if (!rows.length) return '';
-      return `<div class="hb-sec"><h3>${esc(sec.title)}</h3><pre>`
-        + rows.map((l) => `<span class="hb-l ${lineClass(l)}">${esc(l) || '&nbsp;'}</span>`).join('')
-        + '</pre></div>';
-    }).join('')
-    + (foot ? `<div class="hb-foot">${esc(foot.trim())}</div>` : '');
+  body.innerHTML = reportHtml(hb.text)
+    + (archive.length
+      ? `<details class="hb-arsip"><summary>Laporan sebelumnya (${archive.length})</summary>`
+        + archive.map((r) => `<details class="hb-old"><summary>${esc(r.generatedAt || '—')}</summary>`
+            + `<div class="hb-body">${rowsHtml(r.text.split('\n').filter((l) => !/^━+$/.test(l.trim())))}</div>`
+            + '</details>').join('')
+        + '</details>'
+      : '');
 
   const when = hb.generatedAt || '—';
   $('#hbHint').textContent = `${when} · diambil ${ago(hb.updatedAt)}`
