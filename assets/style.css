@@ -183,3 +183,31 @@ code { font-family: var(--mono); font-size: .92em; color: var(--accent); }
 .cal-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
             display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
 .cal-foot b { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ── tab ─────────────────────────────────────────────────────────────── */
+.tabs { display: flex; gap: 4px; margin: 16px 0 0; border-bottom: 1px solid var(--line); }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted);
+               font: 600 13.5px var(--sans); padding: 10px 16px; cursor: pointer; margin-bottom: -1px; }
+.tabs button:hover { color: var(--text); }
+.tabs button.on { color: var(--text); border-bottom-color: var(--accent); }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+
+/* ── laporan bot ─────────────────────────────────────────────────────── */
+.hb { display: flex; flex-direction: column; gap: 14px; }
+.hb-lead { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: #0f1319; }
+.hb-lead .t { font: 600 17px var(--sans); letter-spacing: -.2px; }
+.hb-lead .s { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.hb-lead .u { color: var(--accent); font: 600 12.5px var(--mono); margin-top: 8px; }
+.hb-sec { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.hb-sec > h3 { margin: 0; padding: 9px 14px; font: 600 11px var(--sans); letter-spacing: .8px;
+               text-transform: uppercase; color: var(--muted); background: #0f1319;
+               border-bottom: 1px solid var(--line); }
+.hb-sec > pre { margin: 0; border: 0; border-radius: 0; background: transparent; padding: 12px 14px;
+                font: 12px/1.65 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.hb-l { display: block; }
+.hb-in { color: var(--accent); }
+.hb-wait { color: var(--amber); }
+.hb-bad { color: var(--red); }
+.hb-good { color: var(--accent); }
+.hb-det { color: var(--muted); }
+.hb-foot { color: var(--muted); font-size: 12px; text-align: center; padding-top: 4px; }

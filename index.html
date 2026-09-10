@@ -35,7 +35,14 @@
     <span class="strip-item"><span class="led"></span><b>Bagi hasil</b> dihitung ulang tiap data masuk</span>
   </div>
 
+  <nav class="tabs" id="tabs" role="tablist">
+    <button role="tab" data-tab="portfolio" class="on" aria-selected="true">Portofolio</button>
+    <button role="tab" data-tab="bot" aria-selected="false">💓 Bot</button>
+  </nav>
+
   <div id="banner" class="banner" hidden></div>
+
+  <div id="tab-portfolio">
 
   <!-- ── ringkasan ─────────────────────────────────────────── -->
   <section class="grid grid-4" id="summary">
@@ -228,6 +235,18 @@
       </table>
     </div>
   </section>
+
+  </div><!-- /tab-portfolio -->
+
+  <div id="tab-bot" hidden>
+    <section class="card" id="hbCard">
+      <div class="card-head">
+        <h2>Laporan bot</h2>
+        <span class="hint" id="hbHint">memuat…</span>
+      </div>
+      <div id="hbBody" class="hb"></div>
+    </section>
+  </div><!-- /tab-bot -->
 
   <footer class="foot">
     <span>Data on-chain read-only dari <span id="footSrc">RPC publik</span>. Tidak ada private key di situs ini.</span>

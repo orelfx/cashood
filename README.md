@@ -177,6 +177,34 @@ terakhir sejam sekali, lebih tua dari itu sehari sekali.
 
 ---
 
+## Tab Bot — laporan heartbeat
+
+Tab **💓 Bot** nampilin laporan yang dikirim bot ke Telegram tiap jam, apa
+adanya: posisi yang lagi jalan, tick range, fee yang belum dipanen, hasil
+screening, hall of fame/shame, sampai jadwal cron-nya.
+
+Alurnya:
+
+1. Bot nulis salinan laporannya ke `.state/heartbeat.json` tiap kali ngirim ke
+   Telegram (satu blok `try/catch` di `heartbeat.js` — gagal nulis tidak
+   menghentikan denyut).
+2. `scripts/heartbeat.mjs` di sini nyalin teks itu ke `data/heartbeat.json`.
+3. `publish.sh` push, situs baca.
+
+Kalau salinannya belum ada, script-nya nyusun ulang laporan lewat `gather()` +
+`renderReport()` punya bot — sama isinya, tapi baris `Agent`, `Uptime`, `Model`
+dan `RPC calls` dibuang karena angka itu milik proses bot yang lagi jalan, bukan
+milik proses yang cuma numpang render. Situs kasih tanda kalau lagi mode ini.
+
+**Yang diambil cuma teks laporan itu.** Tidak ada `.env`, tidak ada log, tidak
+ada kunci. Sebelum nulis, script-nya nyaring: kalau nemu sesuatu sepanjang
+private key, seed phrase, token bot, atau nama variabel rahasia — dia berhenti
+dan tidak nerbitin apa-apa.
+
+Cron: `7 * * * *` (bot kirim heartbeat menit :04).
+
+---
+
 ## Riwayat profit
 
 Kartu **Riwayat profit** ambil angka dari buku posisi bot — semua posisi yang
@@ -211,7 +239,9 @@ assets/app.js         ledger unit, ambil data, render
 data/config.json      pemilik + riwayat transaksi  <- yang kamu edit
 data/live.json        snapshot bot (otomatis)
 data/nav.json         deret nilai wallet (otomatis)
+data/heartbeat.json   laporan bot terakhir (otomatis)
 scripts/sync.mjs      bikin live.json + nav.json dari bot
 scripts/record.mjs    catat setoran / penarikan
+scripts/heartbeat.mjs ambil laporan bot
 scripts/publish.sh    sync + commit + push
 ```

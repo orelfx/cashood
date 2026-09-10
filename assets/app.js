@@ -461,6 +461,113 @@ function renderCalc() {
 
 
 
+
+/* ── laporan bot ─────────────────────────────────────────────────────────
+ *
+ * Teksnya diambil apa adanya dari laporan yang bot kirim ke Telegram tiap jam.
+ * Yang dilakukan di sini cuma memecahnya jadi bagian-bagian dan mewarnai baris
+ * per baris — tidak ada angka yang dihitung ulang, tidak ada kalimat yang
+ * ditulis ulang, supaya yang dibaca orang di sini sama dengan yang dibaca
+ * operatornya di Telegram.
+ */
+
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function lineClass(line) {
+  const t = line.trim();
+  if (/^🟢/.test(t)) return 'hb-in';
+  if (/^(⏳|⚠️)/.test(t)) return 'hb-wait';
+  if (/^(💀|🔴)/.test(t)) return 'hb-bad';
+  if (/^🏆/.test(t)) return 'hb-good';
+  if (/^\s+/.test(line)) return 'hb-det';
+  return '';
+}
+
+/** Pecah laporan jadi bagian: judul diapit garis ━ di atas dan di bawahnya. */
+function splitSections(text) {
+  const lines = text.split('\n');
+  const rule = (l) => /^━+$/.test(l.trim());
+  const lead = [];
+  const sections = [];
+  let current = null;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    if (rule(lines[i]) && lines[i + 1] && !rule(lines[i + 1]) && rule(lines[i + 2] || '')) {
+      current = { title: lines[i + 1].trim(), lines: [] };
+      sections.push(current);
+      i += 2;
+      continue;
+    }
+    if (rule(lines[i])) continue;                       // garis penutup tanpa judul
+    (current ? current.lines : lead).push(lines[i]);
+  }
+  return { lead, sections };
+}
+
+function renderHeartbeat(hb) {
+  const body = $('#hbBody');
+  if (!hb?.text) {
+    body.innerHTML = '<p class="hint">Belum ada laporan. Jalankan <code>scripts/heartbeat.mjs</code>.</p>';
+    $('#hbHint').textContent = 'belum ada data';
+    return;
+  }
+
+  const { lead, sections } = splitSections(hb.text);
+  const head = lead.filter((l) => l.trim());
+  const title = head.shift() || '💓 REBORN-RICH HEARTBEAT';
+  const uptime = head.find((l) => /Uptime/.test(l)) || '';
+  const subs = head.filter((l) => l !== uptime);
+
+  // Baris terakhir laporan adalah ringkasan jadwal, bukan isi bagian mana pun.
+  const tail = sections.length && sections[sections.length - 1].lines.slice(-1)[0];
+  const foot = tail && /position\(s\) active/.test(tail) ? sections[sections.length - 1].lines.pop() : null;
+
+  body.innerHTML = `<div class="hb-lead">
+      <div class="t">${esc(title)}</div>
+      ${subs.map((l) => `<div class="s">${esc(l)}</div>`).join('')}
+      ${uptime ? `<div class="u">${esc(uptime.trim())}</div>` : ''}
+    </div>`
+    + sections.map((sec) => {
+      const rows = sec.lines.filter((l, i, a) => l.trim() || (i && a[i - 1].trim()));
+      if (!rows.length) return '';
+      return `<div class="hb-sec"><h3>${esc(sec.title)}</h3><pre>`
+        + rows.map((l) => `<span class="hb-l ${lineClass(l)}">${esc(l) || '&nbsp;'}</span>`).join('')
+        + '</pre></div>';
+    }).join('')
+    + (foot ? `<div class="hb-foot">${esc(foot.trim())}</div>` : '');
+
+  const when = hb.generatedAt || '—';
+  $('#hbHint').textContent = `${when} · diambil ${ago(hb.updatedAt)}`
+    + (hb.source === 'rendered' ? ' · disusun ulang di luar proses bot (uptime & mode tidak ikut)' : '');
+}
+
+async function loadHeartbeat(cfg) {
+  const urls = [cfg?.app?.heartbeatUrl, 'data/heartbeat.json'].filter(Boolean);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) continue;
+      const j = await res.json();
+      if (j?.text) return j;
+    } catch { /* coba sumber berikutnya */ }
+  }
+  return null;
+}
+
+/* ── tab ─────────────────────────────────────────────────────────────── */
+
+function showTab(name) {
+  const bot = name === 'bot';
+  $('#tab-portfolio').hidden = bot;
+  $('#tab-bot').hidden = !bot;
+  document.querySelectorAll('#tabs button').forEach((b) => {
+    const on = b.getAttribute('data-tab') === name;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-selected', String(on));
+  });
+  if (location.hash.slice(1) !== name) history.replaceState(null, '', bot ? '#bot' : location.pathname);
+}
+
 /* ── nilai wallet dari waktu ke waktu ────────────────────────────────────
  *
  * Deret ini dikumpulkan sendiri oleh scripts/sync.mjs, satu titik tiap kali
@@ -606,7 +713,10 @@ const M_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 
 const parseDay = (iso) => { const [y, m, d] = iso.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
 const fmtDay = (iso) => { const d = parseDay(iso); return `${d.getUTCDate()} ${M_SHORT[d.getUTCMonth()]}`; };
 
-function history() {
+// Namanya bukan `history` karena itu nama milik browser — fungsi dengan nama
+// itu menutupi window.history di seluruh berkas, dan tab bar yang memanggil
+// history.replaceState akan mati tanpa suara.
+function profitDays() {
   return (state.nav?.history || []).filter((r) => r && r.date);
 }
 
@@ -726,7 +836,7 @@ function renderChart(buckets) {
 }
 
 function renderCalendar() {
-  const rows = history();
+  const rows = profitDays();
   const map = new Map(rows.map((r) => [r.date, r]));
   const months = [...new Set(rows.map((r) => r.date.slice(0, 7)))].sort();
   if (!view.month || !months.includes(view.month)) view.month = months[months.length - 1] || new Date().toISOString().slice(0, 7);
@@ -784,7 +894,7 @@ function renderStats() {
 let historyRetried = false;
 
 function renderProfit() {
-  const rows = history();
+  const rows = profitDays();
   $('#profitCard').hidden = false;
 
   if (!rows.length) {
@@ -842,7 +952,7 @@ function wireProfitControls() {
   pick('#segRange', 'data-r', (v) => { view.rangeDays = Number(v); });
 
   const hop = (dir) => {
-    const months = [...new Set(history().map((r) => r.date.slice(0, 7)))].sort();
+    const months = [...new Set(profitDays().map((r) => r.date.slice(0, 7)))].sort();
     const i = months.indexOf(view.month) + dir;
     if (i >= 0 && i < months.length) { view.month = months[i]; renderCalendar(); }
   };
@@ -870,12 +980,14 @@ async function load({ force = false } = {}) {
   btn.disabled = true;
   btn.textContent = 'memuat…';
   try {
-    const [nav, series] = await Promise.all([
+    const [nav, series, hb] = await Promise.all([
       resolveNav(state.cfg, { force }),
       readNavSeries(state.cfg),
+      loadHeartbeat(state.cfg),
     ]);
     state.nav = nav;
     if (series.length) navPoints = series;
+    renderHeartbeat(hb);
     const msgs = [...state.ledger.warnings];
     if (state.nav.partial) msgs.push('Nilai posisi LP belum ikut dihitung — yang tampil cuma token di dalam wallet. Jalankan scripts/sync.mjs biar lengkap.');
     if (state.nav.lpStale) msgs.push(`Nilai posisi LP terakhir dihitung ${ago(state.nav.updatedAt)} — bagian itu bisa ketinggalan. Saldo token tetap live.`);
@@ -914,6 +1026,13 @@ async function init() {
   };
   $('#refreshBtn').onclick = () => load({ force: true });
   wireProfitControls();
+
+  $('#tabs').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (btn) showTab(btn.getAttribute('data-tab'));
+  };
+  window.addEventListener('hashchange', () => showTab(location.hash === '#bot' ? 'bot' : 'portfolio'));
+  showTab(location.hash === '#bot' ? 'bot' : 'portfolio');
   $('#wdAmount').oninput = renderCalc;
   $('#wdMode').onchange = renderCalc;
   $('#wdOwner').onchange = renderCalc;
