@@ -122,3 +122,64 @@ code { font-family: var(--mono); font-size: .92em; color: var(--accent); }
 .foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
         color: var(--muted); font-size: 12px; padding: 8px 2px 0; }
 .skel { color: var(--muted); }
+
+/* ── strip status update ─────────────────────────────────────────────── */
+.strip { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center;
+         padding: 12px 16px; margin-top: 16px; border: 1px solid var(--line);
+         border-radius: 12px; background: #0f1319; font-size: 12.5px; color: var(--muted); }
+.strip-item { display: flex; align-items: center; gap: 7px; }
+.strip-item b { color: var(--text); font-weight: 600; }
+.led { width: 7px; height: 7px; border-radius: 50%; background: #3a4552; flex: none; }
+.led.live { background: var(--accent); box-shadow: 0 0 0 3px rgba(74,222,128,.14); }
+.led.lp { background: var(--blue); box-shadow: 0 0 0 3px rgba(96,165,250,.14); }
+
+/* ── panel statistik ─────────────────────────────────────────────────── */
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
+         background: var(--line); border: 1px solid var(--line); border-radius: 12px;
+         overflow: hidden; margin-bottom: 16px; }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+.stat { background: var(--card); padding: 12px 14px; }
+.stat .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .6px; }
+.stat .v { font: 600 17px/1.3 var(--mono); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.stat .n { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+
+/* ── segmented control ───────────────────────────────────────────────── */
+.controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.seg { display: inline-flex; background: var(--bg-soft); border: 1px solid var(--line);
+       border-radius: 10px; padding: 3px; gap: 3px; }
+.seg button { background: none; border: 0; color: var(--muted); cursor: pointer;
+              font: 500 12.5px var(--sans); padding: 6px 12px; border-radius: 7px; }
+.seg button:hover { color: var(--text); }
+.seg button.on { background: #222b36; color: var(--text); }
+.seg button:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── grafik ──────────────────────────────────────────────────────────── */
+.chart-wrap { position: relative; }
+.chart-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+.tip { position: absolute; pointer-events: none; z-index: 5; transform: translate(-50%, -100%);
+       background: #0b0e13; border: 1px solid #2b3543; border-radius: 9px; padding: 8px 11px;
+       font-size: 12px; white-space: nowrap; box-shadow: 0 8px 22px rgba(0,0,0,.5); }
+.tip .t-d { color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+.tip .t-v { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; }
+.tip .t-n { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.g-grid { stroke: #1e2530; stroke-width: 1; }
+.g-zero { stroke: #384352; stroke-width: 1; }
+.g-lbl { fill: #8b97a8; font: 11px ui-monospace, monospace; }
+.g-cap { fill: #e7ecf3; font: 600 11px ui-monospace, monospace; }
+
+/* ── kalender ────────────────────────────────────────────────────────── */
+.cal-head { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 12px; }
+.cal-head strong { font-size: 14px; }
+.cal-dow, .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal-dow { margin-bottom: 6px; }
+.cal-dow span { text-align: center; color: var(--muted); font-size: 11px;
+                text-transform: uppercase; letter-spacing: .5px; }
+.cell { border: 1px solid var(--line); border-radius: 9px; min-height: 58px; padding: 7px 8px;
+        display: flex; flex-direction: column; justify-content: space-between; }
+.cell.void { border-style: dashed; opacity: .35; }
+.cell .d { font-size: 11.5px; color: var(--muted); }
+.cell .a { font: 600 12px var(--mono); font-variant-numeric: tabular-nums; }
+.cell .c { font-size: 10.5px; color: var(--muted); }
+.cal-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
+            display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+.cal-foot b { font-family: var(--mono); font-variant-numeric: tabular-nums; }

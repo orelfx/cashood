@@ -30,6 +30,7 @@ const { bookValueUsd, readBook } = await load('manager.js');
 const { balanceOf } = await load('venue/quote.js');
 const { ethUsd } = await load('venue/price.js');
 const { getWallet } = await load('chain/signer.js');
+const { getClosed } = await load('store.js');
 const { NATIVE, USDG, WETH } = await load('chain/addresses.js');
 
 const wallet = getWallet('multi');
@@ -63,6 +64,53 @@ for (const book of await readBook()) {
   }
 }
 
+// ─── riwayat profit yang sudah terkunci (posisi yang ditutup) ─────────────
+const closed = getClosed({ limit: 5000 }).filter((r) => Number.isFinite(Number(r.netUsd)));
+
+const byDay = new Map();
+let wins = 0, losses = 0, graded = 0;
+const bases = [];
+
+for (const r of closed) {
+  const netUsd = Number(r.netUsd);
+  const day = new Date(Number(r.closedAt) || 0).toISOString().slice(0, 10);
+  const row = byDay.get(day) || { date: day, usd: 0, closes: 0, wins: 0 };
+  row.usd += netUsd;
+  row.closes += 1;
+
+  const pct = Number(r.netPct);
+  if (Number.isFinite(pct)) {
+    graded += 1;
+    if (pct > 0.005) { wins += 1; row.wins += 1; }
+    else if (pct < -0.005) losses += 1;
+    // Modal per posisi tidak disimpan dalam dolar, tapi netUsd/netPct memberi
+    // angka yang sama tanpa perlu tahu token kuotenya apa.
+    if (Math.abs(pct) > 1e-6) bases.push(Math.abs(netUsd / pct));
+  }
+  byDay.set(day, row);
+}
+
+const history = [...byDay.values()]
+  .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)) }))
+  .sort((a, b) => a.date.localeCompare(b.date));
+
+const realisedUsd = history.reduce((s, r) => s + r.usd, 0);
+const best = history.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
+const worst = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), null);
+
+const stats = {
+  closedCount: closed.length,
+  winRate: graded ? Number(((wins / graded) * 100).toFixed(2)) : null,
+  wins,
+  losses,
+  avgInvestedUsd: bases.length ? Number((bases.reduce((s, b) => s + b, 0) / bases.length).toFixed(2)) : null,
+  realisedUsd: Number(realisedUsd.toFixed(2)),
+  bestDay: best ? { date: best.date, usd: best.usd } : null,
+  worstDay: worst ? { date: worst.date, usd: worst.usd } : null,
+  openCount: positions.length,
+  unrealisedUsd: Number(positions.reduce((s, p) => s + (Number(p.feesUsd) || 0), 0).toFixed(2)),
+};
+
 const totalUsd = await bookValueUsd('multi');
 if (!Number.isFinite(totalUsd) || totalUsd <= 0) throw new Error(`bookValueUsd tidak masuk akal: ${totalUsd}`);
 
@@ -73,9 +121,12 @@ const snapshot = {
   ethPrice: price,
   holdings,
   positions,
+  history,
+  stats,
 };
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(snapshot, null, 2) + '\n');
-console.log(`[cashood] ${new Date().toISOString()} total=$${snapshot.totalUsd} positions=${positions.length} -> ${OUT}`);
+console.log(`[cashood] ${new Date().toISOString()} total=$${snapshot.totalUsd} positions=${positions.length}`
+  + ` closed=${stats.closedCount} realised=$${stats.realisedUsd} -> ${OUT}`);
 process.exit(0);

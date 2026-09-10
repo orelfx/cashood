@@ -29,6 +29,12 @@
 
 <main class="wrap">
 
+  <div class="strip" id="strip">
+    <span class="strip-item"><span class="led live"></span><b>Saldo token</b> <span id="stripToken">live dari chain</span></span>
+    <span class="strip-item"><span class="led lp"></span><b>Nilai LP</b> <span id="stripLp">—</span></span>
+    <span class="strip-item"><span class="led"></span><b>Bagi hasil</b> dihitung ulang tiap data masuk</span>
+  </div>
+
   <div id="banner" class="banner" hidden></div>
 
   <!-- ── ringkasan ─────────────────────────────────────────── -->
@@ -85,6 +91,46 @@
         </table>
       </div>
     </div>
+  </section>
+
+  <!-- ── riwayat profit ────────────────────────────────────── -->
+  <section class="card" id="profitCard">
+    <div class="card-head">
+      <h2>Riwayat profit</h2>
+      <span class="hint" id="profitHint"></span>
+    </div>
+
+    <div class="stats" id="profitStats"></div>
+
+    <div class="controls">
+      <div class="seg" id="segView" role="group" aria-label="Tampilan">
+        <button data-v="chart" class="on">grafik</button><button data-v="cal">kalender</button>
+      </div>
+      <div class="seg" id="segBucket" role="group" aria-label="Kelompok waktu">
+        <button data-b="day" class="on">harian</button><button data-b="week">mingguan</button><button data-b="month">bulanan</button>
+      </div>
+      <div class="seg" id="segRange" role="group" aria-label="Rentang">
+        <button data-r="7" class="on">7 hari</button><button data-r="30">30 hari</button><button data-r="0">semua</button>
+      </div>
+    </div>
+
+    <div class="chart-wrap" id="chartWrap">
+      <svg id="profitChart" viewBox="0 0 720 280" role="img" aria-label="Profit terkunci per periode"></svg>
+      <div class="tip" id="chartTip" hidden></div>
+    </div>
+
+    <div id="calWrap" hidden>
+      <div class="cal-head">
+        <button class="btn ghost" id="calPrev" aria-label="Bulan sebelumnya">‹</button>
+        <strong id="calTitle">—</strong>
+        <button class="btn ghost" id="calNext" aria-label="Bulan berikutnya">›</button>
+      </div>
+      <div class="cal-dow" id="calDow"></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-foot" id="calFoot"></div>
+    </div>
+
+    <p class="hint" id="profitNote"></p>
   </section>
 
   <!-- ── kalkulator tarik ──────────────────────────────────── -->

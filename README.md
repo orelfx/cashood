@@ -144,6 +144,31 @@ Jangan dibikin lebih rapat dari 10 menit: GitHub Pages punya batas lunak
 
 ---
 
+## Riwayat profit
+
+Kartu **Riwayat profit** ambil angka dari buku posisi bot — semua posisi yang
+sudah ditutup, dikelompokkan per hari.
+
+- **Grafik**: batang naik = untung, turun = rugi. Bisa harian / mingguan /
+  bulanan, rentang 7 hari / 30 hari / semua. Arahkan kursor ke batangnya buat
+  lihat jumlah dan berapa posisi yang ditutup hari itu.
+- **Kalender**: satu kotak satu hari, ala LP Agent. Warna makin pekat makin
+  besar angkanya, dan tandanya tetap ditulis (`+`/`−`) biar tidak cuma
+  mengandalkan warna.
+- **Statistik**: profit terkunci, win rate, jumlah posisi ditutup, rata-rata
+  modal per posisi, hari terbaik.
+
+Yang dihitung di kartu ini cuma profit yang **sudah terkunci**. Untung/rugi
+posisi yang masih jalan tidak dicampur ke situ — bagian itu sudah kehitung di
+**Nilai sekarang** paling atas. Makanya angkanya bisa beda jauh sama LP Agent:
+mereka pakai basis dan perhitungan fee sendiri.
+
+> LP Agent tidak dipakai sebagai sumber data — API-nya ditutup Cloudflare, tidak
+> ada endpoint gratis yang bisa dipanggil browser. Semua angka di sini datang
+> dari RPC publik dan buku posisi bot sendiri.
+
+---
+
 ## Isi folder
 
 ```
