@@ -48,8 +48,8 @@ const holdings = [
   { symbol: 'USDG', amount: Number(usdg) / 1e6, price: 1 },
   { symbol: 'WETH', amount: Number(weth) / 1e18, price },
 ]
-  .filter((h) => h.amount > 0)
-  .map((h) => ({ ...h, usd: h.price == null ? null : h.amount * h.price }));
+  .map((h) => ({ ...h, usd: h.price == null ? null : h.amount * h.price }))
+  .filter((h) => h.usd == null || h.usd >= 0.01);            // buang debu sisa swap
 
 const positions = [];
 for (const book of await readBook()) {

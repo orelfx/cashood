@@ -188,7 +188,9 @@ async function readWallet(cfg) {
 
     const amount = Number(BigInt(raw || '0x0')) / 10 ** t.decimals;
     const unit = t.priceId === 'ethereum' ? price : Number(t.priceUsd ?? 0);
-    if (amount <= 0) continue;
+    // Debu sisa swap — 1e-18 WETH itu $0,0000000000000025. Barisnya cuma bikin
+    // tabel ramai tanpa menambah apa-apa.
+    if (amount <= 0 || (unit != null && amount * unit < 0.01)) continue;
     holdings.push({ symbol: t.symbol, amount, price: unit, usd: unit == null ? null : amount * unit });
   }
 
