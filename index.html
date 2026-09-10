@@ -6,7 +6,7 @@
 <title>cashood — shared wallet tracker</title>
 <meta name="description" content="Pantau saldo wallet bersama dan pembagian saham tiap pemilik.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=3">
 </head>
 <body>
 
@@ -219,6 +219,14 @@
 
 </main>
 
-<script src="assets/app.js"></script>
+<script>
+  // GitHub Pages menyajikan aset dengan cache-control 600 detik. Kalau tag-nya
+  // statis, browser bisa menjalankan kode lama sampai sepuluh menit setelah
+  // deploy — dan itu tampil sebagai kartu kosong, bukan sebagai error. Nomor
+  // versi yang berganti tiap 10 menit bikin cache-nya lepas sendiri.
+  const s = document.createElement('script');
+  s.src = 'assets/app.js?v=' + Math.floor(Date.now() / 600000);
+  document.body.appendChild(s);
+</script>
 </body>
 </html>

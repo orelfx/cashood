@@ -11,7 +11,7 @@
 
 const CONFIG_URL = 'data/config.json';
 const LIVE_URL = 'data/live.json';
-const CACHE_KEY = 'cashood.nav.v2';
+const CACHE_KEY = 'cashood.nav.v3';
 
 const $ = (sel) => document.querySelector(sel);
 const state = { cfg: null, ledger: null, nav: null };
@@ -652,12 +652,27 @@ function renderStats() {
   ].join('');
 }
 
+let historyRetried = false;
+
 function renderProfit() {
   const rows = history();
   $('#profitCard').hidden = false;
 
   if (!rows.length) {
-    $('#profitHint').textContent = 'butuh snapshot bot — jalankan scripts/sync.mjs';
+    // NAV bisa datang dari cache lama yang belum kenal riwayat profit. Daripada
+    // menyuruh orang jalanin script yang sebenarnya sudah jalan, ambil sendiri
+    // snapshotnya sekali lalu gambar ulang.
+    if (!historyRetried) {
+      historyRetried = true;
+      readSnapshot(state.cfg).then((snap) => {
+        if (!snap?.history?.length) return;
+        state.nav.history = snap.history;
+        state.nav.stats = snap.stats || state.nav.stats;
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(state.nav)); } catch { /* mode privat */ }
+        renderProfit();
+      }).catch(() => {});
+    }
+    $('#profitHint').textContent = 'mengambil riwayat dari snapshot…';
     $('#profitStats').innerHTML = '';
     $('#chartWrap').hidden = true;
     $('#profitNote').textContent = '';
