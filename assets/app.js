@@ -14,6 +14,29 @@ const LIVE_URL = 'data/live.json';
 const CACHE_KEY = 'cashood.nav.v3';
 
 const $ = (sel) => document.querySelector(sel);
+
+/**
+ * Alamat file data di raw.githubusercontent, dihitung dari alamat halamannya.
+ *
+ * Ditulis di config, alamat ini memuat nama pemilik dan nama repo secara
+ * harfiah — repo yang di-rename atau di-fork akan tetap membaca data milik
+ * repo lama, diam-diam, sampai ada yang sadar angkanya tidak pernah berubah.
+ * Di GitHub Pages kedua nama itu sudah ada di URL halaman, jadi lebih baik
+ * dibaca dari sana. Config tetap dipakai kalau situsnya di domain sendiri.
+ */
+function rawDataBase() {
+  const host = location.hostname.match(/^([^.]+)\.github\.io$/);
+  if (!host) return null;
+  const repo = location.pathname.split('/').filter(Boolean)[0];
+  if (!repo) return null;
+  return `https://raw.githubusercontent.com/${host[1]}/${repo}/main/data/`;
+}
+
+/** URL sumber data: turunan dari alamat halaman dulu, config sebagai cadangan. */
+function dataUrls(cfg, file, configured) {
+  const base = rawDataBase();
+  return [base ? base + file : null, configured, 'data/' + file].filter(Boolean);
+}
 const state = { cfg: null, ledger: null, nav: null };
 
 /* ── format ──────────────────────────────────────────────────────────── */
@@ -210,7 +233,7 @@ async function readWallet(cfg) {
  * gagal, jatuh ke salinan yang ikut ke-deploy bareng situsnya.
  */
 async function readSnapshot(cfg) {
-  const urls = [cfg?.app?.snapshotUrl, LIVE_URL].filter(Boolean);
+  const urls = dataUrls(cfg, 'live.json', cfg?.app?.snapshotUrl);
   let lastErr;
   for (const url of urls) {
     try {
@@ -598,7 +621,7 @@ async function refreshHeartbeat({ force = false } = {}) {
 }
 
 async function loadHeartbeat(cfg) {
-  const urls = [cfg?.app?.heartbeatUrl, 'data/heartbeat.json'].filter(Boolean);
+  const urls = dataUrls(cfg, 'heartbeat.json', cfg?.app?.heartbeatUrl);
   for (const url of urls) {
     try {
       const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
@@ -637,7 +660,7 @@ const navView = { hours: 24 };
 let navPoints = [];
 
 async function readNavSeries(cfg) {
-  const urls = [cfg?.app?.navUrl, 'data/nav.json'].filter(Boolean);
+  const urls = dataUrls(cfg, 'nav.json', cfg?.app?.navUrl);
   for (const url of urls) {
     try {
       const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });

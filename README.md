@@ -128,9 +128,15 @@ Kenapa LP tidak ikut live: nilainya tidak bisa dibaca dengan satu panggilan
 RPC. Butuh tick math + quoter per posisi — itu kerjaan bot, bukan browser.
 Jadi bagian itu dititip di snapshot.
 
-Situsnya baca snapshot dari `raw.githubusercontent.com` (diatur di
-`app.snapshotUrl`), bukan dari file yang ikut ke-deploy — begitu bot push,
-angkanya langsung kepakai tanpa nunggu GitHub Pages build ulang.
+Situsnya baca snapshot dari `raw.githubusercontent.com`, bukan dari file yang
+ikut ke-deploy — begitu bot push, angkanya kepakai tanpa nunggu Pages build
+ulang (CDN raw nahan maksimal 5 menit).
+
+Alamatnya **dihitung sendiri dari alamat halaman**: `orelfx.github.io/cashood`
+→ `raw.githubusercontent.com/orelfx/cashood/main/data/`. Jadi repo yang
+di-rename atau di-fork tetap baca datanya sendiri. `app.snapshotUrl`,
+`app.navUrl` dan `app.heartbeatUrl` di config cuma cadangan buat domain
+sendiri.
 
 Kalau RPC lagi mati, situs pakai snapshot bulat-bulat. Kalau snapshot yang
 hilang, situs tetap jalan dengan saldo token saja dan kasih peringatan bahwa
@@ -227,6 +233,12 @@ mereka pakai basis dan perhitungan fee sendiri.
 > LP Agent tidak dipakai sebagai sumber data — API-nya ditutup Cloudflare, tidak
 > ada endpoint gratis yang bisa dipanggil browser. Semua angka di sini datang
 > dari RPC publik dan buku posisi bot sendiri.
+
+---
+
+## Lisensi
+
+MIT — lihat [LICENSE](LICENSE).
 
 ---
 
