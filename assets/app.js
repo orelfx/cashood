@@ -690,7 +690,7 @@ function renderProfit() {
   else renderCalendar();
 
   const st = state.nav?.stats;
-  $('#profitHint').textContent = `${rows.length} hari ada transaksi · sumber: buku posisi bot`;
+  $('#profitHint').textContent = `${rows.length} hari ada transaksi · batas hari pakai jam WIB · sumber: buku posisi bot`;
   $('#profitNote').textContent = st
     ? `Yang dihitung di kartu ini cuma profit yang sudah terkunci. Untung/rugi ${st.openCount} posisi yang masih jalan belum masuk sini — bagian itu sudah ikut di "Nilai sekarang" paling atas.`
     : '';
@@ -734,6 +734,7 @@ function renderAll() {
 
 async function load({ force = false } = {}) {
   const btn = $('#refreshBtn');
+  historyRetried = false;
   btn.disabled = true;
   btn.textContent = 'memuat…';
   try {

@@ -67,13 +67,19 @@ for (const book of await readBook()) {
 // ─── riwayat profit yang sudah terkunci (posisi yang ditutup) ─────────────
 const closed = getClosed({ limit: 5000 }).filter((r) => Number.isFinite(Number(r.netUsd)));
 
+// Hari dihitung pakai jam Jakarta, bukan UTC. Posisi yang ditutup jam 2 pagi
+// WIB itu kejadian hari itu buat operatornya — kalau dibiarkan UTC, angkanya
+// mendarat di kotak kalender hari sebelumnya.
+const WIB_OFFSET = 7 * 3600e3;
+const dayKey = (ts) => new Date((Number(ts) || 0) + WIB_OFFSET).toISOString().slice(0, 10);
+
 const byDay = new Map();
 let wins = 0, losses = 0, graded = 0;
 const bases = [];
 
 for (const r of closed) {
   const netUsd = Number(r.netUsd);
-  const day = new Date(Number(r.closedAt) || 0).toISOString().slice(0, 10);
+  const day = dayKey(r.closedAt);
   const row = byDay.get(day) || { date: day, usd: 0, closes: 0, wins: 0 };
   row.usd += netUsd;
   row.closes += 1;
@@ -108,7 +114,8 @@ const stats = {
   bestDay: best ? { date: best.date, usd: best.usd } : null,
   worstDay: worst ? { date: worst.date, usd: worst.usd } : null,
   openCount: positions.length,
-  unrealisedUsd: Number(positions.reduce((s, p) => s + (Number(p.feesUsd) || 0), 0).toFixed(2)),
+  openFeesUsd: Number(positions.reduce((s, p) => s + (Number(p.feesUsd) || 0), 0).toFixed(2)),
+  timezone: 'Asia/Jakarta (UTC+7)',
 };
 
 const totalUsd = await bookValueUsd('multi');
