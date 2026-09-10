@@ -133,10 +133,20 @@ ikut ke-deploy — begitu bot push, angkanya kepakai tanpa nunggu Pages build
 ulang (CDN raw nahan maksimal 5 menit).
 
 Alamatnya **dihitung sendiri dari alamat halaman**: `orelfx.github.io/cashood`
-→ `raw.githubusercontent.com/orelfx/cashood/main/data/`. Jadi repo yang
-di-rename atau di-fork tetap baca datanya sendiri. `app.snapshotUrl`,
-`app.navUrl` dan `app.heartbeatUrl` di config cuma cadangan buat domain
-sendiri.
+→ `raw.githubusercontent.com/orelfx/cashood/data/`. Jadi repo yang di-rename
+atau di-fork tetap baca datanya sendiri. `app.snapshotUrl`, `app.navUrl` dan
+`app.heartbeatUrl` di config cuma cadangan buat domain sendiri.
+
+### Kenapa datanya di branch `data`, bukan `main`
+
+GitHub Pages membangun ulang situs tiap kali `main` berubah, dan batas
+lunaknya **10 build per jam**. Cron 10 menitan sendirian sudah makan 6 — pas
+ditambah beberapa push kode, jatahnya habis dan **semua** build gagal, termasuk
+yang bawa perbaikan. Kejadian beneran tanggal 10 Sep: situs nyangkut 25 menit
+di versi lama.
+
+Sekarang `live.json`, `nav.json` dan `heartbeat.json` tinggal di branch `data`
+yang tidak pernah memicu build. `main` cuma berubah kalau kodenya berubah.
 
 Kalau RPC lagi mati, situs pakai snapshot bulat-bulat. Kalau snapshot yang
 hilang, situs tetap jalan dengan saldo token saja dan kasih peringatan bahwa

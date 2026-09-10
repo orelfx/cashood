@@ -33,7 +33,10 @@ function rawDataBase() {
     if (!host) return null;
     const repo = String(location?.pathname || '').split('/').filter(Boolean)[0];
     if (!repo) return null;
-    return `https://raw.githubusercontent.com/${host[1]}/${repo}/main/data/`;
+    // Ref-nya branch `data`, bukan `main`: di situlah file yang berubah tiap
+    // sepuluh menit tinggal, supaya Pages tidak membangun ulang situs untuk
+    // setiap angka baru.
+    return `https://raw.githubusercontent.com/${host[1]}/${repo}/data/`;
   } catch {
     return null;
   }
