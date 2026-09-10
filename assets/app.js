@@ -25,11 +25,18 @@ const $ = (sel) => document.querySelector(sel);
  * dibaca dari sana. Config tetap dipakai kalau situsnya di domain sendiri.
  */
 function rawDataBase() {
-  const host = location.hostname.match(/^([^.]+)\.github\.io$/);
-  if (!host) return null;
-  const repo = location.pathname.split('/').filter(Boolean)[0];
-  if (!repo) return null;
-  return `https://raw.githubusercontent.com/${host[1]}/${repo}/main/data/`;
+  // Dibungkus: kalau membaca alamat halaman saja gagal (konteks aneh, iframe
+  // yang dikunci), yang boleh terjadi cuma kehilangan jalan pintas ini — bukan
+  // seluruh halaman gagal memuat data.
+  try {
+    const host = String(location?.hostname || '').match(/^([^.]+)\.github\.io$/);
+    if (!host) return null;
+    const repo = String(location?.pathname || '').split('/').filter(Boolean)[0];
+    if (!repo) return null;
+    return `https://raw.githubusercontent.com/${host[1]}/${repo}/main/data/`;
+  } catch {
+    return null;
+  }
 }
 
 /** URL sumber data: turunan dari alamat halaman dulu, config sebagai cadangan. */
