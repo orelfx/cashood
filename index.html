@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cashood — shared wallet tracker</title>
+<meta name="description" content="Pantau saldo wallet bersama dan pembagian saham tiap pemilik.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>cashood</h1>
+      <span class="tag" id="tagline">shared wallet tracker</span>
+    </div>
+    <div class="top-right">
+      <a class="addr" id="addrLink" href="#" target="_blank" rel="noopener" title="Lihat di explorer">
+        <span id="addrText">0x…</span>
+      </a>
+      <button class="btn ghost" id="copyBtn" title="Salin address">salin</button>
+      <button class="btn" id="refreshBtn" title="Ambil data terbaru">refresh</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- ── ringkasan ─────────────────────────────────────────── -->
+  <section class="grid grid-4" id="summary">
+    <div class="card kpi">
+      <div class="label">Nilai sekarang</div>
+      <div class="big" id="kpiNav">—</div>
+      <div class="sub" id="kpiNavSub">memuat…</div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Modal masuk</div>
+      <div class="big" id="kpiDeposit">—</div>
+      <div class="sub">total setoran semua pemilik</div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Sudah ditarik</div>
+      <div class="big" id="kpiWithdraw">—</div>
+      <div class="sub">total penarikan</div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Untung / rugi</div>
+      <div class="big" id="kpiPnl">—</div>
+      <div class="sub" id="kpiPnlSub">nilai + tarikan − setoran</div>
+    </div>
+  </section>
+
+  <!-- ── pembagian saham ───────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Pembagian saham</h2>
+      <span class="hint" id="unitHint"></span>
+    </div>
+    <div class="split">
+      <div class="donut-box">
+        <svg id="donut" viewBox="0 0 200 200" role="img" aria-label="Grafik pembagian saham"></svg>
+        <div class="donut-center">
+          <div class="donut-val" id="donutVal">—</div>
+          <div class="donut-lbl">total nilai</div>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table id="ownerTable">
+          <thead>
+            <tr>
+              <th>Pemilik</th>
+              <th class="num">Saham</th>
+              <th class="num">Setoran</th>
+              <th class="num">Ditarik</th>
+              <th class="num">Nilai sekarang</th>
+              <th class="num">Untung / rugi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── kalkulator tarik ──────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Kalkulator penarikan</h2>
+      <span class="hint">hitung dulu sebelum tarik — jatah tiap orang ikut porsi saham</span>
+    </div>
+    <div class="calc">
+      <label class="field">
+        <span>Jumlah tarik (USD)</span>
+        <input type="number" id="wdAmount" min="0" step="any" placeholder="800">
+      </label>
+      <label class="field">
+        <span>Mode</span>
+        <select id="wdMode">
+          <option value="prorata">Bagi rata sesuai saham</option>
+          <option value="single">Satu orang saja</option>
+        </select>
+      </label>
+      <label class="field" id="wdOwnerField" hidden>
+        <span>Pemilik</span>
+        <select id="wdOwner"></select>
+      </label>
+    </div>
+    <div class="table-scroll">
+      <table id="wdTable">
+        <thead>
+          <tr>
+            <th>Pemilik</th>
+            <th class="num">Dapat</th>
+            <th class="num">Sisa nilai</th>
+            <th class="num">Saham setelah tarik</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <details class="rec">
+      <summary>Catat transaksi ini ke <code>data/config.json</code></summary>
+      <p class="hint">Salin baris di bawah, tempel ke array <code>events</code> di <code>data/config.json</code>, lalu push ke GitHub.</p>
+      <pre id="wdJson">—</pre>
+      <button class="btn ghost" id="wdCopyBtn">salin JSON</button>
+    </details>
+  </section>
+
+  <!-- ── isi wallet ────────────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Isi wallet</h2>
+      <span class="hint" id="holdHint"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="holdTable">
+        <thead>
+          <tr><th>Aset</th><th class="num">Jumlah</th><th class="num">Harga</th><th class="num">Nilai</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── riwayat ───────────────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Riwayat setoran &amp; penarikan</h2>
+      <span class="hint" id="histHint"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="histTable">
+        <thead>
+          <tr>
+            <th>Tanggal</th><th>Jenis</th><th>Pemilik</th>
+            <th class="num">Jumlah</th><th class="num">Harga unit</th><th>Catatan</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Data on-chain read-only dari <span id="footSrc">RPC publik</span>. Tidak ada private key di situs ini.</span>
+    <span id="footTime"></span>
+  </footer>
+
+</main>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

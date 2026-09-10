@@ -1,0 +1,44 @@
+{
+  "app": {
+    "name": "cashood",
+    "tagline": "Shared wallet tracker — Robinhood Chain",
+    "currency": "USD",
+    "refreshMinutes": 60
+  },
+
+  "wallet": {
+    "address": "0xd84be45d81750b178d98fb1e3fbacc43c002d202",
+    "chainId": 4663,
+    "chainName": "Robinhood Chain",
+    "rpc": [
+      "https://rpc.mainnet.chain.robinhood.com"
+    ],
+    "explorer": "https://robinhoodchain.blockscout.com",
+    "tokens": [
+      { "symbol": "ETH",  "address": "native", "decimals": 18, "priceId": "ethereum" },
+      { "symbol": "USDG", "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168", "decimals": 6,  "priceUsd": 1 },
+      { "symbol": "WETH", "address": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73", "decimals": 18, "priceId": "ethereum" }
+    ]
+  },
+
+  "_navOverrideUsd_help": "Isi angka di sini kalau mau kunci nilai NAV manual (mis. 8000). Kosongkan (null) untuk pakai data live.",
+  "navOverrideUsd": null,
+
+  "owners": [
+    { "id": "orel", "name": "Orel", "color": "#4ade80" },
+    { "id": "as",   "name": "A$",   "color": "#60a5fa" }
+  ],
+
+  "_events_help": [
+    "type: deposit | withdraw",
+    "usd: jumlah dalam dolar",
+    "founding: true hanya untuk setoran awal (harga 1 unit = $1)",
+    "navBefore: total nilai wallet SEBELUM transaksi ini. WAJIB untuk event non-founding,",
+    "           supaya bagian orang lama tidak kena encer waktu ada orang baru masuk.",
+    "note: bebas, boleh dikosongkan"
+  ],
+  "events": [
+    { "date": "2026-09-01", "type": "deposit", "owner": "orel", "usd": 6000, "founding": true, "note": "setoran awal" },
+    { "date": "2026-09-01", "type": "deposit", "owner": "as",   "usd": 2000, "founding": true, "note": "setoran awal" }
+  ]
+}
