@@ -77,10 +77,28 @@ lalu setorannya:
 { "date": "2026-10-01", "type": "deposit", "owner": "budi", "usd": 2000, "navBefore": 10000 }
 ```
 
-### Nyatat penarikan
+### Nyatat setoran / penarikan
 
-Pakai **kalkulator penarikan** di situsnya: isi jumlah, dia keluarin baris JSON
-siap tempel ke `events` (lengkap dengan `navBefore` hari itu).
+Paling aman lewat script — dia yang ngisi `navBefore` dari nilai wallet terkini
+dan mastiin penarikan pro-rata dibagi di harga unit yang sama:
+
+```bash
+node scripts/record.mjs deposit  orel 500 --note "topup"
+node scripts/record.mjs withdraw as   200
+node scripts/record.mjs withdraw --prorata 800 --push
+```
+
+- `--dry` cuma nampilin hasilnya, config tidak disentuh
+- `--push` langsung commit + push
+- `--nav <angka>` kalau mau paksa nilai wallet sendiri
+- nolak kalau jumlahnya lebih besar dari jatah orangnya, atau kalau snapshot
+  sudah lebih tua dari 30 menit
+
+Hitungannya bukan salinan: script ini menjalankan mesin ledger di
+`assets/app.js` apa adanya, jadi angkanya pasti sama dengan yang di situs.
+
+Cara manual masih bisa: **kalkulator penarikan** di situsnya keluarin baris JSON
+siap tempel ke `events`.
 
 ---
 
@@ -144,6 +162,21 @@ Jangan dibikin lebih rapat dari 10 menit: GitHub Pages punya batas lunak
 
 ---
 
+## Nilai wallet dari waktu ke waktu
+
+Kartu **Nilai wallet** gambar garis nilai total dari waktu ke waktu, lengkap
+sama garis putus-putus **modal** — di atas garis berarti untung.
+
+Datanya dikumpulin sendiri: tiap `sync.mjs` jalan, satu titik masuk ke
+`data/nav.json`. Chain cuma tahu saldo *sekarang*, ga nyimpen saldo kemarin,
+jadi ga ada cara lain selain nyatet sambil jalan. Artinya grafik ini mulai dari
+nol dan makin panjang tiap 10 menit (6 titik per jam).
+
+Yang lama diencerkan biar filenya ga bengkak: 2 hari terakhir utuh, sebulan
+terakhir sejam sekali, lebih tua dari itu sehari sekali.
+
+---
+
 ## Riwayat profit
 
 Kartu **Riwayat profit** ambil angka dari buku posisi bot — semua posisi yang
@@ -177,6 +210,8 @@ assets/style.css      tampilan
 assets/app.js         ledger unit, ambil data, render
 data/config.json      pemilik + riwayat transaksi  <- yang kamu edit
 data/live.json        snapshot bot (otomatis)
-scripts/sync.mjs      bikin live.json dari bot
+data/nav.json         deret nilai wallet (otomatis)
+scripts/sync.mjs      bikin live.json + nav.json dari bot
+scripts/record.mjs    catat setoran / penarikan
 scripts/publish.sh    sync + commit + push
 ```

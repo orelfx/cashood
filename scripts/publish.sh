@@ -8,13 +8,13 @@ cd "$(dirname "$0")/.."
 
 /usr/bin/node scripts/sync.mjs
 
-if git diff --quiet -- data/live.json; then
+if git diff --quiet -- data/live.json data/nav.json; then
   echo "no change"
   exit 0
 fi
 
 TOTAL=$(/usr/bin/node -e "console.log(require('./data/live.json').totalUsd)")
-git add data/live.json
+git add data/live.json data/nav.json
 git commit -q -m "chore: snapshot \$${TOTAL} $(date -u +%Y-%m-%dT%H:%MZ)"
 git push -q
 echo "pushed \$${TOTAL}"

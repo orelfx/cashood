@@ -13,7 +13,7 @@
  *   0 * * * * cd /root/cashood && node scripts/sync.mjs >> /tmp/cashood-sync.log 2>&1
  */
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -134,6 +134,34 @@ const snapshot = {
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(snapshot, null, 2) + '\n');
+
+// ─── deret nilai wallet ───────────────────────────────────────────────────
+//
+// Satu titik tiap kali script ini jalan. Yang lama diencerkan, bukan dibuang:
+// dua hari terakhir disimpan utuh, sebulan terakhir sejam sekali, sisanya
+// sehari sekali. Tanpa itu, tiap 10 menit selama setahun jadi 52 ribu titik —
+// file yang harus diunduh ulang tiap kali orang buka halamannya.
+const NAV_OUT = resolve(dirname(OUT), 'nav.json');
+const now = Date.now();
+
+const previous = existsSync(NAV_OUT)
+  ? (JSON.parse(readFileSync(NAV_OUT, 'utf8')).points || [])
+  : [];
+
+const kept = previous.filter((p) => {
+  const age = now - p.t;
+  if (age < 2 * 86400e3) return true;
+  const at = new Date(p.t);
+  if (age < 30 * 86400e3) return at.getUTCMinutes() < 10;
+  return at.getUTCHours() === 0 && at.getUTCMinutes() < 10;
+});
+
+kept.push({ t: now, usd: snapshot.totalUsd, lp: Number(positions.reduce((s, p) => s + p.principalUsd + p.feesUsd, 0).toFixed(2)) });
+
+writeFileSync(NAV_OUT, JSON.stringify({
+  updatedAt: now,
+  points: kept.slice(-4000),
+}, null, 2) + '\n');
 console.log(`[cashood] ${new Date().toISOString()} total=$${snapshot.totalUsd} positions=${positions.length}`
-  + ` closed=${stats.closedCount} realised=$${stats.realisedUsd} -> ${OUT}`);
+  + ` closed=${stats.closedCount} realised=$${stats.realisedUsd} navPoints=${kept.length} -> ${OUT}`);
 process.exit(0);

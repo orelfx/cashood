@@ -460,6 +460,133 @@ function renderCalc() {
 }
 
 
+
+/* ── nilai wallet dari waktu ke waktu ────────────────────────────────────
+ *
+ * Deret ini dikumpulkan sendiri oleh scripts/sync.mjs, satu titik tiap kali
+ * dia jalan. Tidak ada sumber lain yang menyimpannya: chain tahu saldo hari
+ * ini, bukan saldo kemarin, dan menghitung ulang nilai posisi LP di ratusan
+ * blok yang lewat jauh lebih mahal daripada mencatat angkanya sambil jalan.
+ */
+
+const navView = { hours: 24 };
+let navPoints = [];
+
+async function readNavSeries(cfg) {
+  const urls = [cfg?.app?.navUrl, 'data/nav.json'].filter(Boolean);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) continue;
+      const j = await res.json();
+      if (Array.isArray(j.points) && j.points.length) return j.points;
+    } catch { /* coba sumber berikutnya */ }
+  }
+  return [];
+}
+
+function renderNavChart() {
+  const svg = $('#navChart');
+  const W = 720, H = 240, m = { t: 16, r: 54, b: 30, l: 60 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+
+  const cut = navView.hours ? Date.now() - navView.hours * 3600e3 : 0;
+  const pts = navPoints.filter((p) => p.t >= cut).sort((a, b) => a.t - b.t);
+
+  const need = 2 - pts.length;
+  if (need > 0) {
+    $('#navHint').textContent = 'baru mulai mengumpulkan — satu titik tiap 10 menit';
+    svg.innerHTML = `<text x="${W / 2}" y="${H / 2 - 6}" text-anchor="middle" class="g-lbl">Grafiknya kebentuk setelah beberapa titik terkumpul.</text>`
+      + `<text x="${W / 2}" y="${H / 2 + 14}" text-anchor="middle" class="g-lbl">Sekarang ada ${navPoints.length} titik · 6 titik per jam.</text>`;
+    return;
+  }
+
+  const modal = state.ledger ? state.ledger.deposited - state.ledger.withdrawn : 0;
+  const vals = pts.map((p) => p.usd);
+  const span = Math.max(...vals) - Math.min(...vals);
+  const padY = Math.max(span * 0.15, 8);
+  let lo = Math.min(...vals) - padY;
+  let hi = Math.max(...vals) + padY;
+  if (modal > 0 && modal > lo && modal < hi) { /* garis modal sudah kelihatan */ }
+  else if (modal > 0 && Math.abs(modal - (lo + hi) / 2) < span * 3) { lo = Math.min(lo, modal - padY); hi = Math.max(hi, modal + padY); }
+
+  const x = (t) => m.l + ((t - pts[0].t) / ((pts[pts.length - 1].t - pts[0].t) || 1)) * pw;
+  const y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph;
+
+  let grid = '';
+  for (let i = 0; i <= 3; i += 1) {
+    const v = lo + ((hi - lo) / 3) * i;
+    grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/>`
+      + `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usd(v, 0)}</text>`;
+  }
+
+  // Garis modal: pembanding yang sebenarnya. Di atas garis = untung.
+  let ref = '';
+  if (modal > 0 && modal >= lo && modal <= hi) {
+    ref = `<line x1="${m.l}" x2="${W - m.r}" y1="${y(modal)}" y2="${y(modal)}" stroke="#8b97a8" stroke-width="1" stroke-dasharray="4 4"/>`
+      + `<text x="${W - m.r + 6}" y="${y(modal) + 3.5}" class="g-lbl">modal</text>`;
+  }
+
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join(' ');
+  const last = pts[pts.length - 1];
+  const up = last.usd >= modal;
+  const stroke = up ? 'var(--accent)' : 'var(--red)';
+  const area = `${line} L${x(last.t).toFixed(1)},${y(lo)} L${x(pts[0].t).toFixed(1)},${y(lo)} Z`;
+
+  const fmtT = (t) => {
+    const d = new Date(t + 7 * 3600e3);                       // tampil dalam WIB
+    return navView.hours && navView.hours <= 48
+      ? `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`
+      : `${d.getUTCDate()} ${M_SHORT[d.getUTCMonth()]}`;
+  };
+
+  let ticks = '';
+  for (let i = 0; i <= 4; i += 1) {
+    const t = pts[0].t + ((last.t - pts[0].t) / 4) * i;
+    ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="middle" class="g-lbl">${fmtT(t)}</text>`;
+  }
+
+  svg.innerHTML = `<defs><linearGradient id="navFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity=".22"/>
+      <stop offset="100%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity="0"/>
+    </linearGradient></defs>`
+    + grid + ref
+    + `<path d="${area}" fill="url(#navFill)"/>`
+    + `<path d="${line}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
+    + `<circle cx="${x(last.t)}" cy="${y(last.usd)}" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2"/>`
+    + `<text x="${x(last.t)}" y="${y(last.usd) - 12}" text-anchor="end" class="g-cap">${usd(last.usd, 0)}</text>`
+    + ticks
+    + `<line id="navCross" x1="0" x2="0" y1="${m.t}" y2="${m.t + ph}" stroke="#3a4552" stroke-width="1" style="display:none"/>`
+    + `<rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" id="navHit"/>`;
+
+  const first = pts[0];
+  const delta = last.usd - first.usd;
+  $('#navHint').textContent = `${pts.length} titik · ${signed(delta)} (${pct(first.usd ? (delta / first.usd) * 100 : 0, 2)}) di rentang ini`;
+
+  // crosshair + tooltip
+  const wrap = $('#navWrap');
+  const tip = $('#navTip');
+  const cross = svg.querySelector('#navCross');
+  const hit = svg.querySelector('#navHit');
+  hit.onmousemove = (ev) => {
+    const box = wrap.getBoundingClientRect();
+    const ratio = W / (box.width || W);
+    const sx = (ev.clientX - box.left) * ratio;
+    let near = pts[0];
+    for (const p of pts) if (Math.abs(x(p.t) - sx) < Math.abs(x(near.t) - sx)) near = p;
+    cross.setAttribute('x1', x(near.t));
+    cross.setAttribute('x2', x(near.t));
+    cross.style.display = '';
+    tip.innerHTML = `<div class="t-d">${fmtT(near.t)} WIB</div>`
+      + `<div class="t-v">${usd(near.usd)}</div>`
+      + `<div class="t-n">${usd(near.usd - (near.lp ?? 0), 0)} token · ${usd(near.lp ?? 0, 0)} LP</div>`;
+    tip.hidden = false;
+    tip.style.left = (x(near.t) / ratio) + 'px';
+    tip.style.top = ((y(near.usd) - 10) / ratio) + 'px';
+  };
+  hit.onmouseleave = () => { tip.hidden = true; cross.style.display = 'none'; };
+}
+
 /* ── riwayat profit ──────────────────────────────────────────────────────
  *
  * Angka di sini datang dari posisi yang SUDAH ditutup — profit yang terkunci.
@@ -705,9 +832,11 @@ function wireProfitControls() {
       if (!btn) return;
       $(sel).querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
       fn(btn.getAttribute(attr));
+      renderNavChart();
       renderProfit();
     };
   };
+  pick('#segNavRange', 'data-h', (v) => { navView.hours = Number(v); });
   pick('#segView', 'data-v', (v) => { view.mode = v; });
   pick('#segBucket', 'data-b', (v) => { view.bucket = v; });
   pick('#segRange', 'data-r', (v) => { view.rangeDays = Number(v); });
@@ -729,6 +858,7 @@ function renderAll() {
   renderDonut(rows);
   renderOwners(rows);
   renderHoldings(state.nav);
+  renderNavChart();
   renderProfit();
   renderHistory(state.ledger);
   renderCalc();
@@ -740,7 +870,12 @@ async function load({ force = false } = {}) {
   btn.disabled = true;
   btn.textContent = 'memuat…';
   try {
-    state.nav = await resolveNav(state.cfg, { force });
+    const [nav, series] = await Promise.all([
+      resolveNav(state.cfg, { force }),
+      readNavSeries(state.cfg),
+    ]);
+    state.nav = nav;
+    if (series.length) navPoints = series;
     const msgs = [...state.ledger.warnings];
     if (state.nav.partial) msgs.push('Nilai posisi LP belum ikut dihitung — yang tampil cuma token di dalam wallet. Jalankan scripts/sync.mjs biar lengkap.');
     if (state.nav.lpStale) msgs.push(`Nilai posisi LP terakhir dihitung ${ago(state.nav.updatedAt)} — bagian itu bisa ketinggalan. Saldo token tetap live.`);
