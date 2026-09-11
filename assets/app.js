@@ -11,7 +11,7 @@
 
 const CONFIG_URL = 'data/config.json';
 const LIVE_URL = 'data/live.json';
-const CACHE_KEY = 'cashood.nav.v3';
+const CACHE_KEY = 'cashood.nav.v4';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -70,8 +70,10 @@ const fmtUsd = (n, dp = 2) =>
     minimumFractionDigits: dp, maximumFractionDigits: dp,
   });
 
+let lastEthPrice = null;
+
 function fmtEth(n) {
-  const price = state.nav?.ethPrice;
+  const price = state.nav?.ethPrice || lastEthPrice;
   if (!price) return '—';
   const v = (Number(n) || 0) / price;
   const a = Math.abs(v);
@@ -217,14 +219,14 @@ async function ethPrice() {
     const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
     const j = await r.json();
     const p = Number(j?.ethereum?.usd);
-    if (p > 0) return p;
+    if (p > 0) { lastEthPrice = p; return p; }
   } catch { /* lanjut ke cadangan */ }
   try {
     const weth = '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73';
     const r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + weth);
     const j = await r.json();
     const p = Number(j?.pairs?.[0]?.priceUsd);
-    if (p > 0) return p;
+    if (p > 0) { lastEthPrice = p; return p; }
   } catch { /* menyerah */ }
   return null;
 }
@@ -315,6 +317,7 @@ async function resolveNav(cfg, { force = false } = {}) {
   const history = snap?.history || [];
   const stats = snap?.stats || null;
   const closedRecent = snap?.closedRecent || [];
+  if (Number(snap?.ethPrice) > 0) lastEthPrice = Number(snap.ethPrice);
   const lpUsd = positions.reduce((s, p) => s + (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), 0);
   const snapAge = snap ? Date.now() - (Number(snap.updatedAt) || 0) : null;
 
@@ -401,6 +404,9 @@ function renderSummary(ledger, nav) {
   }[nav.source] || 'RPC publik';
   $('#footTime').textContent = 'diperbarui ' + ago(nav.fetchedAt);
 
+  const eth = nav.ethPrice || lastEthPrice;
+  $('#ethRate').textContent = eth ? `1 ETH = ${fmtUsd(eth)}` : 'kurs ETH belum terbaca';
+
   const every = Number(state.cfg?.app?.refreshMinutes) || 5;
   $('#stripToken').textContent = nav.source === 'manual'
     ? 'dikunci manual di config.json'
@@ -451,23 +457,47 @@ const dur = (minutes) => {
   return `${Math.floor(h / 24)}h ${h % 24}j`;
 };
 
+let holdPage = 0;
+const HOLD_PER_PAGE = 5;
+
 function renderHoldings(nav) {
-  const rows = nav.holdings || [];
+  const rows = [...(nav.holdings || [])].sort((a, b) => (b.usd || 0) - (a.usd || 0));
   const body = $('#holdTable').querySelector('tbody');
-  body.innerHTML = rows.length
-    ? rows.map((r) => `
+  const pages = Math.max(1, Math.ceil(rows.length / HOLD_PER_PAGE));
+  if (holdPage >= pages) holdPage = pages - 1;
+
+  const slice = rows.slice(holdPage * HOLD_PER_PAGE, (holdPage + 1) * HOLD_PER_PAGE);
+  body.innerHTML = slice.length
+    ? slice.map((r) => `
       <tr>
-        <td><span class="who"><span class="chip" style="background:#4ade80"></span>${r.symbol}</span></td>
+        <td><span class="who"><span class="chip" style="background:${r.symbol === 'ETH' ? '#627eea' : '#4ade80'}"></span>${r.symbol}</span></td>
         <td class="num">${num(r.amount, 6)}</td>
         <td class="num">${r.price == null ? '<span class="dim">—</span>' : usd(r.price, r.price < 10 ? 4 : 2)}</td>
         <td class="num">${r.usd == null ? '<span class="dim">?</span>' : usd(r.usd)}</td>
       </tr>`).join('')
     : '<tr><td colspan="4" class="dim">Tidak ada saldo token terbaca.</td></tr>';
 
+  // Halaman baru muncul kalau tokennya lebih dari lima; di bawah itu tidak ada
+  // yang perlu digeser dan pagernya cuma jadi hiasan.
+  const pager = $('#holdPager');
+  pager.hidden = pages < 2;
+  if (pages > 1) {
+    const btn = (label, page, extra = '') =>
+      `<button ${extra} data-p="${page}" class="${page === holdPage ? 'on' : ''}">${label}</button>`;
+    const nums = [];
+    for (let i = 0; i < pages; i += 1) {
+      if (i === 0 || i === pages - 1 || Math.abs(i - holdPage) <= 1) nums.push(btn(String(i + 1), i));
+      else if (nums[nums.length - 1] !== '<span class="gap">…</span>') nums.push('<span class="gap">…</span>');
+    }
+    pager.innerHTML = btn('‹', Math.max(0, holdPage - 1), holdPage === 0 ? 'disabled' : '')
+      + nums.join('')
+      + btn('›', Math.min(pages - 1, holdPage + 1), holdPage === pages - 1 ? 'disabled' : '');
+  }
+
   const total = rows.reduce((sum, r) => sum + (r.usd || 0), 0);
   $('#holdHint').textContent = nav.source === 'manual'
     ? 'NAV dikunci manual di config.json'
-    : `${usd(total)} · dibaca live dari chain`;
+    : `${rows.length} token · ${usd(total)} · dibaca live dari chain`;
 }
 
 /**
@@ -927,7 +957,7 @@ function renderNavChart() {
  * merah-hijau.
  */
 
-const view = { mode: 'chart', bucket: 'day', rangeDays: 7, month: null };
+const view = { mode: 'cal', bucket: 'day', rangeDays: 7, month: null };
 
 const D_SHORT = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 const M_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -1253,6 +1283,13 @@ async function init() {
   };
   $('#refreshBtn').onclick = () => load({ force: true });
   wireProfitControls();
+
+  $('#holdPager').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.disabled) return;
+    holdPage = Number(btn.getAttribute('data-p')) || 0;
+    renderHoldings(state.nav);
+  };
 
   $('#segCur').onclick = (e) => {
     const btn = e.target.closest('button');

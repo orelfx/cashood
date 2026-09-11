@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>cashood — shared wallet tracker</title>
-<meta name="description" content="Pantau saldo wallet bersama dan pembagian saham tiap pemilik.">
+<title>Cashood — Headfund</title>
+<meta name="description" content="Private AI liquidity provider di Robinhood Chain — pantau nilai dana, porsi saham tiap investor, dan apa yang sedang dikerjakan bot.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
 <script>
   // Sama alasannya dengan app.js di bawah: Pages menahan aset 600 detik, dan
@@ -20,15 +20,16 @@
   <div class="wrap top-in">
     <div class="brand">
       <span class="dot"></span>
-      <h1>cashood</h1>
-      <span class="tag" id="tagline">shared wallet tracker</span>
+      <h1>Cashood <span class="mark">Headfund</span></h1>
+      <span class="tag" id="tagline">Private AI liquidity provider · Robinhood Chain</span>
     </div>
     <div class="top-right">
       <a class="addr" id="addrLink" href="#" target="_blank" rel="noopener" title="Lihat di explorer">
         <span id="addrText">0x…</span>
       </a>
+      <span class="rate" id="ethRate" title="Kurs yang dipakai menilai seluruh halaman">—</span>
       <div class="seg cur" id="segCur" role="group" aria-label="Mata uang">
-        <button data-c="usd" class="on" title="Tampilkan dalam dolar">$</button><button data-c="eth" title="Tampilkan dalam ETH">Ξ</button>
+        <button data-c="usd" class="on" title="Tampilkan dalam dolar">$</button><button data-c="eth" title="Tampilkan dalam ETH" aria-label="ETH"><svg class="eth" viewBox="0 0 256 417" aria-hidden="true" focusable="false"><path d="M127.96 0l-2.8 9.5v275.67l2.8 2.79L255.92 212.3z" fill="currentColor" opacity=".65"/><path d="M127.96 0L0 212.3l127.96 75.66V154.16z" fill="currentColor"/><path d="M127.96 312.19l-1.58 1.92v98.2l1.58 4.6L256 236.59z" fill="currentColor" opacity=".65"/><path d="M127.96 416.9v-104.71L0 236.59z" fill="currentColor"/><path d="M127.96 287.96l127.96-75.65-127.96-58.16z" fill="currentColor" opacity=".38"/><path d="M0 212.31l127.96 75.65V154.15z" fill="currentColor" opacity=".8"/></svg></button>
       </div>
       <button class="btn ghost" id="copyBtn" title="Salin address">salin</button>
       <button class="btn" id="refreshBtn" title="Ambil data terbaru">refresh</button>
@@ -83,6 +84,40 @@
       <h2>Pembagian saham</h2>
       <span class="hint" id="unitHint"></span>
     </div>
+    <details class="explain" id="shareExplain">
+      <summary>Bagaimana sistem sahamnya bekerja</summary>
+      <div class="explain-body">
+        <p><strong>Cashood dikelola seperti dana bersama, bukan titipan terpisah.</strong>
+           Semua setoran masuk ke satu wallet yang sama dan dikelola satu bot. Yang
+           dicatat per orang bukan “uangnya yang mana”, tapi <strong>berapa unit</strong>
+           yang dia pegang — persis seperti lembar saham.</p>
+
+        <p><strong>Harga unit</strong> = nilai wallet ÷ jumlah unit beredar. Saat Cashood
+           dibuka, satu unit dihargai $1. Harga itu naik-turun mengikuti kinerja bot, dan
+           <em>nilai</em> kepemilikan tiap orang ikut bergerak — sementara <em>jumlah</em>
+           unitnya tetap, kecuali dia setor atau menarik.</p>
+
+        <p><strong>Investor baru tidak mengencerkan yang lama.</strong> Dia membeli unit
+           pada harga hari itu. Kalau dana sedang untung, uangnya membeli lebih sedikit
+           unit; kalau sedang rugi, lebih banyak. Nilai dolar pemilik lama tidak berubah
+           sedikit pun saat ada orang masuk — yang berubah cuma persentasenya, karena
+           pembaginya bertambah.</p>
+
+        <p><strong>“Kenapa saya rugi tapi dia untung?”</strong> Karena yang menentukan
+           untung-rugi seseorang adalah <strong>harga unit saat dia masuk</strong>, bukan
+           kondisi dana hari ini. Dua orang di dana yang sama bisa berbeda hasil kalau
+           masuk di harga unit yang berbeda — sama seperti dua orang membeli saham
+           perusahaan yang sama di dua tanggal berbeda.</p>
+
+        <p><strong>Dividen</strong> dibagikan bulanan menurut proporsi saham pada saat
+           pembagian. Pemegang 10% saham menerima 10% dari yang dibagikan.</p>
+
+        <p><strong>Penarikan</strong> mengurangi unit sebesar nilai yang ditarik pada
+           harga unit hari itu, jadi porsi pemilik lain tidak ikut berubah. Kalkulator di
+           bawah menghitungnya sebelum apa pun dieksekusi.</p>
+      </div>
+    </details>
+
     <div class="split">
       <div class="donut-box">
         <svg id="donut" viewBox="0 0 200 200" role="img" aria-label="Grafik pembagian saham"></svg>
@@ -137,7 +172,7 @@
 
     <div class="controls">
       <div class="seg" id="segView" role="group" aria-label="Tampilan">
-        <button data-v="chart" class="on">grafik</button><button data-v="cal">kalender</button>
+        <button data-v="chart">grafik</button><button data-v="cal" class="on">kalender</button>
       </div>
       <div class="seg" id="segBucket" role="group" aria-label="Kelompok waktu">
         <button data-b="day" class="on">harian</button><button data-b="week">mingguan</button><button data-b="month">bulanan</button>
@@ -164,6 +199,12 @@
     </div>
 
     <p class="hint" id="profitNote"></p>
+    <p class="hint disclaimer">Angka pada kartu ini adalah hasil yang tercatat di buku posisi
+      bot. Realisasi akhir dapat berbeda: biaya gas berfluktuasi mengikuti kepadatan
+      jaringan, dan setiap keluar-masuk posisi menanggung slippage serta price impact yang
+      besarnya bergantung pada kedalaman likuiditas pool saat transaksi dieksekusi. Selisih
+      itu melekat pada aktivitas penyediaan likuiditas dan tidak dapat dihilangkan
+      sepenuhnya.</p>
   </section>
 
   <!-- ── kalkulator tarik ──────────────────────────────────── -->
@@ -224,6 +265,7 @@
         <tbody></tbody>
       </table>
     </div>
+    <div class="pager" id="holdPager" hidden></div>
   </section>
 
   <!-- ── posisi LP ─────────────────────────────────────────── -->

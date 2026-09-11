@@ -32,6 +32,8 @@ const { ethUsd } = await load('venue/price.js');
 const { getWallet } = await load('chain/signer.js');
 const { getClosed } = await load('store.js');
 const { NATIVE, USDG, WETH, decimalsOf } = await load('chain/addresses.js');
+const { getClient } = await load('chain/rpc.js');
+const { ERC20_ABI } = await load('chain/abi.js');
 
 const wallet = getWallet('multi');
 if (!wallet) throw new Error('wallet "multi" tidak ketemu — cek RR_* di .env');
@@ -63,8 +65,10 @@ const toUsd = (amount, token) => {
   return null;
 };
 
+const books = await readBook();
+
 const positions = [];
-for (const book of await readBook()) {
+for (const book of books) {
   for (const p of book.positions || []) {
     if (p.error) continue;
 
@@ -137,6 +141,54 @@ const history = [...byDay.values()]
 const realisedUsd = history.reduce((s, r) => s + r.usd, 0);
 const best = history.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
 const worst = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), null);
+
+// ─── token lain yang nyangkut di dompet ──────────────────────────────────
+//
+// Sisa swap dan posisi yang ditutup ke token dasarnya mendarat di dompet dan
+// diam di sana. Daftarnya dirakit dari buku bot sendiri — token yang pernah
+// dipegang — lalu saldonya dibaca satu per satu; harga diambil dari DexScreener
+// yang gratis dan tanpa kunci. Semuanya dibatasi: token yang diperiksa dibatasi
+// jumlahnya, dan kegagalan apa pun di sini tidak boleh menjatuhkan snapshot.
+const extra = [];
+try {
+  const client = getClient();
+  const seen = new Set([NATIVE, USDG.toLowerCase(), WETH.toLowerCase()]);
+  const candidates = [];
+  for (const r of [...books.flatMap((b) => b.positions || []), ...closed.slice(0, 60)]) {
+    const token = String(r.baseToken || r.token || '').toLowerCase();
+    if (!token || seen.has(token)) continue;
+    seen.add(token);
+    candidates.push(token);
+    if (candidates.length >= 25) break;
+  }
+
+  const held = [];
+  for (const token of candidates) {
+    try {
+      const [raw, dec] = await Promise.all([
+        client.readContract({ address: token, abi: ERC20_ABI, functionName: 'balanceOf', args: [wallet.address] }),
+        client.readContract({ address: token, abi: ERC20_ABI, functionName: 'decimals' }).catch(() => 18),
+      ]);
+      if (raw > 0n) held.push({ token, amount: Number(raw) / 10 ** Number(dec) });
+    } catch { /* token tidak menjawab; lewati */ }
+  }
+
+  for (const h of held.slice(0, 12)) {
+    let unit = null, symbol = h.token.slice(0, 8);
+    try {
+      const r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + h.token, { signal: AbortSignal.timeout(8000) });
+      const j = await r.json();
+      const pair = (j.pairs || []).find((x) => String(x.baseToken?.address || '').toLowerCase() === h.token);
+      if (pair) { unit = Number(pair.priceUsd) || null; symbol = pair.baseToken?.symbol || symbol; }
+    } catch { /* tanpa harga, barisnya tidak diterbitkan */ }
+    const value = unit == null ? null : h.amount * unit;
+    if (value != null && value >= 0.5) extra.push({ symbol, amount: h.amount, price: unit, usd: value });
+  }
+} catch (error) {
+  console.error('[cashood] gagal membaca token sisa:', error.message);
+}
+
+holdings.push(...extra);
 
 // Sepuluh posisi terakhir yang ditutup — cukup untuk melihat apa yang baru
 // saja terjadi tanpa mengunduh dua ratus baris yang tidak dibaca siapa pun.

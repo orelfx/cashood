@@ -1,6 +1,6 @@
-# cashood
+# Cashood — Headfund
 
-Pemantau wallet patungan di **Robinhood Chain**. Satu wallet, beberapa pemilik,
+Private AI liquidity provider di **Robinhood Chain**. Satu wallet, beberapa pemilik,
 pembagian saham otomatis. Situs statis — HTML + CSS + JS polos, tanpa build,
 tanpa dependency, siap di-host di GitHub Pages.
 
@@ -108,6 +108,12 @@ siap tempel ke `events`.
 ---
 
 ## Cara hitungnya (unit / saham)
+
+Penjelasan versi ramah-investor ada langsung di halaman, di kartu **Pembagian
+saham** — buka bagian "Bagaimana sistem sahamnya bekerja". Ringkasnya: unit itu
+lembar saham, harga unit = nilai wallet ÷ unit beredar, investor baru beli di
+harga hari itu, dividen dibagi bulanan menurut proporsi saham.
+
 
 Bukan `setoran gue ÷ total setoran`, tapi sistem unit seperti reksa dana:
 
