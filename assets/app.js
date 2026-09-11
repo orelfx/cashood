@@ -72,16 +72,40 @@ const fmtUsd = (n, dp = 2) =>
 
 let lastEthPrice = null;
 
-function fmtEth(n) {
+// Lambang Ether, digambar di tempat — bukan huruf Yunani Ξ, yang kebetulan
+// mirip dan bukan lambang apa pun di sini. Diwarnai currentColor supaya ikut
+// merah/hijau baris yang memuatnya.
+const ETH_MARK = '<svg class="ethmark" viewBox="0 0 256 417" aria-hidden="true" focusable="false">'
+  + '<path d="M127.96 0l-2.8 9.5v275.67l2.8 2.79L255.92 212.3z" fill="currentColor" opacity=".6"/>'
+  + '<path d="M127.96 0L0 212.3l127.96 75.66V154.16z" fill="currentColor"/>'
+  + '<path d="M127.96 312.19l-1.58 1.92v98.2l1.58 4.6L256 236.59z" fill="currentColor" opacity=".6"/>'
+  + '<path d="M127.96 416.9v-104.71L0 236.59z" fill="currentColor"/>'
+  + '<path d="M127.96 287.96l127.96-75.65-127.96-58.16z" fill="currentColor" opacity=".35"/>'
+  + '<path d="M0 212.31l127.96 75.65V154.15z" fill="currentColor" opacity=".8"/></svg>';
+
+function ethAmount(n) {
   const price = state.nav?.ethPrice || lastEthPrice;
-  if (!price) return '—';
+  if (!price) return null;
   const v = (Number(n) || 0) / price;
   const a = Math.abs(v);
   const dp = a >= 100 ? 2 : a >= 1 ? 3 : a >= 0.01 ? 4 : 6;
-  return (v < 0 ? '-' : '') + 'Ξ' + a.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  return { negative: v < 0, digits: a.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }) };
+}
+
+/** Dengan lambang. Untuk tempat yang menerima HTML. */
+function fmtEth(n) {
+  const v = ethAmount(n);
+  return v ? (v.negative ? '-' : '') + ETH_MARK + v.digits : '—';
+}
+
+/** Tanpa lambang. Untuk <text> di dalam SVG, yang tidak bisa memuat elemen HTML. */
+function fmtEthText(n) {
+  const v = ethAmount(n);
+  return v ? (v.negative ? '-' : '') + v.digits + ' ETH' : '—';
 }
 
 const usd = (n, dp = 2) => (currency === 'eth' ? fmtEth(n) : fmtUsd(n, dp));
+const usdText = (n, dp = 2) => (currency === 'eth' ? fmtEthText(n) : fmtUsd(n, dp));
 
 const pct = (n, dp = 2) => (Number(n) || 0).toFixed(dp) + '%';
 
@@ -91,6 +115,7 @@ const num = (n, dp = 4) =>
 const short = (a) => a.slice(0, 6) + '…' + a.slice(-4);
 
 const signed = (n) => (n > 0 ? '+' : '') + usd(n);
+const signedText = (n) => (n > 0 ? '+' : '') + usdText(n);
 
 const cls = (n) => (n > 0.005 ? 'pos' : n < -0.005 ? 'neg' : 'dim');
 
@@ -385,17 +410,17 @@ function renderSummary(ledger, nav) {
   const pnl = nav.totalUsd + ledger.withdrawn - ledger.deposited;
   const pnlPct = ledger.deposited > 0 ? (pnl / ledger.deposited) * 100 : 0;
 
-  $('#kpiNav').textContent = usd(nav.totalUsd);
-  $('#kpiNavSub').textContent = nav.lpUsd > 0
+  $('#kpiNav').innerHTML = usd(nav.totalUsd);
+  $('#kpiNavSub').innerHTML = nav.lpUsd > 0
     ? `${usd(nav.liveUsd ?? 0, 0)} token + ${usd(nav.lpUsd, 0)} di LP`
     : nav.label;
-  $('#kpiDeposit').textContent = usd(ledger.deposited);
-  $('#kpiWithdraw').textContent = usd(ledger.withdrawn);
+  $('#kpiDeposit').innerHTML = usd(ledger.deposited);
+  $('#kpiWithdraw').innerHTML = usd(ledger.withdrawn);
   const el = $('#kpiPnl');
-  el.textContent = signed(pnl);
+  el.innerHTML = signed(pnl);
   el.className = 'big ' + cls(pnl);
   $('#kpiPnlSub').textContent = (pnl >= 0 ? '+' : '') + pct(pnlPct) + ' dari modal';
-  $('#donutVal').textContent = usd(nav.totalUsd, 0);
+  $('#donutVal').innerHTML = usd(nav.totalUsd, 0);
   $('#footSrc').textContent = {
     'live+lp': 'RPC publik (live) + snapshot LP',
     rpc: 'RPC publik (live)',
@@ -445,7 +470,7 @@ function renderOwners(rows) {
       <td class="num"><strong>${usd(r.value)}</strong></td>
       <td class="num ${cls(r.pnl)}">${signed(r.pnl)}</td>
     </tr>`).join('');
-  $('#unitHint').textContent =
+  $('#unitHint').innerHTML =
     `${num(state.ledger.totalUnits, 2)} unit beredar · 1 unit = ${usd(state.ledger.totalUnits > 0 ? state.nav.totalUsd / state.ledger.totalUnits : 0, 4)}`;
 }
 
@@ -495,7 +520,7 @@ function renderHoldings(nav) {
   }
 
   const total = rows.reduce((sum, r) => sum + (r.usd || 0), 0);
-  $('#holdHint').textContent = nav.source === 'manual'
+  $('#holdHint').innerHTML = nav.source === 'manual'
     ? 'NAV dikunci manual di config.json'
     : `${rows.length} token · ${usd(total)} · dibaca live dari chain`;
 }
@@ -579,7 +604,7 @@ function renderClosed(nav) {
       <td class="num dim">${ago(r.closedAt)}</td>
     </tr>`).join('');
   const net = rows.reduce((t, r) => t + (Number(r.netUsd) || 0), 0);
-  $('#closedHint').textContent = `${rows.length} terakhir · jumlahnya ${signed(net)}`;
+  $('#closedHint').innerHTML = `${rows.length} terakhir · jumlahnya ${signed(net)}`;
 }
 
 /** Biaya langganan bulanan. Dibayar dari luar wallet, jadi tidak masuk NAV. */
@@ -876,7 +901,7 @@ function renderNavChart() {
   for (let i = 0; i <= 3; i += 1) {
     const v = lo + ((hi - lo) / 3) * i;
     grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/>`
-      + `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usd(v, 0)}</text>`;
+      + `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usdText(v, 0)}</text>`;
   }
 
   // Garis modal: pembanding yang sebenarnya. Di atas garis = untung.
@@ -913,14 +938,14 @@ function renderNavChart() {
     + `<path d="${area}" fill="url(#navFill)"/>`
     + `<path d="${line}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
     + `<circle cx="${x(last.t)}" cy="${y(last.usd)}" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2"/>`
-    + `<text x="${x(last.t)}" y="${y(last.usd) - 12}" text-anchor="end" class="g-cap">${usd(last.usd, 0)}</text>`
+    + `<text x="${x(last.t)}" y="${y(last.usd) - 12}" text-anchor="end" class="g-cap">${usdText(last.usd, 0)}</text>`
     + ticks
     + `<line id="navCross" x1="0" x2="0" y1="${m.t}" y2="${m.t + ph}" stroke="#3a4552" stroke-width="1" style="display:none"/>`
     + `<rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" id="navHit"/>`;
 
   const first = pts[0];
   const delta = last.usd - first.usd;
-  $('#navHint').textContent = `${pts.length} titik · ${signed(delta)} (${pct(first.usd ? (delta / first.usd) * 100 : 0, 2)}) di rentang ini`;
+  $('#navHint').innerHTML = `${pts.length} titik · ${signed(delta)} (${pct(first.usd ? (delta / first.usd) * 100 : 0, 2)}) di rentang ini`;
 
   // crosshair + tooltip
   const wrap = $('#navWrap');
@@ -1033,7 +1058,7 @@ function renderChart(buckets) {
   for (let v = lo; v <= hi + 1e-9; v += step) {
     const yy = y(v);
     grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" class="${Math.abs(v) < 1e-9 ? 'g-zero' : 'g-grid'}"/>`
-      + `<text x="${m.l - 9}" y="${yy + 3.5}" text-anchor="end" class="g-lbl">${v === 0 ? '0' : usd(v, 0)}</text>`;
+      + `<text x="${m.l - 9}" y="${yy + 3.5}" text-anchor="end" class="g-lbl">${v === 0 ? '0' : usdText(v, 0)}</text>`;
   }
 
   // batang: ujung datanya dibulatkan, pangkalnya nempel garis nol
@@ -1057,7 +1082,7 @@ function renderChart(buckets) {
     bars += `<path d="${path}" fill="${color}"/>`;
 
     if ((i === maxI && b.usd > 0) || (i === minI && b.usd < 0)) {
-      caps += `<text x="${x + bw / 2}" y="${up ? yv - 7 : yv + 14}" text-anchor="middle" class="g-cap">${signed(b.usd)}</text>`;
+      caps += `<text x="${x + bw / 2}" y="${up ? yv - 7 : yv + 14}" text-anchor="middle" class="g-cap">${signedText(b.usd)}</text>`;
     }
 
     const every = Math.ceil(buckets.length / 8);
