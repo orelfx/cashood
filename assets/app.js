@@ -674,14 +674,6 @@ function renderCalc() {
       <td class="num">${pct(unitsLeft > 0 ? (c.unitsLeft / unitsLeft) * 100 : 0)}</td>
     </tr>`).join('');
 
-  const taken = cuts.filter((c) => c.take > 0);
-  const today = new Date().toISOString().slice(0, 10);
-  $('#wdJson').textContent = taken.length
-    ? taken.map((c) => JSON.stringify({
-        date: today, type: 'withdraw', owner: c.id,
-        usd: Number(c.take.toFixed(2)), navBefore: Number(state.nav.totalUsd.toFixed(2)), note: '',
-      })).join(',\n')
-    : '—';
 }
 
 
@@ -833,15 +825,20 @@ async function loadHeartbeat(cfg) {
 /* ── tab ─────────────────────────────────────────────────────────────── */
 
 function showTab(name) {
-  const bot = name === 'bot';
-  $('#tab-portfolio').hidden = bot;
-  $('#tab-bot').hidden = !bot;
+  const known = ['portfolio', 'investor', 'bot'];
+  const tab = known.includes(name) ? name : 'portfolio';
+  $('#tab-portfolio').hidden = tab !== 'portfolio';
+  $('#tab-investor').hidden = tab !== 'investor';
+  $('#tab-bot').hidden = tab !== 'bot';
+  const bot = tab === 'bot';
   document.querySelectorAll('#tabs button').forEach((b) => {
-    const on = b.getAttribute('data-tab') === name;
+    const on = b.getAttribute('data-tab') === tab;
     b.classList.toggle('on', on);
     b.setAttribute('aria-selected', String(on));
   });
-  if (location.hash.slice(1) !== name) history.replaceState(null, '', bot ? '#bot' : location.pathname);
+  if (location.hash.slice(1) !== tab) {
+    history.replaceState(null, '', tab === 'portfolio' ? location.pathname : '#' + tab);
+  }
   if (bot) refreshHeartbeat();
 }
 
@@ -853,7 +850,7 @@ function showTab(name) {
  * blok yang lewat jauh lebih mahal daripada mencatat angkanya sambil jalan.
  */
 
-const navView = { hours: 24 };
+const navView = { hours: 24, series: 'wallet' };
 let navPoints = [];
 
 async function readNavSeries(cfg) {
@@ -875,7 +872,13 @@ function renderNavChart() {
   const pw = W - m.l - m.r, ph = H - m.t - m.b;
 
   const cut = navView.hours ? Date.now() - navView.hours * 3600e3 : 0;
-  const pts = navPoints.filter((p) => p.t >= cut).sort((a, b) => a.t - b.t);
+  const raw = navPoints.filter((p) => p.t >= cut).sort((a, b) => a.t - b.t);
+  const share = navView.series === 'share';
+  const pts = share ? sharePriceSeries(raw) : raw.map((p) => ({ ...p, v: p.usd }));
+
+  // Harga saham bergerak dalam sen. Dibulatkan ke dolar penuh, grafiknya jadi
+  // garis datar yang tidak mengatakan apa pun.
+  const fmt = (n) => (share ? usdText(n, 4) : usdText(n, 0));
 
   const need = 2 - pts.length;
   if (need > 0) {
@@ -885,10 +888,15 @@ function renderNavChart() {
     return;
   }
 
-  const modal = state.ledger ? state.ledger.deposited - state.ledger.withdrawn : 0;
-  const vals = pts.map((p) => p.usd);
+  const modal = share ? 1 : (state.ledger ? state.ledger.deposited - state.ledger.withdrawn : 0);
+  const vals = pts.map((p) => p.v);
   const span = Math.max(...vals) - Math.min(...vals);
-  const padY = Math.max(span * 0.15, 8);
+  // Padding harus ikut besaran angkanya. Batas bawah $8 masuk akal untuk nilai
+  // wallet yang ribuan dolar, tapi pada harga saham yang bergerak di sekitar
+  // $0,95 ia menelan seluruh grafik — sumbunya melar ke minus tujuh dolar dan
+  // garisnya jadi datar tak berarti.
+  const scale = Math.max(Math.abs(Math.max(...vals)), Math.abs(Math.min(...vals)), 1e-9);
+  const padY = Math.max(span * 0.15, scale * 0.004);
   let lo = Math.min(...vals) - padY;
   let hi = Math.max(...vals) + padY;
   if (modal > 0 && modal > lo && modal < hi) { /* garis modal sudah kelihatan */ }
@@ -901,19 +909,19 @@ function renderNavChart() {
   for (let i = 0; i <= 3; i += 1) {
     const v = lo + ((hi - lo) / 3) * i;
     grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/>`
-      + `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usdText(v, 0)}</text>`;
+      + `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${fmt(v)}</text>`;
   }
 
   // Garis modal: pembanding yang sebenarnya. Di atas garis = untung.
   let ref = '';
   if (modal > 0 && modal >= lo && modal <= hi) {
     ref = `<line x1="${m.l}" x2="${W - m.r}" y1="${y(modal)}" y2="${y(modal)}" stroke="#8b97a8" stroke-width="1" stroke-dasharray="4 4"/>`
-      + `<text x="${W - m.r + 6}" y="${y(modal) + 3.5}" class="g-lbl">modal</text>`;
+      + `<text x="${W - m.r + 6}" y="${y(modal) + 3.5}" class="g-lbl">${share ? 'awal' : 'modal'}</text>`;
   }
 
-  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join(' ');
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1];
-  const up = last.usd >= modal;
+  const up = last.v >= modal;
   const stroke = up ? 'var(--accent)' : 'var(--red)';
   const area = `${line} L${x(last.t).toFixed(1)},${y(lo)} L${x(pts[0].t).toFixed(1)},${y(lo)} Z`;
 
@@ -937,15 +945,18 @@ function renderNavChart() {
     + grid + ref
     + `<path d="${area}" fill="url(#navFill)"/>`
     + `<path d="${line}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
-    + `<circle cx="${x(last.t)}" cy="${y(last.usd)}" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2"/>`
-    + `<text x="${x(last.t)}" y="${y(last.usd) - 12}" text-anchor="end" class="g-cap">${usdText(last.usd, 0)}</text>`
+    + `<circle cx="${x(last.t)}" cy="${y(last.v)}" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2"/>`
+    + `<text x="${x(last.t)}" y="${y(last.v) - 12}" text-anchor="end" class="g-cap">${fmt(last.v)}</text>`
     + ticks
     + `<line id="navCross" x1="0" x2="0" y1="${m.t}" y2="${m.t + ph}" stroke="#3a4552" stroke-width="1" style="display:none"/>`
     + `<rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" id="navHit"/>`;
 
   const first = pts[0];
-  const delta = last.usd - first.usd;
-  $('#navHint').innerHTML = `${pts.length} titik · ${signed(delta)} (${pct(first.usd ? (delta / first.usd) * 100 : 0, 2)}) di rentang ini`;
+  const delta = last.v - first.v;
+  const movePct = first.v ? (delta / first.v) * 100 : 0;
+  $('#navHint').innerHTML = share
+    ? `1 saham = ${usd(last.v, 4)} · ${(movePct >= 0 ? '+' : '') + pct(movePct)} di rentang ini`
+    : `${pts.length} titik · ${signed(delta)} (${pct(movePct)}) di rentang ini`;
 
   // crosshair + tooltip
   const wrap = $('#navWrap');
@@ -962,13 +973,128 @@ function renderNavChart() {
     cross.setAttribute('x2', x(near.t));
     cross.style.display = '';
     tip.innerHTML = `<div class="t-d">${fmtT(near.t)} WIB</div>`
-      + `<div class="t-v">${usd(near.usd)}</div>`
-      + `<div class="t-n">${usd(near.usd - (near.lp ?? 0), 0)} token · ${usd(near.lp ?? 0, 0)} LP</div>`;
+      + `<div class="t-v">${share ? usd(near.v, 4) : usd(near.v)}</div>`
+      + (share
+        ? `<div class="t-n">nilai wallet ${usd(near.usd, 0)}</div>`
+        : `<div class="t-n">${usd(near.usd - (near.lp ?? 0), 0)} token · ${usd(near.lp ?? 0, 0)} LP</div>`);
     tip.hidden = false;
     tip.style.left = (x(near.t) / ratio) + 'px';
-    tip.style.top = ((y(near.usd) - 10) / ratio) + 'px';
+    tip.style.top = ((y(near.v) - 10) / ratio) + 'px';
   };
   hit.onmouseleave = () => { tip.hidden = true; cross.style.display = 'none'; };
+}
+
+
+/* ── harga satu saham ────────────────────────────────────────────────────
+ *
+ * Nilai wallet naik karena bot untung ATAU karena ada orang menyetor. Dua
+ * sebab yang sangat berbeda, dan grafik nilai wallet tidak bisa membedakannya:
+ * garis yang melompat $1.000 terlihat seperti hari yang hebat padahal cuma ada
+ * investor baru masuk. Harga satu unit membagi nilai wallet dengan jumlah unit
+ * beredar saat itu, jadi setoran tidak menggerakkannya sama sekali — yang
+ * tersisa di grafik itu murni kinerja.
+ */
+function unitsAt(ts) {
+  return (state.ledger?.events || []).reduce(
+    // `at` adalah jam transaksi benar-benar mendarat; `date` hanya tanggalnya.
+    // Tanpa jam, unit bertambah sejak 00:00 padahal uangnya baru masuk sore —
+    // dan harga saham tampak jatuh beberapa jam tanpa sebab.
+    (sum, e) => {
+      const when = Number(e.at) > 0 ? Number(e.at) : parseDay(e.date).getTime();
+      return sum + (when <= ts ? (Number(e.units) || 0) : 0);
+    }, 0);
+}
+
+function sharePriceSeries(points) {
+  return points
+    .map((p) => {
+      const units = unitsAt(p.t);
+      return units > 0 ? { ...p, v: p.usd / units } : null;
+    })
+    .filter(Boolean);
+}
+
+/* ── dividen ─────────────────────────────────────────────────────────────
+ *
+ * Dibayar dari laba di atas modal terkunci, bukan dari nilai wallet. Urutannya
+ * ditampilkan baris per baris dengan sengaja: yang menerima uang berhak tahu
+ * angkanya datang dari mana, dan aturan yang cuma hidup di kepala pengelola
+ * adalah aturan yang bisa berubah tanpa ada yang sadar.
+ */
+function dividendPlan(navUsd) {
+  const d = state.cfg?.dividend || {};
+  const ledger = state.ledger;
+  const locked = Number(d.lockedCapitalUsd) > 0
+    ? Number(d.lockedCapitalUsd)
+    : (ledger?.deposited || 0) - (ledger?.withdrawn || 0);
+
+  const profit = Math.max(0, (Number(navUsd) || 0) - locked);
+  const profitSharePct = Number.isFinite(Number(d.profitSharePct)) ? Number(d.profitSharePct) : 50;
+  const platformFeePct = Number(d.platformFeePct) || 0;
+
+  const pool = profit * (profitSharePct / 100);
+  const reserve = Math.min(Number(d.reserveUsd) || 0, pool);
+  const fee = Math.max(0, (pool - reserve) * (platformFeePct / 100));
+  const distributed = Math.max(0, pool - reserve - fee);
+
+  // Cadangan tetap di dalam dana; dividen dan fee keluar dari dana.
+  const navAfter = (Number(navUsd) || 0) - distributed - fee;
+
+  return { locked, profit, pool, reserve, fee, distributed, navAfter, profitSharePct, platformFeePct,
+    retained: Math.max(0, (Number(navUsd) || 0) - locked - pool) + reserve,
+    payDay: Number(d.payDayOfMonth) || 1 };
+}
+
+function nextPayDate(day) {
+  const now = new Date();
+  const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, day));
+  return `${next.getUTCDate()} ${M_SHORT[next.getUTCMonth()]} ${next.getUTCFullYear()}`;
+}
+
+function renderDividend() {
+  if (!state.ledger || !state.nav) return;
+  const input = $('#divNav');
+  if (!input.value) input.value = (state.nav.totalUsd || 0).toFixed(2);
+
+  const navUsd = Math.max(0, Number(input.value) || 0);
+  const plan = dividendPlan(navUsd);
+  const owners = ownerValues(state.ledger, plan.navAfter);
+
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  $('#divSummary').innerHTML = [
+    tile('Modal terkunci', usd(plan.locked), 'setoran dikurangi penarikan'),
+    tile('Laba di atas modal', usd(plan.profit), plan.profit > 0 ? 'dasar perhitungan dividen' : 'belum ada laba — belum ada dividen', cls(plan.profit)),
+    tile('Kantong dividen', usd(plan.pool), `${plan.profitSharePct}% dari laba`),
+    tile('Tetap di dana', usd(plan.retained), 'cadangan + laba yang diputar lagi'),
+    tile('Dibayarkan', usd(plan.distributed), plan.fee > 0 ? `setelah fee platform ${usd(plan.fee)}` : 'ke seluruh investor', plan.distributed > 0 ? 'pos' : ''),
+  ].join('');
+
+  $('#divTable').querySelector('tbody').innerHTML = owners.map((o) => `
+    <tr>
+      <td><span class="who"><span class="chip" style="background:${o.color || '#4ade80'}"></span>${o.name}</span></td>
+      <td class="num">${pct(o.share)}</td>
+      <td class="num ${plan.distributed > 0 ? 'pos' : 'dim'}">${usd(plan.distributed * (o.share / 100))}</td>
+      <td class="num">${usd(o.value)}</td>
+    </tr>`).join('');
+
+  const real = Math.abs(navUsd - (state.nav.totalUsd || 0)) < 0.01;
+  $('#divHint').textContent = `dibayar tiap tanggal ${plan.payDay} · berikutnya ${nextPayDate(plan.payDay)}`
+    + (real ? '' : ' · memakai angka andaian');
+
+  $('#divRule').innerHTML = `
+    <p><strong>Urutan hitungnya.</strong> Modal terkunci ${usd(plan.locked)} tidak pernah ikut
+       dibagi — itu uang pokok yang harus tetap bekerja. Yang dibagi hanya laba di atasnya.</p>
+    <p>Dari laba ${usd(plan.profit)}, sebanyak <strong>${plan.profitSharePct}%</strong>
+       (${usd(plan.pool)}) masuk kantong dividen. Sisanya diputar lagi di dana — harga saham
+       naik, dan modal tiap orang ikut tumbuh tanpa perlu setor lagi.</p>
+    <p>Dari kantong itu ${usd(plan.reserve)} ditahan sebagai saldo mengendap, bantalan untuk gas
+       dan biaya keluar-masuk posisi${plan.platformFeePct > 0
+        ? `, lalu fee platform ${plan.platformFeePct}% (${usd(plan.fee)})` : ''}. Sisanya,
+       <strong>${usd(plan.distributed)}</strong>, dibagi menurut proporsi saham pada tanggal
+       pembayaran.</p>
+    <p class="dim">Contoh angka bulat: modal terkunci $9.300, wallet menyentuh $10.000. Laba $700
+       → kantong dividen $350 → mengendap $50 → dibayarkan $300. Pemegang 10% saham menerima $30.
+       Sisa laba $350 tetap di dana dan mengangkat harga saham.</p>`;
 }
 
 /* ── riwayat profit ──────────────────────────────────────────────────────
@@ -1248,6 +1374,7 @@ function renderAll() {
   renderLp(state.nav);
   renderClosed(state.nav);
   renderCosts(state.cfg);
+  renderDividend();
   renderNavChart();
   renderProfit();
   renderHistory(state.ledger);
@@ -1330,16 +1457,32 @@ async function init() {
     const btn = e.target.closest('button');
     if (btn) showTab(btn.getAttribute('data-tab'));
   };
-  window.addEventListener('hashchange', () => showTab(location.hash === '#bot' ? 'bot' : 'portfolio'));
-  showTab(location.hash === '#bot' ? 'bot' : 'portfolio');
+  const fromHash = () => showTab(location.hash.replace('#', '') || 'portfolio');
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+
+  // sub-bagian di dalam tab investor
+  $('#segInv').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const want = btn.getAttribute('data-i');
+    $('#segInv').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
+    document.querySelectorAll('[data-inv]').forEach((el) => { el.hidden = el.getAttribute('data-inv') !== want; });
+  };
+
+  // dua deret di kartu nilai
+  $('#segSeries').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    navView.series = btn.getAttribute('data-s') === 'share' ? 'share' : 'wallet';
+    $('#segSeries').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
+    renderNavChart();
+  };
+
+  $('#divNav').oninput = renderDividend;
   $('#wdAmount').oninput = renderCalc;
   $('#wdMode').onchange = renderCalc;
   $('#wdOwner').onchange = renderCalc;
-  $('#wdCopyBtn').onclick = async () => {
-    try { await navigator.clipboard.writeText($('#wdJson').textContent); $('#wdCopyBtn').textContent = 'tersalin'; }
-    catch { $('#wdCopyBtn').textContent = 'gagal'; }
-    setTimeout(() => { $('#wdCopyBtn').textContent = 'salin JSON'; }, 1400);
-  };
 
   await load();
 

@@ -110,15 +110,19 @@ const valueOf = (id) => (before.owners.find((o) => o.id === id)?.units ?? 0) * u
 const date = String(flag('date') || new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10));
 const note = typeof flag('note') === 'string' ? flag('note') : '';
 
+// Jam disimpan, bukan cuma tanggal: grafik harga saham membagi nilai wallet
+// dengan jumlah unit beredar, dan unit yang bertambah sejak 00:00 padahal
+// uangnya baru mendarat sore hari membuat harga saham tampak jatuh berjam-jam
+// tanpa ada yang terjadi.
 const events = [];
 if (prorata) {
   for (const o of before.owners) {
     const share = before.totalUnits > 0 ? o.units / before.totalUnits : 0;
     const cut = Number((amount * share).toFixed(2));
-    if (cut > 0) events.push({ date, type, owner: o.id, usd: cut, navBefore: Number(navUsd.toFixed(2)), note });
+    if (cut > 0) events.push({ date, at: Date.now(), type, owner: o.id, usd: cut, navBefore: Number(navUsd.toFixed(2)), note });
   }
 } else {
-  events.push({ date, type, owner, usd: Number(amount.toFixed(2)), navBefore: Number(navUsd.toFixed(2)), note });
+  events.push({ date, at: Date.now(), type, owner, usd: Number(amount.toFixed(2)), navBefore: Number(navUsd.toFixed(2)), note });
 }
 
 // ─── penarikan tidak boleh melebihi jatah ─────────────────────────────────

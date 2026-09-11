@@ -47,6 +47,7 @@
 
   <nav class="tabs" id="tabs" role="tablist">
     <button role="tab" data-tab="portfolio" class="on" aria-selected="true">Portofolio</button>
+    <button role="tab" data-tab="investor" aria-selected="false">Data investor</button>
     <button role="tab" data-tab="bot" aria-selected="false">💓 Bot</button>
   </nav>
 
@@ -147,7 +148,9 @@
   <!-- ── nilai wallet dari waktu ke waktu ──────────────────── -->
   <section class="card" id="navCard">
     <div class="card-head">
-      <h2>Nilai wallet</h2>
+      <div class="seg tabs2" id="segSeries" role="group" aria-label="Deret">
+        <button data-s="wallet" class="on">Nilai wallet</button><button data-s="share">Nilai saham</button>
+      </div>
       <span class="hint" id="navHint"></span>
     </div>
     <div class="controls">
@@ -207,50 +210,6 @@
       sepenuhnya.</p>
   </section>
 
-  <!-- ── kalkulator tarik ──────────────────────────────────── -->
-  <section class="card">
-    <div class="card-head">
-      <h2>Kalkulator penarikan</h2>
-      <span class="hint">hitung dulu sebelum tarik — jatah tiap orang ikut porsi saham</span>
-    </div>
-    <div class="calc">
-      <label class="field">
-        <span>Jumlah tarik (USD)</span>
-        <input type="number" id="wdAmount" min="0" step="any" placeholder="800">
-      </label>
-      <label class="field">
-        <span>Mode</span>
-        <select id="wdMode">
-          <option value="prorata">Bagi rata sesuai saham</option>
-          <option value="single">Satu orang saja</option>
-        </select>
-      </label>
-      <label class="field" id="wdOwnerField" hidden>
-        <span>Pemilik</span>
-        <select id="wdOwner"></select>
-      </label>
-    </div>
-    <div class="table-scroll">
-      <table id="wdTable">
-        <thead>
-          <tr>
-            <th>Pemilik</th>
-            <th class="num">Dapat</th>
-            <th class="num">Sisa nilai</th>
-            <th class="num">Saham setelah tarik</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <details class="rec">
-      <summary>Catat transaksi ini ke <code>data/config.json</code></summary>
-      <p class="hint">Salin baris di bawah, tempel ke array <code>events</code> di <code>data/config.json</code>, lalu push ke GitHub.</p>
-      <pre id="wdJson">—</pre>
-      <button class="btn ghost" id="wdCopyBtn">salin JSON</button>
-    </details>
-  </section>
-
   <!-- ── token di wallet ───────────────────────────────────── -->
   <section class="card">
     <div class="card-head">
@@ -304,6 +263,94 @@
     </div>
   </section>
 
+  <!-- ── biaya bulanan ─────────────────────────────────────── -->
+  <section class="card" id="costCard">
+    <div class="card-head">
+      <h2>Biaya bulanan</h2>
+      <span class="hint" id="costHint"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="costTable">
+        <thead><tr><th>Pos</th><th class="num">Per bulan</th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </section>
+
+  </div><!-- /tab-portfolio -->
+
+  <div id="tab-investor" hidden>
+    <div class="controls sub">
+      <div class="seg" id="segInv" role="group" aria-label="Bagian data investor">
+        <button data-i="dividen" class="on">Dividen</button><button data-i="tarik">Simulasi penarikan</button><button data-i="riwayat">Riwayat transaksi</button>
+      </div>
+    </div>
+
+    <div data-inv="dividen">
+      <section class="card">
+        <div class="card-head">
+          <h2>Estimasi dividen</h2>
+          <span class="hint" id="divHint"></span>
+        </div>
+        <div class="stats div-sum" id="divSummary"></div>
+        <div class="calc">
+          <label class="field">
+            <span>Andai nilai wallet (USD)</span>
+            <input type="number" id="divNav" min="0" step="any">
+          </label>
+        </div>
+        <div class="table-scroll">
+          <table id="divTable">
+            <thead><tr><th>Investor</th><th class="num">Saham</th><th class="num">Estimasi dividen</th><th class="num">Nilai saham tersisa</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="explain-body" id="divRule"></div>
+      </section>
+    </div>
+
+    <div data-inv="tarik" hidden>
+  <!-- ── kalkulator tarik ──────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Simulasi penarikan</h2>
+      <span class="hint">hitung dulu sebelum tarik — jatah tiap orang ikut porsi saham</span>
+    </div>
+    <div class="calc">
+      <label class="field">
+        <span>Jumlah tarik (USD)</span>
+        <input type="number" id="wdAmount" min="0" step="any" placeholder="800">
+      </label>
+      <label class="field">
+        <span>Mode</span>
+        <select id="wdMode">
+          <option value="prorata">Bagi rata sesuai saham</option>
+          <option value="single">Satu orang saja</option>
+        </select>
+      </label>
+      <label class="field" id="wdOwnerField" hidden>
+        <span>Pemilik</span>
+        <select id="wdOwner"></select>
+      </label>
+    </div>
+    <div class="table-scroll">
+      <table id="wdTable">
+        <thead>
+          <tr>
+            <th>Pemilik</th>
+            <th class="num">Dapat</th>
+            <th class="num">Sisa nilai</th>
+            <th class="num">Saham setelah tarik</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+    </div>
+
+    <div data-inv="riwayat" hidden>
   <!-- ── riwayat ───────────────────────────────────────────── -->
   <section class="card">
     <div class="card-head">
@@ -322,23 +369,10 @@
       </table>
     </div>
   </section>
-
-  <!-- ── biaya bulanan ─────────────────────────────────────── -->
-  <section class="card" id="costCard">
-    <div class="card-head">
-      <h2>Biaya bulanan</h2>
-      <span class="hint" id="costHint"></span>
     </div>
-    <div class="table-scroll">
-      <table id="costTable">
-        <thead><tr><th>Pos</th><th class="num">Per bulan</th></tr></thead>
-        <tbody></tbody>
-        <tfoot></tfoot>
-      </table>
-    </div>
-  </section>
+  </div><!-- /tab-investor -->
 
-  </div><!-- /tab-portfolio -->
+
 
   <div id="tab-bot" hidden>
     <section class="card" id="hbCard">
