@@ -51,10 +51,35 @@ const state = { cfg: null, ledger: null, nav: null };
 
 /* ── format ──────────────────────────────────────────────────────────── */
 
-const usd = (n, dp = 2) =>
+/**
+ * Satu angka, dua satuan.
+ *
+ * Semua yang dihitung situs ini berdenominasi dolar — itu satuan yang dipakai
+ * bot dan yang dipakai orang waktu menyetor. Tampilan ETH adalah konversi di
+ * lapisan paling luar memakai harga ETH yang sama dengan yang dipakai menilai
+ * wallet, jadi tidak ada angka kedua yang bisa berbeda diam-diam dari yang
+ * pertama.
+ */
+let currency = (() => {
+  try { return localStorage.getItem('cashood.currency') === 'eth' ? 'eth' : 'usd'; }
+  catch { return 'usd'; }
+})();
+
+const fmtUsd = (n, dp = 2) =>
   (n < 0 ? '-' : '') + '$' + Math.abs(Number(n) || 0).toLocaleString('en-US', {
     minimumFractionDigits: dp, maximumFractionDigits: dp,
   });
+
+function fmtEth(n) {
+  const price = state.nav?.ethPrice;
+  if (!price) return '—';
+  const v = (Number(n) || 0) / price;
+  const a = Math.abs(v);
+  const dp = a >= 100 ? 2 : a >= 1 ? 3 : a >= 0.01 ? 4 : 6;
+  return (v < 0 ? '-' : '') + 'Ξ' + a.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+}
+
+const usd = (n, dp = 2) => (currency === 'eth' ? fmtEth(n) : fmtUsd(n, dp));
 
 const pct = (n, dp = 2) => (Number(n) || 0).toFixed(dp) + '%';
 
@@ -289,6 +314,7 @@ async function resolveNav(cfg, { force = false } = {}) {
   const positions = snap?.positions || [];
   const history = snap?.history || [];
   const stats = snap?.stats || null;
+  const closedRecent = snap?.closedRecent || [];
   const lpUsd = positions.reduce((s, p) => s + (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), 0);
   const snapAge = snap ? Date.now() - (Number(snap.updatedAt) || 0) : null;
 
@@ -304,9 +330,11 @@ async function resolveNav(cfg, { force = false } = {}) {
       positions,
       history,
       stats,
+      closedRecent,
       lpUsd,
       liveUsd: live.totalUsd,
       updatedAt: snap ? Number(snap.updatedAt) : null,
+      ethPrice: live.ethPrice ?? snap?.ethPrice ?? null,
       lpStale: snapAge != null && snapAge > 45 * 60e3,
       partial: !positions.length,
       fetchedAt: Date.now(),
@@ -321,9 +349,11 @@ async function resolveNav(cfg, { force = false } = {}) {
       positions,
       history,
       stats,
+      closedRecent,
       lpUsd,
       liveUsd: (snap.holdings || []).reduce((sum, h) => sum + (Number(h.usd) || 0), 0),
       updatedAt: Number(snap.updatedAt) || null,
+      ethPrice: Number(snap.ethPrice) || null,
       lpStale: snapAge != null && snapAge > 45 * 60e3,
       fetchedAt: Date.now(),
     };
@@ -413,31 +443,133 @@ function renderOwners(rows) {
     `${num(state.ledger.totalUnits, 2)} unit beredar · 1 unit = ${usd(state.ledger.totalUnits > 0 ? state.nav.totalUsd / state.ledger.totalUnits : 0, 4)}`;
 }
 
+const dur = (minutes) => {
+  const m = Math.max(0, Math.round(Number(minutes) || 0));
+  if (m < 60) return m + 'm';
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}j ${m % 60}m`;
+  return `${Math.floor(h / 24)}h ${h % 24}j`;
+};
+
 function renderHoldings(nav) {
-  const rows = [
-    ...(nav.holdings || []).map((h) => ({ ...h, kind: 'token' })),
-    ...(nav.positions || []).map((p) => ({
-      symbol: 'LP ' + (p.symbol || p.tokenId || '?'), amount: null, price: null,
-      usd: (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), kind: 'lp',
-    })),
-  ];
+  const rows = nav.holdings || [];
   const body = $('#holdTable').querySelector('tbody');
-  if (!rows.length) {
-    body.innerHTML = `<tr><td colspan="4" class="dim">Tidak ada saldo terbaca.</td></tr>`;
-  } else {
-    body.innerHTML = rows.map((r) => `
+  body.innerHTML = rows.length
+    ? rows.map((r) => `
       <tr>
-        <td><span class="who"><span class="chip" style="background:${r.kind === 'lp' ? '#60a5fa' : '#4ade80'}"></span>${r.symbol}</span></td>
-        <td class="num">${r.amount == null ? '<span class="dim">—</span>' : num(r.amount, 6)}</td>
+        <td><span class="who"><span class="chip" style="background:#4ade80"></span>${r.symbol}</span></td>
+        <td class="num">${num(r.amount, 6)}</td>
         <td class="num">${r.price == null ? '<span class="dim">—</span>' : usd(r.price, r.price < 10 ? 4 : 2)}</td>
         <td class="num">${r.usd == null ? '<span class="dim">?</span>' : usd(r.usd)}</td>
-      </tr>`).join('');
-  }
+      </tr>`).join('')
+    : '<tr><td colspan="4" class="dim">Tidak ada saldo token terbaca.</td></tr>';
+
+  const total = rows.reduce((sum, r) => sum + (r.usd || 0), 0);
   $('#holdHint').textContent = nav.source === 'manual'
     ? 'NAV dikunci manual di config.json'
-    : nav.partial
-      ? 'token dibaca live dari chain — posisi LP belum terhitung'
-      : `token live dari chain · nilai LP dihitung ${ago(nav.updatedAt)}`;
+    : `${usd(total)} · dibaca live dari chain`;
+}
+
+/**
+ * Posisi LP.
+ *
+ * Fee yang ditampilkan adalah fee yang BELUM dipanen. Fee yang sudah dipanen
+ * tidak dicatat per posisi oleh bot, jadi menjumlahkannya jadi satu kolom
+ * "total fee" akan mengarang angka yang tidak ada sumbernya — kolomnya diberi
+ * nama apa adanya.
+ *
+ * Untung/rugi di sini nilai sekarang dikurangi modal yang masuk ke posisi itu,
+ * dan belum memperhitungkan biaya keluar.
+ */
+function renderLp(nav) {
+  const rows = nav.positions || [];
+  const body = $('#lpTable').querySelector('tbody');
+  $('#lpCount').textContent = rows.length ? `(${rows.length})` : '';
+
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="7" class="dim">Tidak ada posisi terbuka.</td></tr>';
+    $('#lpSummary').innerHTML = '';
+    $('#lpHint').textContent = nav.positions ? 'kosong' : 'butuh snapshot bot';
+    return;
+  }
+
+  const sum = (key) => rows.reduce((t, r) => t + (Number(r[key]) || 0), 0);
+  const value = sum('valueUsd');
+  const invested = sum('investedUsd');
+  const fees = sum('feesUsd');
+  const pnl = value - invested;
+  const inRange = rows.filter((r) => r.inRange).length;
+
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  $('#lpSummary').innerHTML = [
+    tile('Nilai posisi', usd(value), `${rows.length} posisi`),
+    tile('Modal masuk', usd(invested), 'saat dibuka'),
+    tile('Fee belum dipanen', usd(fees), 'masih di dalam posisi'),
+    tile('Untung / rugi', signed(pnl), invested ? pct((pnl / invested) * 100) + ' dari modal' : '—', cls(pnl)),
+    tile('Di dalam range', `${inRange}/${rows.length}`, inRange === rows.length ? 'semua earning' : `${rows.length - inRange} tidak earning`,
+      inRange === rows.length ? 'pos' : 'neg'),
+  ].join('');
+
+  body.innerHTML = [...rows]
+    .sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0))
+    .map((r) => {
+      const band = r.throughBandPct == null ? '' : `<span class="band">${r.throughBandPct.toFixed(0)}%</span>`;
+      return `<tr>
+        <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${r.symbol ?? r.tokenId}</span>
+            <div class="sub2">${r.strategy ?? ''}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div></td>
+        <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
+        <td class="num dim">${dur(r.ageMinutes)}</td>
+        <td class="num">${r.investedUsd == null ? '<span class="dim">—</span>' : usd(r.investedUsd)}</td>
+        <td class="num"><strong>${r.valueUsd == null ? '—' : usd(r.valueUsd)}</strong></td>
+        <td class="num pos">${usd(r.feesUsd)}</td>
+        <td class="num ${cls(r.pnlUsd)}">${r.pnlUsd == null ? '—' : signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
+      </tr>`;
+    }).join('');
+
+  $('#lpHint').textContent = `dihitung bot ${ago(nav.updatedAt)} · fee = yang belum dipanen`;
+}
+
+function renderClosed(nav) {
+  const rows = nav.closedRecent || [];
+  const body = $('#closedTable').querySelector('tbody');
+  $('#closedCard').hidden = false;
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="7" class="dim">Belum ada posisi yang ditutup.</td></tr>';
+    $('#closedHint').textContent = '';
+    return;
+  }
+  body.innerHTML = rows.map((r) => `
+    <tr>
+      <td><span class="who"><span class="chip" style="background:${r.netUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${r.symbol ?? '—'}</span></td>
+      <td class="dim">${r.strategy ?? '—'}</td>
+      <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
+      <td class="num ${cls(r.netUsd)}">${signed(r.netUsd)}</td>
+      <td class="num ${cls(r.netUsd)}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
+      <td class="dim">${r.reason ?? '—'}</td>
+      <td class="num dim">${ago(r.closedAt)}</td>
+    </tr>`).join('');
+  const net = rows.reduce((t, r) => t + (Number(r.netUsd) || 0), 0);
+  $('#closedHint').textContent = `${rows.length} terakhir · jumlahnya ${signed(net)}`;
+}
+
+/** Biaya langganan bulanan. Dibayar dari luar wallet, jadi tidak masuk NAV. */
+function renderCosts(cfg) {
+  const items = cfg?.costs?.items || [];
+  const table = $('#costTable');
+  $('#costCard').hidden = !items.length;
+  if (!items.length) return;
+
+  table.querySelector('tbody').innerHTML = items
+    .map((c) => `<tr><td>${c.name}</td><td class="num">${usd(c.usd)}</td></tr>`).join('');
+
+  const total = items.reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  table.querySelector('tfoot').innerHTML =
+    `<tr class="total"><td><strong>Total</strong></td><td class="num"><strong>${usd(total)}</strong></td></tr>`
+    + `<tr><td class="dim">Per hari</td><td class="num dim">${usd(total / 30)}</td></tr>`;
+
+  const navUsd = state.nav?.totalUsd || 0;
+  $('#costHint').textContent = cfg.costs.note
+    + (navUsd ? ` · ${pct((total / navUsd) * 100)} dari nilai wallet per bulan` : '');
 }
 
 function renderHistory(ledger) {
@@ -1058,6 +1190,9 @@ function renderAll() {
   renderDonut(rows);
   renderOwners(rows);
   renderHoldings(state.nav);
+  renderLp(state.nav);
+  renderClosed(state.nav);
+  renderCosts(state.cfg);
   renderNavChart();
   renderProfit();
   renderHistory(state.ledger);
@@ -1118,6 +1253,16 @@ async function init() {
   };
   $('#refreshBtn').onclick = () => load({ force: true });
   wireProfitControls();
+
+  $('#segCur').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    currency = btn.getAttribute('data-c') === 'eth' ? 'eth' : 'usd';
+    try { localStorage.setItem('cashood.currency', currency); } catch { /* mode privat */ }
+    $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
+    renderAll();
+  };
+  $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-c') === currency));
 
   $('#tabs').onclick = (e) => {
     const btn = e.target.closest('button');

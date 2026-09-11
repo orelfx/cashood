@@ -31,7 +31,7 @@ const { balanceOf } = await load('venue/quote.js');
 const { ethUsd } = await load('venue/price.js');
 const { getWallet } = await load('chain/signer.js');
 const { getClosed } = await load('store.js');
-const { NATIVE, USDG, WETH } = await load('chain/addresses.js');
+const { NATIVE, USDG, WETH, decimalsOf } = await load('chain/addresses.js');
 
 const wallet = getWallet('multi');
 if (!wallet) throw new Error('wallet "multi" tidak ketemu — cek RR_* di .env');
@@ -51,15 +51,49 @@ const holdings = [
   .map((h) => ({ ...h, usd: h.price == null ? null : h.amount * h.price }))
   .filter((h) => h.usd == null || h.usd >= 0.01);            // buang debu sisa swap
 
+// Modal per posisi disimpan bot dalam satuan token kuotanya, bukan dolar.
+// Hanya tiga token yang boleh jadi kuota di sini, jadi konversinya pasti.
+const toUsd = (amount, token) => {
+  const dec = decimalsOf(token);
+  if (dec == null) return null;
+  const units = Number(amount) / 10 ** dec;
+  const quote = String(token || '').toLowerCase();
+  if (quote === USDG.toLowerCase()) return units;
+  if (quote === WETH.toLowerCase() || quote === NATIVE) return price == null ? null : units * price;
+  return null;
+};
+
 const positions = [];
 for (const book of await readBook()) {
   for (const p of book.positions || []) {
     if (p.error) continue;
+
+    const investedUsd = toUsd(p.basisQuote, p.quoteToken);
+    const valueUsd = Number(p.valueUsd);          // principal + fee yang belum dipanen
+    const pnlUsd = investedUsd == null || !Number.isFinite(valueUsd) ? null : valueUsd - investedUsd;
+
+    // Seberapa jauh harga berjalan di dalam pitanya — 0% di tepi bawah,
+    // 100% di tepi atas. Di luar pita angkanya keluar dari rentang itu.
+    const span = Number(p.tickUpper) - Number(p.tickLower);
+    const through = Number.isFinite(span) && span > 0
+      ? ((Number(p.currentTick) - Number(p.tickLower)) / span) * 100
+      : null;
+
     positions.push({
       tokenId: String(p.tokenId ?? ''),
       symbol: p.symbol ?? null,
+      strategy: book.strategy ?? null,
+      inRange: p.inRange === true,
       principalUsd: Number(p.principalUsd) || 0,
-      feesUsd: Number(p.feesUsd) || 0,
+      feesUsd: Number(p.feesUsd) || 0,            // belum dipanen
+      valueUsd: Number.isFinite(valueUsd) ? Number(valueUsd.toFixed(2)) : null,
+      investedUsd: investedUsd == null ? null : Number(investedUsd.toFixed(2)),
+      pnlUsd: pnlUsd == null ? null : Number(pnlUsd.toFixed(2)),
+      pnlPct: pnlUsd == null || !investedUsd ? null : Number(((pnlUsd / investedUsd) * 100).toFixed(2)),
+      feePct: Number(p.lpFeePct) || null,
+      ageMinutes: Math.round(Number(p.ageMinutes) || 0),
+      outOfRangeMinutes: Math.round(Number(p.outOfRangeMinutes) || 0),
+      throughBandPct: through == null ? null : Number(through.toFixed(1)),
     });
   }
 }
@@ -104,6 +138,22 @@ const realisedUsd = history.reduce((s, r) => s + r.usd, 0);
 const best = history.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
 const worst = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), null);
 
+// Sepuluh posisi terakhir yang ditutup — cukup untuk melihat apa yang baru
+// saja terjadi tanpa mengunduh dua ratus baris yang tidak dibaca siapa pun.
+const closedRecent = [...closed]
+  .sort((a, b) => (Number(b.closedAt) || 0) - (Number(a.closedAt) || 0))
+  .slice(0, 10)
+  .map((r) => ({
+    symbol: r.symbol ?? null,
+    strategy: r.strategy ?? null,
+    netUsd: Number(Number(r.netUsd).toFixed(2)),
+    netPct: Number.isFinite(Number(r.netPct)) ? Number((Number(r.netPct) * 100).toFixed(2)) : null,
+    openedAt: Number(r.openedAt) || null,
+    closedAt: Number(r.closedAt) || null,
+    holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null,
+    reason: String(r.closeReason || '').split(':')[0] || null,
+  }));
+
 const stats = {
   closedCount: closed.length,
   winRate: graded ? Number(((wins / graded) * 100).toFixed(2)) : null,
@@ -130,6 +180,7 @@ const snapshot = {
   positions,
   history,
   stats,
+  closedRecent,
 };
 
 mkdirSync(dirname(OUT), { recursive: true });

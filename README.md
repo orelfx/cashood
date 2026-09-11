@@ -226,6 +226,53 @@ Cron: `7 * * * *` (bot kirim heartbeat menit :04).
 
 ---
 
+## Tampilan dolar / ETH
+
+Tombol `$` / `Ξ` di kanan atas menukar satuan semua angka di halaman. Semua
+hitungan tetap dalam dolar — itu satuan yang dipakai bot dan yang dipakai orang
+waktu menyetor — dan ETH cuma konversi di lapisan paling luar, memakai harga
+ETH yang sama dengan yang dipakai menilai wallet. Jadi tidak ada angka kedua
+yang bisa melenceng diam-diam dari yang pertama. Pilihannya diingat di browser.
+
+---
+
+## Posisi LP
+
+Kartu **Posisi LP** terpisah dari **Token di wallet** — dua hal yang berbeda dan
+tidak enak dibaca kalau dicampur dalam satu tabel.
+
+Tiap baris: pool, status range, umur, modal, nilai, fee, untung/rugi.
+
+- **hijau** = harga di dalam range (posisi sedang menghasilkan fee)
+- **merah** = di luar range (diam, tidak menghasilkan)
+- angka `14%` di sebelah status = posisi harga di dalam pita, 0% tepi bawah,
+  100% tepi atas
+- untung/rugi hijau kalau plus, merah kalau minus
+
+Kolomnya **"Fee"** itu fee yang **belum dipanen**. Fee yang sudah dipanen tidak
+dicatat per posisi oleh bot, jadi menjumlahkannya jadi satu kolom "total fee"
+berarti mengarang angka yang tidak ada sumbernya.
+
+Kartu **Posisi terakhir ditutup** menampilkan 10 terbaru, ikut diperbarui tiap
+snapshot.
+
+---
+
+## Biaya bulanan
+
+Diatur di `data/config.json` bagian `costs`. Dibayar dari luar wallet, jadi
+tidak ikut mengurangi NAV maupun bagi hasil — ditampilkan supaya kelihatan
+berapa yang harus ditutup tiap bulan.
+
+```json
+"costs": {
+  "note": "biaya bulanan, dibayar dari luar wallet",
+  "items": [ { "name": "VPS", "usd": 15 } ]
+}
+```
+
+---
+
 ## Riwayat profit
 
 Kartu **Riwayat profit** ambil angka dari buku posisi bot — semua posisi yang

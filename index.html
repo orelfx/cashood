@@ -27,6 +27,9 @@
       <a class="addr" id="addrLink" href="#" target="_blank" rel="noopener" title="Lihat di explorer">
         <span id="addrText">0x…</span>
       </a>
+      <div class="seg cur" id="segCur" role="group" aria-label="Mata uang">
+        <button data-c="usd" class="on" title="Tampilkan dalam dolar">$</button><button data-c="eth" title="Tampilkan dalam ETH">Ξ</button>
+      </div>
       <button class="btn ghost" id="copyBtn" title="Salin address">salin</button>
       <button class="btn" id="refreshBtn" title="Ambil data terbaru">refresh</button>
     </div>
@@ -207,16 +210,52 @@
     </details>
   </section>
 
-  <!-- ── isi wallet ────────────────────────────────────────── -->
+  <!-- ── token di wallet ───────────────────────────────────── -->
   <section class="card">
     <div class="card-head">
-      <h2>Isi wallet</h2>
+      <h2>Token di wallet</h2>
       <span class="hint" id="holdHint"></span>
     </div>
     <div class="table-scroll">
       <table id="holdTable">
         <thead>
           <tr><th>Aset</th><th class="num">Jumlah</th><th class="num">Harga</th><th class="num">Nilai</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── posisi LP ─────────────────────────────────────────── -->
+  <section class="card" id="lpCard">
+    <div class="card-head">
+      <h2>Posisi LP <span class="count" id="lpCount"></span></h2>
+      <span class="hint" id="lpHint"></span>
+    </div>
+    <div class="stats lp-sum" id="lpSummary"></div>
+    <div class="table-scroll">
+      <table id="lpTable">
+        <thead>
+          <tr>
+            <th>Pool</th><th>Status</th><th class="num">Umur</th><th class="num">Modal</th>
+            <th class="num">Nilai</th><th class="num">Fee</th><th class="num">Untung / rugi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── posisi yang sudah ditutup ─────────────────────────── -->
+  <section class="card" id="closedCard">
+    <div class="card-head">
+      <h2>Posisi terakhir ditutup</h2>
+      <span class="hint" id="closedHint"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="closedTable">
+        <thead>
+          <tr><th>Pool</th><th>Strategi</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -238,6 +277,21 @@
           </tr>
         </thead>
         <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── biaya bulanan ─────────────────────────────────────── -->
+  <section class="card" id="costCard">
+    <div class="card-head">
+      <h2>Biaya bulanan</h2>
+      <span class="hint" id="costHint"></span>
+    </div>
+    <div class="table-scroll">
+      <table id="costTable">
+        <thead><tr><th>Pos</th><th class="num">Per bulan</th></tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
       </table>
     </div>
   </section>
