@@ -283,7 +283,7 @@
   <div id="tab-investor" hidden>
     <div class="controls sub">
       <div class="seg" id="segInv" role="group" aria-label="Bagian data investor">
-        <button data-i="dividen" class="on">Dividen</button><button data-i="tarik">Simulasi penarikan</button><button data-i="riwayat">Riwayat transaksi</button>
+        <button data-i="dividen" class="on">Dividen</button><button data-i="tarik">Simulasi penarikan</button><button data-i="riwayat">Riwayat transaksi</button><button data-i="aturan">Aturan dana</button>
       </div>
     </div>
 
@@ -370,6 +370,31 @@
     </div>
   </section>
     </div>
+    <div data-inv="aturan" hidden>
+      <section class="card">
+        <div class="card-head">
+          <h2>Kapasitas dana</h2>
+          <span class="hint" id="capHint"></span>
+        </div>
+        <div class="meter"><div class="meter-fill" id="capFill"></div></div>
+        <div class="meter-legend" id="capLegend"></div>
+        <p class="hint" id="capNote"></p>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Aturan main</h2>
+          <span class="hint">berlaku untuk semua pemegang saham</span>
+        </div>
+        <div class="table-scroll">
+          <table id="rulesTable">
+            <thead><tr><th>Pokok</th><th>Aturan</th><th>Kenapa begitu</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
   </div><!-- /tab-investor -->
 
 

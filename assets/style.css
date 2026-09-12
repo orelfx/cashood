@@ -289,3 +289,16 @@ svg.ethmark { width: .5em; height: .8em; display: inline-block; vertical-align: 
 #divRule p { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.65; }
 #divRule p:last-child { margin-bottom: 0; }
 #divRule strong { color: var(--text); }
+
+/* ── meter kapasitas ─────────────────────────────────────────────────── */
+.meter { height: 16px; border-radius: 999px; background: #0f1319; border: 1px solid var(--line);
+         overflow: hidden; }
+.meter-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width .4s ease; }
+.meter-fill.full { background: var(--amber); }
+.meter-fill.over { background: var(--red); }
+.meter-legend { display: flex; justify-content: space-between; margin-top: 8px;
+                font: 12px var(--mono); color: var(--muted); }
+.meter-legend b { color: var(--text); }
+#rulesTable td:first-child { font-weight: 600; white-space: nowrap; }
+#rulesTable td:nth-child(2) { font-family: var(--mono); color: var(--accent); white-space: nowrap; }
+#rulesTable td:last-child { color: var(--muted); white-space: normal; font-size: 12.5px; }

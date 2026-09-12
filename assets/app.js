@@ -1023,32 +1023,41 @@ function sharePriceSeries(points) {
 
 /* ── dividen ─────────────────────────────────────────────────────────────
  *
- * Dibayar dari laba di atas modal terkunci, bukan dari nilai wallet. Urutannya
- * ditampilkan baris per baris dengan sengaja: yang menerima uang berhak tahu
- * angkanya datang dari mana, dan aturan yang cuma hidup di kepala pengelola
- * adalah aturan yang bisa berubah tanpa ada yang sadar.
+ * Dihitung dari kenaikan HARGA SAHAM di atas rekor tertinggi, bukan dari
+ * selisih nilai wallet terhadap total setoran. Bedanya menentukan: nilai
+ * wallet ikut naik saat ada investor baru masuk, dan dividen yang dihitung
+ * dari situ akan membagikan uang yang baru saja disetor orang. Harga saham
+ * tidak bergerak oleh setoran, jadi yang terbagi benar-benar hasil kerja bot.
+ *
+ * Rekor tertinggi mencegah laba yang sama dibayar dua kali: dana yang naik,
+ * membayar dividen, jatuh, lalu naik lagi ke titik yang sama tidak menghasilkan
+ * apa-apa yang baru untuk dibagi.
  */
 function dividendPlan(navUsd) {
   const d = state.cfg?.dividend || {};
-  const ledger = state.ledger;
-  const locked = Number(d.lockedCapitalUsd) > 0
-    ? Number(d.lockedCapitalUsd)
-    : (ledger?.deposited || 0) - (ledger?.withdrawn || 0);
-
-  const profit = Math.max(0, (Number(navUsd) || 0) - locked);
+  const units = state.ledger?.totalUnits || 0;
+  const hwm = Number(d.highWaterMarkPerUnit) > 0 ? Number(d.highWaterMarkPerUnit) : 1;
+  const feePct = Number(d.performanceFeePct) || 0;
   const profitSharePct = Number.isFinite(Number(d.profitSharePct)) ? Number(d.profitSharePct) : 50;
-  const platformFeePct = Number(d.platformFeePct) || 0;
 
-  const pool = profit * (profitSharePct / 100);
+  const navPerUnit = units > 0 ? (Number(navUsd) || 0) / units : 0;
+  const locked = hwm * units;                       // modal terkunci = rekor × unit beredar
+  const gain = Math.max(0, (navPerUnit - hwm) * units);
+
+  const fee = gain * (feePct / 100);
+  const pool = (gain - fee) * (profitSharePct / 100);
   const reserve = Math.min(Number(d.reserveUsd) || 0, pool);
-  const fee = Math.max(0, (pool - reserve) * (platformFeePct / 100));
-  const distributed = Math.max(0, pool - reserve - fee);
+  const distributed = Math.max(0, pool - reserve);
 
-  // Cadangan tetap di dalam dana; dividen dan fee keluar dari dana.
+  // Cadangan tetap di dalam dana; dividen dan fee performa keluar.
   const navAfter = (Number(navUsd) || 0) - distributed - fee;
 
-  return { locked, profit, pool, reserve, fee, distributed, navAfter, profitSharePct, platformFeePct,
-    retained: Math.max(0, (Number(navUsd) || 0) - locked - pool) + reserve,
+  return { locked, hwm, navPerUnit, units, profit: gain, pool, reserve, fee, distributed, navAfter,
+    profitSharePct, feePct,
+    standardFeePct: Number(d.performanceFeeStandardPct) || 0,
+    feeNote: d.performanceFeeNote || '',
+    retained: Math.max(0, gain - fee - pool) + reserve,
+    hwmAfter: units > 0 ? navAfter / units : hwm,
     payDay: Number(d.payDayOfMonth) || 1 };
 }
 
@@ -1056,6 +1065,42 @@ function nextPayDate(day) {
   const now = new Date();
   const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, day));
   return `${next.getUTCDate()} ${M_SHORT[next.getUTCMonth()]} ${next.getUTCFullYear()}`;
+}
+
+/** Plafon kapasitas: strategi ini punya batas, dan batasnya diumumkan. */
+function renderRules() {
+  const f = state.cfg?.fund || {};
+  const d = state.cfg?.dividend || {};
+  const cap = Number(f.capacityUsd) || 0;
+  const nav = state.nav?.totalUsd || 0;
+  const used = cap > 0 ? (nav / cap) * 100 : 0;
+
+  const fill = $('#capFill');
+  fill.style.width = Math.min(100, used).toFixed(1) + '%';
+  fill.className = 'meter-fill' + (used >= 100 ? ' over' : used >= 85 ? ' full' : '');
+
+  $('#capHint').textContent = used >= 100 ? 'plafon tercapai' : `${pct(used, 1)} terpakai`;
+  $('#capLegend').innerHTML = `<span>terisi <b>${usd(nav, 0)}</b></span>`
+    + `<span>${used >= 100 ? 'kelebihan ' + usd(nav - cap, 0) : 'ruang tersisa <b>' + usd(cap - nav, 0) + '</b>'}</span>`
+    + `<span>plafon <b>${usd(cap, 0)}</b></span>`;
+  $('#capNote').textContent = used >= 100
+    ? 'Dana sudah penuh. Investor baru masuk dengan membeli saham pemegang lama, bukan dengan setoran baru — supaya ukuran posisi tidak melebihi kedalaman pool.'
+    : `Selama masih ada ruang, setoran baru mencetak unit baru. ${f.note || ''}`;
+
+  const costs = (state.cfg?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  const rules = [
+    ['Minimum setoran', usd(Number(f.minDepositUsd) || 0, 0), 'Di bawah ini, biaya gas untuk masuk dan keluar memakan porsi yang terlalu besar dari setorannya sendiri.'],
+    ['Plafon dana', usd(cap, 0), 'Bot menaruh $600–900 per posisi mengikuti kedalaman pool. Dana yang terlalu besar memaksa posisi membesar, dan price impact naik untuk semua orang.'],
+    ['Masuk & keluar', `${Number(f.noticeHours) || 24} jam`, 'Modal terpasang di posisi likuiditas. Bot perlu waktu menutup posisi di harga yang wajar, bukan panik di harga buruk.'],
+    ['Biaya operasional', `${usd(costs, 0)}/bln`, `Dipotong dari dana menurut porsi saham — ${pct(nav ? (costs / nav) * 100 : 0, 2)} dari modal masing-masing per bulan. Tidak ada yang perlu transfer apa pun.`],
+    ['Fee performa', Number(d.performanceFeePct) > 0 ? d.performanceFeePct + '%' : 'GRATIS',
+      Number(d.performanceFeePct) > 0
+        ? 'Diambil dari laba di atas rekor harga saham. Tidak ada laba, tidak ada fee.'
+        : `Tarif normal ${d.performanceFeeStandardPct || 15}% dari laba di atas rekor, tapi selama masa perkenalan pengelola tidak mengambil apa pun.`],
+    ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1}`, `${d.profitSharePct ?? 50}% dari laba di atas rekor tertinggi, dibagi menurut porsi saham. Sisanya diputar lagi dan menaikkan harga saham.`],
+  ];
+  $('#rulesTable').querySelector('tbody').innerHTML = rules
+    .map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
 }
 
 function renderDividend() {
@@ -1069,11 +1114,18 @@ function renderDividend() {
 
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   $('#divSummary').innerHTML = [
-    tile('Modal terkunci', usd(plan.locked), 'setoran dikurangi penarikan'),
-    tile('Laba di atas modal', usd(plan.profit), plan.profit > 0 ? 'dasar perhitungan dividen' : 'belum ada laba — belum ada dividen', cls(plan.profit)),
-    tile('Kantong dividen', usd(plan.pool), `${plan.profitSharePct}% dari laba`),
-    tile('Tetap di dana', usd(plan.retained), 'cadangan + laba yang diputar lagi'),
-    tile('Dibayarkan', usd(plan.distributed), plan.fee > 0 ? `setelah fee platform ${usd(plan.fee)}` : 'ke seluruh investor', plan.distributed > 0 ? 'pos' : ''),
+    tile('Rekor harga saham', usd(plan.hwm, 4), `modal terkunci ${usd(plan.locked, 0)}`),
+    tile('Harga saham', usd(plan.navPerUnit, 4),
+      plan.navPerUnit >= plan.hwm ? 'di atas rekor' : 'masih di bawah rekor',
+      plan.navPerUnit >= plan.hwm ? 'pos' : 'neg'),
+    tile('Laba di atas rekor', usd(plan.profit),
+      plan.profit > 0 ? 'dasar perhitungan dividen' : 'belum ada laba — belum ada dividen', cls(plan.profit)),
+    tile('Fee performa', plan.feePct > 0 ? usd(plan.fee) : 'GRATIS',
+      plan.feePct > 0 ? `${plan.feePct}% dari laba` : `masa perkenalan · normal ${plan.standardFeePct}%`,
+      plan.feePct > 0 ? '' : 'pos'),
+    tile('Dibayarkan', usd(plan.distributed),
+      plan.profit > 0 ? `${plan.profitSharePct}% dari laba, dikurangi cadangan ${usd(plan.reserve, 0)}` : 'ke seluruh investor',
+      plan.distributed > 0 ? 'pos' : ''),
   ].join('');
 
   $('#divTable').querySelector('tbody').innerHTML = owners.map((o) => `
@@ -1089,19 +1141,24 @@ function renderDividend() {
     + (real ? '' : ' · memakai angka andaian');
 
   $('#divRule').innerHTML = `
-    <p><strong>Urutan hitungnya.</strong> Modal terkunci ${usd(plan.locked)} tidak pernah ikut
-       dibagi — itu uang pokok yang harus tetap bekerja. Yang dibagi hanya laba di atasnya.</p>
-    <p>Dari laba ${usd(plan.profit)}, sebanyak <strong>${plan.profitSharePct}%</strong>
-       (${usd(plan.pool)}) masuk kantong dividen. Sisanya diputar lagi di dana — harga saham
-       naik, dan modal tiap orang ikut tumbuh tanpa perlu setor lagi.</p>
-    <p>Dari kantong itu ${usd(plan.reserve)} ditahan sebagai saldo mengendap, bantalan untuk gas
-       dan biaya keluar-masuk posisi${plan.platformFeePct > 0
-        ? `, lalu fee platform ${plan.platformFeePct}% (${usd(plan.fee)})` : ''}. Sisanya,
-       <strong>${usd(plan.distributed)}</strong>, dibagi menurut proporsi saham pada tanggal
-       pembayaran.</p>
-    <p class="dim">Contoh angka bulat: modal terkunci $9.300, wallet menyentuh $10.000. Laba $700
-       → kantong dividen $350 → mengendap $50 → dibayarkan $300. Pemegang 10% saham menerima $30.
-       Sisa laba $350 tetap di dana dan mengangkat harga saham.</p>`;
+    <p><strong>Yang dibagi adalah kenaikan harga saham, bukan kenaikan nilai wallet.</strong>
+       Nilai wallet ikut naik setiap ada investor baru menyetor — dividen yang dihitung dari situ
+       akan membagikan uang yang baru saja masuk. Harga saham tidak bergerak oleh setoran, jadi
+       yang terbagi benar-benar hasil kerja bot.</p>
+    <p><strong>Rekor tertinggi ${usd(plan.hwm, 4)}</strong> adalah harga saham tertinggi yang pernah
+       dibayarkan dividennya. Selama harga di bawah angka itu, tidak ada dividen — dana yang turun
+       lalu naik lagi ke titik yang sama tidak menghasilkan apa pun yang baru untuk dibagi.</p>
+    <p><strong>Fee performa ${plan.feePct > 0 ? plan.feePct + '%' : '0% — ' + plan.feeNote}.</strong>
+       ${plan.feePct > 0
+        ? 'Diambil dari laba di atas rekor, sebelum sisanya dibagi.'
+        : `Tarif normalnya ${plan.standardFeePct}% dari laba di atas rekor. Selama masa perkenalan pengelola tidak mengambil apa pun; seluruh laba masuk ke investor.`}</p>
+    <p>Dari laba ${usd(plan.profit)}, sebanyak <strong>${plan.profitSharePct}%</strong> masuk kantong
+       dividen, ${usd(plan.reserve, 0)} ditahan sebagai saldo mengendap untuk gas dan biaya
+       keluar-masuk posisi, dan sisanya <strong>${usd(plan.distributed)}</strong> dibagi menurut
+       porsi saham. Laba yang tidak dibagikan tetap bekerja di dana dan menaikkan harga saham.</p>
+    <p class="dim">Contoh: harga saham naik dari rekor $1,0000 ke $1,0750 dengan 9.337 unit → laba
+       $700 → dividen $325 dibagikan, $50 mengendap, $325 diputar lagi. Pemegang 10% saham
+       menerima $32,50, dan sisa unitnya ikut naik nilainya.</p>`;
 }
 
 /* ── riwayat profit ──────────────────────────────────────────────────────
@@ -1382,6 +1439,7 @@ function renderAll() {
   renderClosed(state.nav);
   renderCosts(state.cfg);
   renderDividend();
+  renderRules();
   renderNavChart();
   renderProfit();
   renderHistory(state.ledger);

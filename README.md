@@ -313,6 +313,27 @@ mereka pakai basis dan perhitungan fee sendiri.
 
 ---
 
+## Aturan dana
+
+| Pokok | Aturan |
+|---|---|
+| Minimum setoran | $100 |
+| Plafon kapasitas | $10.000 — di atas itu investor baru beli saham pemegang lama |
+| Masuk & keluar | pemberitahuan 24 jam |
+| Biaya operasional | $155/bln, dipotong dari dana menurut porsi saham |
+| Fee performa | 15% dari laba di atas rekor harga saham — **gratis selama masa perkenalan** |
+| Dividen | 50% dari laba di atas rekor, tiap tanggal 1 |
+
+Semuanya diatur di `data/config.json` (`fund` dan `dividend`) dan ditampilkan di
+tab **Data investor → Aturan dana**, lengkap dengan meter kapasitas.
+
+Dividen dihitung dari kenaikan **harga saham** di atas rekor tertinggi, bukan
+dari kenaikan nilai wallet. Bedanya menentukan: nilai wallet ikut naik tiap ada
+setoran baru, dan dividen yang dihitung dari situ akan membagikan uang yang baru
+saja disetor orang.
+
+---
+
 ## Lisensi
 
 MIT — lihat [LICENSE](LICENSE).
