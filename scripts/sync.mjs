@@ -67,6 +67,22 @@ const toUsd = (amount, token) => {
 
 const books = await readBook();
 
+// ─── fee yang sudah dipanen ──────────────────────────────────────────────
+//
+// Bot tidak mencatat fee yang sudah dipanen per posisi, jadi satu-satunya cara
+// mengetahuinya tanpa mengindeks ulang seluruh chain adalah dengan mengawasi
+// angka fee yang belum dipanen: kalau ia terjun mendekati nol sementara
+// posisinya masih terbuka, fee-nya baru saja diambil.
+//
+// Ambangnya sengaja ketat — turun di bawah 30% DAN lebih dari lima puluh sen —
+// supaya penurunan harga token, yang juga menggerus nilai fee dalam dolar,
+// tidak terhitung sebagai panen. Lebih baik melaporkan kurang daripada
+// mengarang angka yang tidak pernah masuk dompet.
+const FEES_OUT = resolve(dirname(OUT), 'fees.json');
+const feeBook = existsSync(FEES_OUT)
+  ? (JSON.parse(readFileSync(FEES_OUT, 'utf8')).positions || {})
+  : {};
+
 const positions = [];
 for (const book of books) {
   for (const p of book.positions || []) {
@@ -83,13 +99,25 @@ for (const book of books) {
       ? ((Number(p.currentTick) - Number(p.tickLower)) / span) * 100
       : null;
 
+    const id = String(p.tokenId ?? '');
+    const unclaimed = Number(p.feesUsd) || 0;
+    const seen = feeBook[id] || { collectedUsd: 0, lastUnclaimedUsd: unclaimed, since: Date.now() };
+    if (seen.lastUnclaimedUsd - unclaimed > 0.5 && unclaimed < seen.lastUnclaimedUsd * 0.3) {
+      seen.collectedUsd += seen.lastUnclaimedUsd - unclaimed;
+    }
+    seen.lastUnclaimedUsd = unclaimed;
+    feeBook[id] = seen;
+
     positions.push({
       tokenId: String(p.tokenId ?? ''),
       symbol: p.symbol ?? null,
       strategy: book.strategy ?? null,
       inRange: p.inRange === true,
       principalUsd: Number(p.principalUsd) || 0,
-      feesUsd: Number(p.feesUsd) || 0,            // belum dipanen
+      feesUsd: unclaimed,                          // belum dipanen
+      collectedFeesUsd: Number(seen.collectedUsd.toFixed(2)),
+      totalFeesUsd: Number((seen.collectedUsd + unclaimed).toFixed(2)),
+      feesTrackedSince: seen.since || null,
       valueUsd: Number.isFinite(valueUsd) ? Number(valueUsd.toFixed(2)) : null,
       investedUsd: investedUsd == null ? null : Number(investedUsd.toFixed(2)),
       pnlUsd: pnlUsd == null ? null : Number(pnlUsd.toFixed(2)),
@@ -189,6 +217,12 @@ try {
 }
 
 holdings.push(...extra);
+
+// Posisi yang sudah ditutup tidak perlu diawasi lagi; catatannya dibuang
+// supaya berkasnya tidak tumbuh selamanya.
+const openIds = new Set(positions.map((p) => p.tokenId));
+for (const id of Object.keys(feeBook)) if (!openIds.has(id)) delete feeBook[id];
+writeFileSync(FEES_OUT, JSON.stringify({ updatedAt: Date.now(), positions: feeBook }, null, 2) + '\n');
 
 // Sepuluh posisi terakhir yang ditutup — cukup untuk melihat apa yang baru
 // saja terjadi tanpa mengunduh dua ratus baris yang tidak dibaca siapa pun.

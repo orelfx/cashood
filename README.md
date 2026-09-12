@@ -255,9 +255,18 @@ Tiap baris: pool, status range, umur, modal, nilai, fee, untung/rugi.
   100% tepi atas
 - untung/rugi hijau kalau plus, merah kalau minus
 
-Kolomnya **"Fee"** itu fee yang **belum dipanen**. Fee yang sudah dipanen tidak
-dicatat per posisi oleh bot, jadi menjumlahkannya jadi satu kolom "total fee"
-berarti mengarang angka yang tidak ada sumbernya.
+Kolom **"Total fee"** = yang sudah dipanen + yang belum.
+
+Bot tidak mencatat fee yang sudah dipanen per posisi, jadi cashood mengawasinya
+sendiri: tiap 10 menit angka fee yang belum dipanen dicatat di `data/fees.json`,
+dan kalau ia terjun mendekati nol sementara posisinya masih terbuka, berarti
+fee-nya baru diambil — selisihnya ditambahkan ke total.
+
+Ambangnya ketat (turun di bawah 30% **dan** lebih dari $0,50) supaya harga token
+yang melemah, yang juga menggerus nilai fee dalam dolar, tidak terhitung sebagai
+panen. Konsekuensinya angkanya **konservatif**: lebih baik kurang daripada
+mengarang. Hitungannya juga dimulai sejak fitur ini dipasang, bukan sejak posisi
+dibuka — situs menyebutkan sejak kapan.
 
 Kartu **Posisi terakhir ditutup** menampilkan 10 terbaru, ikut diperbarui tiap
 snapshot.

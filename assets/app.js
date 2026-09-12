@@ -552,6 +552,9 @@ function renderLp(nav) {
   const value = sum('valueUsd');
   const invested = sum('investedUsd');
   const fees = sum('feesUsd');
+  const collected = sum('collectedFeesUsd');
+  const sinceAll = rows.map((r) => Number(r.feesTrackedSince) || 0).filter(Boolean);
+  const trackedSince = sinceAll.length ? Math.min(...sinceAll) : null;
   const pnl = value - invested;
   const inRange = rows.filter((r) => r.inRange).length;
 
@@ -559,7 +562,8 @@ function renderLp(nav) {
   $('#lpSummary').innerHTML = [
     tile('Nilai posisi', usd(value), `${rows.length} posisi`),
     tile('Modal masuk', usd(invested), 'saat dibuka'),
-    tile('Fee belum dipanen', usd(fees), 'masih di dalam posisi'),
+    tile('Fee terkumpul', usd(fees + collected),
+      collected > 0 ? `${usd(collected)} sudah dipanen · ${usd(fees)} belum` : 'semuanya masih di dalam posisi', 'pos'),
     tile('Untung / rugi', signed(pnl), invested ? pct((pnl / invested) * 100) + ' dari modal' : '—', cls(pnl)),
     tile('Di dalam range', `${inRange}/${rows.length}`, inRange === rows.length ? 'semua earning' : `${rows.length - inRange} tidak earning`,
       inRange === rows.length ? 'pos' : 'neg'),
@@ -576,12 +580,15 @@ function renderLp(nav) {
         <td class="num dim">${dur(r.ageMinutes)}</td>
         <td class="num">${r.investedUsd == null ? '<span class="dim">—</span>' : usd(r.investedUsd)}</td>
         <td class="num"><strong>${r.valueUsd == null ? '—' : usd(r.valueUsd)}</strong></td>
-        <td class="num pos">${usd(r.feesUsd)}</td>
+        <td class="num pos">${usd((r.totalFeesUsd ?? r.feesUsd) || 0)}<div class="sub2">${
+          r.collectedFeesUsd > 0 ? `${usd(r.collectedFeesUsd)} dipanen` : 'belum dipanen'
+        }</div></td>
         <td class="num ${cls(r.pnlUsd)}">${r.pnlUsd == null ? '—' : signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
       </tr>`;
     }).join('');
 
-  $('#lpHint').textContent = `dihitung bot ${ago(nav.updatedAt)} · fee = yang belum dipanen`;
+  $('#lpHint').textContent = `dihitung bot ${ago(nav.updatedAt)}`
+    + (trackedSince ? ` · fee dipanen dihitung sejak ${ago(trackedSince)}` : '');
 }
 
 function renderClosed(nav) {
