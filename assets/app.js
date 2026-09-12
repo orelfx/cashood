@@ -1568,7 +1568,11 @@ async function init() {
   $('#segCur').onclick = (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
-    currency = btn.getAttribute('data-c') === 'eth' ? 'eth' : 'usd';
+    // Daftar mata uang dibaca dari tombolnya sendiri. Versi sebelumnya menulis
+    // ulang daftar itu di sini — "eth atau usd" — jadi tombol rupiah menyala
+    // tapi angkanya tetap dolar, dan tidak ada yang error untuk menandainya.
+    const want = btn.getAttribute('data-c');
+    currency = ['eth', 'idr'].includes(want) ? want : 'usd';
     try { localStorage.setItem('cashood.currency', currency); } catch { /* mode privat */ }
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     renderAll();
