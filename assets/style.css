@@ -355,3 +355,96 @@ ul.plain strong { color: var(--text); }
 #aboutRules td:last-child { white-space: normal; color: var(--muted); }
 #aboutRules td:first-child { font-weight: 600; white-space: nowrap; }
 .seg.cur button[data-c="idr"] { font: 600 12.5px var(--sans); }
+
+/* ── layar sempit ────────────────────────────────────────────────────────
+ *
+ * Ditulis belakangan setelah halaman ini benar-benar dibuka di telepon.
+ * Yang paling parah bukan tata letaknya, tapi teks di dalam grafik: SVG-nya
+ * diskalakan mengikuti lebar layar, jadi label 11px pada kanvas 720 unit
+ * mendarat sebagai enam piksel di layar 380 — ada, tapi tidak terbaca.
+ */
+@media (max-width: 640px) {
+  .wrap { padding: 0 12px; }
+
+  .top-in { min-height: 0; padding: 9px 0; gap: 8px; }
+  .brand h1 { font-size: 17px; }
+  .tag { display: none; }
+  .top-right { gap: 6px; width: 100%; }
+  .rate { font-size: 11px; padding: 5px 8px; }
+  .addr { font-size: 11px; padding: 5px 8px; }
+  .btn { padding: 6px 11px; font-size: 12px; }
+
+  /* Tab digeser, bukan dibungkus — dibungkus membuat tingginya berubah-ubah
+     saat berpindah tab, dan isi halaman ikut melompat. */
+  .tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { padding: 10px 12px; font-size: 13px; white-space: nowrap; }
+
+  .card { padding: 14px; }
+  .card h2 { font-size: 14.5px; }
+  .card-head { margin-bottom: 12px; gap: 6px; }
+  .hint { font-size: 11.5px; }
+
+  .kpi { padding: 13px; }
+  .kpi .big { font-size: 21px; }
+  .kpi .label { font-size: 10.5px; }
+
+  .strip { gap: 7px 14px; padding: 10px 12px; font-size: 11.5px; }
+
+  table { font-size: 12.5px; }
+  th, td { padding: 8px 9px; }
+  th { font-size: 10.5px; }
+  .table-scroll { -webkit-overflow-scrolling: touch; }
+
+  .stat { padding: 10px 11px; }
+  .stat .v { font-size: 15px; }
+  .stat .k { font-size: 10px; }
+  .stat .n { font-size: 10px; }
+
+  .controls { gap: 8px; }
+  .seg button { padding: 6px 10px; font-size: 12px; }
+  .seg.tabs2 button { padding: 6px 11px; font-size: 12.5px; }
+  input, select { min-width: 0; width: 100%; font-size: 13px; }
+  .field { flex: 1 1 100%; }
+
+  /* Kalender: tujuh kolom di layar 380 menyisakan 44px per kotak. Baris
+     "n tutup" tidak muat dan mendorong angkanya keluar — angkanya yang
+     dipertahankan, keterangannya yang pergi. */
+  .cal-dow, .cal-grid { gap: 4px; }
+  .cal-dow span { font-size: 9px; letter-spacing: 0; }
+  .cell { min-height: 44px; padding: 5px 4px; border-radius: 7px; }
+  .cell .d { font-size: 10px; }
+  .cell .a { font-size: 9.5px; letter-spacing: -.3px; }
+  .cell .c { display: none; }
+  .cal-foot { flex-direction: column; gap: 4px; font-size: 12px; }
+
+  .donut-box, .donut-box > svg#donut { width: 168px; height: 168px; }
+  .donut-val { font-size: 16px; }
+
+  .hero-h { font-size: 20px; }
+  .hero-p, .lead { font-size: 13px; }
+  .hero-stat .hv { font-size: 19px; }
+  .two { gap: 16px; }
+  .explain-body, #divRule, #treRule { padding-left: 0; padding-right: 0; }
+  .explain > summary { padding: 11px 12px; font-size: 12.5px; }
+
+  .meter-legend { flex-wrap: wrap; gap: 4px 12px; font-size: 11px; }
+  .pager button { min-width: 28px; height: 28px; font-size: 12px; }
+  .foot { font-size: 11px; }
+  .hb-row { padding: 8px 11px; font-size: 11.5px; }
+  .hb-lead .t { font-size: 15px; }
+  .risk { padding: 11px 12px; }
+  .how-item { padding: 13px; }
+}
+
+/* Teks di dalam grafik dibesarkan dalam satuan kanvas, supaya setelah SVG
+   diskalakan ke lebar telepon ukurannya mendarat di sekitar sembilan piksel. */
+.chart-wrap svg.small .g-lbl { font-size: 17px; }
+.chart-wrap svg.small .g-cap { font-size: 19px; }
+
+@media (max-width: 430px) {
+  .grid-4 { grid-template-columns: 1fr; }
+  .stats, .lp-sum, .div-sum, .tre-sum { grid-template-columns: 1fr 1fr; }
+  .brand h1 .mark { display: none; }
+  .cell .a { font-size: 9px; }
+}

@@ -835,6 +835,17 @@ function showTab(name) {
  */
 
 const navView = { hours: 24, series: 'wallet' };
+
+/**
+ * Layar sempit butuh grafik yang berbeda, bukan grafik yang sama diperkecil.
+ *
+ * SVG diskalakan mengikuti lebar wadahnya, jadi label 11px pada kanvas 720 unit
+ * mendarat sebagai enam piksel di telepon. Tulisannya dibesarkan lewat kelas
+ * `small`, dan karena tulisan yang lebih besar butuh ruang lebih, marginnya
+ * ikut melebar dan jumlah tanda sumbunya dikurangi — kalau tidak, labelnya
+ * saling menimpa.
+ */
+const narrow = () => (typeof window !== 'undefined' ? (window.innerWidth || 900) : 900) < 640;
 let navPoints = [];
 
 async function readNavSeries(cfg) {
@@ -852,7 +863,8 @@ async function readNavSeries(cfg) {
 
 function renderNavChart() {
   const svg = $('#navChart');
-  const W = 720, H = 240, m = { t: 16, r: 54, b: 30, l: 60 };
+  const small = narrow();
+  const W = 720, H = 240, m = { t: 16, r: small ? 72 : 54, b: small ? 38 : 30, l: small ? 104 : 60 };
   const pw = W - m.l - m.r, ph = H - m.t - m.b;
 
   const cut = navView.hours ? Date.now() - navView.hours * 3600e3 : 0;
@@ -890,8 +902,9 @@ function renderNavChart() {
   const y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph;
 
   let grid = '';
-  for (let i = 0; i <= 3; i += 1) {
-    const v = lo + ((hi - lo) / 3) * i;
+  const ySteps = small ? 2 : 3;
+  for (let i = 0; i <= ySteps; i += 1) {
+    const v = lo + ((hi - lo) / ySteps) * i;
     grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/>`
       + `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${fmt(v)}</text>`;
   }
@@ -917,11 +930,14 @@ function renderNavChart() {
   };
 
   let ticks = '';
-  for (let i = 0; i <= 4; i += 1) {
-    const t = pts[0].t + ((last.t - pts[0].t) / 4) * i;
-    ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="middle" class="g-lbl">${fmtT(t)}</text>`;
+  const xSteps = small ? 2 : 4;
+  for (let i = 0; i <= xSteps; i += 1) {
+    const t = pts[0].t + ((last.t - pts[0].t) / xSteps) * i;
+    const anchor = i === 0 ? 'start' : i === xSteps ? 'end' : 'middle';
+    ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="${anchor}" class="g-lbl">${fmtT(t)}</text>`;
   }
 
+  svg.setAttribute('class', small ? 'small' : '');
   svg.innerHTML = `<defs><linearGradient id="navFill" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity=".22"/>
       <stop offset="100%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity="0"/>
@@ -1288,7 +1304,8 @@ function niceBounds(lo, hi) {
 
 function renderChart(buckets) {
   const svg = $('#profitChart');
-  const W = 720, H = 280, m = { t: 18, r: 16, b: 36, l: 60 };
+  const small = narrow();
+  const W = 720, H = 280, m = { t: 18, r: 16, b: small ? 44 : 36, l: small ? 104 : 60 };
   const pw = W - m.l - m.r, ph = H - m.t - m.b;
 
   if (!buckets.length) {
@@ -1333,7 +1350,7 @@ function renderChart(buckets) {
       caps += `<text x="${x + bw / 2}" y="${up ? yv - 7 : yv + 14}" text-anchor="middle" class="g-cap">${signedText(b.usd)}</text>`;
     }
 
-    const every = Math.ceil(buckets.length / 8);
+    const every = Math.ceil(buckets.length / (small ? 3 : 8));
     if (i % every === 0 || i === buckets.length - 1) {
       bars += `<text x="${x + bw / 2}" y="${H - m.b + 18}" text-anchor="middle" class="g-lbl">${b.label}</text>`;
     }
@@ -1341,6 +1358,7 @@ function renderChart(buckets) {
     hits += `<rect x="${m.l + i * slot}" y="${m.t}" width="${slot}" height="${ph}" fill="transparent" data-i="${i}"/>`;
   });
 
+  svg.setAttribute('class', small ? 'small' : '');
   svg.innerHTML = grid + bars + caps + `<g id="hits">${hits}</g>`;
 
   const wrap = $('#chartWrap');
@@ -1606,6 +1624,19 @@ async function init() {
   };
 
   $('#divNav').oninput = renderDividend;
+
+  // Memutar telepon mengubah lebar, dan grafik yang digambar untuk lebar lama
+  // ikut terbawa — marginnya kelebaran atau labelnya bertumpuk.
+  let resizeTimer = null;
+  let lastNarrow = narrow();
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (narrow() === lastNarrow) return;
+      lastNarrow = narrow();
+      if (state.nav) { renderNavChart(); renderProfit(); }
+    }, 200);
+  });
   $('#wdAmount').oninput = renderCalc;
   $('#wdMode').onchange = renderCalc;
   $('#wdOwner').onchange = renderCalc;
