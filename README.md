@@ -241,12 +241,17 @@ Cron: `7 * * * *` (bot kirim heartbeat menit :04).
 
 ---
 
-## Tampilan dolar / ETH
+## Tampilan dolar / ETH / rupiah
 
-Tombol `$` / `Ξ` di kanan atas menukar satuan semua angka di halaman. Semua
+Tombol `$` / lambang Ether / `Rp` di kanan atas menukar satuan semua angka di
+halaman. Kursnya ditulis di sebelahnya: `1 ETH = $2.513` dan `$1 = Rp 17.607`. Semua
 hitungan tetap dalam dolar — itu satuan yang dipakai bot dan yang dipakai orang
-waktu menyetor — dan ETH cuma konversi di lapisan paling luar, memakai harga
-ETH yang sama dengan yang dipakai menilai wallet. Jadi tidak ada angka kedua
+waktu menyetor — dan ETH maupun rupiah cuma konversi di lapisan paling luar: ETH memakai harga
+yang sama dengan yang dipakai menilai wallet, rupiah memakai kurs dari
+CoinGecko (ETH dalam dolar dan rupiah sekaligus, jadi kursnya turunan dari satu
+panggilan) dengan cadangan open.er-api.com. Kurs terakhir juga ikut ditulis di
+snapshot, supaya tampilan rupiah tetap jalan kalau CoinGecko tidak bisa
+dihubungi dari browser pengunjung. Jadi tidak ada angka kedua
 yang bisa melenceng diam-diam dari yang pertama. Pilihannya diingat di browser.
 
 ---

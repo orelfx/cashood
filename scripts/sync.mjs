@@ -270,8 +270,20 @@ try {
 // Alamat wallet sengaja TIDAK ditulis ke snapshot: berkas ini terbit di repo
 // publik, dan satu baris saja sudah cukup untuk menghubungkan situs ini dengan
 // dompet yang dipantaunya.
+// Kurs rupiah ikut ditulis sebagai cadangan: kalau CoinGecko tidak bisa
+// dihubungi dari browser pengunjung, tampilan rupiah tetap punya angka.
+let usdIdr = null;
+try {
+  const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd,idr',
+    { signal: AbortSignal.timeout(8000) });
+  const j = await r.json();
+  const u = Number(j?.ethereum?.usd), i = Number(j?.ethereum?.idr);
+  if (u > 0 && i > 0) usdIdr = Number((i / u).toFixed(2));
+} catch { /* tanpa kurs, situs mencarinya sendiri */ }
+
 const snapshot = {
   updatedAt: Date.now(),
+  usdIdr,
   totalUsd: Number((totalUsd + treasuryUsd).toFixed(2)),
   botWalletUsd: Number(totalUsd.toFixed(2)),
   treasuryUsd,

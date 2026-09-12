@@ -61,8 +61,10 @@ const state = { cfg: null, ledger: null, nav: null };
  * pertama.
  */
 let currency = (() => {
-  try { return localStorage.getItem('cashood.currency') === 'eth' ? 'eth' : 'usd'; }
-  catch { return 'usd'; }
+  try {
+    const saved = localStorage.getItem('cashood.currency');
+    return ['eth', 'idr'].includes(saved) ? saved : 'usd';
+  } catch { return 'usd'; }
 })();
 
 const fmtUsd = (n, dp = 2) =>
@@ -104,8 +106,36 @@ function fmtEthText(n) {
   return v ? (v.negative ? '-' : '') + v.digits + ' ETH' : '—';
 }
 
-const usd = (n, dp = 2) => (currency === 'eth' ? fmtEth(n) : fmtUsd(n, dp));
-const usdText = (n, dp = 2) => (currency === 'eth' ? fmtEthText(n) : fmtUsd(n, dp));
+let lastUsdIdr = null;
+
+/**
+ * Rupiah ditulis tanpa sen. Kurs 17 ribu membuat satu sen dolar bernilai
+ * seratus tujuh puluh rupiah — angka di belakang koma di sini tidak
+ * menyampaikan apa pun, hanya memanjangkan kolom.
+ */
+function fmtIdr(n) {
+  if (!lastUsdIdr) return '—';
+  const v = (Number(n) || 0) * lastUsdIdr;
+  return (v < 0 ? '-' : '') + 'Rp' + '\u202f'
+    + Math.round(Math.abs(v)).toLocaleString('id-ID', { maximumFractionDigits: 0 });
+}
+
+/** Ringkas, untuk sumbu grafik: puluhan juta rupiah tidak muat ditulis penuh. */
+function fmtIdrText(n) {
+  if (!lastUsdIdr) return '—';
+  const v = (Number(n) || 0) * lastUsdIdr;
+  const a = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  const short = (x, unit) => sign + 'Rp' + '\u202f'
+    + x.toLocaleString('id-ID', { maximumFractionDigits: x >= 100 ? 0 : 1 }) + '\u202f' + unit;
+  if (a >= 1e9) return short(a / 1e9, 'M');
+  if (a >= 1e6) return short(a / 1e6, 'jt');
+  if (a >= 1e4) return short(a / 1e3, 'rb');
+  return sign + 'Rp' + '\u202f' + Math.round(a).toLocaleString('id-ID');
+}
+
+const usd = (n, dp = 2) => (currency === 'eth' ? fmtEth(n) : currency === 'idr' ? fmtIdr(n) : fmtUsd(n, dp));
+const usdText = (n, dp = 2) => (currency === 'eth' ? fmtEthText(n) : currency === 'idr' ? fmtIdrText(n) : fmtUsd(n, dp));
 
 const pct = (n, dp = 2) => (Number(n) || 0).toFixed(dp) + '%';
 
@@ -229,21 +259,32 @@ function buildLedger(cfg) {
  * untuk melakukannya browser harus menyebut alamat wallet yang dipantau —
  * dan alamat itu tidak boleh bocor dari sini.
  */
-async function ethPrice() {
+/**
+ * Kurs ETH dan rupiah dari satu panggilan.
+ *
+ * CoinGecko mengembalikan harga ETH dalam dolar dan rupiah sekaligus; membagi
+ * keduanya memberi kurs dolar-rupiah tanpa perlu sumber kedua. Kalau gagal,
+ * baru mencari kurs rupiah ke tempat lain.
+ */
+async function fxRates() {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd,idr');
     const j = await r.json();
-    const p = Number(j?.ethereum?.usd);
-    if (p > 0) { lastEthPrice = p; return p; }
+    const u = Number(j?.ethereum?.usd);
+    const i = Number(j?.ethereum?.idr);
+    if (u > 0) lastEthPrice = u;
+    if (u > 0 && i > 0) lastUsdIdr = i / u;
   } catch { /* lanjut ke cadangan */ }
-  try {
-    const weth = '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73';
-    const r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + weth);
-    const j = await r.json();
-    const p = Number(j?.pairs?.[0]?.priceUsd);
-    if (p > 0) { lastEthPrice = p; return p; }
-  } catch { /* menyerah */ }
-  return null;
+
+  if (!lastUsdIdr) {
+    try {
+      const r = await fetch('https://open.er-api.com/v6/latest/USD');
+      const j = await r.json();
+      const i = Number(j?.rates?.IDR);
+      if (i > 0) lastUsdIdr = i;
+    } catch { /* tanpa kurs, tampilan rupiah menampilkan tanda pisah */ }
+  }
+  return { eth: lastEthPrice, idr: lastUsdIdr };
 }
 
 /**
@@ -316,6 +357,7 @@ async function resolveNav(cfg, { force = false } = {}) {
     lpUsd,
     liveUsd,
     treasuryUsd: Number(snap.treasuryUsd) || 0,
+    usdIdr: Number(snap.usdIdr) || null,
     botWalletUsd: Number(snap.botWalletUsd) || Number(snap.totalUsd),
     ethPrice: Number(snap.ethPrice) || null,
     updatedAt: Number(snap.updatedAt) || null,
@@ -364,6 +406,9 @@ function renderSummary(ledger, nav) {
 
   const eth = nav.ethPrice || lastEthPrice;
   $('#ethRate').textContent = eth ? `1 ETH = ${fmtUsd(eth)}` : 'kurs ETH belum terbaca';
+  $('#idrRate').textContent = lastUsdIdr
+    ? `$1 = Rp\u202f${Math.round(lastUsdIdr).toLocaleString('id-ID')}`
+    : 'kurs Rp belum terbaca';
 
   const every = Number(state.cfg?.app?.refreshMinutes) || 5;
   $('#stripToken').textContent = nav.source === 'manual'
@@ -1470,7 +1515,9 @@ async function load({ force = false } = {}) {
     const [nav, series] = await Promise.all([
       resolveNav(state.cfg, { force }),
       readNavSeries(state.cfg),
+      fxRates(),
     ]);
+    if (!lastUsdIdr && Number(nav?.usdIdr) > 0) lastUsdIdr = Number(nav.usdIdr);
     state.nav = nav;
     if (series.length) navPoints = series;
 
