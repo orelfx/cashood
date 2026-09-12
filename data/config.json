@@ -9,33 +9,9 @@
     "heartbeatUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/heartbeat.json"
   },
   "wallet": {
-    "address": "0xd84be45d81750b178d98fb1e3fbacc43c002d202",
     "chainId": 4663,
     "chainName": "Robinhood Chain",
-    "rpc": [
-      "https://rpc.mainnet.chain.robinhood.com"
-    ],
-    "explorer": "https://robinhoodchain.blockscout.com",
-    "tokens": [
-      {
-        "symbol": "ETH",
-        "address": "native",
-        "decimals": 18,
-        "priceId": "ethereum"
-      },
-      {
-        "symbol": "USDG",
-        "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
-        "decimals": 6,
-        "priceUsd": 1
-      },
-      {
-        "symbol": "WETH",
-        "address": "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73",
-        "decimals": 18,
-        "priceId": "ethereum"
-      }
-    ]
+    "_note": "Alamat wallet sengaja tidak dicantumkan. Seluruh angka datang dari snapshot yang ditulis bot, bukan dari pembacaan chain di browser — supaya halaman ini tidak pernah menyebut alamat yang dipantaunya."
   },
   "_navOverrideUsd_help": "Isi angka di sini kalau mau kunci nilai NAV manual (mis. 8000). Kosongkan (null) untuk pakai data live.",
   "navOverrideUsd": null,
@@ -145,5 +121,10 @@
     "minDepositUsd": 100,
     "noticeHours": 24,
     "note": "Plafon ditinjau ulang setelah bot terbukti sanggup memegang lebih."
+  },
+  "treasury": {
+    "movedUsd": 10,
+    "stepUsd": 100,
+    "note": "Setiap kelipatan $100 laba dipindahkan ke wallet terpisah. Dividen dan pencairan dibayar dari sana."
   }
 }

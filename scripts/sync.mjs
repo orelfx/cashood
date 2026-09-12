@@ -257,10 +257,24 @@ const stats = {
 const totalUsd = await bookValueUsd('multi');
 if (!Number.isFinite(totalUsd) || totalUsd <= 0) throw new Error(`bookValueUsd tidak masuk akal: ${totalUsd}`);
 
+// Kas cadangan tinggal di wallet lain, tapi ia tetap harta dana. Kalau tidak
+// ikut dihitung, memindahkannya akan terbaca sebagai kerugian sebesar uang
+// yang dipindahkan — dan harga saham semua orang turun karena tindakan yang
+// justru mengamankan uang mereka.
+let treasuryUsd = 0;
+try {
+  const cfg = JSON.parse(readFileSync(resolve(dirname(OUT), 'config.json'), 'utf8'));
+  treasuryUsd = Number(cfg?.treasury?.movedUsd) || 0;
+} catch { /* tanpa config, kas cadangan dianggap nol */ }
+
+// Alamat wallet sengaja TIDAK ditulis ke snapshot: berkas ini terbit di repo
+// publik, dan satu baris saja sudah cukup untuk menghubungkan situs ini dengan
+// dompet yang dipantaunya.
 const snapshot = {
   updatedAt: Date.now(),
-  address: wallet.address,
-  totalUsd: Number(totalUsd.toFixed(2)),
+  totalUsd: Number((totalUsd + treasuryUsd).toFixed(2)),
+  botWalletUsd: Number(totalUsd.toFixed(2)),
+  treasuryUsd,
   ethPrice: price,
   holdings,
   positions,
@@ -300,5 +314,5 @@ writeFileSync(NAV_OUT, JSON.stringify({
   points: kept.slice(-4000),
 }, null, 2) + '\n');
 console.log(`[cashood] ${new Date().toISOString()} total=$${snapshot.totalUsd} positions=${positions.length}`
-  + ` closed=${stats.closedCount} realised=$${stats.realisedUsd} navPoints=${kept.length} -> ${OUT}`);
+  + ` treasury=$${treasuryUsd} closed=${stats.closedCount} realised=$${stats.realisedUsd} navPoints=${kept.length} -> ${OUT}`);
 process.exit(0);

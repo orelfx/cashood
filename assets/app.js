@@ -221,24 +221,14 @@ function buildLedger(cfg) {
 
 /* ── nilai wallet (NAV) ──────────────────────────────────────────────── */
 
-async function rpcCall(urls, method, params) {
-  let lastErr;
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const json = await res.json();
-      if (json.error) throw new Error(json.error.message || 'rpc error');
-      return json.result;
-    } catch (err) { lastErr = err; }
-  }
-  throw lastErr || new Error('semua RPC gagal');
-}
-
+/**
+ * Harga ETH, untuk tombol dolar/ETH.
+ *
+ * Ini satu-satunya panggilan jaringan yang tersisa selain mengambil snapshot:
+ * halaman ini sengaja tidak lagi membaca saldo langsung dari chain, karena
+ * untuk melakukannya browser harus menyebut alamat wallet yang dipantau —
+ * dan alamat itu tidak boleh bocor dari sini.
+ */
 async function ethPrice() {
   try {
     const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
@@ -254,37 +244,6 @@ async function ethPrice() {
     if (p > 0) { lastEthPrice = p; return p; }
   } catch { /* menyerah */ }
   return null;
-}
-
-/** Saldo token yang dipegang wallet, langsung dari RPC publik. */
-async function readWallet(cfg) {
-  const { address, rpc, tokens } = cfg.wallet;
-  const price = await ethPrice();
-  const pad = address.toLowerCase().replace('0x', '').padStart(64, '0');
-
-  // Satu pembacaan yang gagal TIDAK boleh dilewat diam-diam.
-  //
-  // Versi sebelumnya `continue` waktu RPC error: kalau semua panggilan gagal,
-  // saldo token terbaca $0, dan halamannya menampilkan nilai wallet minus
-  // seluruh isi dompet — dengan label "live", tanpa peringatan apa pun. Lebih
-  // baik seluruh pembacaan dianggap gagal supaya jatuh ke snapshot yang utuh.
-  const holdings = [];
-  for (const t of tokens || []) {
-    const raw = t.address === 'native'
-      ? await rpcCall(rpc, 'eth_getBalance', [address, 'latest'])
-      : await rpcCall(rpc, 'eth_call', [{ to: t.address, data: '0x70a08231' + pad }, 'latest']);
-
-    const amount = Number(BigInt(raw || '0x0')) / 10 ** t.decimals;
-    const unit = t.priceId === 'ethereum' ? price : Number(t.priceUsd ?? 0);
-    if (amount > 0 && unit == null) throw new Error(`harga ${t.symbol} tidak terbaca`);
-    // Debu sisa swap — 1e-18 WETH itu $0,0000000000000025. Barisnya cuma bikin
-    // tabel ramai tanpa menambah apa-apa.
-    if (amount <= 0 || amount * unit < 0.01) continue;
-    holdings.push({ symbol: t.symbol, amount, price: unit, usd: amount * unit });
-  }
-
-  const totalUsd = holdings.reduce((s, h) => s + h.usd, 0);
-  return { totalUsd, holdings, ethPrice: price };
 }
 
 /**
@@ -316,7 +275,7 @@ async function resolveNav(cfg, { force = false } = {}) {
     return { totalUsd: manual, source: 'manual', label: 'angka manual dari config.json', fetchedAt: Date.now(), holdings: [], positions: [] };
   }
 
-  // 2. cache pendek — cuma buat nahan reload beruntun, bukan buat nunda data
+  // 2. cache pendek — menahan reload beruntun, bukan menunda data
   const ttl = (Number(cfg.app?.refreshMinutes) || 5) * 60000;
   if (!force) {
     try {
@@ -325,67 +284,45 @@ async function resolveNav(cfg, { force = false } = {}) {
     } catch { /* cache rusak, abaikan */ }
   }
 
-  // 3. Dua sumber, digabung.
+  // 3. Satu sumber: snapshot yang ditulis bot.
   //
-  //    Saldo token dibaca LANGSUNG dari chain tiap kali halaman dibuka — itu
-  //    yang bikin angkanya ikut wallet detik itu juga. Yang tidak bisa dibaca
-  //    browser adalah nilai posisi LP: hitungannya butuh tick math + quoter
-  //    per posisi, jadi bagian itu diambil dari snapshot yang ditulis bot.
-  const [live, snap] = await Promise.all([
-    readWallet(cfg).catch(() => null),
-    readSnapshot(cfg).catch(() => null),
-  ]);
-
-  if (!live && !snap) throw new Error('RPC dan snapshot dua-duanya tidak bisa dibaca');
+  //    Versi sebelumnya membaca saldo token langsung dari chain supaya angkanya
+  //    bergerak tiap menit. Untuk itu browser harus mengirim alamat wallet ke
+  //    RPC publik — alamat yang lalu terbaca siapa pun yang membuka panel
+  //    jaringan. Kesegaran sepuluh menit ditukar dengan alamat yang tidak
+  //    pernah meninggalkan server.
+  const [snap] = await Promise.all([readSnapshot(cfg)]);
 
   const positions = snap?.positions || [];
   const history = snap?.history || [];
   const stats = snap?.stats || null;
   const closedRecent = snap?.closedRecent || [];
   if (Number(snap?.ethPrice) > 0) lastEthPrice = Number(snap.ethPrice);
-  const lpUsd = positions.reduce((s, p) => s + (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), 0);
-  const snapAge = snap ? Date.now() - (Number(snap.updatedAt) || 0) : null;
 
-  let out;
-  if (live) {
-    out = {
-      totalUsd: live.totalUsd + lpUsd,
-      source: positions.length ? 'live+lp' : 'rpc',
-      label: positions.length
-        ? `token live dari chain + ${positions.length} posisi LP dari snapshot`
-        : 'token live dari chain — tidak ada posisi LP terbaca',
-      holdings: live.holdings,
-      positions,
-      history,
-      stats,
-      closedRecent,
-      lpUsd,
-      liveUsd: live.totalUsd,
-      updatedAt: snap ? Number(snap.updatedAt) : null,
-      ethPrice: live.ethPrice ?? snap?.ethPrice ?? null,
-      lpStale: snapAge != null && snapAge > 45 * 60e3,
-      partial: !positions.length,
-      fetchedAt: Date.now(),
-    };
-  } else {
-    // RPC lagi ngambek — pakai snapshot apa adanya
-    out = {
-      totalUsd: Number(snap.totalUsd),
-      source: 'snapshot',
-      label: 'RPC tidak jalan — pakai snapshot bot',
-      holdings: snap.holdings || [],
-      positions,
-      history,
-      stats,
-      closedRecent,
-      lpUsd,
-      liveUsd: (snap.holdings || []).reduce((sum, h) => sum + (Number(h.usd) || 0), 0),
-      updatedAt: Number(snap.updatedAt) || null,
-      ethPrice: Number(snap.ethPrice) || null,
-      lpStale: snapAge != null && snapAge > 45 * 60e3,
-      fetchedAt: Date.now(),
-    };
-  }
+  const lpUsd = positions.reduce((s, p) => s + (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), 0);
+  const holdings = snap.holdings || [];
+  const liveUsd = holdings.reduce((sum, h) => sum + (Number(h.usd) || 0), 0);
+  const age = Date.now() - (Number(snap.updatedAt) || 0);
+
+  const out = {
+    totalUsd: Number(snap.totalUsd),
+    source: 'snapshot',
+    label: `dihitung bot ${ago(Number(snap.updatedAt))}`,
+    holdings,
+    positions,
+    history,
+    stats,
+    closedRecent,
+    lpUsd,
+    liveUsd,
+    treasuryUsd: Number(snap.treasuryUsd) || 0,
+    botWalletUsd: Number(snap.botWalletUsd) || Number(snap.totalUsd),
+    ethPrice: Number(snap.ethPrice) || null,
+    updatedAt: Number(snap.updatedAt) || null,
+    lpStale: age > 45 * 60e3,
+    partial: !positions.length,
+    fetchedAt: Date.now(),
+  };
 
   try { localStorage.setItem(CACHE_KEY, JSON.stringify(out)); } catch { /* mode privat */ }
   return out;
@@ -413,6 +350,7 @@ function renderSummary(ledger, nav) {
   $('#kpiNav').innerHTML = usd(nav.totalUsd);
   $('#kpiNavSub').innerHTML = nav.lpUsd > 0
     ? `${usd(nav.liveUsd ?? 0, 0)} token + ${usd(nav.lpUsd, 0)} di LP`
+      + (nav.treasuryUsd > 0 ? ` + ${usd(nav.treasuryUsd, 0)} kas cadangan` : '')
     : nav.label;
   $('#kpiDeposit').innerHTML = usd(ledger.deposited);
   $('#kpiWithdraw').innerHTML = usd(ledger.withdrawn);
@@ -421,12 +359,7 @@ function renderSummary(ledger, nav) {
   el.className = 'big ' + cls(pnl);
   $('#kpiPnlSub').textContent = (pnl >= 0 ? '+' : '') + pct(pnlPct) + ' dari modal';
   $('#donutVal').innerHTML = usd(nav.totalUsd, 0);
-  $('#footSrc').textContent = {
-    'live+lp': 'RPC publik (live) + snapshot LP',
-    rpc: 'RPC publik (live)',
-    snapshot: 'snapshot bot',
-    manual: 'config manual',
-  }[nav.source] || 'RPC publik';
+  $('#footSrc').textContent = nav.source === 'manual' ? 'config manual' : 'snapshot bot';
   $('#footTime').textContent = 'diperbarui ' + ago(nav.fetchedAt);
 
   const eth = nav.ethPrice || lastEthPrice;
@@ -435,9 +368,7 @@ function renderSummary(ledger, nav) {
   const every = Number(state.cfg?.app?.refreshMinutes) || 5;
   $('#stripToken').textContent = nav.source === 'manual'
     ? 'dikunci manual di config.json'
-    : nav.source === 'snapshot'
-      ? 'RPC tidak jalan — ikut snapshot'
-      : `live dari chain, cek ulang tiap ${every} menit`;
+    : `dihitung bot, halaman cek ulang tiap ${every} menit`;
   $('#stripLp').textContent = nav.positions?.length
     ? `dihitung bot tiap 10 menit · terakhir ${ago(nav.updatedAt)}`
     : 'belum ada snapshot — LP belum terhitung';
@@ -522,7 +453,7 @@ function renderHoldings(nav) {
   const total = rows.reduce((sum, r) => sum + (r.usd || 0), 0);
   $('#holdHint').innerHTML = nav.source === 'manual'
     ? 'NAV dikunci manual di config.json'
-    : `${rows.length} token · ${usd(total)} · dibaca live dari chain`;
+    : `${rows.length} token · ${usd(total)} · dihitung bot ${ago(nav.updatedAt)}`;
 }
 
 /**
@@ -832,11 +763,12 @@ async function loadHeartbeat(cfg) {
 /* ── tab ─────────────────────────────────────────────────────────────── */
 
 function showTab(name) {
-  const known = ['portfolio', 'investor', 'bot'];
+  const known = ['portfolio', 'investor', 'bot', 'tentang'];
   const tab = known.includes(name) ? name : 'portfolio';
   $('#tab-portfolio').hidden = tab !== 'portfolio';
   $('#tab-investor').hidden = tab !== 'investor';
   $('#tab-bot').hidden = tab !== 'bot';
+  $('#tab-tentang').hidden = tab !== 'tentang';
   const bot = tab === 'bot';
   document.querySelectorAll('#tabs button').forEach((b) => {
     const on = b.getAttribute('data-tab') === tab;
@@ -1101,6 +1033,87 @@ function renderRules() {
   ];
   $('#rulesTable').querySelector('tbody').innerHTML = rules
     .map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+}
+
+/** Kas cadangan: uang yang sudah dipindah keluar dari wallet kerja bot. */
+function renderTreasury() {
+  const t = state.cfg?.treasury || {};
+  const moved = Number(t.movedUsd) || 0;
+  const step = Number(t.stepUsd) || 100;
+  const nav = state.nav?.totalUsd || 0;
+  const inBot = Math.max(0, nav - moved);
+
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  $('#treSummary').innerHTML = [
+    tile('Sudah dipindahkan', usd(moved), 'ke wallet terpisah', moved > 0 ? 'pos' : ''),
+    tile('Masih dipakai bot', usd(inBot), 'terpasang di posisi dan token'),
+    tile('Dipindah setiap', usd(step, 0), 'kelipatan laba'),
+    tile('Porsi saham', 'tidak berubah', 'perpindahan tidak menyentuh kepemilikan'),
+  ].join('');
+
+  $('#treHint').textContent = moved > 0
+    ? `${usd(moved)} sudah diamankan · ${pct(nav ? (moved / nav) * 100 : 0, 1)} dari dana`
+    : 'belum ada yang dipindahkan';
+
+  $('#treRule').innerHTML = `
+    <p><strong>Wallet yang dipakai bot menandatangani transaksi ratusan kali sehari.</strong>
+       Itu permukaan serangan, dan permukaan serangan tidak boleh menyimpan seluruh dana. Setiap
+       kelipatan ${usd(step, 0)} laba dipindahkan ke wallet terpisah yang tidak pernah
+       menandatangani apa pun.</p>
+    <p><strong>Dividen dan pencairan dibayar dari kas ini</strong>, bukan dari posisi yang sedang
+       berjalan. Membayar dari posisi berarti membongkarnya di waktu yang belum tentu tepat, dan
+       ongkos pembongkaran itu ditanggung semua orang.</p>
+    <p><strong>Uang yang dipindahkan tetap milik dana.</strong> Ia tetap dihitung penuh dalam nilai
+       saham — kalau tidak, memindahkannya akan terbaca sebagai kerugian sebesar uang yang
+       dipindahkan, dan harga saham semua orang turun karena tindakan yang justru mengamankan uang
+       mereka. Porsi kepemilikan tidak berubah sedikit pun.</p>
+    <p class="dim">Alasan kedua: bot punya batas kapasitas. Modal di atas batas itu tidak menambah
+       hasil, hanya menambah risiko. Memindahkan laba menjaga ukuran yang dipegang bot tetap di
+       ukuran yang memang sanggup dikelolanya.</p>`;
+}
+
+/** Halaman pengenalan — angkanya ikut data hidup, bukan ditulis tangan. */
+function renderAbout() {
+  const f = state.cfg?.fund || {};
+  const d = state.cfg?.dividend || {};
+  const t = state.cfg?.treasury || {};
+  const nav = state.nav?.totalUsd || 0;
+  const units = state.ledger?.totalUnits || 0;
+  const perUnit = units > 0 ? nav / units : 0;
+  const costs = (state.cfg?.costs?.items || []).reduce((a, c) => a + (Number(c.usd) || 0), 0);
+
+  const big = (v, k, c = '') => `<div class="hero-stat"><div class="hv ${c}">${v}</div><div class="hk">${k}</div></div>`;
+  $('#heroStats').innerHTML = [
+    big(usd(nav, 0), 'dana kelolaan'),
+    big(usd(perUnit, 4), 'harga satu saham', perUnit >= 1 ? 'pos' : 'neg'),
+    big(String((state.ledger?.owners || []).length), 'pemegang saham'),
+    big(String((state.nav?.positions || []).length), 'posisi berjalan'),
+  ].join('');
+
+  $('#aboutFacts').innerHTML = [
+    ['Harga satu saham', usd(perUnit, 4)],
+    ['Unit beredar', num(units, 2)],
+    ['Harga saat dibuka', usd(1, 4)],
+    ['Sejak dibuka', `${perUnit >= 1 ? '+' : ''}${pct((perUnit - 1) * 100)}`],
+  ].map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('');
+
+  $('#aboutRules').querySelector('tbody').innerHTML = [
+    ['Minimum setoran', usd(Number(f.minDepositUsd) || 0, 0)],
+    ['Plafon dana', `${usd(Number(f.capacityUsd) || 0, 0)} — di atas itu, investor baru membeli saham pemegang lama`],
+    ['Masuk & keluar', `pemberitahuan ${Number(f.noticeHours) || 24} jam`],
+    ['Biaya operasional', `${usd(costs, 0)} per bulan, dibagi menurut porsi saham`],
+    ['Fee performa', Number(d.performanceFeePct) > 0
+      ? `${d.performanceFeePct}% dari laba di atas rekor harga saham`
+      : `${d.performanceFeeStandardPct || 15}% dari laba di atas rekor — gratis selama masa perkenalan`],
+    ['Dividen', `${d.profitSharePct ?? 50}% dari laba di atas rekor, dibayar tiap tanggal ${Number(d.payDayOfMonth) || 1}`],
+  ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+
+  $('#aboutTreHint').textContent = Number(t.movedUsd) > 0
+    ? `${usd(Number(t.movedUsd))} sudah dipindahkan` : 'belum ada yang dipindahkan';
+  $('#aboutRisk1').innerHTML = `Harga satu saham hari ini ${usd(perUnit, 4)}, dibanding ${usd(1, 4)} saat dana dibuka — `
+    + `${perUnit >= 1 ? 'naik' : 'turun'} ${pct(Math.abs(perUnit - 1) * 100)}. Dana ini pernah turun dan bisa turun lagi.`;
+  $('#aboutRisk3').innerHTML = `Biaya ${usd(costs, 0)} per bulan atas dana ${usd(nav, 0)} adalah `
+    + `${pct(nav ? (costs / nav) * 100 : 0)} sebulan. Bot harus melewati angka itu dulu sebelum ada laba yang bisa dibagi.`;
 }
 
 function renderDividend() {
@@ -1440,6 +1453,8 @@ function renderAll() {
   renderCosts(state.cfg);
   renderDividend();
   renderRules();
+  renderTreasury();
+  renderAbout();
   renderNavChart();
   renderProfit();
   renderHistory(state.ledger);
@@ -1487,17 +1502,12 @@ async function init() {
   const cfg = state.cfg;
   document.title = `${cfg.app?.name || 'cashood'} — shared wallet tracker`;
   $('#tagline').textContent = cfg.app?.tagline || '';
-  $('#addrText').textContent = short(cfg.wallet.address);
-  $('#addrLink').href = `${cfg.wallet.explorer}/address/${cfg.wallet.address}`;
+  // Alamat wallet tidak ditampilkan dan tidak disimpan di config.
+  $('#addrText').textContent = cfg.wallet?.chainName || 'Robinhood Chain';
 
   state.ledger = buildLedger(cfg);
   $('#wdOwner').innerHTML = state.ledger.owners.map((o) => `<option value="${o.id}">${o.name}</option>`).join('');
 
-  $('#copyBtn').onclick = async () => {
-    try { await navigator.clipboard.writeText(cfg.wallet.address); $('#copyBtn').textContent = 'tersalin'; }
-    catch { $('#copyBtn').textContent = 'gagal'; }
-    setTimeout(() => { $('#copyBtn').textContent = 'salin'; }, 1400);
-  };
   $('#refreshBtn').onclick = () => load({ force: true });
   wireProfitControls();
 

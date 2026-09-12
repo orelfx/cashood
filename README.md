@@ -4,10 +4,19 @@ Private AI liquidity provider di **Robinhood Chain**. Satu wallet, beberapa pemi
 pembagian saham otomatis. Situs statis — HTML + CSS + JS polos, tanpa build,
 tanpa dependency, siap di-host di GitHub Pages.
 
-**Yang ada di repo ini cuma address publik.** Tidak ada private key, seed, atau
-API key. Aman di-share.
+**Tidak ada rahasia di repo ini.** Tidak ada private key, seed, API key — dan
+sejak 12 Sep 2026, **alamat wallet pun tidak dicantumkan**.
 
-Wallet: `0xd84be45d81750b178d98fb1e3fbacc43c002d202`
+Halaman ini tidak lagi membaca saldo langsung dari chain. Untuk melakukannya,
+browser harus mengirim alamat wallet ke RPC publik, dan alamat itu lalu terbaca
+siapa pun yang membuka panel jaringan. Semua angka sekarang datang dari snapshot
+yang ditulis bot di server. Harganya: saldo token ikut siklus 10 menit, tidak
+lagi bergerak tiap menit.
+
+> Catatan jujur: alamat itu **masih ada di riwayat commit** repo ini (3 commit
+> awal). Menghapusnya dari file yang sekarang tidak menghapusnya dari sejarah.
+> Kalau alamatnya benar-benar harus tidak terlacak, repo ini perlu dibuat ulang
+> dari nol tanpa riwayat lama.
 
 ---
 

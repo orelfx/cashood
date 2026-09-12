@@ -74,6 +74,18 @@ if (!text) throw new Error('tidak ada teks heartbeat yang bisa diterbitkan');
 // Jaring pengaman. Laporan ini tidak pernah memuat rahasia, tapi file ini
 // terbit ke repo publik — kalau suatu hari formatnya berubah dan sesuatu yang
 // panjang dan berbentuk kunci ikut masuk, lebih baik berhenti daripada terbit.
+// Alamat wallet yang dipantau tidak boleh muncul di berkas yang terbit publik.
+// Diambil dari bot, bukan ditulis di sini, supaya berkas ini pun tidak memuatnya.
+let walletAddress = null;
+try {
+  const { getWallet } = await load('chain/signer.js');
+  walletAddress = getWallet('multi')?.address?.toLowerCase() || null;
+} catch { /* tanpa wallet, pemeriksaan ini dilewati */ }
+
+if (walletAddress && text.toLowerCase().includes(walletAddress)) {
+  throw new Error('laporan memuat alamat wallet — tidak diterbitkan');
+}
+
 const LEAKS = [
   [/\b(0x)?[0-9a-fA-F]{64}\b/, 'sesuatu sepanjang private key'],
   [/\b([a-z]+\s+){11,}[a-z]+\b/, 'sesuatu berbentuk seed phrase'],

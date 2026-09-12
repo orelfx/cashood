@@ -24,14 +24,11 @@
       <span class="tag" id="tagline">Private AI liquidity provider · Robinhood Chain</span>
     </div>
     <div class="top-right">
-      <a class="addr" id="addrLink" href="#" target="_blank" rel="noopener" title="Lihat di explorer">
-        <span id="addrText">0x…</span>
-      </a>
+      <span class="addr" id="addrLink" title="Alamat wallet sengaja tidak ditampilkan"><span id="addrText">Robinhood Chain</span></span>
       <span class="rate" id="ethRate" title="Kurs yang dipakai menilai seluruh halaman">—</span>
       <div class="seg cur" id="segCur" role="group" aria-label="Mata uang">
         <button data-c="usd" class="on" title="Tampilkan dalam dolar">$</button><button data-c="eth" title="Tampilkan dalam ETH" aria-label="ETH"><svg class="eth" viewBox="0 0 256 417" aria-hidden="true" focusable="false"><path d="M127.96 0l-2.8 9.5v275.67l2.8 2.79L255.92 212.3z" fill="currentColor" opacity=".65"/><path d="M127.96 0L0 212.3l127.96 75.66V154.16z" fill="currentColor"/><path d="M127.96 312.19l-1.58 1.92v98.2l1.58 4.6L256 236.59z" fill="currentColor" opacity=".65"/><path d="M127.96 416.9v-104.71L0 236.59z" fill="currentColor"/><path d="M127.96 287.96l127.96-75.65-127.96-58.16z" fill="currentColor" opacity=".38"/><path d="M0 212.31l127.96 75.65V154.15z" fill="currentColor" opacity=".8"/></svg></button>
       </div>
-      <button class="btn ghost" id="copyBtn" title="Salin address">salin</button>
       <button class="btn" id="refreshBtn" title="Ambil data terbaru">refresh</button>
     </div>
   </div>
@@ -49,6 +46,7 @@
     <button role="tab" data-tab="portfolio" class="on" aria-selected="true">Portofolio</button>
     <button role="tab" data-tab="investor" aria-selected="false">Data investor</button>
     <button role="tab" data-tab="bot" aria-selected="false">💓 Bot</button>
+    <button role="tab" data-tab="tentang" aria-selected="false">Tentang</button>
   </nav>
 
   <div id="banner" class="banner" hidden></div>
@@ -371,6 +369,15 @@
   </section>
     </div>
     <div data-inv="aturan" hidden>
+      <section class="card" id="treasuryCard">
+        <div class="card-head">
+          <h2>Kas cadangan</h2>
+          <span class="hint" id="treHint"></span>
+        </div>
+        <div class="stats tre-sum" id="treSummary"></div>
+        <div class="explain-body" id="treRule"></div>
+      </section>
+
       <section class="card">
         <div class="card-head">
           <h2>Kapasitas dana</h2>
@@ -408,6 +415,78 @@
       <div id="hbBody" class="hb"></div>
     </section>
   </div><!-- /tab-bot -->
+
+  <div id="tab-tentang" hidden>
+    <section class="card hero">
+      <h2 class="hero-h">Dana likuiditas yang dijalankan bot, dimiliki bersama.</h2>
+      <p class="hero-p">Cashood menaruh modal sebagai likuiditas di pool Uniswap pada Robinhood Chain dan memanen fee perdagangan. Yang menjalankannya bot otomatis 24 jam — membuka posisi, mengawasi rentang harga, menutup saat aturannya terpenuhi. Beberapa orang menaruh uang di dana yang sama, dan masing-masing memegang saham sesuai porsinya.</p>
+      <div class="hero-row" id="heroStats"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Cara kerjanya</h2><span class="hint">empat langkah, berulang setiap hari</span></div>
+      <div class="how">
+        <div class="how-item"><div class="how-n">1</div><h3>Menyaring pool</h3><p>Bot memindai ratusan pool tiap setengah jam dan menolak yang terlalu kecil, terlalu sepi, atau tidak punya likuiditas yang bisa dimasuki.</p></div>
+        <div class="how-item"><div class="how-n">2</div><h3>Membuka posisi</h3><p>Modal ditaruh pada rentang harga tertentu. Selama harga bergerak di dalam rentang itu, posisi menerima fee dari setiap perdagangan yang lewat.</p></div>
+        <div class="how-item"><div class="how-n">3</div><h3>Mengawasi</h3><p>Tiap lima menit tiap posisi diperiksa: masih di dalam rentang, seberapa banyak fee terkumpul, apakah kerugian sudah menyentuh batas.</p></div>
+        <div class="how-item"><div class="how-n">4</div><h3>Menutup</h3><p>Ditutup saat untungnya sudah cukup, saat harga keluar rentang dan berhenti menghasilkan, atau saat kerugian menyentuh batas yang sudah ditetapkan.</p></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Kepemilikan berbentuk saham</h2><span class="hint">bukan uang yang dititipkan terpisah</span></div>
+      <div class="two">
+        <div>
+          <p class="lead">Semua setoran masuk ke satu wallet dan dikelola satu bot. Melacak “uang siapa yang mana” di dalamnya mustahil — jadi yang dicatat bukan itu, melainkan <strong>berapa unit</strong> yang dipegang tiap orang.</p>
+          <p class="lead">Harga satu unit = nilai dana dibagi jumlah unit beredar. Saat Cashood dibuka, satu unit dihargai $1. Harga itu naik-turun mengikuti kinerja bot — dan itulah satu-satunya ukuran prestasi yang jujur, karena ia tidak bergerak sedikit pun ketika ada orang menyetor.</p>
+        </div>
+        <div class="facts" id="aboutFacts"></div>
+      </div>
+      <div class="qa">
+        <h3>“Kenapa teman saya untung, saya rugi, padahal dananya sama?”</h3>
+        <p>Karena yang menentukan hasil seseorang adalah <strong>harga unit saat dia masuk</strong>, bukan kondisi dana hari ini. Dua orang di dana yang sama bisa berbeda hasilnya kalau masuk di harga berbeda — persis seperti dua orang membeli saham perusahaan yang sama di dua tanggal berbeda.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Aturan yang berlaku</h2><span class="hint">semuanya bisa diperiksa di tab Data investor</span></div>
+      <div class="table-scroll">
+        <table id="aboutRules">
+          <thead><tr><th>Pokok</th><th>Aturan</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Uang yang sudah aman, dipindahkan</h2><span class="hint" id="aboutTreHint"></span></div>
+      <p class="lead">Setiap kelipatan laba tertentu dipindahkan keluar dari wallet yang dipakai bot, ke wallet terpisah yang tidak pernah menandatangani transaksi apa pun. Dividen dan pencairan dibayar dari sana.</p>
+      <div class="two">
+        <div><h3 class="sub-h">Kenapa dipisah</h3><ul class="plain">
+          <li>Wallet yang dipakai bot menandatangani transaksi ratusan kali sehari — itu permukaan serangan, dan permukaan serangan tidak boleh menyimpan seluruh dana.</li>
+          <li>Bot punya batas kapasitas. Modal yang melebihi batas itu tidak menambah hasil, hanya menambah risiko.</li>
+          <li>Laba yang sudah nyata seharusnya berhenti dipertaruhkan.</li>
+        </ul></div>
+        <div><h3 class="sub-h">Yang tidak berubah</h3><ul class="plain">
+          <li>Uang yang dipindahkan <strong>tetap milik dana</strong> dan tetap dihitung dalam nilai saham.</li>
+          <li>Porsi saham siapa pun <strong>tidak berubah sedikit pun</strong> oleh perpindahan ini.</li>
+          <li>Jumlah yang sudah dipindahkan diumumkan di tab Data investor.</li>
+        </ul></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Yang harus diketahui sebelum masuk</h2><span class="hint">apa adanya</span></div>
+      <div class="risks">
+        <div class="risk"><span class="dot red"></span><div><h3>Bisa rugi — dan sedang rugi</h3><p id="aboutRisk1">Harga unit hari ini di bawah harga pembukaan.</p></div></div>
+        <div class="risk"><span class="dot red"></span><div><h3>Pool memecoin itu dangkal</h3><p>Likuiditas bisa menguap dalam hitungan menit. Impermanent loss adalah kejadian harian di sini, bukan teori di buku.</p></div></div>
+        <div class="risk"><span class="dot amber"></span><div><h3>Biaya berat untuk dana kecil</h3><p id="aboutRisk3">Biaya bulanan harus dilewati dulu sebelum ada laba.</p></div></div>
+        <div class="risk"><span class="dot amber"></span><div><h3>Satu pengelola, satu mesin</h3><p>Tidak ada tim dan tidak ada cadangan. Kalau pengelolanya berhenti, dananya harus dibongkar.</p></div></div>
+        <div class="risk"><span class="dot amber"></span><div><h3>Tanpa payung hukum</h3><p>Ini kesepakatan pribadi, bukan produk berizin. Tidak ada penjamin, tidak ada pengawas, tidak ada jaminan pengembalian.</p></div></div>
+      </div>
+      <p class="hint disclaimer">Seluruh angka di situs ini berasal dari catatan bot dan diperbarui setiap sepuluh menit. Posisi yang sedang berjalan, riwayat posisi yang sudah ditutup, biaya, dan porsi tiap pemegang saham terbuka untuk diperiksa siapa pun. Alamat wallet sengaja tidak dicantumkan.</p>
+    </section>
+  </div><!-- /tab-tentang -->
 
   <footer class="foot">
     <span>Data on-chain read-only dari <span id="footSrc">RPC publik</span>. Tidak ada private key di situs ini.</span>
