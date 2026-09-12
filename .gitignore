@@ -3,3 +3,12 @@ node_modules/
 *.log
 .env
 .databranch/
+
+# Berkas data ditulis ulang tiap sepuluh menit dan tinggal di branch `data`.
+# Dilacak di `main`, setiap push kode ikut membawa snapshot basi dan memicu
+# build GitHub Pages — persis yang dulu menghabiskan jatah build sampai situs
+# berhenti diperbarui.
+data/live.json
+data/nav.json
+data/heartbeat.json
+data/fees.json
