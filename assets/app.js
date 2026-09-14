@@ -147,6 +147,16 @@ const short = (a) => a.slice(0, 6) + '…' + a.slice(-4);
 const signed = (n) => (n > 0 ? '+' : '') + usd(n);
 const signedText = (n) => (n > 0 ? '+' : '') + usdText(n);
 
+// Kotak kalender di telepon selebar empat puluhan piksel: sen dibuang dan
+// ribuan diringkas, supaya angkanya tetap utuh di dalam kotaknya.
+function signedCompact(n) {
+  const v = Number(n) || 0;
+  const sign = v > 0 ? '+' : v < 0 ? '-' : '';
+  if (currency !== 'usd') return (v > 0 ? '+' : '') + usdText(v, 0);
+  const a = Math.abs(v);
+  return sign + '$' + (a >= 1000 ? (a / 1000).toFixed(a >= 10000 ? 0 : 1) + 'k' : Math.round(a));
+}
+
 const cls = (n) => (n > 0.005 ? 'pos' : n < -0.005 ? 'neg' : 'dim');
 
 function ago(ts) {
@@ -551,7 +561,9 @@ function renderLp(nav) {
       const band = r.throughBandPct == null ? '' : `<span class="band">${r.throughBandPct.toFixed(0)}%</span>`;
       return `<tr>
         <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${r.symbol ?? r.tokenId}</span>
-            <div class="sub2">${r.strategy ?? ''}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div></td>
+            <div class="sub2">${r.strategy ?? ''}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
+            <div class="sub2 m-only ${r.inRange ? 'pos' : 'neg'}">${r.inRange ? 'di dalam range' : 'di luar range'}${
+              r.throughBandPct == null ? '' : ' · ' + r.throughBandPct.toFixed(0) + '%'}</div></td>
         <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
         <td class="num dim">${dur(r.ageMinutes)}</td>
         <td class="num">${r.investedUsd == null ? '<span class="dim">—</span>' : usd(r.investedUsd)}</td>
@@ -1408,7 +1420,7 @@ function renderCalendar() {
     const rgb = row.usd >= 0 ? '74,222,128' : '248,113,113';
     cells += `<div class="cell" style="background:rgba(${rgb},${a.toFixed(3)});border-color:rgba(${rgb},.4)">
       <span class="d">${d}</span>
-      <span class="a ${cls(row.usd)}">${signed(row.usd)}</span>
+      <span class="a ${cls(row.usd)}">${narrow() ? signedCompact(row.usd) : signed(row.usd)}</span>
       <span class="c">${row.closes} tutup</span>
     </div>`;
   }

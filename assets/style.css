@@ -366,7 +366,9 @@ ul.plain strong { color: var(--text); }
 @media (max-width: 640px) {
   .wrap { padding: 0 12px; }
 
-  .top-in { min-height: 0; padding: 9px 0; gap: 8px; }
+  /* hanya atas-bawah: `padding: 9px 0` ikut menghapus padding kiri-kanan dari
+     .wrap, dan seluruh isi header menempel ke tepi layar */
+  .top-in { min-height: 0; padding-top: 9px; padding-bottom: 9px; gap: 8px; }
   .brand h1 { font-size: 17px; }
   .tag { display: none; }
   .top-right { gap: 6px; width: 100%; }
@@ -447,4 +449,63 @@ ul.plain strong { color: var(--text); }
   .stats, .lp-sum, .div-sum, .tre-sum { grid-template-columns: 1fr 1fr; }
   .brand h1 .mark { display: none; }
   .cell .a { font-size: 9px; }
+}
+
+/* ── layar sempit, putaran kedua (diperiksa lewat screenshot iPhone) ───── */
+@media (max-width: 640px) {
+  /* 1fr tidak bisa menyusut di bawah lebar isinya, jadi tujuh kotak kalender
+     yang memuat "-$643.45" mendorong seluruh halaman 14px melebihi layar */
+  .cal-dow, .cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .cell { overflow: hidden; }
+  .cell .a { white-space: nowrap; overflow: hidden; text-overflow: clip; }
+
+  /* lima kotak di dua kolom menyisakan satu slot kosong yang tampak rusak */
+  .stats > .stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+  /* Tabel: sembunyikan kolom yang boleh hilang, bukan yang paling penting.
+     Sebelumnya "Nilai sekarang" dan "Untung / rugi" terdorong ke luar layar
+     sementara kolom "Ditarik" yang isinya strip semua memakan tempat. */
+  #ownerTable th:nth-child(3), #ownerTable td:nth-child(3),
+  #ownerTable th:nth-child(4), #ownerTable td:nth-child(4),
+  #holdTable th:nth-child(3), #holdTable td:nth-child(3),
+  #lpTable th:nth-child(3), #lpTable td:nth-child(3),
+  #lpTable th:nth-child(4), #lpTable td:nth-child(4),
+  #lpTable th:nth-child(6), #lpTable td:nth-child(6),
+  #closedTable th:nth-child(2), #closedTable td:nth-child(2),
+  #closedTable th:nth-child(3), #closedTable td:nth-child(3),
+  #closedTable th:nth-child(6), #closedTable td:nth-child(6),
+  #histTable th:nth-child(5), #histTable td:nth-child(5),
+  #histTable th:nth-child(6), #histTable td:nth-child(6),
+  #divTable th:nth-child(4), #divTable td:nth-child(4),
+  #wdTable th:nth-child(4), #wdTable td:nth-child(4) { display: none; }
+
+  #lpTable .pill { font-size: 10px; padding: 2px 6px; }
+  #lpTable .band { display: block; margin: 3px 0 0; }
+
+  /* aturan main: tiga kolom teks panjang tidak pernah muat — jadi kartu */
+  #rulesTable thead, #aboutRules thead { display: none; }
+  #rulesTable tr, #aboutRules tr { display: block; padding: 11px 0; border-bottom: 1px solid #1a1f27; }
+  #rulesTable td, #aboutRules td { display: block; padding: 2px 0; border: 0; white-space: normal; }
+  #rulesTable td:nth-child(2) { margin: 2px 0 4px; }
+
+  /* sub-tab digeser ke samping, jangan dipatahkan jadi dua baris */
+  #segInv, #segView, #segBucket, #segRange { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  #segInv::-webkit-scrollbar { display: none; }
+  #segInv button, .seg button { white-space: nowrap; }
+
+  /* label jaringan paling tidak penting di header yang sesak */
+  #addrLink { display: none; }
+}
+
+/* status range dipindah ke bawah nama pool di telepon; di layar lebar ia punya kolomnya sendiri */
+.m-only { display: none; }
+@media (max-width: 640px) {
+  .m-only { display: block; }
+  #lpTable th:nth-child(2), #lpTable td:nth-child(2) { display: none; }
+
+  /* dua tabel inti dipadatkan supaya empat kolomnya muat tanpa digeser */
+  #ownerTable th, #ownerTable td, #lpTable th, #lpTable td { padding: 8px 6px; }
+  #ownerTable th, #lpTable th { font-size: 9.5px; letter-spacing: .3px; }
+  #ownerTable td, #lpTable td { font-size: 12px; }
+  #ownerTable .who, #lpTable .who { gap: 6px; }
 }
