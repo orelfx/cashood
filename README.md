@@ -152,7 +152,7 @@ Situsnya baca snapshot dari `raw.githubusercontent.com`, bukan dari file yang
 ikut ke-deploy — begitu bot push, angkanya kepakai tanpa nunggu Pages build
 ulang (CDN raw nahan maksimal 5 menit).
 
-Alamatnya **dihitung sendiri dari alamat halaman**: `orelfx.github.io/cashood`
+Alamatnya **dihitung sendiri dari alamat halaman**: `cashood.id`
 → `raw.githubusercontent.com/orelfx/cashood/data/`. Jadi repo yang di-rename
 atau di-fork tetap baca datanya sendiri. `app.snapshotUrl`, `app.navUrl` dan
 `app.heartbeatUrl` di config cuma cadangan buat domain sendiri.
@@ -360,6 +360,19 @@ Diterima investor             $591,50
 Setelah pembagian dijalankan, tambahkan bagian 30%-nya ke `dividend.retainedUsd`.
 Itu yang membuat bagian yang sudah diputar lagi tidak dihitung sebagai laba baru
 bulan berikutnya — tanpa itu, uang yang sama akan dibagi dua kali.
+
+---
+
+## Domain
+
+Situs dibuka di **https://cashood.id**. Link lama `orelfx.github.io/cashood`
+tetap hidup dan otomatis mengalihkan ke sana.
+
+- Domain dibeli di Niagahoster (sekarang Hostinger), DNS dikelola di hPanel
+- Record: empat `A @` ke `185.199.108–111.153`, dan `CNAME www` ke `orelfx.github.io`
+- File `CNAME` di akar repo **wajib ada**. Situs dideploy lewat Actions yang mengunggah
+  isi repo apa adanya, jadi setelan domain di GitHub hilang di setiap deploy kalau
+  berkas itu tidak ikut
 
 ---
 
