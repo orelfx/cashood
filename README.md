@@ -152,10 +152,10 @@ Situsnya baca snapshot dari `raw.githubusercontent.com`, bukan dari file yang
 ikut ke-deploy — begitu bot push, angkanya kepakai tanpa nunggu Pages build
 ulang (CDN raw nahan maksimal 5 menit).
 
-Alamatnya **dihitung sendiri dari alamat halaman**: `cashood.id`
+Alamatnya **dihitung sendiri dari alamat halaman** kalau situs dibuka dari GitHub Pages: `orelfx.github.io/cashood`
 → `raw.githubusercontent.com/orelfx/cashood/data/`. Jadi repo yang di-rename
 atau di-fork tetap baca datanya sendiri. `app.snapshotUrl`, `app.navUrl` dan
-`app.heartbeatUrl` di config cuma cadangan buat domain sendiri.
+`app.heartbeatUrl` di config dipakai kalau situs dibuka dari domain sendiri — termasuk `cashood.id` sekarang.
 
 ### Kenapa datanya di branch `data`, bukan `main`
 
