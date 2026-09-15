@@ -335,16 +335,31 @@ mereka pakai basis dan perhitungan fee sendiri.
 | Plafon kapasitas | $10.000 — di atas itu investor baru beli saham pemegang lama |
 | Masuk & keluar | pemberitahuan 24 jam |
 | Biaya operasional | $155/bln, dipotong dari dana menurut porsi saham |
-| Fee performa | 15% dari laba di atas rekor harga saham — **gratis selama masa perkenalan** |
-| Dividen | 50% dari laba di atas rekor, tiap tanggal 1 |
+| Fee investor | 10% dari dividen tiap investor — **gratis selama masa perkenalan** |
+| Dividen | tiap tanggal 1: laba − biaya sistem, lalu **70% dibagikan**, **30% kembali ke dana** |
 
 Semuanya diatur di `data/config.json` (`fund` dan `dividend`) dan ditampilkan di
-tab **Data investor → Aturan dana**, lengkap dengan meter kapasitas.
+tab **Data investor**, lengkap dengan simulasinya.
 
-Dividen dihitung dari kenaikan **harga saham** di atas rekor tertinggi, bukan
-dari kenaikan nilai wallet. Bedanya menentukan: nilai wallet ikut naik tiap ada
-setoran baru, dan dividen yang dihitung dari situ akan membagikan uang yang baru
-saja disetor orang.
+### Cara menghitung dividen
+
+Contoh: modal awal $9.300, saldo tanggal 1 $10.300.
+
+```
+Saldo tanggal 1            $10.300,00
+Modal acuan                −$9.300,00   setoran bersih + bagian 30% dari pembagian sebelumnya
+Laba kotor                  $1.000,00
+Biaya sistem                 −$155,00   MiniMax, Claude, VPS, RPC, LP Agent
+Laba bersih                   $845,00
+Kembali ke dana (30%)        −$253,50   tetap bekerja, menaikkan harga saham
+Dibagikan (70%)               $591,50   menurut porsi saham
+Fee investor (10%)             GRATIS   normalnya −$59,15
+Diterima investor             $591,50
+```
+
+Setelah pembagian dijalankan, tambahkan bagian 30%-nya ke `dividend.retainedUsd`.
+Itu yang membuat bagian yang sudah diputar lagi tidak dihitung sebagai laba baru
+bulan berikutnya — tanpa itu, uang yang sama akan dibagi dua kali.
 
 ---
 

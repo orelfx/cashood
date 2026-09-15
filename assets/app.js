@@ -1028,42 +1028,56 @@ function sharePriceSeries(points) {
 
 /* ── dividen ─────────────────────────────────────────────────────────────
  *
- * Dihitung dari kenaikan HARGA SAHAM di atas rekor tertinggi, bukan dari
- * selisih nilai wallet terhadap total setoran. Bedanya menentukan: nilai
- * wallet ikut naik saat ada investor baru masuk, dan dividen yang dihitung
- * dari situ akan membagikan uang yang baru saja disetor orang. Harga saham
- * tidak bergerak oleh setoran, jadi yang terbagi benar-benar hasil kerja bot.
+ * Aturan dari pengelola, diterapkan apa adanya setiap tanggal 1:
  *
- * Rekor tertinggi mencegah laba yang sama dibayar dua kali: dana yang naik,
- * membayar dividen, jatuh, lalu naik lagi ke titik yang sama tidak menghasilkan
- * apa-apa yang baru untuk dibagi.
+ *   laba kotor   = saldo − modal acuan
+ *   laba bersih  = laba kotor − biaya sistem bulan itu
+ *   30%          kembali ke dana (menaikkan harga saham)
+ *   70%          dibagikan menurut porsi saham
+ *   fee investor dipotong dari bagian tiap orang (sekarang 0%)
+ *
+ * Modal acuan = setoran bersih + seluruh bagian 30% dari pembagian yang sudah
+ * dijalankan. Tanpa suku kedua, uang yang diputar lagi bulan lalu akan terbaca
+ * sebagai laba baru bulan ini dan dibagikan untuk kedua kalinya.
  */
+function monthlyCosts() {
+  return (state.cfg?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
+}
+
 function dividendPlan(navUsd) {
   const d = state.cfg?.dividend || {};
-  const units = state.ledger?.totalUnits || 0;
-  const hwm = Number(d.highWaterMarkPerUnit) > 0 ? Number(d.highWaterMarkPerUnit) : 1;
-  const feePct = Number(d.performanceFeePct) || 0;
-  const profitSharePct = Number.isFinite(Number(d.profitSharePct)) ? Number(d.profitSharePct) : 50;
+  const ledger = state.ledger;
+  const nav = Number(navUsd) || 0;
 
-  const navPerUnit = units > 0 ? (Number(navUsd) || 0) / units : 0;
-  const locked = hwm * units;                       // modal terkunci = rekor × unit beredar
-  const gain = Math.max(0, (navPerUnit - hwm) * units);
+  const netDeposits = (ledger?.deposited || 0) - (ledger?.withdrawn || 0);
+  const retained = Number(d.retainedUsd) || 0;
+  const base = netDeposits + retained;
 
-  const fee = gain * (feePct / 100);
-  const pool = (gain - fee) * (profitSharePct / 100);
-  const reserve = Math.min(Number(d.reserveUsd) || 0, pool);
-  const distributed = Math.max(0, pool - reserve);
+  const costs = monthlyCosts();
+  const gross = Math.max(0, nav - base);
+  const net = Math.max(0, gross - costs);
+  // Laba yang tidak cukup menutup biaya: sisanya tetap dibayar, dari dana.
+  const costsFromFund = Math.max(0, costs - gross);
 
-  // Cadangan tetap di dalam dana; dividen dan fee performa keluar.
-  const navAfter = (Number(navUsd) || 0) - distributed - fee;
+  const distributePct = Number.isFinite(Number(d.distributePct)) ? Number(d.distributePct) : 70;
+  const reinvestPct = Number.isFinite(Number(d.reinvestPct)) ? Number(d.reinvestPct) : 30;
+  const reinvest = net * (reinvestPct / 100);
+  const distributed = net * (distributePct / 100);
 
-  return { locked, hwm, navPerUnit, units, profit: gain, pool, reserve, fee, distributed, navAfter,
-    profitSharePct, feePct,
-    standardFeePct: Number(d.performanceFeeStandardPct) || 0,
-    feeNote: d.performanceFeeNote || '',
-    retained: Math.max(0, gain - fee - pool) + reserve,
-    hwmAfter: units > 0 ? navAfter / units : hwm,
-    payDay: Number(d.payDayOfMonth) || 1 };
+  const feePct = Number(d.investorFeePct) || 0;
+  const standardFeePct = Number(d.investorFeeStandardPct) || 0;
+  const fee = distributed * (feePct / 100);
+  const received = distributed - fee;
+
+  return {
+    nav, netDeposits, retained, base, costs, gross, net, costsFromFund,
+    distributePct, reinvestPct, reinvest, distributed,
+    feePct, standardFeePct, fee, received,
+    feeIfStandard: distributed * (standardFeePct / 100),
+    feeNote: d.investorFeeNote || '',
+    navAfter: nav - costs - distributed,
+    payDay: Number(d.payDayOfMonth) || 1,
+  };
 }
 
 function nextPayDate(day) {
@@ -1098,11 +1112,12 @@ function renderRules() {
     ['Plafon dana', usd(cap, 0), 'Bot menaruh $600–900 per posisi mengikuti kedalaman pool. Dana yang terlalu besar memaksa posisi membesar, dan price impact naik untuk semua orang.'],
     ['Masuk & keluar', `${Number(f.noticeHours) || 24} jam`, 'Modal terpasang di posisi likuiditas. Bot perlu waktu menutup posisi di harga yang wajar, bukan panik di harga buruk.'],
     ['Biaya operasional', `${usd(costs, 0)}/bln`, `Dipotong dari dana menurut porsi saham — ${pct(nav ? (costs / nav) * 100 : 0, 2)} dari modal masing-masing per bulan. Tidak ada yang perlu transfer apa pun.`],
-    ['Fee performa', Number(d.performanceFeePct) > 0 ? d.performanceFeePct + '%' : 'GRATIS',
-      Number(d.performanceFeePct) > 0
-        ? 'Diambil dari laba di atas rekor harga saham. Tidak ada laba, tidak ada fee.'
-        : `Tarif normal ${d.performanceFeeStandardPct || 15}% dari laba di atas rekor, tapi selama masa perkenalan pengelola tidak mengambil apa pun.`],
-    ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1}`, `${d.profitSharePct ?? 50}% dari laba di atas rekor tertinggi, dibagi menurut porsi saham. Sisanya diputar lagi dan menaikkan harga saham.`],
+    ['Fee investor', Number(d.investorFeePct) > 0 ? d.investorFeePct + '%' : 'GRATIS',
+      Number(d.investorFeePct) > 0
+        ? 'Dipotong dari bagian dividen tiap investor sebelum dibayarkan.'
+        : `Normalnya ${d.investorFeeStandardPct || 10}% dari bagian dividen tiap investor. Selama masa perkenalan tidak dipungut — bagiannya diterima penuh.`],
+    ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1}`,
+      `Laba dikurangi biaya sistem. Dari laba bersihnya ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct ?? 30}% kembali ke dana dan menaikkan harga saham.`],
   ];
   $('#rulesTable').querySelector('tbody').innerHTML = rules
     .map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
@@ -1175,10 +1190,10 @@ function renderAbout() {
     ['Plafon dana', `${usd(Number(f.capacityUsd) || 0, 0)} — di atas itu, investor baru membeli saham pemegang lama`],
     ['Masuk & keluar', `pemberitahuan ${Number(f.noticeHours) || 24} jam`],
     ['Biaya operasional', `${usd(costs, 0)} per bulan, dibagi menurut porsi saham`],
-    ['Fee performa', Number(d.performanceFeePct) > 0
-      ? `${d.performanceFeePct}% dari laba di atas rekor harga saham`
-      : `${d.performanceFeeStandardPct || 15}% dari laba di atas rekor — gratis selama masa perkenalan`],
-    ['Dividen', `${d.profitSharePct ?? 50}% dari laba di atas rekor, dibayar tiap tanggal ${Number(d.payDayOfMonth) || 1}`],
+    ['Fee investor', Number(d.investorFeePct) > 0
+      ? `${d.investorFeePct}% dari bagian dividen tiap investor`
+      : `${d.investorFeeStandardPct || 10}% dari bagian dividen tiap investor — gratis selama masa perkenalan`],
+    ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1} — laba dikurangi biaya sistem, ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct ?? 30}% kembali ke dana`],
   ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
 
   $('#aboutTreHint').textContent = Number(t.movedUsd) > 0
@@ -1194,57 +1209,71 @@ function renderDividend() {
   const input = $('#divNav');
   if (!input.value) input.value = (state.nav.totalUsd || 0).toFixed(2);
 
-  const navUsd = Math.max(0, Number(input.value) || 0);
-  const plan = dividendPlan(navUsd);
-  const owners = ownerValues(state.ledger, plan.navAfter);
+  const plan = dividendPlan(Math.max(0, Number(input.value) || 0));
+  const owners = ownerValues(state.ledger, state.nav.totalUsd || 0);
 
-  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
-  $('#divSummary').innerHTML = [
-    tile('Rekor harga saham', usd(plan.hwm, 4), `modal terkunci ${usd(plan.locked, 0)}`),
-    tile('Harga saham', usd(plan.navPerUnit, 4),
-      plan.navPerUnit >= plan.hwm ? 'di atas rekor' : 'masih di bawah rekor',
-      plan.navPerUnit >= plan.hwm ? 'pos' : 'neg'),
-    tile('Laba di atas rekor', usd(plan.profit),
-      plan.profit > 0 ? 'dasar perhitungan dividen' : 'belum ada laba — belum ada dividen', cls(plan.profit)),
-    tile('Fee performa', plan.feePct > 0 ? usd(plan.fee) : 'GRATIS',
-      plan.feePct > 0 ? `${plan.feePct}% dari laba` : `masa perkenalan · normal ${plan.standardFeePct}%`,
-      plan.feePct > 0 ? '' : 'pos'),
-    tile('Dibayarkan', usd(plan.distributed),
-      plan.profit > 0 ? `${plan.profitSharePct}% dari laba, dikurangi cadangan ${usd(plan.reserve, 0)}` : 'ke seluruh investor',
-      plan.distributed > 0 ? 'pos' : ''),
+  // Rinciannya ditulis sebagai urutan, bukan kotak-kotak: yang menerima uang
+  // perlu melihat angkanya berkurang dari atas ke bawah dan tahu ke mana tiap
+  // potongan pergi.
+  const row = (label, value, note, kind = '') =>
+    `<div class="flow-row ${kind}"><div class="fl">${label}<span>${note}</span></div><div class="fv">${value}</div></div>`;
+  const minus = (v) => (v > 0 ? '−' : '') + usd(v);
+
+  $('#divFlow').innerHTML = [
+    row(`Saldo tanggal ${plan.payDay}`, usd(plan.nav), 'nilai seluruh dana saat dihitung'),
+    row('Modal acuan', minus(plan.base),
+      plan.retained > 0
+        ? `setoran bersih ${usd(plan.netDeposits, 0)} + laba yang sudah diputar ${usd(plan.retained, 0)}`
+        : 'total setoran bersih semua investor'),
+    row('Laba kotor', usd(plan.gross), plan.gross > 0 ? 'kenaikan di atas modal acuan' : 'belum ada kenaikan di atas modal', 'sub'),
+    row('Biaya sistem', minus(Math.min(plan.costs, plan.gross)),
+      plan.costsFromFund > 0
+        ? `${usd(plan.costs, 0)} per bulan — laba belum cukup, ${usd(plan.costsFromFund)} sisanya dari dana`
+        : `${usd(plan.costs, 0)} per bulan: MiniMax, Claude, VPS, RPC, LP Agent`),
+    row('Laba bersih', usd(plan.net), plan.net > 0 ? 'yang dibagi dua di bawah ini' : 'tidak ada yang dibagikan bulan ini', 'sub'),
+    row(`Kembali ke dana (${plan.reinvestPct}%)`, minus(plan.reinvest), 'tetap bekerja dan menaikkan harga saham semua orang'),
+    row(`Dibagikan (${plan.distributePct}%)`, usd(plan.distributed), 'dibagi menurut porsi saham', 'sub'),
+    row(`Fee investor (${plan.feePct > 0 ? plan.feePct : plan.standardFeePct}%)`,
+      plan.feePct > 0 ? minus(plan.fee) : '<span class="free">GRATIS</span>',
+      plan.feePct > 0 ? 'dipotong dari bagian tiap investor'
+        : `${plan.feeNote}${plan.feeIfStandard > 0 ? ' · normalnya −' + usd(plan.feeIfStandard) : ''}`),
+    row('Diterima seluruh investor', usd(plan.received), `dibayar tiap tanggal ${plan.payDay}`, 'total'),
   ].join('');
 
-  $('#divTable').querySelector('tbody').innerHTML = owners.map((o) => `
-    <tr>
+  $('#divTable').querySelector('tbody').innerHTML = owners.map((o) => {
+    const gross = plan.distributed * (o.share / 100);
+    const fee = gross * (plan.feePct / 100);
+    return `<tr>
       <td><span class="who"><span class="chip" style="background:${o.color || '#4ade80'}"></span>${o.name}</span></td>
       <td class="num">${pct(o.share)}</td>
-      <td class="num ${plan.distributed > 0 ? 'pos' : 'dim'}">${usd(plan.distributed * (o.share / 100))}</td>
-      <td class="num">${usd(o.value)}</td>
-    </tr>`).join('');
+      <td class="num">${usd(gross)}</td>
+      <td class="num ${plan.feePct > 0 ? 'neg' : 'pos'}">${plan.feePct > 0 ? '−' + usd(fee) : 'gratis'}</td>
+      <td class="num ${gross > 0 ? 'pos' : 'dim'}"><strong>${usd(gross - fee)}</strong></td>
+    </tr>`;
+  }).join('');
 
-  const real = Math.abs(navUsd - (state.nav.totalUsd || 0)) < 0.01;
+  const real = Math.abs(plan.nav - (state.nav.totalUsd || 0)) < 0.01;
   $('#divHint').textContent = `dibayar tiap tanggal ${plan.payDay} · berikutnya ${nextPayDate(plan.payDay)}`
-    + (real ? '' : ' · memakai angka andaian');
+    + (real ? ' · memakai saldo sekarang' : ' · memakai angka andaian');
 
   $('#divRule').innerHTML = `
-    <p><strong>Yang dibagi adalah kenaikan harga saham, bukan kenaikan nilai wallet.</strong>
-       Nilai wallet ikut naik setiap ada investor baru menyetor — dividen yang dihitung dari situ
-       akan membagikan uang yang baru saja masuk. Harga saham tidak bergerak oleh setoran, jadi
-       yang terbagi benar-benar hasil kerja bot.</p>
-    <p><strong>Rekor tertinggi ${usd(plan.hwm, 4)}</strong> adalah harga saham tertinggi yang pernah
-       dibayarkan dividennya. Selama harga di bawah angka itu, tidak ada dividen — dana yang turun
-       lalu naik lagi ke titik yang sama tidak menghasilkan apa pun yang baru untuk dibagi.</p>
-    <p><strong>Fee performa ${plan.feePct > 0 ? plan.feePct + '%' : '0% — ' + plan.feeNote}.</strong>
+    <p><strong>Modal tidak pernah dibagi.</strong> Yang dibagi hanya kenaikan di atas modal acuan —
+       total setoran bersih semua investor, ditambah laba yang sudah diputar kembali dari bulan-bulan
+       sebelumnya. Bagian kedua itu penting: tanpa itu, uang yang sudah diputar lagi akan terbaca sebagai
+       laba baru dan dibagikan untuk kedua kalinya.</p>
+    <p><strong>Biaya sistem dibayar lebih dulu.</strong> MiniMax, Claude, VPS, RPC, dan LP Agent
+       adalah ongkos yang membuat bot bekerja, jadi dipotong dari laba sebelum apa pun dibagi. Kalau
+       labanya belum cukup menutup biaya, sisanya diambil dari dana.</p>
+    <p><strong>${plan.distributePct}% dibagikan, ${plan.reinvestPct}% kembali ke dana.</strong>
+       Bagian yang kembali tidak hilang: ia tetap milik semua pemegang saham menurut porsinya, dan
+       menaikkan harga saham sehingga modal tiap orang ikut tumbuh tanpa perlu menyetor lagi.</p>
+    <p><strong>Fee investor ${plan.standardFeePct}% — ${plan.feePct > 0 ? 'berlaku' : 'saat ini gratis'}.</strong>
        ${plan.feePct > 0
-        ? 'Diambil dari laba di atas rekor, sebelum sisanya dibagi.'
-        : `Tarif normalnya ${plan.standardFeePct}% dari laba di atas rekor. Selama masa perkenalan pengelola tidak mengambil apa pun; seluruh laba masuk ke investor.`}</p>
-    <p>Dari laba ${usd(plan.profit)}, sebanyak <strong>${plan.profitSharePct}%</strong> masuk kantong
-       dividen, ${usd(plan.reserve, 0)} ditahan sebagai saldo mengendap untuk gas dan biaya
-       keluar-masuk posisi, dan sisanya <strong>${usd(plan.distributed)}</strong> dibagi menurut
-       porsi saham. Laba yang tidak dibagikan tetap bekerja di dana dan menaikkan harga saham.</p>
-    <p class="dim">Contoh: harga saham naik dari rekor $1,0000 ke $1,0750 dengan 9.337 unit → laba
-       $700 → dividen $325 dibagikan, $50 mengendap, $325 diputar lagi. Pemegang 10% saham
-       menerima $32,50, dan sisa unitnya ikut naik nilainya.</p>`;
+        ? `Dipotong dari bagian dividen tiap investor sebelum dibayarkan.`
+        : `Normalnya ${plan.standardFeePct}% dari bagian dividen tiap investor dipotong sebagai imbalan pengelola. Selama masa perkenalan tidak dipungut sama sekali — setiap investor menerima bagiannya penuh.`}</p>
+    <p class="dim">Contoh angka bulat: modal acuan $9.300, saldo tanggal 1 $10.300 → laba kotor $1.000
+       → biaya sistem $155 → laba bersih $845 → $253,50 kembali ke dana → $591,50 dibagikan. Pemegang
+       10% saham menerima $59,15 (normalnya $53,24 setelah fee 10%).</p>`;
 }
 
 /* ── riwayat profit ──────────────────────────────────────────────────────
@@ -1636,6 +1665,13 @@ async function init() {
   };
 
   $('#divNav').oninput = renderDividend;
+  $('#divQuick').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const v = btn.getAttribute('data-v');
+    $('#divNav').value = v === 'now' ? (state.nav?.totalUsd || 0).toFixed(2) : v;
+    renderDividend();
+  };
 
   // Memutar telepon mengubah lebar, dan grafik yang digambar untuk lebar lama
   // ikut terbawa — marginnya kelebaran atau labelnya bertumpuk.

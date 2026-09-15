@@ -109,12 +109,16 @@
            masuk di harga unit yang berbeda — sama seperti dua orang membeli saham
            perusahaan yang sama di dua tanggal berbeda.</p>
 
-        <p><strong>Dividen</strong> dibagikan bulanan menurut proporsi saham pada saat
-           pembagian. Pemegang 10% saham menerima 10% dari yang dibagikan.</p>
+        <p><strong>Dividen dibagikan setiap tanggal 1.</strong> Laba bulan itu dikurangi dulu biaya
+           sistem (MiniMax, Claude, VPS, RPC, LP Agent). Dari laba bersihnya, <strong>70%
+           dibagikan</strong> ke seluruh investor menurut proporsi saham, dan <strong>30% kembali ke
+           dana</strong> — tetap bekerja dan menaikkan harga saham semua orang. Pemegang 10% saham
+           menerima 10% dari yang dibagikan. Rincian lengkap dan simulasinya ada di tab
+           <em>Data investor</em>.</p>
 
         <p><strong>Penarikan</strong> mengurangi unit sebesar nilai yang ditarik pada
-           harga unit hari itu, jadi porsi pemilik lain tidak ikut berubah. Kalkulator di
-           bawah menghitungnya sebelum apa pun dieksekusi.</p>
+           harga unit hari itu, jadi porsi pemilik lain tidak ikut berubah. Simulasinya ada di
+           tab <em>Data investor</em>.</p>
       </div>
     </details>
 
@@ -292,16 +296,20 @@
           <h2>Estimasi dividen</h2>
           <span class="hint" id="divHint"></span>
         </div>
-        <div class="stats div-sum" id="divSummary"></div>
+        <div class="flow" id="divFlow"></div>
         <div class="calc">
           <label class="field">
-            <span>Andai nilai wallet (USD)</span>
+            <span>Andai saldo pada tanggal 1 (USD)</span>
             <input type="number" id="divNav" min="0" step="any">
           </label>
+          <div class="field quick">
+            <span>Isi cepat</span>
+            <div class="seg" id="divQuick"><button data-v="now">saldo sekarang</button><button data-v="10300">contoh $10.300</button></div>
+          </div>
         </div>
         <div class="table-scroll">
           <table id="divTable">
-            <thead><tr><th>Investor</th><th class="num">Saham</th><th class="num">Estimasi dividen</th><th class="num">Nilai saham tersisa</th></tr></thead>
+            <thead><tr><th>Investor</th><th class="num">Saham</th><th class="num">Dividen</th><th class="num">Fee investor</th><th class="num">Diterima</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>

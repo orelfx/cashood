@@ -476,6 +476,7 @@ ul.plain strong { color: var(--text); }
   #closedTable th:nth-child(6), #closedTable td:nth-child(6),
   #histTable th:nth-child(5), #histTable td:nth-child(5),
   #histTable th:nth-child(6), #histTable td:nth-child(6),
+  #divTable th:nth-child(3), #divTable td:nth-child(3),
   #divTable th:nth-child(4), #divTable td:nth-child(4),
   #wdTable th:nth-child(4), #wdTable td:nth-child(4) { display: none; }
 
@@ -508,4 +509,27 @@ ul.plain strong { color: var(--text); }
   #ownerTable th, #lpTable th { font-size: 9.5px; letter-spacing: .3px; }
   #ownerTable td, #lpTable td { font-size: 12px; }
   #ownerTable .who, #lpTable .who { gap: 6px; }
+}
+
+/* ── rincian dividen, dibaca dari atas ke bawah ─────────────────────── */
+.flow { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.flow-row { display: flex; justify-content: space-between; align-items: center; gap: 16px;
+            padding: 11px 15px; border-bottom: 1px solid #1a1f27; }
+.flow-row:last-child { border-bottom: 0; }
+.flow-row .fl { font-size: 13.5px; color: var(--text); }
+.flow-row .fl span { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+.flow-row .fv { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.flow-row.sub { background: #0f1319; }
+.flow-row.sub .fl { font-weight: 600; }
+.flow-row.total { background: #101c14; }
+.flow-row.total .fl { font-weight: 650; }
+.flow-row.total .fv { color: var(--accent); font-size: 16px; }
+.flow-row .free { color: var(--accent); }
+.field.quick .seg { align-self: flex-start; }
+@media (max-width: 640px) {
+  .flow-row { padding: 10px 11px; gap: 10px; }
+  .flow-row .fl { font-size: 12.5px; }
+  .flow-row .fl span { font-size: 10.5px; }
+  .flow-row .fv { font-size: 12.5px; }
+  .flow-row.total .fv { font-size: 14px; }
 }
