@@ -43,6 +43,8 @@
     <span class="strip-item"><span class="led"></span><b>Bagi hasil</b> dihitung ulang tiap data masuk</span>
   </div>
 
+  <nav class="funds" id="fundBar" role="tablist" aria-label="Pilih dana"></nav>
+
   <nav class="tabs" id="tabs" role="tablist">
     <button role="tab" data-tab="portfolio" class="on" aria-selected="true">Portofolio</button>
     <button role="tab" data-tab="investor" aria-selected="false">Data investor</button>
@@ -428,18 +430,13 @@
   <div id="tab-tentang" hidden>
     <section class="card hero">
       <h2 class="hero-h">Dana likuiditas yang dijalankan bot, dimiliki bersama.</h2>
-      <p class="hero-p">Cashood menaruh modal sebagai likuiditas di pool Uniswap pada Robinhood Chain dan memanen fee perdagangan. Yang menjalankannya bot otomatis 24 jam — membuka posisi, mengawasi rentang harga, menutup saat aturannya terpenuhi. Beberapa orang menaruh uang di dana yang sama, dan masing-masing memegang saham sesuai porsinya.</p>
+      <p class="hero-p" id="aboutLead"></p>
       <div class="hero-row" id="heroStats"></div>
     </section>
 
     <section class="card">
       <div class="card-head"><h2>Cara kerjanya</h2><span class="hint">empat langkah, berulang setiap hari</span></div>
-      <div class="how">
-        <div class="how-item"><div class="how-n">1</div><h3>Menyaring pool</h3><p>Bot memindai ratusan pool tiap setengah jam dan menolak yang terlalu kecil, terlalu sepi, atau tidak punya likuiditas yang bisa dimasuki.</p></div>
-        <div class="how-item"><div class="how-n">2</div><h3>Membuka posisi</h3><p>Modal ditaruh pada rentang harga tertentu. Selama harga bergerak di dalam rentang itu, posisi menerima fee dari setiap perdagangan yang lewat.</p></div>
-        <div class="how-item"><div class="how-n">3</div><h3>Mengawasi</h3><p>Tiap lima menit tiap posisi diperiksa: masih di dalam rentang, seberapa banyak fee terkumpul, apakah kerugian sudah menyentuh batas.</p></div>
-        <div class="how-item"><div class="how-n">4</div><h3>Menutup</h3><p>Ditutup saat untungnya sudah cukup, saat harga keluar rentang dan berhenti menghasilkan, atau saat kerugian menyentuh batas yang sudah ditetapkan.</p></div>
-      </div>
+      <div class="how" id="aboutHow"></div>
     </section>
 
     <section class="card">
@@ -467,7 +464,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" id="aboutTreasury">
       <div class="card-head"><h2>Uang yang sudah aman, dipindahkan</h2><span class="hint" id="aboutTreHint"></span></div>
       <p class="lead">Setiap kelipatan laba tertentu dipindahkan keluar dari wallet yang dipakai bot, ke wallet terpisah yang tidak pernah menandatangani transaksi apa pun. Dividen dan pencairan dibayar dari sana.</p>
       <div class="two">

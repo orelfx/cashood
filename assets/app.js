@@ -9,9 +9,19 @@
  * wallet that already made a profit does not hand them a slice of that profit.
  */
 
-const CONFIG_URL = 'data/config.json';
-const LIVE_URL = 'data/live.json';
-const CACHE_KEY = 'cashood.nav.v4';
+const FUNDS_URL = 'data/funds.json';
+
+/**
+ * Satu situs, dua dana yang tidak berbagi apa pun kecuali tampilannya.
+ *
+ * Tiap dana punya config, buku investor, snapshot, deret nilai, dan laporan
+ * botnya sendiri. Yang dipakai bersama hanya header, tombol mata uang, dan
+ * domainnya — karena mencampur angkanya, sekali saja, akan menghasilkan porsi
+ * saham yang salah untuk orang sungguhan.
+ */
+const state = { fund: null, funds: [], cfg: null, ledger: null, nav: null };
+
+const cacheKey = () => `cashood.nav.v5.${state.fund || 'reborn'}`;
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -24,7 +34,7 @@ const $ = (sel) => document.querySelector(sel);
  * Di GitHub Pages kedua nama itu sudah ada di URL halaman, jadi lebih baik
  * dibaca dari sana. Config tetap dipakai kalau situsnya di domain sendiri.
  */
-function rawDataBase() {
+function rawDataBase(fund) {
   // Dibungkus: kalau membaca alamat halaman saja gagal (konteks aneh, iframe
   // yang dikunci), yang boleh terjadi cuma kehilangan jalan pintas ini — bukan
   // seluruh halaman gagal memuat data.
@@ -36,7 +46,7 @@ function rawDataBase() {
     // Ref-nya branch `data`, bukan `main`: di situlah file yang berubah tiap
     // sepuluh menit tinggal, supaya Pages tidak membangun ulang situs untuk
     // setiap angka baru.
-    return `https://raw.githubusercontent.com/${host[1]}/${repo}/data/`;
+    return `https://raw.githubusercontent.com/${host[1]}/${repo}/data/${fund}/`;
   } catch {
     return null;
   }
@@ -44,11 +54,10 @@ function rawDataBase() {
 
 /** URL sumber data: turunan dari alamat halaman dulu, config sebagai cadangan. */
 function dataUrls(cfg, file, configured) {
-  const base = rawDataBase();
-  return [base ? base + file : null, configured, 'data/' + file].filter(Boolean);
+  const fund = state.fund || 'reborn';
+  const base = rawDataBase(fund);
+  return [base ? base + file : null, configured, `data/${fund}/${file}`].filter(Boolean);
 }
-const state = { cfg: null, ledger: null, nav: null };
-
 /* ── format ──────────────────────────────────────────────────────────── */
 
 /**
@@ -330,7 +339,7 @@ async function resolveNav(cfg, { force = false } = {}) {
   const ttl = (Number(cfg.app?.refreshMinutes) || 5) * 60000;
   if (!force) {
     try {
-      const hit = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      const hit = JSON.parse(localStorage.getItem(cacheKey()) || 'null');
       if (hit && Date.now() - hit.fetchedAt < ttl) return { ...hit, cached: true };
     } catch { /* cache rusak, abaikan */ }
   }
@@ -376,7 +385,7 @@ async function resolveNav(cfg, { force = false } = {}) {
     fetchedAt: Date.now(),
   };
 
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify(out)); } catch { /* mode privat */ }
+  try { localStorage.setItem(cacheKey(), JSON.stringify(out)); } catch { /* mode privat */ }
   return out;
 }
 
@@ -820,8 +829,8 @@ async function loadHeartbeat(cfg) {
 /* ── tab ─────────────────────────────────────────────────────────────── */
 
 function showTab(name) {
-  const known = ['portfolio', 'investor', 'bot', 'tentang'];
-  const tab = known.includes(name) ? name : 'portfolio';
+  const tab = TABS.includes(name) ? name : 'portfolio';
+  currentTab = tab;
   $('#tab-portfolio').hidden = tab !== 'portfolio';
   $('#tab-investor').hidden = tab !== 'investor';
   $('#tab-bot').hidden = tab !== 'bot';
@@ -832,9 +841,10 @@ function showTab(name) {
     b.classList.toggle('on', on);
     b.setAttribute('aria-selected', String(on));
   });
-  if (location.hash.slice(1) !== tab) {
-    history.replaceState(null, '', tab === 'portfolio' ? location.pathname : '#' + tab);
-  }
+  // Alamat selalu memuat nama dananya, supaya link yang dibagikan membuka dana
+  // yang dimaksud dan bukan dana bawaan.
+  const want = `#${state.fund}/${tab}`;
+  if (location.hash !== want) history.replaceState(null, '', want);
   if (bot) refreshHeartbeat();
 }
 
@@ -1126,6 +1136,9 @@ function renderRules() {
 /** Kas cadangan: uang yang sudah dipindah keluar dari wallet kerja bot. */
 function renderTreasury() {
   const t = state.cfg?.treasury || {};
+  const used = Number(t.movedUsd) > 0 || Number(t.stepUsd) > 0;
+  $('#treasuryCard').hidden = !used;
+  if (!used) return;
   const moved = Number(t.movedUsd) || 0;
   const step = Number(t.stepUsd) || 100;
   const nav = state.nav?.totalUsd || 0;
@@ -1160,6 +1173,36 @@ function renderTreasury() {
        ukuran yang memang sanggup dikelolanya.</p>`;
 }
 
+/**
+ * Isi halaman pengenalan yang berbeda per dana.
+ *
+ * Dua bot ini bekerja di rantai, bursa, dan bentuk posisi yang berbeda. Satu
+ * teks yang dipakai keduanya akan benar untuk satu dana dan menyesatkan untuk
+ * satu lagi — jadi bagian yang menjelaskan cara kerjanya ditulis terpisah.
+ */
+const FUND_COPY = {
+  reborn: {
+    lead: 'Reborn Rich menaruh modal sebagai likuiditas di pool Uniswap pada Robinhood Chain dan memanen fee perdagangan. Yang menjalankannya bot otomatis 24 jam — membuka posisi pada rentang harga tertentu, mengawasinya, dan menutup saat aturannya terpenuhi. Beberapa orang menaruh uang di dana yang sama, dan masing-masing memegang saham sesuai porsinya.',
+    how: [
+      ['Menyaring pool', 'Bot memindai ratusan pool tiap setengah jam dan menolak yang terlalu kecil, terlalu sepi, atau tidak punya likuiditas yang bisa dimasuki.'],
+      ['Membuka posisi', 'Modal ditaruh pada rentang harga tertentu di Uniswap v3 atau v4. Selama harga bergerak di dalam rentang itu, posisi menerima fee dari setiap perdagangan yang lewat.'],
+      ['Mengawasi', 'Tiap lima menit tiap posisi diperiksa: masih di dalam rentang, seberapa banyak fee terkumpul, apakah kerugian sudah menyentuh batas.'],
+      ['Menutup', 'Ditutup saat untungnya cukup, saat harga keluar rentang dan berhenti menghasilkan, atau saat kerugian menyentuh batas yang sudah ditetapkan.'],
+    ],
+    risk: 'Pool memecoin di Robinhood Chain itu dangkal. Likuiditas bisa menguap dalam hitungan menit, dan impermanent loss adalah kejadian harian di sini.',
+  },
+  meridian: {
+    lead: 'Meridian menaruh modal sebagai likuiditas di pool DLMM Meteora pada Solana dan memanen fee perdagangan. Berbeda dengan Uniswap, likuiditas DLMM ditaruh dalam kotak-kotak harga yang disebut bin — posisi hanya menghasilkan saat harga berada di dalam rentang bin yang dipilih. Botnya berjalan otomatis 24 jam, memilih pool, menentukan rentang bin, dan menutup posisi sesuai aturannya.',
+    how: [
+      ['Menyaring pool', 'Bot memindai pool Meteora dan menilai rasio fee terhadap likuiditas, umur token, volatilitas, serta jejak dompet-dompet besar sebelum memutuskan masuk.'],
+      ['Membuka posisi', 'Modal SOL disebar ke rentang bin di sekitar harga berjalan. Strategi penyebarannya dipilih bot — merata, condong ke bawah, atau terpusat — mengikuti bentuk pasarnya.'],
+      ['Mengawasi', 'Tiap beberapa menit posisi diperiksa: harga masih di dalam rentang bin, berapa fee terkumpul, seberapa lama di luar rentang, dan apakah kerugiannya menembus batas.'],
+      ['Menutup', 'Ditutup saat untungnya cukup, saat harga meninggalkan rentang terlalu lama, atau saat pola rugi berlanjut. Fee yang sudah terkumpul dipanen lebih dulu.'],
+    ],
+    risk: 'Pool memecoin di Solana bergerak sangat cepat. Harga bisa meninggalkan rentang bin dalam hitungan menit dan posisi berhenti menghasilkan, sementara nilai tokennya ikut turun.',
+  },
+};
+
 /** Halaman pengenalan — angkanya ikut data hidup, bukan ditulis tangan. */
 function renderAbout() {
   const f = state.cfg?.fund || {};
@@ -1169,6 +1212,12 @@ function renderAbout() {
   const units = state.ledger?.totalUnits || 0;
   const perUnit = units > 0 ? nav / units : 0;
   const costs = (state.cfg?.costs?.items || []).reduce((a, c) => a + (Number(c.usd) || 0), 0);
+
+  const copy = FUND_COPY[state.fund] || FUND_COPY.reborn;
+  $('#aboutLead').textContent = copy.lead;
+  $('#aboutHow').innerHTML = copy.how.map(([title, body], i) => `
+    <div class="how-item"><div class="how-n">${i + 1}</div><h3>${title}</h3><p>${body}</p></div>`).join('');
+  $('#aboutTreasury').hidden = !(Number(t.movedUsd) > 0 || Number(t.stepUsd) > 0);
 
   const big = (v, k, c = '') => `<div class="hero-stat"><div class="hv ${c}">${v}</div><div class="hk">${k}</div></div>`;
   $('#heroStats').innerHTML = [
@@ -1198,6 +1247,8 @@ function renderAbout() {
 
   $('#aboutTreHint').textContent = Number(t.movedUsd) > 0
     ? `${usd(Number(t.movedUsd))} sudah dipindahkan` : 'belum ada yang dipindahkan';
+  const risk2 = document.querySelector('#tab-tentang .risk:nth-child(2) p');
+  if (risk2) risk2.textContent = copy.risk;
   $('#aboutRisk1').innerHTML = `Harga satu saham hari ini ${usd(perUnit, 4)}, dibanding ${usd(1, 4)} saat dana dibuka — `
     + `${perUnit >= 1 ? 'naik' : 'turun'} ${pct(Math.abs(perUnit - 1) * 100)}. Dana ini pernah turun dan bisa turun lagi.`;
   $('#aboutRisk3').innerHTML = `Biaya ${usd(costs, 0)} per bulan atas dana ${usd(nav, 0)} adalah `
@@ -1491,7 +1542,7 @@ function renderProfit() {
         if (!snap?.history?.length) return;
         state.nav.history = snap.history;
         state.nav.stats = snap.stats || state.nav.stats;
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(state.nav)); } catch { /* mode privat */ }
+        try { localStorage.setItem(cacheKey(), JSON.stringify(state.nav)); } catch { /* mode privat */ }
         renderProfit();
       }).catch(() => {});
     }
@@ -1542,6 +1593,78 @@ function wireProfitControls() {
   };
   $('#calPrev').onclick = () => hop(-1);
   $('#calNext').onclick = () => hop(1);
+}
+
+/* ── dana aktif ──────────────────────────────────────────────────────────
+ *
+ * Berpindah dana berarti mengganti SELURUH isi halaman: config, buku investor,
+ * snapshot, deret nilai, laporan bot. Semua keadaan per-dana direset di satu
+ * tempat ini — kalau ada yang tertinggal, angka dana lama akan muncul sekejap
+ * di bawah nama dana baru, dan itu jenis kesalahan yang tidak disadari orang.
+ */
+const TABS = ['portfolio', 'investor', 'bot', 'tentang'];
+let currentTab = 'portfolio';
+
+function fundMeta(id) {
+  return state.funds.find((f) => f.id === id) || state.funds[0] || null;
+}
+
+function parseHash() {
+  const parts = location.hash.replace('#', '').split('/').filter(Boolean);
+  let fund = state.fund || state.funds[0]?.id;
+  let tab = 'portfolio';
+  if (parts.length) {
+    if (state.funds.some((f) => f.id === parts[0])) {
+      fund = parts[0];
+      if (TABS.includes(parts[1])) tab = parts[1];
+    } else if (TABS.includes(parts[0])) {
+      tab = parts[0];                       // alamat lama tanpa nama dana
+    }
+  }
+  return { fund, tab };
+}
+
+function renderFundBar() {
+  const bar = $('#fundBar');
+  bar.innerHTML = state.funds.map((f) => `
+    <button data-fund="${f.id}" class="${f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
+      <span class="fdot" style="background:${f.accent}"></span>
+      <span class="fname">${f.label}</span>
+      <span class="fchain">${f.chain}</span>
+    </button>`).join('');
+}
+
+async function loadFundConfig(id) {
+  const meta = fundMeta(id);
+  if (!meta) throw new Error('daftar dana kosong');
+  const res = await fetch(meta.configUrl + '?t=' + Date.now(), { cache: 'no-store' });
+  if (!res.ok) throw new Error(`${meta.configUrl}: HTTP ${res.status}`);
+  state.cfg = await res.json();
+  state.fund = meta.id;
+
+  document.title = `${meta.label} — Cashood Headfund`;
+  $('#tagline').textContent = state.cfg.app?.tagline || '';
+  $('#addrText').textContent = state.cfg.wallet?.chainName || meta.chain;
+  document.documentElement.style.setProperty('--accent', meta.accent);
+
+  state.ledger = buildLedger(state.cfg);
+  $('#wdOwner').innerHTML = state.ledger.owners.map((o) => `<option value="${o.id}">${o.name}</option>`).join('');
+  renderFundBar();
+}
+
+async function switchFund(id) {
+  if (id === state.fund) return;
+  state.nav = null;
+  navPoints = [];
+  hbLoaded = false;
+  hbLoading = null;
+  holdPage = 0;
+  historyRetried = false;
+  view.month = null;
+  $('#divNav').value = '';
+  await loadFundConfig(id);
+  showTab(currentTab);
+  await load({ force: true });
 }
 
 /* ── boot ────────────────────────────────────────────────────────────── */
@@ -1598,21 +1721,20 @@ async function load({ force = false } = {}) {
 
 async function init() {
   try {
-    const res = await fetch(CONFIG_URL + '?t=' + Date.now(), { cache: 'no-store' });
-    state.cfg = await res.json();
+    const res = await fetch(FUNDS_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    const list = await res.json();
+    state.funds = list.funds || [];
+    if (!state.funds.length) throw new Error('daftar dana kosong');
+    await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
-    banner('data/config.json tidak terbaca: ' + (err.message || err), 'err');
+    banner('daftar dana tidak terbaca: ' + (err.message || err), 'err');
     return;
   }
 
-  const cfg = state.cfg;
-  document.title = `${cfg.app?.name || 'cashood'} — shared wallet tracker`;
-  $('#tagline').textContent = cfg.app?.tagline || '';
-  // Alamat wallet tidak ditampilkan dan tidak disimpan di config.
-  $('#addrText').textContent = cfg.wallet?.chainName || 'Robinhood Chain';
-
-  state.ledger = buildLedger(cfg);
-  $('#wdOwner').innerHTML = state.ledger.owners.map((o) => `<option value="${o.id}">${o.name}</option>`).join('');
+  $('#fundBar').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (btn) switchFund(btn.getAttribute('data-fund'));
+  };
 
   $('#refreshBtn').onclick = () => load({ force: true });
   wireProfitControls();
@@ -1642,7 +1764,11 @@ async function init() {
     const btn = e.target.closest('button');
     if (btn) showTab(btn.getAttribute('data-tab'));
   };
-  const fromHash = () => showTab(location.hash.replace('#', '') || 'portfolio');
+  const fromHash = () => {
+    const { fund, tab } = parseHash();
+    if (fund && fund !== state.fund) { switchFund(fund).then(() => showTab(tab)); return; }
+    showTab(tab);
+  };
   window.addEventListener('hashchange', fromHash);
   fromHash();
 
@@ -1692,7 +1818,7 @@ async function init() {
   await load();
 
   // auto-refresh diam-diam selama tab dibiarkan terbuka
-  const every = (Number(cfg.app?.refreshMinutes) || 60) * 60000;
+  const every = (Number(state.cfg?.app?.refreshMinutes) || 5) * 60000;
   setInterval(() => load({ force: true }), every);
 }
 

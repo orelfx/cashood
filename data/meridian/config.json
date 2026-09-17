@@ -1,0 +1,82 @@
+{
+  "app": {
+    "name": "Cashood",
+    "tagline": "Private AI liquidity provider · Solana",
+    "currency": "USD",
+    "refreshMinutes": 5,
+    "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/meridian/live.json",
+    "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/meridian/nav.json",
+    "heartbeatUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/meridian/heartbeat.json"
+  },
+  "wallet": {
+    "chainName": "Solana",
+    "_note": "Alamat wallet sengaja tidak dicantumkan. Seluruh angka datang dari snapshot yang ditulis bot."
+  },
+  "navOverrideUsd": null,
+  "owners": [
+    {
+      "id": "orel",
+      "name": "Orel",
+      "color": "#4ade80"
+    }
+  ],
+  "_events_help": [
+    "type: deposit | withdraw",
+    "usd: jumlah dalam dolar",
+    "founding: true hanya untuk setoran awal (harga 1 unit = $1)",
+    "navBefore: total nilai wallet SEBELUM transaksi ini. WAJIB untuk event non-founding,",
+    "           supaya bagian orang lama tidak kena encer waktu ada orang baru masuk.",
+    "note: bebas, boleh dikosongkan"
+  ],
+  "events": [
+    {
+      "date": "2026-09-17",
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 950,
+      "founding": true,
+      "note": "setoran awal — tanggal perkiraan, operator tidak ingat tanggal persisnya"
+    }
+  ],
+  "costs": {
+    "note": "biaya bulanan, dibayar dari luar wallet",
+    "items": [
+      {
+        "name": "MiniMax high",
+        "usd": 50
+      },
+      {
+        "name": "Claude",
+        "usd": 20
+      },
+      {
+        "name": "VPS",
+        "usd": 15
+      },
+      {
+        "name": "RPC",
+        "usd": 50
+      },
+      {
+        "name": "LP Agent",
+        "usd": 20
+      }
+    ]
+  },
+  "fund": {
+    "capacityUsd": 3000,
+    "minDepositUsd": 100,
+    "noticeHours": 24,
+    "note": "Plafon ditinjau ulang setelah bot terbukti sanggup memegang lebih."
+  },
+  "dividend": {
+    "payDayOfMonth": 1,
+    "distributePct": 70,
+    "reinvestPct": 30,
+    "investorFeePct": 0,
+    "investorFeeStandardPct": 10,
+    "investorFeeNote": "gratis selama masa perkenalan",
+    "retainedUsd": 0,
+    "note": "Tiap tanggal 1: laba dikurangi biaya sistem, 70% dibagikan menurut porsi saham, 30% kembali ke dana. retainedUsd bertambah sebesar bagian 30% setiap kali pembagian dijalankan."
+  }
+}

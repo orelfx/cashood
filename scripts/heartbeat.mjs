@@ -18,7 +18,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT = process.argv[2] ? resolve(process.argv[2]) : resolve(HERE, '..', 'data', 'heartbeat.json');
+const OUT = process.argv[2] ? resolve(process.argv[2]) : resolve(HERE, '..', 'data', 'reborn', 'heartbeat.json');
 const RR_HOME = process.env.RR_HOME || '/root/robinhood';
 
 const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
