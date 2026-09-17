@@ -41,7 +41,7 @@ MERIDIAN_HOME="${MERIDIAN_HOME:-/root/main/meridian}" /usr/bin/node scripts/sync
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
 for fund in reborn meridian; do
   mkdir -p "$WORK/$fund"
-  for f in live.json nav.json heartbeat.json; do
+  for f in live.json nav.json heartbeat.json forecast.json; do
     [ -f "data/$fund/$f" ] && cp "data/$fund/$f" "$WORK/$fund/$f"
   done
 done

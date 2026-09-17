@@ -882,6 +882,10 @@ async function loadHeartbeat(cfg) {
 function showTab(name) {
   const tab = TABS.includes(name) ? name : 'portfolio';
   currentTab = tab;
+  state.view = 'fund';
+  $('#tabs').hidden = false;
+  $('#tab-analisa').hidden = true;
+  renderFundBar();
   $('#tab-portfolio').hidden = tab !== 'portfolio';
   $('#tab-investor').hidden = tab !== 'investor';
   $('#tab-bot').hidden = tab !== 'bot';
@@ -1688,6 +1692,9 @@ function parseHash() {
   const parts = location.hash.replace('#', '').split('/').filter(Boolean);
   let fund = state.fund || state.funds[0]?.id;
   let tab = 'portfolio';
+  if (parts[0] === 'analisa') {
+    return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
+  }
   if (parts.length) {
     if (state.funds.some((f) => f.id === parts[0])) {
       fund = parts[0];
@@ -1700,13 +1707,18 @@ function parseHash() {
 }
 
 function renderFundBar() {
-  const bar = $('#fundBar');
-  bar.innerHTML = state.funds.map((f) => `
-    <button data-fund="${f.id}" class="${f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
+  const analisa = state.view === 'analisa';
+  $('#fundBar').innerHTML = state.funds.map((f) => `
+    <button data-fund="${f.id}" class="${!analisa && f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
       <span class="fdot" style="background:${f.accent}"></span>
       <span class="fname">${f.label}</span>
       <span class="fchain">${f.chain}</span>
-    </button>`).join('');
+    </button>`).join('')
+    + `<button data-view="analisa" class="analysis ${analisa ? 'on' : ''}" style="--fund-accent:#fbbf24">
+        <span class="fdot" style="background:#fbbf24"></span>
+        <span class="fname">AI Analisa</span>
+        <span class="fchain">proyeksi tanggal 1</span>
+      </button>`;
 }
 
 async function loadFundConfig(id) {
@@ -1740,6 +1752,138 @@ async function switchFund(id) {
   await loadFundConfig(id);
   showTab(currentTab);
   await load({ force: true });
+}
+
+/* ── analisa: proyeksi sampai tanggal pembagian ──────────────────────────
+ *
+ * Angkanya tidak dihitung di halaman ini. Semuanya datang dari
+ * data/<dana>/forecast.json yang ditulis sekali sehari oleh scripts/forecast.mjs,
+ * supaya siapa pun bisa membuka berkasnya dan menghitung ulang sendiri.
+ */
+let analisaFund = null;
+const forecastCache = {};
+
+async function loadForecast(fund) {
+  if (forecastCache[fund]) return forecastCache[fund];
+  const base = rawDataBase(fund);
+  const urls = [base ? base + 'forecast.json' : null,
+    `https://raw.githubusercontent.com/orelfx/cashood/data/${fund}/forecast.json`,
+    `data/${fund}/forecast.json`].filter(Boolean);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) continue;
+      const j = await res.json();
+      if (j && j.fund) { forecastCache[fund] = j; return j; }
+    } catch { /* sumber berikutnya */ }
+  }
+  return null;
+}
+
+function scenarioCard(s, kind) {
+  const naik = s.changeUsd >= 0;
+  return `<div class="scen-card ${kind}">
+    <div class="scen-k">${s.label}</div>
+    <div class="scen-v ${cls(s.changeUsd)}">${usd(s.navUsd, 0)}</div>
+    <div class="scen-d ${cls(s.changeUsd)}">${naik ? '+' : ''}${usd(s.changeUsd, 0)} · ${naik ? '+' : ''}${pct(s.changePct)}</div>
+    <div class="scen-rows">
+      <div class="scen-row"><span>Harga saham</span><b>${s.sharePrice == null ? '—' : usd(s.sharePrice, 4)}</b></div>
+      <div class="scen-row"><span>Laba di atas modal</span><b>${usd(s.dividend.gross, 0)}</b></div>
+      <div class="scen-row"><span>Dividen dibagikan</span><b class="${s.dividend.distributed > 0 ? 'pos' : ''}">${usd(s.dividend.distributed, 0)}</b></div>
+    </div>
+  </div>`;
+}
+
+function renderAnalisa() {
+  const body = $('#analisaBody');
+  const fund = analisaFund || state.funds[0]?.id;
+  const meta = fundMeta(fund);
+
+  $('#segAnalisa').innerHTML = state.funds.map((f) => `
+    <button data-af="${f.id}" class="${f.id === fund ? 'on' : ''}">${f.label}</button>`).join('');
+
+  body.innerHTML = '<p class="hint">memuat analisa…</p>';
+  loadForecast(fund).then((f) => {
+    if (analisaFund !== fund) return;                 // pembaca sudah pindah dana
+    if (!f) {
+      body.innerHTML = '<section class="card"><p class="miss">Analisa belum tersedia untuk dana ini. Laporan disusun sekali sehari pukul 07.00 WIB.</p></section>';
+      return;
+    }
+    if (!f.enough) {
+      body.innerHTML = `<section class="card"><div class="card-head"><h2>Belum cukup data</h2></div>
+        <p class="miss">Proyeksi butuh minimal tiga hari hasil yang tercatat; dana ini baru punya ${f.samples || 0}.
+        Angka karangan tidak diterbitkan di sini — kartunya akan muncul sendiri begitu datanya cukup.</p></section>`;
+      return;
+    }
+
+    const s = f.scenarios;
+    const m = f.market;
+    const a = f.activity;
+    const ramai = a.closesPerDay3d > a.closesPerDay7d * 1.15;
+    const sepi = a.closesPerDay3d < a.closesPerDay7d * 0.85;
+
+    body.innerHTML = `
+      <section class="card">
+        <div class="card-head">
+          <h2>Perkiraan nilai dana pada ${f.paydayDate}</h2>
+          <span class="hint">${f.days} hari lagi · disusun ${f.generatedAt}</span>
+        </div>
+        <p class="lead">Sekarang <strong>${usd(f.navNow)}</strong>${f.sharePriceNow ? ` · harga saham ${usd(f.sharePriceNow, 4)}` : ''}.
+           Rentang di bawah ini datang dari mengundi ulang hasil harian yang sudah benar-benar terjadi
+           — ${f.sample.days} hari, dari ${f.sample.from} sampai ${f.sample.to} — sebanyak sepuluh ribu kali.</p>
+        <div class="scen">
+          ${scenarioCard(s.worst, 'worst')}
+          ${scenarioCard(s.normal, 'normal')}
+          ${scenarioCard(s.best, 'best')}
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Dasar perhitungannya</h2><span class="hint">semua angka bisa diperiksa</span></div>
+        <div class="table-scroll"><table><tbody>
+          <tr><td>Contoh yang dipakai</td><td class="num">${f.sample.days} hari</td><td class="dim">${f.sample.from} → ${f.sample.to}</td></tr>
+          <tr><td>Hari untung / rugi</td><td class="num">${f.sample.winDays} / ${f.sample.lossDays}</td><td class="dim">di dalam contoh itu</td></tr>
+          <tr><td>Rata-rata per hari</td><td class="num ${cls(f.sample.meanDailyPct)}">${f.sample.meanDailyPct > 0 ? '+' : ''}${pct(f.sample.meanDailyPct, 3)}</td><td class="dim">naik-turunnya ${pct(f.sample.stdevDailyPct, 3)}</td></tr>
+          <tr><td>Modal acuan</td><td class="num">${usd(f.baseCapital, 0)}</td><td class="dim">dipakai menghitung dividen tiap skenario</td></tr>
+          <tr><td>Biaya sistem dipotong</td><td class="num">${usd(f.costs, 0)}</td><td class="dim">${f.costs > 0 ? 'ditanggung dana ini' : 'ditanggung dana lain'}</td></tr>
+          <tr><td>Cara menghitung</td><td class="num">—</td><td class="dim">${f.method}</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Kondisi pasar dan bot</h2><span class="hint">bahan yang membentuk angka di atas</span></div>
+        <div class="stats" id="anaStats">
+          ${m ? `<div class="stat"><div class="k">${m.symbol} 24 jam</div><div class="v ${cls(m.change24hPct)}">${m.change24hPct > 0 ? '+' : ''}${pct(m.change24hPct)}</div><div class="n">harga ${fmtUsd(m.priceUsd, 2)}</div></div>` : ''}
+          ${m ? `<div class="stat"><div class="k">${m.symbol} 7 hari</div><div class="v ${cls(m.change7dPct)}">${m.change7dPct > 0 ? '+' : ''}${pct(m.change7dPct)}</div><div class="n">arah pasar sepekan</div></div>` : ''}
+          <div class="stat"><div class="k">Sibuk tidaknya bot</div><div class="v">${a.closesPerDay3d}</div><div class="n">posisi ditutup per hari, 3 hari terakhir${a.closesPerDay7d ? ` · sepekan ${a.closesPerDay7d}` : ''}</div></div>
+          <div class="stat"><div class="k">Posisi di dalam range</div><div class="v ${a.inRangePct >= 60 ? 'pos' : 'neg'}">${a.inRangePct == null ? '—' : a.inRangePct + '%'}</div><div class="n">${a.openPositions} posisi terbuka</div></div>
+          <div class="stat"><div class="k">Win rate</div><div class="v">${pct(a.winRatePct, 1)}</div><div class="n">fee belum dipanen ${usd(a.openFeesUsd, 0)}</div></div>
+        </div>
+        <p class="hint" style="margin-top:14px">${ramai ? 'Tiga hari terakhir bot lebih sibuk dari rata-rata sepekan — pasarnya sedang ramai.'
+          : sepi ? 'Tiga hari terakhir bot lebih sepi dari rata-rata sepekan — lebih sedikit peluang yang lolos saringan.'
+          : 'Kesibukan bot tiga hari terakhir setara rata-rata sepekan.'}</p>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Yang harus dibaca sebelum percaya angka ini</h2><span class="hint">batas dari metodenya sendiri</span></div>
+        <ul class="note-list">${f.caveats.map((c) => `<li>${c}</li>`).join('')}</ul>
+        <p class="hint disclaimer">Ini proyeksi statistik, bukan janji dan bukan ramalan. Tidak ada model bahasa
+          yang dipakai membuat angkanya: seluruhnya dihitung dari catatan hasil bot sendiri, sekali sehari pukul
+          07.00 WIB, dan berkas mentahnya terbuka untuk diperiksa.</p>
+      </section>`;
+  });
+}
+
+function showAnalisa(fund) {
+  state.view = 'analisa';
+  analisaFund = fund || analisaFund || state.funds[0]?.id;
+  $('#tabs').hidden = true;
+  ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  $('#tab-analisa').hidden = false;
+  renderFundBar();
+  const want = `#analisa/${analisaFund}`;
+  if (location.hash !== want) history.replaceState(null, '', want);
+  renderAnalisa();
 }
 
 /* ── boot ────────────────────────────────────────────────────────────── */
@@ -1809,7 +1953,16 @@ async function init() {
 
   $('#fundBar').onclick = (e) => {
     const btn = e.target.closest('button');
-    if (btn) switchFund(btn.getAttribute('data-fund'));
+    if (!btn) return;
+    if (btn.getAttribute('data-view') === 'analisa') { showAnalisa(); return; }
+    const id = btn.getAttribute('data-fund');
+    if (state.view === 'analisa' && id === state.fund) { showTab(currentTab); return; }
+    switchFund(id);
+  };
+
+  $('#segAnalisa').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (btn) showAnalisa(btn.getAttribute('data-af'));
   };
 
   $('#refreshBtn').onclick = () => load({ force: true });
@@ -1842,9 +1995,10 @@ async function init() {
     if (btn) showTab(btn.getAttribute('data-tab'));
   };
   const fromHash = () => {
-    const { fund, tab } = parseHash();
-    if (fund && fund !== state.fund) { switchFund(fund).then(() => showTab(tab)); return; }
-    showTab(tab);
+    const route = parseHash();
+    if (route.analisa) { showAnalisa(route.fund); return; }
+    if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }
+    showTab(route.tab);
   };
   window.addEventListener('hashchange', fromHash);
   fromHash();

@@ -564,3 +564,23 @@ ul.plain strong { color: var(--text); }
    sendiri supaya tidak gepeng seperti lambang Ether yang jangkung. */
 svg.solmark { width: .78em; height: .61em; vertical-align: 0; }
 .seg.cur button svg.solmark { width: 17px; height: 13px; }
+
+/* ── analisa ─────────────────────────────────────────────────────────── */
+.funds button.analysis { border-style: dashed; }
+.scen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 760px) { .scen { grid-template-columns: 1fr; } }
+.scen-card { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: #0f1319; }
+.scen-card.normal { border-color: #2f4a39; background: linear-gradient(180deg, #101c14, #0f1319); }
+.scen-k { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+.scen-v { font: 600 26px/1.2 var(--mono); margin: 6px 0 2px; letter-spacing: -.6px; }
+.scen-d { font: 12.5px var(--mono); }
+.scen-rows { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; display: flex;
+             flex-direction: column; gap: 6px; }
+.scen-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--muted); }
+.scen-row b { color: var(--text); font-family: var(--mono); font-weight: 600; }
+.note-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.note-list li { display: flex; gap: 9px; align-items: flex-start; color: var(--muted);
+                font-size: 12.5px; line-height: 1.6; }
+.note-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--amber);
+                        margin-top: 6px; flex: none; }
+.miss { color: var(--muted); font-size: 13px; line-height: 1.7; }
