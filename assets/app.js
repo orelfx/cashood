@@ -72,7 +72,7 @@ function dataUrls(cfg, file, configured) {
 let currency = (() => {
   try {
     const saved = localStorage.getItem('cashood.currency');
-    return ['eth', 'idr'].includes(saved) ? saved : 'usd';
+    return saved && (saved === 'idr' || saved in COINS) ? saved : 'usd';
   } catch { return 'usd'; }
 })();
 
@@ -81,39 +81,7 @@ const fmtUsd = (n, dp = 2) =>
     minimumFractionDigits: dp, maximumFractionDigits: dp,
   });
 
-let lastEthPrice = null;
 
-// Lambang Ether, digambar di tempat — bukan huruf Yunani Ξ, yang kebetulan
-// mirip dan bukan lambang apa pun di sini. Diwarnai currentColor supaya ikut
-// merah/hijau baris yang memuatnya.
-const ETH_MARK = '<svg class="ethmark" viewBox="0 0 256 417" aria-hidden="true" focusable="false">'
-  + '<path d="M127.96 0l-2.8 9.5v275.67l2.8 2.79L255.92 212.3z" fill="currentColor" opacity=".6"/>'
-  + '<path d="M127.96 0L0 212.3l127.96 75.66V154.16z" fill="currentColor"/>'
-  + '<path d="M127.96 312.19l-1.58 1.92v98.2l1.58 4.6L256 236.59z" fill="currentColor" opacity=".6"/>'
-  + '<path d="M127.96 416.9v-104.71L0 236.59z" fill="currentColor"/>'
-  + '<path d="M127.96 287.96l127.96-75.65-127.96-58.16z" fill="currentColor" opacity=".35"/>'
-  + '<path d="M0 212.31l127.96 75.65V154.15z" fill="currentColor" opacity=".8"/></svg>';
-
-function ethAmount(n) {
-  const price = state.nav?.ethPrice || lastEthPrice;
-  if (!price) return null;
-  const v = (Number(n) || 0) / price;
-  const a = Math.abs(v);
-  const dp = a >= 100 ? 2 : a >= 1 ? 3 : a >= 0.01 ? 4 : 6;
-  return { negative: v < 0, digits: a.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }) };
-}
-
-/** Dengan lambang. Untuk tempat yang menerima HTML. */
-function fmtEth(n) {
-  const v = ethAmount(n);
-  return v ? (v.negative ? '-' : '') + ETH_MARK + v.digits : '—';
-}
-
-/** Tanpa lambang. Untuk <text> di dalam SVG, yang tidak bisa memuat elemen HTML. */
-function fmtEthText(n) {
-  const v = ethAmount(n);
-  return v ? (v.negative ? '-' : '') + v.digits + ' ETH' : '—';
-}
 
 let lastUsdIdr = null;
 
@@ -143,8 +111,65 @@ function fmtIdrText(n) {
   return sign + 'Rp' + '\u202f' + Math.round(a).toLocaleString('id-ID');
 }
 
-const usd = (n, dp = 2) => (currency === 'eth' ? fmtEth(n) : currency === 'idr' ? fmtIdr(n) : fmtUsd(n, dp));
-const usdText = (n, dp = 2) => (currency === 'eth' ? fmtEthText(n) : currency === 'idr' ? fmtIdrText(n) : fmtUsd(n, dp));
+/**
+ * Daftar koin yang bisa dipakai menampilkan angka.
+ *
+ * Ditulis sebagai daftar, bukan percabangan per koin, supaya menambah BTC atau
+ * BNB nanti cukup menambah satu baris di sini dan satu nama di `coins` pada
+ * data/funds.json — tidak ada logika lain yang perlu disentuh.
+ *
+ * `cg` adalah nama koin di CoinGecko; harga semua koin diambil sekali jalan.
+ */
+const COINS = {
+  eth: {
+    symbol: 'ETH', cg: 'ethereum',
+    mark: '<svg class="ethmark" viewBox="0 0 256 417" aria-hidden="true" focusable="false">'
+      + '<path d="M127.96 0l-2.8 9.5v275.67l2.8 2.79L255.92 212.3z" fill="currentColor" opacity=".6"/>'
+      + '<path d="M127.96 0L0 212.3l127.96 75.66V154.16z" fill="currentColor"/>'
+      + '<path d="M127.96 312.19l-1.58 1.92v98.2l1.58 4.6L256 236.59z" fill="currentColor" opacity=".6"/>'
+      + '<path d="M127.96 416.9v-104.71L0 236.59z" fill="currentColor"/>'
+      + '<path d="M127.96 287.96l127.96-75.65-127.96-58.16z" fill="currentColor" opacity=".35"/>'
+      + '<path d="M0 212.31l127.96 75.65V154.15z" fill="currentColor" opacity=".8"/></svg>',
+  },
+  sol: {
+    symbol: 'SOL', cg: 'solana',
+    mark: '<svg class="ethmark solmark" viewBox="0 0 398 312" aria-hidden="true" focusable="false">'
+      + '<path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1z" fill="currentColor"/>'
+      + '<path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1z" fill="currentColor" opacity=".75"/>'
+      + '<path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1z" fill="currentColor" opacity=".5"/></svg>',
+  },
+  btc: { symbol: 'BTC', cg: 'bitcoin', mark: '<span class="coinmark">₿</span>' },
+  bnb: { symbol: 'BNB', cg: 'binancecoin', mark: '<span class="coinmark">◆</span>' },
+};
+
+/** Harga tiap koin dalam dolar, diisi sekali ambil. */
+const coinPrice = {};
+
+function coinAmount(n, id) {
+  const price = coinPrice[id] || (state.nav?.nativeSymbol === COINS[id]?.symbol ? state.nav?.nativePrice : null);
+  if (!price) return null;
+  const v = (Number(n) || 0) / price;
+  const a = Math.abs(v);
+  const dp = a >= 100 ? 2 : a >= 1 ? 3 : a >= 0.01 ? 4 : 6;
+  return { negative: v < 0, digits: a.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }) };
+}
+
+/** Dengan lambang koin. Untuk tempat yang menerima HTML. */
+function fmtCoin(n, id) {
+  const v = coinAmount(n, id);
+  return v ? (v.negative ? '-' : '') + (COINS[id]?.mark || '') + v.digits : '—';
+}
+
+/** Tanpa lambang. Untuk <text> di dalam SVG, yang tidak bisa memuat elemen HTML. */
+function fmtCoinText(n, id) {
+  const v = coinAmount(n, id);
+  return v ? (v.negative ? '-' : '') + v.digits + ' ' + (COINS[id]?.symbol || '') : '—';
+}
+
+const usd = (n, dp = 2) => (COINS[currency] ? fmtCoin(n, currency)
+  : currency === 'idr' ? fmtIdr(n) : fmtUsd(n, dp));
+const usdText = (n, dp = 2) => (COINS[currency] ? fmtCoinText(n, currency)
+  : currency === 'idr' ? fmtIdrText(n) : fmtUsd(n, dp));
 
 const pct = (n, dp = 2) => (Number(n) || 0).toFixed(dp) + '%';
 
@@ -286,13 +311,16 @@ function buildLedger(cfg) {
  * baru mencari kurs rupiah ke tempat lain.
  */
 async function fxRates() {
+  const ids = [...new Set(Object.values(COINS).map((c) => c.cg))].join(',');
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd,idr');
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd,idr`);
     const j = await r.json();
-    const u = Number(j?.ethereum?.usd);
-    const i = Number(j?.ethereum?.idr);
-    if (u > 0) lastEthPrice = u;
-    if (u > 0 && i > 0) lastUsdIdr = i / u;
+    for (const [id, coin] of Object.entries(COINS)) {
+      const usdPrice = Number(j?.[coin.cg]?.usd);
+      if (usdPrice > 0) coinPrice[id] = usdPrice;
+      const idrPrice = Number(j?.[coin.cg]?.idr);
+      if (!lastUsdIdr && usdPrice > 0 && idrPrice > 0) lastUsdIdr = idrPrice / usdPrice;
+    }
   } catch { /* lanjut ke cadangan */ }
 
   if (!lastUsdIdr) {
@@ -303,7 +331,7 @@ async function fxRates() {
       if (i > 0) lastUsdIdr = i;
     } catch { /* tanpa kurs, tampilan rupiah menampilkan tanda pisah */ }
   }
-  return { eth: lastEthPrice, idr: lastUsdIdr };
+  return { coinPrice, idr: lastUsdIdr };
 }
 
 /**
@@ -357,7 +385,12 @@ async function resolveNav(cfg, { force = false } = {}) {
   const history = snap?.history || [];
   const stats = snap?.stats || null;
   const closedRecent = snap?.closedRecent || [];
-  if (Number(snap?.ethPrice) > 0) lastEthPrice = Number(snap.ethPrice);
+  // Snapshot membawa harga koin asli dananya; dipakai kalau CoinGecko tidak
+  // bisa dihubungi dari browser pengunjung.
+  const nativeId = Object.keys(COINS).find((k) => COINS[k].symbol === snap?.nativeSymbol);
+  if (nativeId && Number(snap?.nativePrice) > 0 && !coinPrice[nativeId]) {
+    coinPrice[nativeId] = Number(snap.nativePrice);
+  }
 
   const lpUsd = positions.reduce((s, p) => s + (Number(p.principalUsd) || 0) + (Number(p.feesUsd) || 0), 0);
   const holdings = snap.holdings || [];
@@ -376,6 +409,10 @@ async function resolveNav(cfg, { force = false } = {}) {
     lpUsd,
     liveUsd,
     treasuryUsd: Number(snap.treasuryUsd) || 0,
+    costsShareUsd: Number.isFinite(Number(snap.costsShareUsd)) ? Number(snap.costsShareUsd) : null,
+    costsTotalUsd: Number(snap.costsTotalUsd) || null,
+    nativeSymbol: snap.nativeSymbol || null,
+    nativePrice: Number(snap.nativePrice) || null,
     usdIdr: Number(snap.usdIdr) || null,
     botWalletUsd: Number(snap.botWalletUsd) || Number(snap.totalUsd),
     ethPrice: Number(snap.ethPrice) || null,
@@ -423,8 +460,14 @@ function renderSummary(ledger, nav) {
   $('#footSrc').textContent = nav.source === 'manual' ? 'config manual' : 'snapshot bot';
   $('#footTime').textContent = 'diperbarui ' + ago(nav.fetchedAt);
 
-  const eth = nav.ethPrice || lastEthPrice;
-  $('#ethRate').textContent = eth ? `1 ETH = ${fmtUsd(eth)}` : 'kurs ETH belum terbaca';
+  // Kurs yang ditampilkan mengikuti koin yang sedang dipilih; kalau sedang
+  // dolar atau rupiah, yang ditampilkan koin asli dana yang sedang dibuka.
+  const coinId = COINS[currency] ? currency
+    : Object.keys(COINS).find((k) => COINS[k].symbol === nav.nativeSymbol) || 'eth';
+  const price = coinPrice[coinId];
+  $('#ethRate').textContent = price
+    ? `1 ${COINS[coinId].symbol} = ${fmtUsd(price)}`
+    : `kurs ${COINS[coinId].symbol} belum terbaca`;
   $('#idrRate').textContent = lastUsdIdr
     ? `$1 = Rp\u202f${Math.round(lastUsdIdr).toLocaleString('id-ID')}`
     : 'kurs Rp belum terbaca';
@@ -621,9 +664,14 @@ function renderCosts(cfg) {
   table.querySelector('tbody').innerHTML = items
     .map((c) => `<tr><td>${c.name}</td><td class="num">${usd(c.usd)}</td></tr>`).join('');
 
-  const total = items.reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  const bill = items.reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  const total = monthlyCosts();
+  const shared = Math.abs(total - bill) > 0.01;
   table.querySelector('tfoot').innerHTML =
-    `<tr class="total"><td><strong>Total</strong></td><td class="num"><strong>${usd(total)}</strong></td></tr>`
+    (shared
+      ? `<tr><td class="dim">Tagihan penuh, dipakai bersama semua dana</td><td class="num dim">${usd(bill)}</td></tr>`
+      : '')
+    + `<tr class="total"><td><strong>${shared ? 'Bagian dana ini' : 'Total'}</strong></td><td class="num"><strong>${usd(total)}</strong></td></tr>`
     + `<tr><td class="dim">Per hari</td><td class="num dim">${usd(total / 30)}</td></tr>`;
 
   const navUsd = state.nav?.totalUsd || 0;
@@ -1050,7 +1098,17 @@ function sharePriceSeries(points) {
  * dijalankan. Tanpa suku kedua, uang yang diputar lagi bulan lalu akan terbaca
  * sebagai laba baru bulan ini dan dibagikan untuk kedua kalinya.
  */
+/**
+ * Biaya bulanan yang ditanggung dana ini.
+ *
+ * Tagihannya dipakai bersama semua dana, dan bagian tiap dana dihitung saat
+ * penerbitan menurut ukurannya — angka itu ikut di snapshot. Kalau belum ada,
+ * jatuh ke tagihan penuh, karena melaporkan biaya terlalu kecil membuat
+ * dividen tampak lebih besar dari yang sebenarnya.
+ */
 function monthlyCosts() {
+  const share = Number(state.nav?.costsShareUsd);
+  if (Number.isFinite(share) && share >= 0) return share;
   return (state.cfg?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
 }
 
@@ -1116,7 +1174,7 @@ function renderRules() {
     ? 'Dana sudah penuh. Investor baru masuk dengan membeli saham pemegang lama, bukan dengan setoran baru — supaya ukuran posisi tidak melebihi kedalaman pool.'
     : `Selama masih ada ruang, setoran baru mencetak unit baru. ${f.note || ''}`;
 
-  const costs = (state.cfg?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  const costs = monthlyCosts();
   const rules = [
     ['Minimum setoran', usd(Number(f.minDepositUsd) || 0, 0), 'Di bawah ini, biaya gas untuk masuk dan keluar memakan porsi yang terlalu besar dari setorannya sendiri.'],
     ['Plafon dana', usd(cap, 0), 'Bot menaruh $600–900 per posisi mengikuti kedalaman pool. Dana yang terlalu besar memaksa posisi membesar, dan price impact naik untuk semua orang.'],
@@ -1211,7 +1269,7 @@ function renderAbout() {
   const nav = state.nav?.totalUsd || 0;
   const units = state.ledger?.totalUnits || 0;
   const perUnit = units > 0 ? nav / units : 0;
-  const costs = (state.cfg?.costs?.items || []).reduce((a, c) => a + (Number(c.usd) || 0), 0);
+  const costs = monthlyCosts();
 
   const copy = FUND_COPY[state.fund] || FUND_COPY.reborn;
   $('#aboutLead').textContent = copy.lead;
@@ -1595,6 +1653,20 @@ function wireProfitControls() {
   $('#calNext').onclick = () => hop(1);
 }
 
+/**
+ * Tombol mata uang dibangun dari daftar koin yang diaktifkan di funds.json.
+ * Menambah koin baru tidak menyentuh berkas ini selain daftar itu.
+ */
+function renderCurrencyButtons() {
+  const ids = (state.coins || ['eth']).filter((id) => COINS[id]);
+  $('#segCur').innerHTML = [
+    `<button data-c="usd" title="Tampilkan dalam dolar">$</button>`,
+    ...ids.map((id) => `<button data-c="${id}" title="Tampilkan dalam ${COINS[id].symbol}" aria-label="${COINS[id].symbol}">${COINS[id].mark}</button>`),
+    `<button data-c="idr" title="Tampilkan dalam rupiah">Rp</button>`,
+  ].join('');
+  $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-c') === currency));
+}
+
 /* ── dana aktif ──────────────────────────────────────────────────────────
  *
  * Berpindah dana berarti mengganti SELURUH isi halaman: config, buku investor,
@@ -1724,6 +1796,7 @@ async function init() {
     const res = await fetch(FUNDS_URL + '?t=' + Date.now(), { cache: 'no-store' });
     const list = await res.json();
     state.funds = list.funds || [];
+    state.coins = list.coins || ['eth'];
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -1746,6 +1819,7 @@ async function init() {
     renderHoldings(state.nav);
   };
 
+  renderCurrencyButtons();
   $('#segCur').onclick = (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -1753,7 +1827,7 @@ async function init() {
     // ulang daftar itu di sini — "eth atau usd" — jadi tombol rupiah menyala
     // tapi angkanya tetap dolar, dan tidak ada yang error untuk menandainya.
     const want = btn.getAttribute('data-c');
-    currency = ['eth', 'idr'].includes(want) ? want : 'usd';
+    currency = (want === 'idr' || want in COINS) ? want : 'usd';
     try { localStorage.setItem('cashood.currency', currency); } catch { /* mode privat */ }
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     renderAll();

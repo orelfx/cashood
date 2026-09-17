@@ -284,6 +284,8 @@ try {
 const snapshot = {
   updatedAt: Date.now(),
   usdIdr,
+  nativeSymbol: 'ETH',
+  nativePrice: price,
   totalUsd: Number((totalUsd + treasuryUsd).toFixed(2)),
   botWalletUsd: Number(totalUsd.toFixed(2)),
   treasuryUsd,

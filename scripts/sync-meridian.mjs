@@ -180,6 +180,8 @@ const snapshot = {
   treasuryUsd: 0,
   solPrice,
   ethPrice: null,
+  nativeSymbol: 'SOL',
+  nativePrice: solPrice,
   holdings: holdings.map((h) => ({ ...h, usd: Number(h.usd.toFixed(2)) })),
   positions,
   history,
