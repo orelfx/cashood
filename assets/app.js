@@ -133,10 +133,13 @@ const COINS = {
   },
   sol: {
     symbol: 'SOL', cg: 'solana',
-    mark: '<svg class="ethmark solmark" viewBox="0 0 398 312" aria-hidden="true" focusable="false">'
-      + '<path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1z" fill="currentColor"/>'
-      + '<path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1z" fill="currentColor" opacity=".75"/>'
-      + '<path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1z" fill="currentColor" opacity=".5"/></svg>',
+    // Tiga bilah miring resmi Solana. Sebelumnya tiap bilah kupotong di ujung
+    // dan diganti "z", yang menutup bentuknya lurus ke pangkal — kemiringannya
+    // hilang dan jadinya tiga garis datar biasa.
+    mark: '<svg class="ethmark solmark" viewBox="0 0 397.7 311.7" aria-hidden="true" focusable="false">'
+      + '<path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="currentColor"/>'
+      + '<path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="currentColor" opacity=".9"/>'
+      + '<path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="currentColor" opacity=".8"/></svg>',
   },
   btc: { symbol: 'BTC', cg: 'bitcoin', mark: '<span class="coinmark">₿</span>' },
   bnb: { symbol: 'BNB', cg: 'binancecoin', mark: '<span class="coinmark">◆</span>' },

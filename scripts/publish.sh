@@ -16,26 +16,26 @@ WORK="$ROOT/.databranch"
 /usr/bin/node scripts/sync.mjs || echo "PERINGATAN: snapshot reborn gagal"
 MERIDIAN_HOME="${MERIDIAN_HOME:-/root/main/meridian}" /usr/bin/node scripts/sync-meridian.mjs || echo "PERINGATAN: snapshot meridian gagal"
 
-# Biaya bulanan dipakai bersama kedua dana. Dibagi rata akan mencekik dana
-# kecil — $77,50 atas dana $978 itu 8% sebulan — jadi dibagi menurut ukuran,
-# prinsip yang sama dengan pembagian di dalam tiap dana. Dihitung di sini,
-# sesudah kedua snapshot ada, supaya angkanya bisa ditelusuri.
+# Tagihan sistem $155 itu satu tagihan untuk seluruh sistem, bukan satu per
+# dana. Dibayar sekali dari dana yang ditandai `costs.primary` di config-nya;
+# dana lain tidak dibebani lagi, supaya biaya yang sama tidak terhitung dua kali
+# dan tidak memotong dividen dua kali.
 /usr/bin/node -e '
   const fs = require("fs");
   const read = (p) => { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; } };
   const funds = ["reborn", "meridian"];
-  const live = Object.fromEntries(funds.map((f) => [f, read(`data/${f}/live.json`)]));
-  const cfg  = Object.fromEntries(funds.map((f) => [f, read(`data/${f}/config.json`)]));
-  const bill = (cfg.reborn?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
-  const navs = Object.fromEntries(funds.map((f) => [f, Number(live[f]?.totalUsd) || 0]));
-  const total = funds.reduce((t, f) => t + navs[f], 0);
+  const bill = (read("data/reborn/config.json")?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  const line = [];
   for (const f of funds) {
-    if (!live[f]) continue;
-    live[f].costsShareUsd = total > 0 ? Number((bill * navs[f] / total).toFixed(2)) : Number((bill / funds.length).toFixed(2));
-    live[f].costsTotalUsd = bill;
-    fs.writeFileSync(`data/${f}/live.json`, JSON.stringify(live[f], null, 2) + "\n");
+    const live = read(`data/${f}/live.json`);
+    if (!live) continue;
+    const primary = read(`data/${f}/config.json`)?.costs?.primary === true;
+    live.costsShareUsd = primary ? bill : 0;
+    live.costsTotalUsd = bill;
+    fs.writeFileSync(`data/${f}/live.json`, JSON.stringify(live, null, 2) + "\n");
+    line.push(`${f} $${live.costsShareUsd}`);
   }
-  console.log(`[biaya] $${bill} dibagi: ` + funds.map((f) => `${f} $${live[f]?.costsShareUsd}`).join(" · "));
+  console.log(`[biaya] tagihan $${bill} → ` + line.join(" · "));
 '
 
 [ -d "$WORK" ] || git worktree add -q "$WORK" data

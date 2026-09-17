@@ -560,5 +560,7 @@ ul.plain strong { color: var(--text); }
   .funds .fchain { display: none; }
 }
 .coinmark { font: 600 13px var(--mono); }
-svg.solmark { width: .62em; height: .49em; vertical-align: .02em; }
-.seg.cur button svg.solmark { width: 15px; height: 12px; }
+/* Lambang Solana lebih lebar dari tinggi (398:312), jadi ukurannya diatur
+   sendiri supaya tidak gepeng seperti lambang Ether yang jangkung. */
+svg.solmark { width: .78em; height: .61em; vertical-align: 0; }
+.seg.cur button svg.solmark { width: 17px; height: 13px; }
