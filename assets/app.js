@@ -1716,8 +1716,7 @@ function renderFundBar() {
     </button>`).join('')
     + `<button data-view="analisa" class="analysis ${analisa ? 'on' : ''}" style="--fund-accent:#fbbf24">
         <span class="fdot" style="background:#fbbf24"></span>
-        <span class="fname">AI Analisa</span>
-        <span class="fchain">proyeksi tanggal 1</span>
+        <span class="fname">Prediksi AI</span>
       </button>`;
 }
 
@@ -1839,9 +1838,32 @@ function renderAnalisa() {
       </section>
 
       <section class="card">
+        <div class="card-head">
+          <h2>Kalau bot terus berjalan seperti sekarang</h2>
+          <span class="hint">memakai seluruh data sejak bot dipantau, bukan bulan ini saja</span>
+        </div>
+        <div class="table-scroll"><table id="horizonTable">
+          <thead><tr><th>Jangka</th><th class="num">Nilai dana</th><th class="num">Dividen terkumpul</th><th class="num">Total diterima</th><th class="num">Terburuk</th><th class="num">Terbaik</th></tr></thead>
+          <tbody>${(f.horizons || []).map((h) => `
+            <tr>
+              <td>${h.label}${h.speculative ? ' <span class="pill out">spekulatif</span>' : ''}</td>
+              <td class="num">${usd(h.normal.navUsd, 0)}</td>
+              <td class="num pos">${usd(h.normal.dividendsUsd, 0)}</td>
+              <td class="num"><strong>${usd(h.normal.totalUsd, 0)}</strong></td>
+              <td class="num dim">${usd(h.worst.totalUsd, 0)}</td>
+              <td class="num dim">${usd(h.best.totalUsd, 0)}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>
+        <p class="hint" style="margin-top:12px">Nilai dana berhenti di sekitar plafon karena aturan dananya ikut dijalankan:
+          tiap bulan biaya dipotong, ${f.scenarios.normal.dividend.distributed >= 0 ? '70% laba dibagikan keluar' : 'laba dibagikan keluar'},
+          dan modal di atas plafon tidak ikut diputar. Yang menumpuk adalah dividen yang sudah diterima, bukan saldo dananya.</p>
+      </section>
+
+      <section class="card">
         <div class="card-head"><h2>Dasar perhitungannya</h2><span class="hint">semua angka bisa diperiksa</span></div>
         <div class="table-scroll"><table><tbody>
-          <tr><td>Contoh yang dipakai</td><td class="num">${f.sample.days} hari</td><td class="dim">${f.sample.from} → ${f.sample.to}</td></tr>
+          <tr><td>Contoh untuk tanggal 1</td><td class="num">${f.monthSample?.days ?? f.sample.days} hari</td><td class="dim">${f.monthSample?.scope || 'bulan berjalan'}</td></tr>
+          <tr><td>Contoh untuk jangka panjang</td><td class="num">${f.sample.days} hari</td><td class="dim">${f.sample.from} → ${f.sample.to}</td></tr>
           <tr><td>Hari untung / rugi</td><td class="num">${f.sample.winDays} / ${f.sample.lossDays}</td><td class="dim">di dalam contoh itu</td></tr>
           <tr><td>Rata-rata per hari</td><td class="num ${cls(f.sample.meanDailyPct)}">${f.sample.meanDailyPct > 0 ? '+' : ''}${pct(f.sample.meanDailyPct, 3)}</td><td class="dim">naik-turunnya ${pct(f.sample.stdevDailyPct, 3)}</td></tr>
           <tr><td>Modal acuan</td><td class="num">${usd(f.baseCapital, 0)}</td><td class="dim">dipakai menghitung dividen tiap skenario</td></tr>
@@ -1986,7 +2008,9 @@ async function init() {
     currency = (want === 'idr' || want in COINS) ? want : 'usd';
     try { localStorage.setItem('cashood.currency', currency); } catch { /* mode privat */ }
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
-    renderAll();
+    // Tampilan analisa digambar terpisah dan tidak ikut renderAll; tanpa baris
+    // ini angkanya tetap dolar setelah tombol rupiah ditekan.
+    if (state.view === 'analisa') renderAnalisa(); else renderAll();
   };
   $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-c') === currency));
 

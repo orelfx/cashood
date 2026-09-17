@@ -27,6 +27,16 @@ const DATA = resolve(HERE, '..', 'data');
 const WIB = 7 * 3600e3;
 const PATHS = 10000;
 
+/** Jangka waktu untuk proyeksi seumur hidup bot. */
+const HORIZONS = [
+  { key: 'w1', label: '1 minggu', days: 7 },
+  { key: 'm1', label: '1 bulan', days: 30 },
+  { key: 'm3', label: '3 bulan', days: 90 },
+  { key: 'm6', label: '6 bulan', days: 180 },
+  { key: 'y1', label: '1 tahun', days: 365 },
+  { key: 'y5', label: '5 tahun', days: 1825 },
+];
+
 const read = (p) => (existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null);
 const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
@@ -105,6 +115,14 @@ function forecast(fund) {
   const daily = history.map((h) => ({ date: h.date, pct: num(h.usd) / Math.max(1, navAt(h.date)) }));
   if (daily.length < 3) return { fund, enough: false, days, paydayAt, navNow: nav, samples: daily.length };
 
+  // Dua contoh yang berbeda, sengaja. Proyeksi tanggal 1 memakai data BULAN
+  // BERJALAN saja — itu periode yang dibayarkan. Proyeksi jangka panjang
+  // memakai SELURUH data, karena yang ditanya di situ adalah perilaku umum
+  // botnya, bukan bagaimana bulan ini kebetulan berjalan.
+  const monthKey = new Date(Date.now() + WIB).toISOString().slice(0, 7);
+  const thisMonth = daily.filter((d) => d.date.slice(0, 7) === monthKey);
+  const monthly = thisMonth.length >= 3 ? thisMonth : daily;
+
   const pcts = daily.map((d) => d.pct);
   const mean = pcts.reduce((a, b) => a + b, 0) / pcts.length;
   const stdev = Math.sqrt(pcts.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(1, pcts.length - 1));
@@ -112,15 +130,6 @@ function forecast(fund) {
   // Biaya sistem hanya memotong dana yang menanggung tagihannya.
   const costs = cfg.costs?.primary === false ? 0
     : (cfg.costs?.items || []).reduce((t, c) => t + num(c.usd), 0);
-
-  const rand = rng(`${fund}:${new Date().toISOString().slice(0, 10)}:${daily.length}:${nav.toFixed(0)}`);
-  const ends = [];
-  for (let i = 0; i < PATHS; i += 1) {
-    let value = nav;
-    for (let d = 0; d < days; d += 1) value *= 1 + pcts[Math.floor(rand() * pcts.length)];
-    ends.push(value);
-  }
-  ends.sort((a, b) => a - b);
 
   const ledger = cfg.events || [];
   const deposits = ledger.filter((e) => e.type !== 'withdraw').reduce((t, e) => t + num(e.usd), 0);
@@ -138,6 +147,59 @@ function forecast(fund) {
     }
     return total;
   })();
+
+  const seed = `${fund}:${new Date().toISOString().slice(0, 10)}:${daily.length}:${nav.toFixed(0)}`;
+
+  /**
+   * Undi ulang `horizonDays` hari dari contoh yang diberikan.
+   *
+   * Untuk jangka panjang, aturan dananya ikut dijalankan — dan itu yang membuat
+   * angkanya masuk akal. Tanpa ini, tujuh hari yang kebetulan bagus dibunga-
+   * berbungakan 1.825 kali menghasilkan angka kuintiliun: dana yang tumbuh
+   * selamanya, padahal setiap bulan 70% labanya justru dibayarkan keluar dan
+   * botnya sendiri punya plafon berapa modal yang sanggup ia kelola.
+   */
+  function simulate(sample, horizonDays, tag, { mechanics = false } = {}) {
+    const pool = sample.map((d) => d.pct);
+    const rand = rng(seed + ':' + tag);
+    const distributePct = (num(cfg.dividend?.distributePct) || 70) / 100;
+    const reinvestPct = (num(cfg.dividend?.reinvestPct) || 30) / 100;
+    const capacity = num(cfg.fund?.capacityUsd);
+    const ends = [];
+
+    for (let i = 0; i < PATHS; i += 1) {
+      let value = nav;
+      let reference = base;
+      let paid = 0;
+
+      for (let d = 1; d <= horizonDays; d += 1) {
+        value *= 1 + pool[Math.floor(rand() * pool.length)];
+        if (value < 0) value = 0;
+
+        if (mechanics && capacity > 0 && value > capacity) {
+          // Di atas plafon, kelebihannya tidak ikut diputar: bot tidak sanggup
+          // menempatkannya, jadi ia keluar ke pemiliknya.
+          paid += value - capacity;
+          value = capacity;
+        }
+
+        if (mechanics && d % 30 === 0) {
+          value = Math.max(0, value - costs);
+          const gross = Math.max(0, value - reference);
+          const distributed = gross * distributePct;
+          value -= distributed;
+          reference += gross * reinvestPct;
+          paid += distributed;
+        }
+      }
+      ends.push({ value: Math.max(0, value), paid });
+    }
+
+    ends.sort((a, b) => a.value - b.value);
+    return ends;
+  }
+
+  const ends = simulate(monthly, days, 'payday').map((e) => e.value);
 
   const scenario = (q, label) => {
     const value = quantile(ends, q);
@@ -190,6 +252,29 @@ function forecast(fund) {
       normal: scenario(0.50, 'Normal'),
       best: scenario(0.90, 'Terbaik'),
     },
+    monthSample: { days: monthly.length, scope: monthly === thisMonth ? 'bulan berjalan' : 'seluruh data — bulan ini belum cukup' },
+    horizons: HORIZONS.map(({ key, label, days: hd }) => {
+      const runs = simulate(daily, hd, key, { mechanics: true });
+      const values = runs.map((r) => r.value);
+      const paids = runs.map((r) => r.paid).sort((a, b) => a - b);
+      const at = (q) => {
+        const value = quantile(values, q);
+        const paid = quantile(paids, q);
+        return {
+          navUsd: Number(value.toFixed(2)),
+          changePct: Number(((value / nav - 1) * 100).toFixed(2)),
+          dividendsUsd: Number(paid.toFixed(2)),
+          totalUsd: Number((value + paid).toFixed(2)),
+          sharePrice: units > 0 ? Number((value / units).toFixed(4)) : null,
+        };
+      };
+      return {
+        key, label, days: hd,
+        // Jangka yang jauh melampaui panjang datanya disebut apa adanya.
+        speculative: hd > daily.length * 12,
+        worst: at(0.10), normal: at(0.50), best: at(0.90),
+      };
+    }),
     caveats: [],
     method: `Undian ulang ${daily.length} hari hasil nyata, ${PATHS.toLocaleString('id-ID')} lintasan, ${days} hari menuju ${new Date(paydayAt + WIB).toISOString().slice(0, 10)}.`,
   };
@@ -219,6 +304,7 @@ for (const fund of want) {
       c.push('Hasil harian Meridian dihitung dari persen hasil tiap posisi dikali ukurannya, karena bot tidak mencatat hasil dalam dolar. Angkanya perkiraan.');
     }
     c.push('Proyeksi memakai asumsi bot berperilaku seperti hari-hari yang sudah tercatat. Kalau pasar atau aturan botnya berubah, angka ini tidak berlaku.');
+    c.push(`Proyeksi jangka panjang mengulang ${out.sample.days} hari yang sama ratusan kali. Semakin jauh jangkanya semakin longgar artinya — tidak ada dana yang berjalan bertahun-tahun tanpa berubah.`);
     out.caveats = c;
   }
 
