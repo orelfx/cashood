@@ -332,7 +332,17 @@ const treasuryMoves = (() => {
   return [...seen.values()].sort((a, b) => a.at - b.at);
 })();
 
-const treasuryUsd = Number(treasuryMoves.reduce((sum, m) => sum + m.usd, 0).toFixed(2));
+// SALDO AWAL. Pemilik menetapkan kas cadangan mulai dari angka tertentu
+// (`treasury.openingUsd`, $300 per 2026-09-18) dan hanya sapuan sejak
+// `treasury.countFrom` (hari WIB) yang ditambahkan di atasnya. Sapuan sebelum
+// tanggal itu sudah terwakili di saldo awal — menjumlahkannya lagi berarti
+// menghitung uang yang sama dua kali.
+const openingUsd = Number(cfgTreasury?.treasury?.openingUsd) || 0;
+const countFromMs = cfgTreasury?.treasury?.countFrom
+  ? Date.parse(`${cfgTreasury.treasury.countFrom}T00:00:00+07:00`)
+  : -Infinity;
+const countedMoves = treasuryMoves.filter((m) => m.at >= countFromMs);
+const treasuryUsd = Number((openingUsd + countedMoves.reduce((sum, m) => sum + m.usd, 0)).toFixed(2));
 
 // Alamat wallet sengaja TIDAK ditulis ke snapshot: berkas ini terbit di repo
 // publik, dan satu baris saja sudah cukup untuk menghubungkan situs ini dengan
@@ -356,7 +366,9 @@ const snapshot = {
   totalUsd: Number((totalUsd + treasuryUsd).toFixed(2)),
   botWalletUsd: Number(totalUsd.toFixed(2)),
   treasuryUsd,
-  treasuryMoves: treasuryMoves.slice(-40),
+  treasuryOpeningUsd: openingUsd,
+  treasuryCountFrom: cfgTreasury?.treasury?.countFrom || null,
+  treasuryMoves: countedMoves.slice(-40),
   fixedCapitalUsd,
   sweepStepUsd,
   // Yang akan tersapu kalau sapuan jalan sekarang — supaya situs bisa bilang

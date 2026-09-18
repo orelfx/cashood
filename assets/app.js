@@ -458,7 +458,20 @@ function renderSummary(ledger, nav) {
       + (nav.treasuryUsd > 0 ? ` + ${usd(nav.treasuryUsd, 0)} kas cadangan` : '')
     : nav.label;
   $('#kpiDeposit').innerHTML = usd(ledger.deposited);
-  $('#kpiWithdraw').innerHTML = usd(ledger.withdrawn);
+  // "Sudah ditarik" = pencairan investor + sapuan harian bot ke wallet tabungan.
+  // HANYA TAMPILAN: sapuan sudah ada di dalam nav.totalUsd (kas cadangan tetap
+  // milik dana), jadi ia tidak boleh ikut masuk ke rumus untung/rugi di bawah —
+  // kalau ikut, uang yang sama terhitung dua kali.
+  const swept = Number(nav.treasuryUsd) || 0;
+  const sweeps = (nav.treasuryMoves || []).length;
+  $('#kpiWithdraw').innerHTML = usd(ledger.withdrawn + swept);
+  const opening = Number(nav.treasuryOpeningUsd) || 0;
+  $('#kpiWithdrawSub').innerHTML = swept > 0
+    ? (ledger.withdrawn > 0 ? `${usd(ledger.withdrawn, 0)} investor + ` : '')
+      + (opening > 0
+        ? `saldo awal ${usd(opening, 0)}` + (sweeps ? ` + ${sweeps} sapuan bot` : ' · sapuan harian ditambahkan otomatis')
+        : `${usd(swept, 0)} disapu bot · ${sweeps} transfer`)
+    : 'total penarikan';
   const el = $('#kpiPnl');
   el.innerHTML = signed(pnl);
   el.className = 'big ' + cls(pnl);
@@ -1226,7 +1239,9 @@ function renderTreasury() {
     tile('Modal kerja bot', usd(fixed, 0), 'dipatok — tidak ikut naik saat dana bertambah'),
     tile('Dipegang bot sekarang', usd(inBot), above > 0 ? `${usd(above)} di atas modal` : 'di bawah atau pas di modal',
       above > 0 ? 'pos' : ''),
-    tile('Sudah dipindahkan', usd(moved), `${(nav.treasuryMoves || []).length} transfer ke wallet terpisah`, moved > 0 ? 'pos' : ''),
+    tile('Sudah dipindahkan', usd(moved), Number(nav.treasuryOpeningUsd) > 0
+      ? `saldo awal ${usd(Number(nav.treasuryOpeningUsd), 0)} + ${(nav.treasuryMoves || []).length} sapuan`
+      : `${(nav.treasuryMoves || []).length} transfer ke wallet terpisah`, moved > 0 ? 'pos' : ''),
     tile('Antre keluar', due > 0 ? usd(due, 0) : '—',
       due > 0 ? 'dikirim pada sapuan berikutnya' : `belum genap ${usd(step, 0)}`, due > 0 ? 'pos' : ''),
   ].join('');
@@ -1238,12 +1253,18 @@ function renderTreasury() {
   // Hari WIB, sama seperti riwayat profit — bukan hari UTC, atau transfer jam
   // 06:00 pagi di sini akan tercatat di tanggal sebelumnya.
   const hariWib = (ms) => new Date(Number(ms) + 7 * 3600e3).toISOString().slice(0, 10);
+  const opening = Number(nav.treasuryOpeningUsd) || 0;
   const moves = [...(nav.treasuryMoves || [])].reverse().slice(0, 8);
   $('#treMoves').innerHTML = moves.length
     ? `<table class="table tre-moves"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aset</th></tr></thead><tbody>`
       + moves.map((m) => `<tr><td>${fmtDay(hariWib(m.at))}</td><td class="pos">${usd(m.usd)}</td><td>${m.asset || 'USDG'}</td></tr>`).join('')
       + '</tbody></table>'
-    : '<p class="dim">Belum ada transfer yang tercatat.</p>';
+    : '<p class="dim">Belum ada sapuan yang tercatat.</p>';
+  if (opening > 0) {
+    const from = nav.treasuryCountFrom ? fmtDay(nav.treasuryCountFrom) : null;
+    $('#treMoves').innerHTML += `<p class="dim">Saldo awal ${usd(opening, 0)}`
+      + (from ? ` · sapuan harian dihitung mulai ${from}` : '') + '.</p>';
+  }
 
   $('#treRule').innerHTML = `
     <p><strong>Bot bekerja dengan modal tetap ${usd(fixed, 0)}.</strong> Dana boleh tumbuh melewati
