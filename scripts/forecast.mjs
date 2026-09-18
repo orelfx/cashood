@@ -34,7 +34,6 @@ const HORIZONS = [
   { key: 'm3', label: '3 bulan', days: 90 },
   { key: 'm6', label: '6 bulan', days: 180 },
   { key: 'y1', label: '1 tahun', days: 365 },
-  { key: 'y5', label: '5 tahun', days: 1825 },
 ];
 
 const read = (p) => (existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null);
@@ -173,15 +172,16 @@ function forecast(fund) {
       let paid = 0;
 
       for (let d = 1; d <= horizonDays; d += 1) {
-        value *= 1 + pool[Math.floor(rand() * pool.length)];
+        // Plafon membatasi berapa yang SANGGUP diputar bot, bukan berapa yang
+        // boleh dimiliki dana. Modal di atas plafon tetap milik dana tapi
+        // menganggur — jadi dana tetap tumbuh dari 30% yang diputar ulang tiap
+        // bulan, hanya lajunya melambat setelah melewati plafon.
+        const working = mechanics && capacity > 0 ? Math.min(value, capacity) : value;
+        const idle = value - working;
+        value = working * (1 + pool[Math.floor(rand() * pool.length)]) + idle;
         if (value < 0) value = 0;
 
-        if (mechanics && capacity > 0 && value > capacity) {
-          // Di atas plafon, kelebihannya tidak ikut diputar: bot tidak sanggup
-          // menempatkannya, jadi ia keluar ke pemiliknya.
-          paid += value - capacity;
-          value = capacity;
-        }
+
 
         if (mechanics && d % 30 === 0) {
           value = Math.max(0, value - costs);

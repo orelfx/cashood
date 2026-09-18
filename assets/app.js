@@ -885,6 +885,7 @@ function showTab(name) {
   state.view = 'fund';
   $('#tabs').hidden = false;
   $('#tab-analisa').hidden = true;
+  $('#tab-safebox').hidden = true;
   renderFundBar();
   $('#tab-portfolio').hidden = tab !== 'portfolio';
   $('#tab-investor').hidden = tab !== 'investor';
@@ -1692,6 +1693,7 @@ function parseHash() {
   const parts = location.hash.replace('#', '').split('/').filter(Boolean);
   let fund = state.fund || state.funds[0]?.id;
   let tab = 'portfolio';
+  if (parts[0] === 'safebox') return { safebox: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
   }
@@ -1714,6 +1716,11 @@ function renderFundBar() {
       <span class="fname">${f.label}</span>
       <span class="fchain">${f.chain}</span>
     </button>`).join('')
+    + (state.safebox ? `<button data-view="safebox" class="${state.view === 'safebox' ? 'on' : ''}" style="--fund-accent:${state.safebox.accent}">
+        <span class="fdot" style="background:${state.safebox.accent}"></span>
+        <span class="fname">${state.safebox.label}</span>
+        <span class="fchain">${state.safebox.subtitle}</span>
+      </button>` : '')
     + `<button data-view="analisa" class="analysis ${analisa ? 'on' : ''}" style="--fund-accent:#fbbf24">
         <span class="fdot" style="background:#fbbf24"></span>
         <span class="fname">Prediksi AI</span>
@@ -1751,6 +1758,137 @@ async function switchFund(id) {
   await loadFundConfig(id);
   showTab(currentTab);
   await load({ force: true });
+}
+
+/* ── safe box ────────────────────────────────────────────────────────────
+ *
+ * Satu simpanan, bukan dana bersama: tidak ada pemilik saham, tidak ada
+ * dividen. Yang ditampilkan nilai simpanan, bunga yang sudah dihasilkan, dan
+ * laju bunganya — diukur dari fee yang benar-benar tercatat, bukan angka tetap.
+ */
+let safeboxData = null;
+let sbCapital = null;
+
+async function loadSafebox() {
+  if (safeboxData) return safeboxData;
+  const urls = [rawDataBase('safebox') ? rawDataBase('safebox') + 'live.json' : null,
+    'https://raw.githubusercontent.com/orelfx/cashood/data/safebox/live.json',
+    'data/safebox/live.json'].filter(Boolean);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) continue;
+      const j = await res.json();
+      if (j && Number.isFinite(Number(j.valueUsd))) { safeboxData = j; return j; }
+    } catch { /* sumber berikutnya */ }
+  }
+  return null;
+}
+
+function renderSafebox() {
+  const body = $('#tab-safebox');
+  body.innerHTML = '<p class="hint">memuat simpanan…</p>';
+
+  loadSafebox().then((d) => {
+    if (state.view !== 'safebox') return;
+    if (!d) {
+      body.innerHTML = '<section class="card"><p class="miss">Data simpanan belum tersedia.</p></section>';
+      return;
+    }
+
+    const rate = d.measure || {};
+    const modal = sbCapital == null ? d.balanceUsd : sbCapital;
+    const perDayRate = d.principalUsd > 0 ? rate.perDayUsd / d.principalUsd : 0;
+
+    // Dua kolom sengaja: bunga diambil tiap kali, dan bunga dibiarkan ikut
+    // bekerja. Bedanya kecil di jangka pendek dan besar di jangka panjang, dan
+    // menampilkan satu angka saja menyembunyikan salah satunya.
+    const rows = [['1 minggu', 7], ['1 bulan', 30], ['3 bulan', 90], ['6 bulan', 180], ['1 tahun', 365]]
+      .map(([label, days]) => {
+        const simple = modal * perDayRate * days;
+        const compound = modal * ((1 + perDayRate) ** days - 1);
+        return `<tr>
+          <td>${label}</td>
+          <td class="num pos">${usd(simple)}</td>
+          <td class="num pos">${usd(compound)}</td>
+          <td class="num"><strong>${usd(modal + compound)}</strong></td>
+        </tr>`;
+      }).join('');
+
+    body.innerHTML = `
+      <section class="card">
+        <div class="card-head">
+          <h2>Safe Box</h2>
+          <span class="hint">${d.venue} · diperbarui ${ago(d.updatedAt)}</span>
+        </div>
+        <div class="sb-head">
+          <div class="sb-main">
+            <div class="k">Saldo simpanan</div>
+            <div class="v">${usd(d.balanceUsd)}</div>
+            <div class="n">pokok ${usd(d.principalUsd)} + bunga ${usd(d.interestUsd, 2)}</div>
+            <div class="sb-pill"><span class="led ${d.inRange ? 'live' : ''}"></span>${d.inRange ? 'sedang menghasilkan' : 'sedang tidak menghasilkan'}</div>
+          </div>
+          <div class="stat"><div class="k">Bunga per bulan</div>
+            <div class="v pos">${rate.monthlyPct == null ? '—' : pct(rate.monthlyPct)}</div>
+            <div class="n">setara ${rate.apyPct == null ? '—' : pct(rate.apyPct)} setahun</div></div>
+          <div class="stat"><div class="k">Bunga per hari</div>
+            <div class="v">${usd(rate.perDayUsd, 4)}</div>
+            <div class="n">diukur ${rate.spanDays} hari · ${rate.basis || 'fee tercatat'}</div></div>
+        </div>
+        <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>: besarnya mengikuti fee yang
+          dihasilkan posisi likuiditas ini, dan fee mengikuti ramainya perdagangan. Angka di atas dihitung ulang
+          tiap sepuluh menit dari fee yang benar-benar tercatat, bukan dari janji persentase.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Kalau laju bunganya bertahan</h2>
+          <span class="hint">hitungan lurus dari laju hari ini, bukan proyeksi pasar</span>
+        </div>
+        <div class="calc">
+          <label class="field">
+            <span>Andai modalnya (USD)</span>
+            <input type="number" id="sbCapital" min="0" step="any" value="${modal.toFixed(2)}">
+          </label>
+          <div class="field quick">
+            <span>Isi cepat</span>
+            <div class="seg" id="sbQuick"><button data-v="now">simpanan sekarang</button><button data-v="1000">$1.000</button><button data-v="10000">$10.000</button></div>
+          </div>
+        </div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Jangka</th><th class="num">Bunga diambil</th><th class="num">Bunga diputar lagi</th><th class="num">Jadi</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+        <p class="hint disclaimer">Tabel ini mengalikan laju bunga hari ini ke depan — bukan ramalan. Laju itu naik
+          dan turun mengikuti perdagangan di pool. Nilai pokoknya sendiri ikut bergerak mengikuti harga pasar; yang
+          dihitung sebagai bunga di sini hanya fee yang dihasilkan posisinya.</p>
+      </section>`;
+
+    $('#sbCapital').oninput = (e) => {
+      sbCapital = Math.max(0, Number(e.target.value) || 0);
+      const keep = e.target.value;
+      renderSafebox();
+      setTimeout(() => { const el = $('#sbCapital'); if (el) { el.value = keep; el.focus(); } }, 0);
+    };
+    $('#sbQuick').onclick = (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const v = btn.getAttribute('data-v');
+      sbCapital = v === 'now' ? d.balanceUsd : Number(v);
+      renderSafebox();
+    };
+  });
+}
+
+function showSafebox() {
+  state.view = 'safebox';
+  $('#tabs').hidden = true;
+  ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  $('#tab-analisa').hidden = true;
+  $('#tab-safebox').hidden = false;
+  renderFundBar();
+  if (location.hash !== '#safebox') history.replaceState(null, '', '#safebox');
+  renderSafebox();
 }
 
 /* ── analisa: proyeksi sampai tanggal pembagian ──────────────────────────
@@ -1901,6 +2039,7 @@ function showAnalisa(fund) {
   analisaFund = fund || analisaFund || state.funds[0]?.id;
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  $('#tab-safebox').hidden = true;
   $('#tab-analisa').hidden = false;
   renderFundBar();
   const want = `#analisa/${analisaFund}`;
@@ -1966,6 +2105,7 @@ async function init() {
     const list = await res.json();
     state.funds = list.funds || [];
     state.coins = list.coins || ['eth'];
+    state.safebox = list.safebox || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -1976,7 +2116,9 @@ async function init() {
   $('#fundBar').onclick = (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
-    if (btn.getAttribute('data-view') === 'analisa') { showAnalisa(); return; }
+    const view = btn.getAttribute('data-view');
+    if (view === 'analisa') { showAnalisa(); return; }
+    if (view === 'safebox') { showSafebox(); return; }
     const id = btn.getAttribute('data-fund');
     if (state.view === 'analisa' && id === state.fund) { showTab(currentTab); return; }
     switchFund(id);
@@ -2010,7 +2152,9 @@ async function init() {
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     // Tampilan analisa digambar terpisah dan tidak ikut renderAll; tanpa baris
     // ini angkanya tetap dolar setelah tombol rupiah ditekan.
-    if (state.view === 'analisa') renderAnalisa(); else renderAll();
+    if (state.view === 'analisa') renderAnalisa();
+    else if (state.view === 'safebox') renderSafebox();
+    else renderAll();
   };
   $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-c') === currency));
 
@@ -2020,6 +2164,7 @@ async function init() {
   };
   const fromHash = () => {
     const route = parseHash();
+    if (route.safebox) { showSafebox(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }
     showTab(route.tab);

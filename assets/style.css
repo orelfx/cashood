@@ -588,3 +588,14 @@ svg.solmark { width: .78em; height: .61em; vertical-align: 0; }
 .note-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--amber);
                         margin-top: 6px; flex: none; }
 .miss { color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+/* ── safe box ────────────────────────────────────────────────────────── */
+.sb-head { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .sb-head { grid-template-columns: 1fr; } }
+.sb-main { border: 1px solid var(--line); border-radius: 12px; padding: 18px;
+           background: linear-gradient(160deg, #0f1d1b, var(--card) 60%); }
+.sb-main .k { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+.sb-main .v { font: 600 30px/1.2 var(--mono); margin: 6px 0 4px; letter-spacing: -.7px; }
+.sb-main .n { color: var(--muted); font-size: 12px; }
+.sb-pill { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11.5px;
+           border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--muted); }

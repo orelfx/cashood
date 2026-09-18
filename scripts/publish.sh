@@ -15,6 +15,7 @@ WORK="$ROOT/.databranch"
 # Satu dana gagal tidak boleh menjatuhkan dana lain.
 /usr/bin/node scripts/sync.mjs || echo "PERINGATAN: snapshot reborn gagal"
 MERIDIAN_HOME="${MERIDIAN_HOME:-/root/main/meridian}" /usr/bin/node scripts/sync-meridian.mjs || echo "PERINGATAN: snapshot meridian gagal"
+RR_HOME="${RR_HOME:-/root/robinhood}" /usr/bin/node scripts/sync-safebox.mjs || echo "PERINGATAN: snapshot safebox gagal"
 
 # Tagihan sistem $155 itu satu tagihan untuk seluruh sistem, bukan satu per
 # dana. Dibayar sekali dari dana yang ditandai `costs.primary` di config-nya;
@@ -39,7 +40,7 @@ MERIDIAN_HOME="${MERIDIAN_HOME:-/root/main/meridian}" /usr/bin/node scripts/sync
 '
 
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
-for fund in reborn meridian; do
+for fund in reborn meridian safebox; do
   mkdir -p "$WORK/$fund"
   for f in live.json nav.json heartbeat.json forecast.json; do
     [ -f "data/$fund/$f" ] && cp "data/$fund/$f" "$WORK/$fund/$f"
