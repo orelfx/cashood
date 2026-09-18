@@ -370,6 +370,21 @@ function forecast(fund) {
       };
       });
     })(),
+    // Bentuk kerugian, bukan cuma peluangnya: kalau dana turun sekian persen,
+    // jadi berapa nilainya, harga sahamnya, dan dividennya. Dividen ikut aturan
+    // yang sama — di bawah modal acuan hasilnya nol, bukan sekadar kecil.
+    lossScenarios: [10, 50, 90].map((dropPct) => {
+      const value = nav * (1 - dropPct / 100);
+      return {
+        dropPct,
+        navUsd: Number(value.toFixed(2)),
+        changeUsd: Number((value - nav).toFixed(2)),
+        sharePrice: units > 0 ? Number((value / units).toFixed(4)) : null,
+        dividend: dividendAt(value, cfg, base, costs),
+        belowBase: value < base,
+      };
+    }),
+
     // Berapa posisi rugi yang wajar terjadi sebulan, dan berapa nilainya.
     lossProfile: (() => {
       const st = live?.stats || {};

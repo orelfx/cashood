@@ -2019,7 +2019,21 @@ function renderAnalisa() {
           <h2>Worst Case</h2>
           <span class="hint">kemungkinan modal tergerus dalam-dalam</span>
         </div>
-        <div class="table-scroll"><table>
+        <div class="scen">${(f.lossScenarios || []).map((l) => {
+          const peluang = f.horizons?.find((h) => h.key === 'm1')?.risk?.[`p${l.dropPct}`];
+          return `<div class="scen-card loss">
+            <div class="scen-k">Kalau dana turun ${l.dropPct}%</div>
+            <div class="scen-v neg">${usd(l.navUsd, 0)}</div>
+            <div class="scen-d neg">${usd(l.changeUsd, 0)} dari sekarang</div>
+            <div class="scen-rows">
+              <div class="scen-row"><span>Harga saham</span><b>${l.sharePrice == null ? '—' : usd(l.sharePrice, 4)}</b></div>
+              <div class="scen-row"><span>Dividen tanggal 1</span><b class="${l.dividend.distributed > 0 ? 'pos' : 'neg'}">${usd(l.dividend.distributed, 0)}</b></div>
+              <div class="scen-row"><span>Peluang dalam sebulan</span><b>${peluang == null ? '—' : pct(peluang, 2)}</b></div>
+            </div>
+          </div>`;
+        }).join('')}</div>
+
+        <div class="table-scroll" style="margin-top:16px"><table>
           <thead><tr><th>Jangka</th><th class="num">Di bawah modal</th><th class="num">Rugi ≥10%</th><th class="num">Rugi ≥50%</th><th class="num">Rugi ≥90%</th></tr></thead>
           <tbody>${(f.horizons || []).map((h) => `
             <tr>
@@ -2030,7 +2044,7 @@ function renderAnalisa() {
               <td class="num dim">${pct(h.risk.p90, 3)}</td>
             </tr>`).join('')}</tbody>
         </table></div>
-        ${f.stress ? `<div class="stats" style="margin-top:14px">
+        ${f.stress ? `<div class="stats three" style="margin-top:14px">
           <div class="stat"><div class="k">Kalau semua pool jatuh ke nol</div>
             <div class="v neg">−${pct(f.stress.lpSharePct, 1)}</div>
             <div class="n">${f.stress.positions} posisi · tersisa ${usd(f.stress.cashUsd, 0)} di luar posisi</div></div>
@@ -2041,7 +2055,7 @@ function renderAnalisa() {
             <div class="v">${f.stress.worstDayPct == null ? '—' : pct(f.stress.worstDayPct)}</div>
             <div class="n">${f.stress.worstDayUsd == null ? '' : usd(f.stress.worstDayUsd)} dalam satu hari</div></div>
         </div>` : ''}
-        ${f.lossProfile ? `<div class="stats" style="margin-top:14px">
+        ${f.lossProfile ? `<div class="stats three" style="margin-top:14px">
           <div class="stat"><div class="k">Posisi rugi tiap bulan</div>
             <div class="v neg">${f.lossProfile.losingPerMonth}</div>
             <div class="n">dari ${f.lossProfile.closesPerMonth} yang ditutup · win rate ${pct(f.lossProfile.winRatePct, 1)}</div></div>
@@ -2070,7 +2084,7 @@ function renderAnalisa() {
 
       <section class="card">
         <div class="card-head"><h2>Kondisi pasar dan bot</h2><span class="hint">bahan yang membentuk angka di atas</span></div>
-        <div class="stats" id="anaStats">
+        <div class="stats wrapfit" id="anaStats">
           ${m ? `<div class="stat"><div class="k">${m.symbol} 24 jam</div><div class="v ${cls(m.change24hPct)}">${m.change24hPct > 0 ? '+' : ''}${pct(m.change24hPct)}</div><div class="n">harga ${fmtUsd(m.priceUsd, 2)}</div></div>` : ''}
           ${m ? `<div class="stat"><div class="k">${m.symbol} 7 hari</div><div class="v ${cls(m.change7dPct)}">${m.change7dPct > 0 ? '+' : ''}${pct(m.change7dPct)}</div><div class="n">arah pasar sepekan</div></div>` : ''}
           <div class="stat"><div class="k">Sibuk tidaknya bot</div><div class="v">${a.closesPerDay3d}</div><div class="n">posisi ditutup per hari, 3 hari terakhir${a.closesPerDay7d ? ` · sepekan ${a.closesPerDay7d}` : ''}</div></div>
