@@ -1241,7 +1241,7 @@ async function renderReports() {
   $('#reportsList').innerHTML = `<div class="table-scroll"><table class="reports"><thead><tr>
       <th>Invoice</th><th>Dibayar</th><th>Ditarik</th><th>Biaya</th><th>Dibagikan</th><th></th></tr></thead><tbody>`
     + mine.map((m) => `<tr>
-      <td><div>${m.periodLabel}${m.example ? ' <span class="tag">contoh</span>' : ''}</div><div class="dim num" style="font-size:11.5px">${m.invoiceNo || ''}</div></td>
+      <td><div>${m.periodLabel}${m.example ? ' <span class="inv-tag">contoh</span>' : ''}</div><div class="inv-no">${m.invoiceNo || ''}</div></td>
       <td>${m.payLabel}</td>
       <td class="num">${usd(m.withdrawnUsd, 0)}</td>
       <td class="num neg">−${usd(m.costsUsd, 0)}</td>
