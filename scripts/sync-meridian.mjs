@@ -147,8 +147,22 @@ const best = history.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null
 const worst = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), null);
 const sizes = closes.map((c) => c.sizeUsd).filter((s) => s > 0);
 
+const lossPcts = closes.map((c) => c.netPct).filter((v) => Number.isFinite(v));
+const countBelow = (limit) => lossPcts.filter((v) => v <= limit).length;
+
+const losers = lossPcts.filter((v) => v < 0);
+const winners = lossPcts.filter((v) => v > 0);
+const avg = (list) => (list.length ? Number((list.reduce((a, b) => a + b, 0) / list.length).toFixed(2)) : null);
+
+
 const stats = {
   closedCount: closes.length,
+  graded: lossPcts.length,
+  worstClosePct: lossPcts.length ? Number(Math.min(...lossPcts).toFixed(2)) : null,
+  avgLossPct: avg(losers),
+  avgWinPct: avg(winners),
+  losersCount: losers.length,
+  lossBuckets: { below50: countBelow(-50), below80: countBelow(-80), below90: countBelow(-90), below99: countBelow(-99) },
   winRate: closes.length ? Number(((wins / closes.length) * 100).toFixed(2)) : null,
   wins,
   losses,

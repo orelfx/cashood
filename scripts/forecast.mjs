@@ -91,6 +91,50 @@ async function coinMarket(symbol) {
   } catch { return null; }
 }
 
+/**
+ * Peluang modal tergerus dalam-dalam — "Worst Case".
+ *
+ * Diukur dari titik TERENDAH tiap lintasan undian, bukan nilai akhirnya: dana
+ * yang sempat jatuh 90% lalu pulih tetap pernah kehilangan 90%.
+ *
+ * Undian itu sudah memuat seluruh kerugian yang pernah terjadi — hari sepi,
+ * posisi meleset, termasuk satu posisi Reborn Rich yang kehilangan 51%, karena
+ * hasil harian dihitung bersih setelah semua yang ditutup hari itu.
+ *
+ * Yang TIDAK bisa diukur dari sini adalah bencana yang belum pernah terjadi:
+ * seluruh pool rugpull bersamaan, atau pasar runtuh serentak. Percobaan pertama
+ * mencoba menambalnya dengan aturan tiga — batas atas 1% per posisi dikalikan
+ * ribuan posisi — dan hasilnya 99,9% dalam tiga bulan. Itu salah: kalau
+ * peluangnya benar 1%, tiga dari 300 posisi seharusnya sudah habis, dan tidak
+ * satu pun habis. Batas atas kepercayaan bukan laju kejadian.
+ *
+ * Jadi yang diterbitkan: peluang dari data apa adanya, dengan lantai 0,001% —
+ * karena "belum pernah terjadi" bukan "tidak mungkin" — ditemani skenario
+ * tekanan yang dihitung langsung dari posisi hari ini, tanpa peluang yang
+ * dikarang.
+ */
+function ruinRisk({ nav, simLows, stats }) {
+  const FLOOR = 0.001;
+  const pct = (v) => Math.min(99.9, Math.max(FLOOR, Number((v * 100).toFixed(3))));
+  const at = (dropPct) => {
+    const limit = nav * (1 - dropPct / 100);
+    return pct(simLows.filter((v) => v <= limit).length / Math.max(1, simLows.length));
+  };
+  const graded = Math.max(1, num(stats?.graded) || num(stats?.closedCount));
+  const buckets = stats?.lossBuckets || {};
+  return {
+    p50: at(50), p80: at(80), p90: at(90), p99: at(99),
+    floored: true,
+    basis: {
+      positionsClosed: graded,
+      worstClosePct: num(stats?.worstClosePct),
+      lostHalf: num(buckets.below50),
+      wipedOut: num(buckets.below90),
+      note: `${num(buckets.below50)} dari ${graded} posisi pernah kehilangan lebih dari setengah nilainya, ${num(buckets.below90)} habis total.`,
+    },
+  };
+}
+
 function forecast(fund) {
   const cfg = read(resolve(DATA, fund, 'config.json'));
   const live = read(resolve(DATA, fund, 'live.json'));
@@ -158,6 +202,25 @@ function forecast(fund) {
    * selamanya, padahal setiap bulan 70% labanya justru dibayarkan keluar dan
    * botnya sendiri punya plafon berapa modal yang sanggup ia kelola.
    */
+  /**
+   * Hari "ekor gemuk".
+   *
+   * Contoh harian yang cuma seminggu tidak pernah memuat hari bencana, jadi
+   * undian murni selalu berkata risikonya nol. Sebagian hari karena itu diambil
+   * dari sebaran Student-t (derajat bebas 3) yang diskalakan ke naik-turun yang
+   * teramati — sebaran berekor tebal yang lazim dipakai mengukur risiko pasar,
+   * justru karena ia memberi bobot pada kejadian yang belum pernah terlihat.
+   */
+  function fatTail(rand) {
+    const normal = () => {
+      const u = Math.max(1e-9, rand()), v = rand();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    };
+    const z = normal();
+    const chi = normal() ** 2 + normal() ** 2 + normal() ** 2;   // khi-kuadrat, df 3
+    return (z / Math.sqrt(Math.max(1e-9, chi / 3))) * stdev;
+  }
+
   function simulate(sample, horizonDays, tag, { mechanics = false } = {}) {
     const pool = sample.map((d) => d.pct);
     const rand = rng(seed + ':' + tag);
@@ -166,22 +229,32 @@ function forecast(fund) {
     const capacity = num(cfg.fund?.capacityUsd);
     const ends = [];
 
+    const marks = new Set(Array.isArray(horizonDays) ? horizonDays : [horizonDays]);
+    const lastDay = Math.max(...marks);
+
     for (let i = 0; i < PATHS; i += 1) {
+      const snap = {};
       let value = nav;
       let reference = base;
       let paid = 0;
+      let low = nav;                      // titik terendah sepanjang lintasan
 
-      for (let d = 1; d <= horizonDays; d += 1) {
+      for (let d = 1; d <= lastDay; d += 1) {
         // Plafon membatasi berapa yang SANGGUP diputar bot, bukan berapa yang
         // boleh dimiliki dana. Modal di atas plafon tetap milik dana tapi
         // menganggur — jadi dana tetap tumbuh dari 30% yang diputar ulang tiap
         // bulan, hanya lajunya melambat setelah melewati plafon.
         const working = mechanics && capacity > 0 ? Math.min(value, capacity) : value;
         const idle = value - working;
-        value = working * (1 + pool[Math.floor(rand() * pool.length)]) + idle;
+        // 15% hari diambil dari ekor gemuk, sisanya dari hari yang benar-benar
+        // tercatat. Tanpa itu tidak ada satu pun lintasan yang pernah jatuh.
+        const move = rand() < 0.15 ? fatTail(rand) : pool[Math.floor(rand() * pool.length)];
+        value = working * (1 + Math.max(-0.95, move)) + idle;
         if (value < 0) value = 0;
 
 
+
+        if (value < low) low = value;
 
         if (mechanics && d % 30 === 0) {
           value = Math.max(0, value - costs);
@@ -191,15 +264,21 @@ function forecast(fund) {
           reference += gross * reinvestPct;
           paid += distributed;
         }
+
+        // Titik pemeriksaan direkam di sepanjang SATU lintasan, bukan diundi
+        // ulang per jangka. Dengan begitu jangka yang lebih panjang benar-benar
+        // memuat jangka yang lebih pendek, dan peluang kerugiannya tidak pernah
+        // mengecil saat jangkanya diperpanjang — hal yang mustahil secara logika
+        // tapi muncul kalau tiap jangka punya undiannya sendiri.
+        if (marks.has(d)) snap[d] = { value: Math.max(0, value), paid, low: Math.max(0, low) };
       }
-      ends.push({ value: Math.max(0, value), paid });
+      ends.push(snap);
     }
 
-    ends.sort((a, b) => a.value - b.value);
     return ends;
   }
 
-  const ends = simulate(monthly, days, 'payday').map((e) => e.value);
+  const ends = simulate(monthly, days, 'payday').map((e) => e[days].value).sort((a, b) => a - b);
 
   const scenario = (q, label) => {
     const value = quantile(ends, q);
@@ -253,10 +332,11 @@ function forecast(fund) {
       best: scenario(0.90, 'Terbaik'),
     },
     monthSample: { days: monthly.length, scope: monthly === thisMonth ? 'bulan berjalan' : 'seluruh data — bulan ini belum cukup' },
-    horizons: HORIZONS.map(({ key, label, days: hd }) => {
-      const runs = simulate(daily, hd, key, { mechanics: true });
-      const values = runs.map((r) => r.value);
-      const paids = runs.map((r) => r.paid).sort((a, b) => a - b);
+    horizons: (() => {
+      const runs = simulate(daily, HORIZONS.map((h) => h.days), 'horizon', { mechanics: true });
+      return HORIZONS.map(({ key, label, days: hd }) => {
+      const values = runs.map((r) => r[hd].value).sort((a, b) => a - b);
+      const paids = runs.map((r) => r[hd].paid).sort((a, b) => a - b);
       const at = (q) => {
         const value = quantile(values, q);
         const paid = quantile(paids, q);
@@ -268,13 +348,47 @@ function forecast(fund) {
           sharePrice: units > 0 ? Number((value / units).toFixed(4)) : null,
         };
       };
+      // Titik TERENDAH tiap lintasan, bukan nilai akhirnya: dana yang sempat
+      // jatuh 90% lalu pulih tetap pernah kehilangan 90%.
+      const lows = runs.map((r) => r[hd].low);
+
       return {
         key, label, days: hd,
         // Jangka yang jauh melampaui panjang datanya disebut apa adanya.
         speculative: hd > daily.length * 12,
         worst: at(0.10), normal: at(0.50), best: at(0.90),
+        risk: ruinRisk({ nav, simLows: lows, stats: live?.stats }),
+        // Pertanyaan yang paling sering ditanyakan orang bukan "berapa peluang
+        // modal habis", tapi "berapa peluang saya rugi". Dana di bawah modal
+        // acuan berarti tepat itu: tidak ada laba, dan tanggal 1 tidak ada
+        // dividen sama sekali.
+        belowBase: {
+          // Lantai yang sama seperti tabel Worst Case: nol tidak pernah ditulis.
+          endPct: Math.max(0.001, Number(((values.filter((v) => v < base).length / values.length) * 100).toFixed(3))),
+          anyPct: Math.max(0.001, Number(((lows.filter((v) => v < base).length / lows.length) * 100).toFixed(3))),
+        },
       };
-    }),
+      });
+    })(),
+    // Berapa posisi rugi yang wajar terjadi sebulan, dan berapa nilainya.
+    lossProfile: (() => {
+      const st = live?.stats || {};
+      const graded = Math.max(1, num(st.graded) || num(st.closedCount));
+      const closesPerDay = (live?.history || []).slice(-7).reduce((t, r) => t + num(r.closes), 0)
+        / Math.max(1, Math.min(7, (live?.history || []).length));
+      const losingShare = num(st.losersCount) / graded;
+      const perMonth = closesPerDay * 30 * losingShare;
+      const avgLossUsd = num(st.avgInvestedUsd) * Math.abs(num(st.avgLossPct)) / 100;
+      return {
+        closesPerMonth: Math.round(closesPerDay * 30),
+        losingPerMonth: Math.round(perMonth),
+        avgLossPct: num(st.avgLossPct),
+        avgLossUsd: Number(avgLossUsd.toFixed(2)),
+        monthlyLossUsd: Number((perMonth * avgLossUsd).toFixed(2)),
+        winRatePct: num(st.winRate),
+      };
+    })(),
+    stress: null,
     caveats: [],
     method: `Undian ulang ${daily.length} hari hasil nyata, ${PATHS.toLocaleString('id-ID')} lintasan, ${days} hari menuju ${new Date(paydayAt + WIB).toISOString().slice(0, 10)}.`,
   };
@@ -288,6 +402,26 @@ for (const fund of want) {
   if (out.enough) {
     const live = read(resolve(DATA, fund, 'live.json'));
     out.market = await coinMarket(live?.nativeSymbol);
+
+    // Kehilangan total tidak pernah muncul di undian, karena belum pernah
+    // terjadi. Yang bisa dihitung langsung: seandainya SELURUH pool tempat dana
+    // ini berada jatuh ke nol hari ini juga, berapa yang tersisa. Itu batas
+    // bawah yang nyata, bukan hasil simulasi.
+    const positions = live?.positions || [];
+    const lpUsd = positions.reduce((t, p) => t + num(p.valueUsd ?? p.principalUsd), 0);
+    const navNow = num(live?.totalUsd);
+    const daily = (live?.history || []).map((h) => num(h.usd));
+    out.stress = {
+      lpUsd: Number(lpUsd.toFixed(2)),
+      lpSharePct: navNow > 0 ? Number(((lpUsd / navNow) * 100).toFixed(1)) : null,
+      cashUsd: Number(Math.max(0, navNow - lpUsd).toFixed(2)),
+      positions: positions.length,
+      worstDayUsd: daily.length ? Number(Math.min(...daily).toFixed(2)) : null,
+      worstDayPct: daily.length && navNow > 0 ? Number(((Math.min(...daily) / navNow) * 100).toFixed(2)) : null,
+      worstClosePct: (live?.closedRecent || []).length
+        ? Number(Math.min(...live.closedRecent.map((c) => num(c.netPct))).toFixed(2))
+        : null,
+    };
 
     // Peringatan ditulis dari keadaan datanya sendiri, bukan kalimat tetap.
     const c = [];

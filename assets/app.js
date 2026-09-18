@@ -2015,6 +2015,61 @@ function renderAnalisa() {
       </section>
 
       <section class="card">
+        <div class="card-head">
+          <h2>Worst Case</h2>
+          <span class="hint">kemungkinan modal tergerus dalam-dalam</span>
+        </div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Jangka</th><th class="num">Di bawah modal</th><th class="num">Rugi ≥50%</th><th class="num">≥80%</th><th class="num">≥90%</th><th class="num">Hampir habis</th></tr></thead>
+          <tbody>${(f.horizons || []).map((h) => `
+            <tr>
+              <td>${h.label}</td>
+              <td class="num ${h.belowBase?.anyPct > 5 ? 'neg' : ''}">${h.belowBase ? pct(h.belowBase.anyPct, 2) : '—'}</td>
+              <td class="num ${h.risk.p50 > 1 ? 'neg' : 'dim'}">${pct(h.risk.p50, 3)}</td>
+              <td class="num dim">${pct(h.risk.p80, 3)}</td>
+              <td class="num dim">${pct(h.risk.p90, 3)}</td>
+              <td class="num dim">${pct(h.risk.p99, 3)}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>
+        ${f.stress ? `<div class="stats" style="margin-top:14px">
+          <div class="stat"><div class="k">Kalau semua pool jatuh ke nol</div>
+            <div class="v neg">−${pct(f.stress.lpSharePct, 1)}</div>
+            <div class="n">${f.stress.positions} posisi · tersisa ${usd(f.stress.cashUsd, 0)} di luar posisi</div></div>
+          <div class="stat"><div class="k">Posisi terburuk yang pernah terjadi</div>
+            <div class="v">${f.horizons[0].risk.basis.worstClosePct == null ? '—' : pct(f.horizons[0].risk.basis.worstClosePct)}</div>
+            <div class="n">dari ${f.horizons[0].risk.basis.positionsClosed} posisi yang sudah ditutup</div></div>
+          <div class="stat"><div class="k">Hari terburuk</div>
+            <div class="v">${f.stress.worstDayPct == null ? '—' : pct(f.stress.worstDayPct)}</div>
+            <div class="n">${f.stress.worstDayUsd == null ? '' : usd(f.stress.worstDayUsd)} dalam satu hari</div></div>
+        </div>` : ''}
+        ${f.lossProfile ? `<div class="stats" style="margin-top:14px">
+          <div class="stat"><div class="k">Posisi rugi tiap bulan</div>
+            <div class="v neg">${f.lossProfile.losingPerMonth}</div>
+            <div class="n">dari ${f.lossProfile.closesPerMonth} yang ditutup · win rate ${pct(f.lossProfile.winRatePct, 1)}</div></div>
+          <div class="stat"><div class="k">Rugi rata-rata per posisi</div>
+            <div class="v neg">${usd(f.lossProfile.avgLossUsd)}</div>
+            <div class="n">${pct(f.lossProfile.avgLossPct)} dari modal posisinya</div></div>
+          <div class="stat"><div class="k">Total kerugian sebulan</div>
+            <div class="v neg">${usd(f.lossProfile.monthlyLossUsd, 0)}</div>
+            <div class="n">sudah termasuk di dalam hasil harian, bukan tambahan</div></div>
+        </div>` : ''}
+        <div class="explain-body" style="padding-left:0;padding-right:0">
+          <p><strong>Kolom "di bawah modal" itu yang paling sering ditanya.</strong> Kalau nilai dana ada di bawah
+             modal acuan ${usd(f.baseCapital, 0)}, artinya belum ada laba — dan tanggal 1 tidak ada dividen sama
+             sekali. Angka itu peluang dana pernah menyentuh keadaan tersebut di sepanjang jangkanya.</p>
+          <p><strong>Dari mana angkanya.</strong> ${f.horizons[0].risk.basis.note} Undian hari-hari yang tercatat
+             sudah memuat semua kerugian yang pernah terjadi, tapi tidak bisa menghasilkan bencana yang belum
+             pernah ada — karena itu sebagian hari diambil dari sebaran berekor tebal yang lazim dipakai mengukur
+             risiko pasar, supaya kejadian ekstrem tetap punya bobot.</p>
+          <p><strong>Tidak ada angka 0% di tabel ini.</strong> Yang paling kecil ditulis 0,001%. Belum pernah
+             terjadi bukan berarti tidak mungkin, dan menulis nol di halaman yang dibaca orang yang menaruh
+             uangnya adalah kebohongan yang paling mahal.</p>
+          <p class="dim">Yang tidak dihitung di sini: dompet diretas, kunci bocor, atau rantai blokchain-nya sendiri
+             berhenti. Itu bukan risiko pasar dan tidak ada datanya untuk diukur.</p>
+        </div>
+      </section>
+
+      <section class="card">
         <div class="card-head"><h2>Kondisi pasar dan bot</h2><span class="hint">bahan yang membentuk angka di atas</span></div>
         <div class="stats" id="anaStats">
           ${m ? `<div class="stat"><div class="k">${m.symbol} 24 jam</div><div class="v ${cls(m.change24hPct)}">${m.change24hPct > 0 ? '+' : ''}${pct(m.change24hPct)}</div><div class="n">harga ${fmtUsd(m.priceUsd, 2)}</div></div>` : ''}

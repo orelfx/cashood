@@ -240,8 +240,25 @@ const closedRecent = [...closed]
     reason: String(r.closeReason || '').split(':')[0] || null,
   }));
 
+// Sebaran kerugian terburuk per posisi. Dipakai analisa untuk menghitung batas
+// atas peluang sebuah posisi habis total — peristiwa yang belum pernah terjadi
+// tidak bisa disimulasikan, tapi batas atasnya bisa dihitung.
+const pcts = closed.map((r) => Number(r.netPct)).filter((v) => Number.isFinite(v)).map((v) => v * 100);
+const countBelow = (limit) => pcts.filter((v) => v <= limit).length;
+
+const losers = pcts.filter((v) => v < 0);
+const winners = pcts.filter((v) => v > 0);
+const avg = (list) => (list.length ? Number((list.reduce((a, b) => a + b, 0) / list.length).toFixed(2)) : null);
+
+
 const stats = {
   closedCount: closed.length,
+  graded: pcts.length,
+  worstClosePct: pcts.length ? Number(Math.min(...pcts).toFixed(2)) : null,
+  avgLossPct: avg(losers),
+  avgWinPct: avg(winners),
+  losersCount: losers.length,
+  lossBuckets: { below50: countBelow(-50), below80: countBelow(-80), below90: countBelow(-90), below99: countBelow(-99) },
   winRate: graded ? Number(((wins / graded) * 100).toFixed(2)) : null,
   wins,
   losses,
