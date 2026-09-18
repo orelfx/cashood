@@ -123,7 +123,7 @@ function ruinRisk({ nav, simLows, stats }) {
   const graded = Math.max(1, num(stats?.graded) || num(stats?.closedCount));
   const buckets = stats?.lossBuckets || {};
   return {
-    p50: at(50), p80: at(80), p90: at(90), p99: at(99),
+    p10: at(10), p50: at(50), p80: at(80), p90: at(90), p99: at(99),
     floored: true,
     basis: {
       positionsClosed: graded,

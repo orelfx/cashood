@@ -2020,15 +2020,14 @@ function renderAnalisa() {
           <span class="hint">kemungkinan modal tergerus dalam-dalam</span>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Jangka</th><th class="num">Di bawah modal</th><th class="num">Rugi ≥50%</th><th class="num">≥80%</th><th class="num">≥90%</th><th class="num">Hampir habis</th></tr></thead>
+          <thead><tr><th>Jangka</th><th class="num">Di bawah modal</th><th class="num">Rugi ≥10%</th><th class="num">Rugi ≥50%</th><th class="num">Rugi ≥90%</th></tr></thead>
           <tbody>${(f.horizons || []).map((h) => `
             <tr>
               <td>${h.label}</td>
               <td class="num ${h.belowBase?.anyPct > 5 ? 'neg' : ''}">${h.belowBase ? pct(h.belowBase.anyPct, 2) : '—'}</td>
+              <td class="num ${h.risk.p10 > 5 ? 'neg' : ''}">${pct(h.risk.p10 ?? 0.001, 2)}</td>
               <td class="num ${h.risk.p50 > 1 ? 'neg' : 'dim'}">${pct(h.risk.p50, 3)}</td>
-              <td class="num dim">${pct(h.risk.p80, 3)}</td>
               <td class="num dim">${pct(h.risk.p90, 3)}</td>
-              <td class="num dim">${pct(h.risk.p99, 3)}</td>
             </tr>`).join('')}</tbody>
         </table></div>
         ${f.stress ? `<div class="stats" style="margin-top:14px">
