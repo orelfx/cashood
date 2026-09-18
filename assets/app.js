@@ -412,6 +412,10 @@ async function resolveNav(cfg, { force = false } = {}) {
     lpUsd,
     liveUsd,
     treasuryUsd: Number(snap.treasuryUsd) || 0,
+    treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
+    fixedCapitalUsd: Number(snap.fixedCapitalUsd) || 0,
+    sweepStepUsd: Number(snap.sweepStepUsd) || 100,
+    sweepDueUsd: Number(snap.sweepDueUsd) || 0,
     costsShareUsd: Number.isFinite(Number(snap.costsShareUsd)) ? Number(snap.costsShareUsd) : null,
     costsTotalUsd: Number(snap.costsTotalUsd) || null,
     nativeSymbol: snap.nativeSymbol || null,
@@ -1201,73 +1205,65 @@ function renderRules() {
 
 /** Kas cadangan: uang yang sudah dipindah keluar dari wallet kerja bot. */
 function renderTreasury() {
-  const t = state.cfg?.treasury || {};
-  const used = Number(t.movedUsd) > 0 || Number(t.stepUsd) > 0;
+  const nav = state.nav || {};
+  const cfgT = state.cfg?.treasury || {};
+  // Angkanya datang dari snapshot (jumlah transfer yang benar-benar terjadi),
+  // bukan dari config — config cuma menyimpan aturannya.
+  const moved = Number(nav.treasuryUsd) || 0;
+  const step = Number(nav.sweepStepUsd) || Number(cfgT.stepUsd) || 100;
+  const fixed = Number(nav.fixedCapitalUsd) || Number(state.cfg?.fund?.fixedCapitalUsd) || 0;
+  const used = moved > 0 || fixed > 0;
   $('#treasuryCard').hidden = !used;
   if (!used) return;
-  const moved = Number(t.movedUsd) || 0;
-  const step = Number(t.stepUsd) || 100;
-  const nav = state.nav?.totalUsd || 0;
-  const inBot = Math.max(0, nav - moved);
+
+  const total = Number(nav.totalUsd) || 0;
+  const inBot = Number(nav.botWalletUsd) || Math.max(0, total - moved);
+  const due = Number(nav.sweepDueUsd) || 0;
+  const above = Math.max(0, inBot - fixed);
 
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   $('#treSummary').innerHTML = [
-    tile('Sudah dipindahkan', usd(moved), 'ke wallet terpisah', moved > 0 ? 'pos' : ''),
-    tile('Masih dipakai bot', usd(inBot), 'terpasang di posisi dan token'),
-    tile('Dipindah setiap', usd(step, 0), 'kelipatan laba'),
-    tile('Porsi saham', 'tidak berubah', 'perpindahan tidak menyentuh kepemilikan'),
+    tile('Modal kerja bot', usd(fixed, 0), 'dipatok — tidak ikut naik saat dana bertambah'),
+    tile('Dipegang bot sekarang', usd(inBot), above > 0 ? `${usd(above)} di atas modal` : 'di bawah atau pas di modal',
+      above > 0 ? 'pos' : ''),
+    tile('Sudah dipindahkan', usd(moved), `${(nav.treasuryMoves || []).length} transfer ke wallet terpisah`, moved > 0 ? 'pos' : ''),
+    tile('Antre keluar', due > 0 ? usd(due, 0) : '—',
+      due > 0 ? 'dikirim pada sapuan berikutnya' : `belum genap ${usd(step, 0)}`, due > 0 ? 'pos' : ''),
   ].join('');
 
   $('#treHint').textContent = moved > 0
-    ? `${usd(moved)} sudah diamankan · ${pct(nav ? (moved / nav) * 100 : 0, 1)} dari dana`
+    ? `${usd(moved)} sudah diamankan · ${pct(total ? (moved / total) * 100 : 0, 1)} dari dana`
     : 'belum ada yang dipindahkan';
 
+  // Hari WIB, sama seperti riwayat profit — bukan hari UTC, atau transfer jam
+  // 06:00 pagi di sini akan tercatat di tanggal sebelumnya.
+  const hariWib = (ms) => new Date(Number(ms) + 7 * 3600e3).toISOString().slice(0, 10);
+  const moves = [...(nav.treasuryMoves || [])].reverse().slice(0, 8);
+  $('#treMoves').innerHTML = moves.length
+    ? `<table class="table tre-moves"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aset</th></tr></thead><tbody>`
+      + moves.map((m) => `<tr><td>${fmtDay(hariWib(m.at))}</td><td class="pos">${usd(m.usd)}</td><td>${m.asset || 'USDG'}</td></tr>`).join('')
+      + '</tbody></table>'
+    : '<p class="dim">Belum ada transfer yang tercatat.</p>';
+
   $('#treRule').innerHTML = `
+    <p><strong>Bot bekerja dengan modal tetap ${usd(fixed, 0)}.</strong> Dana boleh tumbuh melewati
+       angka itu, ukuran posisinya tidak. Bot menghitung besar tiap posisi dari ${usd(fixed, 0)},
+       bukan dari saldo hari ini — jadi laba tidak otomatis dipertaruhkan lagi.</p>
+    <p><strong>Kelebihannya dipindahkan tiap hari, dalam kelipatan ${usd(step, 0)}.</strong>
+       Saldo ${usd(fixed + 550, 0)} mengirim ${usd(500, 0)} dan menyisakan ${usd(fixed + 50, 0)};
+       sisa ${usd(50, 0)} itu belum genap satu kelipatan, jadi ia menunggu hari berikutnya. Di bawah
+       ${usd(fixed, 0)} tidak ada yang keluar sama sekali, sebagus apa pun kemarin.</p>
     <p><strong>Wallet yang dipakai bot menandatangani transaksi ratusan kali sehari.</strong>
-       Itu permukaan serangan, dan permukaan serangan tidak boleh menyimpan seluruh dana. Setiap
-       kelipatan ${usd(step, 0)} laba dipindahkan ke wallet terpisah yang tidak pernah
-       menandatangani apa pun.</p>
-    <p><strong>Dividen dan pencairan dibayar dari kas ini</strong>, bukan dari posisi yang sedang
-       berjalan. Membayar dari posisi berarti membongkarnya di waktu yang belum tentu tepat, dan
-       ongkos pembongkaran itu ditanggung semua orang.</p>
+       Itu permukaan serangan, dan permukaan serangan tidak boleh menyimpan seluruh dana. Wallet
+       tujuannya tidak pernah menandatangani apa pun.</p>
     <p><strong>Uang yang dipindahkan tetap milik dana.</strong> Ia tetap dihitung penuh dalam nilai
        saham — kalau tidak, memindahkannya akan terbaca sebagai kerugian sebesar uang yang
        dipindahkan, dan harga saham semua orang turun karena tindakan yang justru mengamankan uang
        mereka. Porsi kepemilikan tidak berubah sedikit pun.</p>
-    <p class="dim">Alasan kedua: bot punya batas kapasitas. Modal di atas batas itu tidak menambah
-       hasil, hanya menambah risiko. Memindahkan laba menjaga ukuran yang dipegang bot tetap di
-       ukuran yang memang sanggup dikelolanya.</p>`;
+    <p class="dim">Dividen dan pencairan dibayar dari kas ini, bukan dari posisi yang sedang
+       berjalan. Membayar dari posisi berarti membongkarnya di waktu yang belum tentu tepat, dan
+       ongkos pembongkaran itu ditanggung semua orang.</p>`;
 }
-
-/**
- * Isi halaman pengenalan yang berbeda per dana.
- *
- * Dua bot ini bekerja di rantai, bursa, dan bentuk posisi yang berbeda. Satu
- * teks yang dipakai keduanya akan benar untuk satu dana dan menyesatkan untuk
- * satu lagi — jadi bagian yang menjelaskan cara kerjanya ditulis terpisah.
- */
-const FUND_COPY = {
-  reborn: {
-    lead: 'Reborn Rich menaruh modal sebagai likuiditas di pool Uniswap pada Robinhood Chain dan memanen fee perdagangan. Yang menjalankannya bot otomatis 24 jam — membuka posisi pada rentang harga tertentu, mengawasinya, dan menutup saat aturannya terpenuhi. Beberapa orang menaruh uang di dana yang sama, dan masing-masing memegang saham sesuai porsinya.',
-    how: [
-      ['Menyaring pool', 'Bot memindai ratusan pool tiap setengah jam dan menolak yang terlalu kecil, terlalu sepi, atau tidak punya likuiditas yang bisa dimasuki.'],
-      ['Membuka posisi', 'Modal ditaruh pada rentang harga tertentu di Uniswap v3 atau v4. Selama harga bergerak di dalam rentang itu, posisi menerima fee dari setiap perdagangan yang lewat.'],
-      ['Mengawasi', 'Tiap lima menit tiap posisi diperiksa: masih di dalam rentang, seberapa banyak fee terkumpul, apakah kerugian sudah menyentuh batas.'],
-      ['Menutup', 'Ditutup saat untungnya cukup, saat harga keluar rentang dan berhenti menghasilkan, atau saat kerugian menyentuh batas yang sudah ditetapkan.'],
-    ],
-    risk: 'Pool memecoin di Robinhood Chain itu dangkal. Likuiditas bisa menguap dalam hitungan menit, dan impermanent loss adalah kejadian harian di sini.',
-  },
-  meridian: {
-    lead: 'Meridian menaruh modal sebagai likuiditas di pool DLMM Meteora pada Solana dan memanen fee perdagangan. Berbeda dengan Uniswap, likuiditas DLMM ditaruh dalam kotak-kotak harga yang disebut bin — posisi hanya menghasilkan saat harga berada di dalam rentang bin yang dipilih. Botnya berjalan otomatis 24 jam, memilih pool, menentukan rentang bin, dan menutup posisi sesuai aturannya.',
-    how: [
-      ['Menyaring pool', 'Bot memindai pool Meteora dan menilai rasio fee terhadap likuiditas, umur token, volatilitas, serta jejak dompet-dompet besar sebelum memutuskan masuk.'],
-      ['Membuka posisi', 'Modal SOL disebar ke rentang bin di sekitar harga berjalan. Strategi penyebarannya dipilih bot — merata, condong ke bawah, atau terpusat — mengikuti bentuk pasarnya.'],
-      ['Mengawasi', 'Tiap beberapa menit posisi diperiksa: harga masih di dalam rentang bin, berapa fee terkumpul, seberapa lama di luar rentang, dan apakah kerugiannya menembus batas.'],
-      ['Menutup', 'Ditutup saat untungnya cukup, saat harga meninggalkan rentang terlalu lama, atau saat pola rugi berlanjut. Fee yang sudah terkumpul dipanen lebih dulu.'],
-    ],
-    risk: 'Pool memecoin di Solana bergerak sangat cepat. Harga bisa meninggalkan rentang bin dalam hitungan menit dan posisi berhenti menghasilkan, sementara nilai tokennya ikut turun.',
-  },
-};
 
 /** Halaman pengenalan — angkanya ikut data hidup, bukan ditulis tangan. */
 function renderAbout() {
@@ -1283,7 +1279,7 @@ function renderAbout() {
   $('#aboutLead').textContent = copy.lead;
   $('#aboutHow').innerHTML = copy.how.map(([title, body], i) => `
     <div class="how-item"><div class="how-n">${i + 1}</div><h3>${title}</h3><p>${body}</p></div>`).join('');
-  $('#aboutTreasury').hidden = !(Number(t.movedUsd) > 0 || Number(t.stepUsd) > 0);
+  $('#aboutTreasury').hidden = !(Number(state.nav?.treasuryUsd) > 0 || Number(state.nav?.fixedCapitalUsd) > 0);
 
   const big = (v, k, c = '') => `<div class="hero-stat"><div class="hv ${c}">${v}</div><div class="hk">${k}</div></div>`;
   $('#heroStats').innerHTML = [
@@ -1311,8 +1307,8 @@ function renderAbout() {
     ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1} — laba dikurangi biaya sistem, ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct ?? 30}% kembali ke dana`],
   ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
 
-  $('#aboutTreHint').textContent = Number(t.movedUsd) > 0
-    ? `${usd(Number(t.movedUsd))} sudah dipindahkan` : 'belum ada yang dipindahkan';
+  $('#aboutTreHint').textContent = Number(state.nav?.treasuryUsd) > 0
+    ? `${usd(Number(state.nav.treasuryUsd))} sudah dipindahkan` : 'belum ada yang dipindahkan';
   const risk2 = document.querySelector('#tab-tentang .risk:nth-child(2) p');
   if (risk2) risk2.textContent = copy.risk;
   $('#aboutRisk1').innerHTML = `Harga satu saham hari ini ${usd(perUnit, 4)}, dibanding ${usd(1, 4)} saat dana dibuka — `

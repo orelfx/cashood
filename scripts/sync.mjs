@@ -30,7 +30,7 @@ const { bookValueUsd, readBook } = await load('manager.js');
 const { balanceOf } = await load('venue/quote.js');
 const { ethUsd } = await load('venue/price.js');
 const { getWallet } = await load('chain/signer.js');
-const { getClosed } = await load('store.js');
+const { getClosed, profitSweeps } = await load('store.js');
 const { NATIVE, USDG, WETH, decimalsOf } = await load('chain/addresses.js');
 const { getClient } = await load('chain/rpc.js');
 const { ERC20_ABI } = await load('chain/abi.js');
@@ -278,11 +278,61 @@ if (!Number.isFinite(totalUsd) || totalUsd <= 0) throw new Error(`bookValueUsd t
 // ikut dihitung, memindahkannya akan terbaca sebagai kerugian sebesar uang
 // yang dipindahkan — dan harga saham semua orang turun karena tindakan yang
 // justru mengamankan uang mereka.
-let treasuryUsd = 0;
-try {
-  const cfg = JSON.parse(readFileSync(resolve(dirname(OUT), 'config.json'), 'utf8'));
-  treasuryUsd = Number(cfg?.treasury?.movedUsd) || 0;
-} catch { /* tanpa config, kas cadangan dianggap nol */ }
+//
+// Aturan pemiliknya, 2026-09-18: modal kerja bot dipatok di
+// `fund.fixedCapitalUsd` ($9.300). Tiap pagi kelebihannya dikirim ke wallet
+// tabungan, dibulatkan ke bawah ke kelipatan `treasury.stepUsd` ($100). Jadi
+// kas cadangan bukan lagi angka yang ditulis tangan di config — ia jumlah
+// seluruh transfer yang benar-benar terjadi.
+//
+// DUA SUMBER, SATU DAFTAR. Bot ini mencatat sendiri tiap sapuan yang ia kirim
+// (store.js: profitSweeps). Bot pencatat milik pemilik menulis ke
+// `treasury.ledgerFile` — dipakai untuk transfer yang tidak lewat bot, atau
+// yang tercatat di sana lebih dulu. Baris yang sama bisa muncul di keduanya,
+// jadi keduanya disatukan dan di-dedup: pakai hash transaksi kalau ada, kalau
+// tidak pakai tanggal + nominal.
+const cfgTreasury = (() => {
+  try { return JSON.parse(readFileSync(resolve(dirname(OUT), 'config.json'), 'utf8')); }
+  catch { return {}; }
+})();
+const fixedCapitalUsd = Number(cfgTreasury?.fund?.fixedCapitalUsd) || 0;
+const sweepStepUsd = Number(cfgTreasury?.treasury?.stepUsd) || 100;
+
+const treasuryMoves = (() => {
+  const seen = new Map();
+  const add = (at, usd, asset, tx) => {
+    const value = Number(usd);
+    // Nol, negatif atau bukan angka: barisnya dilewati, sisanya tetap dihitung.
+    if (!Number.isFinite(value) || value <= 0) return;
+    const when = Number.isFinite(Number(at)) ? Number(at) : Date.parse(at);
+    if (!Number.isFinite(when)) return;
+    const hash = String(tx || '').trim().toLowerCase();
+    const key = hash || `${new Date(when).toISOString().slice(0, 10)}:${value.toFixed(2)}`;
+    if (seen.has(key)) return;
+    seen.set(key, { at: when, usd: Number(value.toFixed(2)), asset: String(asset || 'USDG') });
+  };
+
+  try {
+    for (const row of profitSweeps()) add(row?.at ?? Date.parse(row?.day), row?.amountUsd, 'USDG', row?.tx);
+  } catch { /* tanpa catatan bot, tinggal berkas pencatat */ }
+
+  const ledger = resolve(HERE, '..', String(cfgTreasury?.treasury?.ledgerFile || 'data/reborn/treasury.jsonl'));
+  if (existsSync(ledger)) {
+    for (const line of readFileSync(ledger, 'utf8').split('\n')) {
+      const text = line.trim();
+      if (!text || text.startsWith('#')) continue;
+      try {
+        const row = JSON.parse(text);
+        add(row.at, row.usd, row.asset, row.tx);
+      } catch { /* satu baris rusak tidak boleh menjatuhkan seluruh sinkronisasi */ }
+    }
+  }
+  // Hash transaksi dan alamat tujuan sengaja tidak ikut: berkas ini terbit di
+  // repo publik, dan satu hash sudah cukup untuk menemukan dompetnya.
+  return [...seen.values()].sort((a, b) => a.at - b.at);
+})();
+
+const treasuryUsd = Number(treasuryMoves.reduce((sum, m) => sum + m.usd, 0).toFixed(2));
 
 // Alamat wallet sengaja TIDAK ditulis ke snapshot: berkas ini terbit di repo
 // publik, dan satu baris saja sudah cukup untuk menghubungkan situs ini dengan
@@ -306,6 +356,14 @@ const snapshot = {
   totalUsd: Number((totalUsd + treasuryUsd).toFixed(2)),
   botWalletUsd: Number(totalUsd.toFixed(2)),
   treasuryUsd,
+  treasuryMoves: treasuryMoves.slice(-40),
+  fixedCapitalUsd,
+  sweepStepUsd,
+  // Yang akan tersapu kalau sapuan jalan sekarang — supaya situs bisa bilang
+  // "$550 di atas modal, $500 antre keluar besok pagi" tanpa menebak.
+  sweepDueUsd: fixedCapitalUsd > 0
+    ? Math.max(0, Math.floor(Math.max(0, totalUsd - fixedCapitalUsd) / sweepStepUsd) * sweepStepUsd)
+    : 0,
   ethPrice: price,
   holdings,
   positions,

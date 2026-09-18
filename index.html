@@ -384,6 +384,7 @@
           <span class="hint" id="treHint"></span>
         </div>
         <div class="stats tre-sum" id="treSummary"></div>
+        <div id="treMoves"></div>
         <div class="explain-body" id="treRule"></div>
       </section>
 
@@ -473,12 +474,12 @@
 
     <section class="card" id="aboutTreasury">
       <div class="card-head"><h2>Uang yang sudah aman, dipindahkan</h2><span class="hint" id="aboutTreHint"></span></div>
-      <p class="lead">Setiap kelipatan laba tertentu dipindahkan keluar dari wallet yang dipakai bot, ke wallet terpisah yang tidak pernah menandatangani transaksi apa pun. Dividen dan pencairan dibayar dari sana.</p>
+      <p class="lead">Bot memegang modal kerja dengan jumlah tetap. Semua kelebihan di atasnya dipindahkan keluar dari wallet yang dipakai bot, ke wallet terpisah yang tidak pernah menandatangani transaksi apa pun. Dividen dan pencairan dibayar dari sana.</p>
       <div class="two">
         <div><h3 class="sub-h">Kenapa dipisah</h3><ul class="plain">
           <li>Wallet yang dipakai bot menandatangani transaksi ratusan kali sehari — itu permukaan serangan, dan permukaan serangan tidak boleh menyimpan seluruh dana.</li>
-          <li>Bot punya batas kapasitas. Modal yang melebihi batas itu tidak menambah hasil, hanya menambah risiko.</li>
-          <li>Laba yang sudah nyata seharusnya berhenti dipertaruhkan.</li>
+          <li>Bot bekerja dengan modal tetap. Ukuran tiap posisi dihitung dari modal itu, bukan dari saldo hari ini — laba tidak otomatis dipertaruhkan lagi.</li>
+          <li>Kelebihan di atas modal dipindahkan tiap hari dalam kelipatan yang bulat; yang belum genap satu kelipatan menunggu hari berikutnya.</li>
         </ul></div>
         <div><h3 class="sub-h">Yang tidak berubah</h3><ul class="plain">
           <li>Uang yang dipindahkan <strong>tetap milik dana</strong> dan tetap dihitung dalam nilai saham.</li>
