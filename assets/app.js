@@ -413,6 +413,8 @@ async function resolveNav(cfg, { force = false } = {}) {
     liveUsd,
     treasuryUsd: Number(snap.treasuryUsd) || 0,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
+    treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
+    treasuryCountFrom: snap.treasuryCountFrom || null,
     fixedCapitalUsd: Number(snap.fixedCapitalUsd) || 0,
     sweepStepUsd: Number(snap.sweepStepUsd) || 100,
     sweepDueUsd: Number(snap.sweepDueUsd) || 0,
