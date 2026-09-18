@@ -1710,8 +1710,12 @@ function parseHash() {
 
 function renderFundBar() {
   const analisa = state.view === 'analisa';
+  // Dana hanya disorot saat tampilan dana yang sedang dibuka. Versi sebelumnya
+  // hanya mengecualikan tampilan analisa, jadi membuka Safe Box menyalakan dua
+  // tombol sekaligus: Safe Box dan dana yang terakhir dilihat.
+  const diDana = !state.view || state.view === 'fund';
   $('#fundBar').innerHTML = state.funds.map((f) => `
-    <button data-fund="${f.id}" class="${!analisa && f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
+    <button data-fund="${f.id}" class="${diDana && f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
       <span class="fdot" style="background:${f.accent}"></span>
       <span class="fname">${f.label}</span>
       <span class="fchain">${f.chain}</span>
