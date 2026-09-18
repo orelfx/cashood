@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * cashood — laporan pembagian dividen, satu lembar A4 untuk semua pemegang saham.
+ * cashood — invoice pembagian dividen, satu lembar A4 untuk semua pemegang saham.
  *
  * Desainnya tinggal di sini supaya setiap tanggal 1 cukup jalankan ulang dengan
  * angka bulan itu — tidak perlu mendesain dari nol lagi.
@@ -17,7 +17,7 @@
  * Porsi saham dihitung oleh buildLedger() dari assets/app.js yang sama dengan
  * situsnya — angka di PDF tidak bisa berbeda dari angka di cashood.id.
  *
- * Keluaran: reports/dividen-<fund>-<tanggal bayar>[-contoh].html dan .pdf
+ * Keluaran: reports/invoice-<fund>-<tanggal bayar>[-contoh].html dan .pdf
  * (dicetak Chromium headless, tanpa dependensi npm).
  */
 
@@ -117,11 +117,13 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 const fundName = fundMeta.name || (fund === 'reborn' ? 'Reborn Rich' : fund);
 const chain = fundMeta.chain || (fund === 'reborn' ? 'Robinhood Chain' : 'Solana');
+// Nomor invoice: INV/<kode dana>/<tahun-bulan bayar>, ditandai CONTOH kalau contoh.
+const invoiceNo = `INV/${fund === 'reborn' ? 'RR' : fund.slice(0, 3).toUpperCase()}/${payIso.slice(0, 7)}${example ? '/CONTOH' : ''}`;
 const generated = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(now);
 
 const html = `<!doctype html>
 <html lang="id"><head><meta charset="utf-8">
-<title>Laporan Dividen ${esc(fundName)} — ${esc(periodLabel)}</title>
+<title>Invoice Dividen ${esc(fundName)} — ${esc(periodLabel)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -149,10 +151,10 @@ const html = `<!doctype html>
   .doc .kind { font-size: 7.4pt; letter-spacing: 0.18em; color: var(--gold); font-weight: 700; }
   .doc h2 { font-size: 15pt; font-weight: 800; margin-top: 1mm; }
   .doc p { font-size: 8pt; color: #c3cde0; margin-top: 0.6mm; }
-  .meta { display: flex; gap: 8mm; margin-top: 7mm; font-size: 7.6pt; color: #aab6cc; }
+  .meta { display: flex; justify-content: space-between; gap: 6mm; margin-top: 7mm; font-size: 7.6pt; color: #aab6cc; }
   .meta b { display: block; color: #fff; font-size: 9pt; font-weight: 600; margin-top: 0.4mm; }
-  .stamp { position: absolute; right: 14mm; top: 36mm; border: 0.5mm solid var(--gold); color: var(--gold);
-           padding: 1mm 3mm; border-radius: 1mm; font-size: 7pt; font-weight: 800; letter-spacing: 0.16em; transform: rotate(-2deg); }
+  .stamp { display: inline-block; margin-top: 2mm; border: 0.45mm solid var(--gold); color: var(--gold);
+           padding: 0.7mm 2.6mm; border-radius: 1mm; font-size: 6.6pt; font-weight: 800; letter-spacing: 0.16em; }
 
   main { padding: 7mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 5.5mm; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
@@ -209,16 +211,17 @@ const html = `<!doctype html>
   <div class="top">
     <div class="brand"><div class="mark">C</div><div>
       <h1>CASHOOD HEADFUND</h1><p>Private AI Liquidity Provider · ${esc(chain)}</p></div></div>
-    <div class="doc"><div class="kind">LAPORAN PEMBAGIAN DIVIDEN</div>
-      <h2>${esc(fundName)}</h2><p>Periode ${esc(periodLabel)}</p></div>
+    <div class="doc"><div class="kind">INVOICE PEMBAGIAN DIVIDEN</div>
+      <h2>${esc(fundName)}</h2><p>Periode ${esc(periodLabel)}</p>
+      ${example ? '<div class="stamp">CONTOH PERHITUNGAN</div>' : ''}</div>
   </div>
   <div class="meta">
+    <div>No. invoice<b class="num">${esc(invoiceNo)}</b></div>
     <div>Tanggal pembayaran<b>${esc(payLabel)}</b></div>
     <div>Kurs yang dipakai<b class="num">1 USD = ${idr(rate)}</b></div>
     <div>Pemegang saham<b>${rows.length} orang</b></div>
     <div>Porsi dibagikan<b>${distributePct}% laba bersih</b></div>
   </div>
-  ${example ? '<div class="stamp">CONTOH PERHITUNGAN</div>' : ''}
 </header>
 
 <main>
@@ -286,7 +289,7 @@ const html = `<!doctype html>
 </div></body></html>`;
 
 mkdirSync(resolve(ROOT, 'reports'), { recursive: true });
-const stem = `dividen-${fund}-${payIso}${example ? '-contoh' : ''}`;
+const stem = `invoice-${fund}-${payIso}${example ? '-contoh' : ''}`;
 const htmlPath = resolve(ROOT, 'reports', `${stem}.html`);
 const pdfPath = resolve(ROOT, 'reports', `${stem}.pdf`);
 writeFileSync(htmlPath, html);
@@ -303,9 +306,9 @@ if (r.status !== 0 || !existsSync(pdfPath)) { console.error(r.stderr || 'cetak P
 const manifestPath = resolve(ROOT, 'reports', 'index.json');
 let manifest = [];
 try { manifest = JSON.parse(readFileSync(manifestPath, 'utf8')); } catch { /* laporan pertama */ }
-manifest = manifest.filter((m) => m.pdf !== `reports/${stem}.pdf`);
+manifest = manifest.filter((m) => m.pdf !== `reports/${stem}.pdf` && existsSync(resolve(ROOT, m.pdf)));
 manifest.push({
-  fund, period, periodLabel, payDate: payIso, payLabel, example,
+  fund, period, periodLabel, payDate: payIso, payLabel, example, invoiceNo,
   withdrawnUsd: withdrawn, costsUsd, distributedUsd: Number(pool.toFixed(2)), rate,
   pdf: `reports/${stem}.pdf`, html: `reports/${stem}.html`, generatedAt: now.toISOString(),
 });

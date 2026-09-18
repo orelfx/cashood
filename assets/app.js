@@ -1239,14 +1239,16 @@ async function renderReports() {
   card.hidden = !mine.length;
   if (!mine.length) return;
   $('#reportsList').innerHTML = `<div class="table-scroll"><table class="reports"><thead><tr>
-      <th>Periode</th><th>Dibayar</th><th>Ditarik</th><th>Biaya</th><th>Dibagikan</th><th></th></tr></thead><tbody>`
+      <th>Invoice</th><th>Dibayar</th><th>Ditarik</th><th>Biaya</th><th>Dibagikan</th><th></th></tr></thead><tbody>`
     + mine.map((m) => `<tr>
-      <td>${m.periodLabel}${m.example ? ' <span class="tag">contoh</span>' : ''}</td>
+      <td><div>${m.periodLabel}${m.example ? ' <span class="tag">contoh</span>' : ''}</div><div class="dim num" style="font-size:11.5px">${m.invoiceNo || ''}</div></td>
       <td>${m.payLabel}</td>
       <td class="num">${usd(m.withdrawnUsd, 0)}</td>
       <td class="num neg">−${usd(m.costsUsd, 0)}</td>
       <td class="num pos">${usd(m.distributedUsd, 0)}</td>
-      <td><a class="btn-pdf" href="${m.pdf}" target="_blank" rel="noopener">Buka PDF</a></td></tr>`).join('')
+      <td class="pdf-actions">
+        <a class="btn-pdf" href="${m.pdf}" download="${m.pdf.split('/').pop()}">Download</a>
+        <a class="btn-pdf ghost" href="${m.pdf}" target="_blank" rel="noopener">Lihat</a></td></tr>`).join('')
     + '</tbody></table></div>';
 }
 

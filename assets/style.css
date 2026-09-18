@@ -98,6 +98,17 @@ main { padding-bottom: 40px; }
 .btn-pdf { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
            background: rgba(212,166,74,.14); color: #e7c276; border: 1px solid rgba(212,166,74,.35); text-decoration: none; }
 .btn-pdf:hover { background: rgba(212,166,74,.24); }
+.btn-pdf.ghost { background: transparent; color: var(--mute, #8b95a7); border-color: var(--line, #2a3345); }
+.pdf-actions { display: flex; gap: 6px; justify-content: flex-end; }
+@media (max-width: 640px) {
+  /* Di HP cukup: invoice apa, berapa yang dibagikan, dan tombolnya. Rinciannya ada di PDF. */
+  .reports th:nth-child(2), .reports td:nth-child(2),
+  .reports th:nth-child(3), .reports td:nth-child(3),
+  .reports th:nth-child(4), .reports td:nth-child(4) { display: none; }
+  .reports td, .reports th { white-space: normal; }
+  .pdf-actions { flex-direction: column; align-items: stretch; }
+  .btn-pdf { text-align: center; padding: 8px 12px; }
+}
 .tre-moves td:nth-child(2) { font-variant-numeric: tabular-nums; }
 table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11.5px;
