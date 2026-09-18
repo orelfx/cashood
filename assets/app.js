@@ -1236,8 +1236,13 @@ async function renderReports() {
     } catch { reportsCache = []; }
   }
   const mine = (Array.isArray(reportsCache) ? reportsCache : []).filter((m) => m.fund === state.fund);
-  card.hidden = !mine.length;
-  if (!mine.length) return;
+  // Tab Invoice selalu ada; dana yang belum punya invoice bilang begitu,
+  // bukan menampilkan halaman kosong.
+  card.hidden = false;
+  if (!mine.length) {
+    $('#reportsList').innerHTML = '<p class="dim">Belum ada invoice untuk dana ini. Invoice dibuat tiap tanggal 1 saat dividen dibagikan.</p>';
+    return;
+  }
   $('#reportsList').innerHTML = `<div class="table-scroll"><table class="reports"><thead><tr>
       <th>Invoice</th><th>Dibayar</th><th>Ditarik</th><th>Biaya</th><th>Dibagikan</th><th></th></tr></thead><tbody>`
     + mine.map((m) => `<tr>
