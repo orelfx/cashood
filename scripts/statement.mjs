@@ -115,6 +115,27 @@ const idr = (n) => (n < 0 ? '−' : '') + 'Rp ' + Math.round(Math.abs(n)).toLoca
 const pct = (n) => n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+// Performa bot di bulan periode, dari snapshot yang sama dengan situs
+// (history per hari WIB: closes, wins, losses, winUsd, lossUsd, usd).
+const perf = (() => {
+  try {
+    const live = JSON.parse(readFileSync(resolve(ROOT, 'data', fund, 'live.json'), 'utf8'));
+    const days = (live.history || []).filter((r) => String(r.date).startsWith(period));
+    if (!days.length) return null;
+    const sum = (k) => days.reduce((t, r) => t + (Number(r[k]) || 0), 0);
+    const closes = sum('closes'), wins = sum('wins'), losses = sum('losses');
+    return {
+      closes, wins, losses, flat: Math.max(0, closes - wins - losses),
+      winUsd: sum('winUsd'), lossUsd: sum('lossUsd'), netUsd: sum('usd'),
+      winRate: closes ? (wins / closes) * 100 : 0,
+      // Win rate di antara posisi yang benar-benar bergerak, tanpa yang impas.
+      decisiveRate: wins + losses ? (wins / (wins + losses)) * 100 : 0,
+      days: days.length,
+      hasSplit: days.some((r) => 'losses' in r),
+    };
+  } catch { return null; }
+})();
+
 const fundName = fundMeta.name || (fund === 'reborn' ? 'Reborn Rich' : fund);
 const chain = fundMeta.chain || (fund === 'reborn' ? 'Robinhood Chain' : 'Solana');
 // Nomor invoice: INV/<kode dana>/<tahun-bulan bayar>, ditandai CONTOH kalau contoh.
@@ -156,7 +177,7 @@ const html = `<!doctype html>
   .stamp { display: inline-block; margin-top: 2mm; border: 0.45mm solid var(--gold); color: var(--gold);
            padding: 0.7mm 2.6mm; border-radius: 1mm; font-size: 6.6pt; font-weight: 800; letter-spacing: 0.16em; }
 
-  main { padding: 7mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 5.5mm; }
+  main { padding: 6mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 4.4mm; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
   .tile { border: 0.3mm solid var(--line); border-radius: 2.2mm; padding: 3.4mm 3.6mm; background: #fff; }
   .tile .k { font-size: 6.9pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
@@ -171,10 +192,20 @@ const html = `<!doctype html>
   .flow .op { color: var(--mute); font-weight: 700; }
   .flow .res { color: var(--green); font-weight: 700; }
 
+  .perf { display: grid; grid-template-columns: repeat(5, 1fr); border: 0.3mm solid var(--line); border-radius: 2.2mm; overflow: hidden; }
+  .perf > div { padding: 2.6mm 3.2mm; border-right: 0.3mm solid var(--line); }
+  .perf > div:last-child { border-right: 0; }
+  .perf .k { font-size: 6.6pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
+  .perf .v { font-size: 12pt; font-weight: 700; margin-top: 0.8mm; }
+  .perf .s { font-size: 7.2pt; color: var(--mute); margin-top: 0.2mm; }
+  .perf .win .v { color: var(--green); } .perf .loss .v { color: var(--red); }
+  .perf .rate .v { color: var(--navy); }
+  .winbar { display: flex; height: 1.4mm; border-radius: 1mm; overflow: hidden; margin-top: 1.2mm; background: var(--line); }
+  .winbar i { display: block; height: 100%; }
   .two { display: grid; grid-template-columns: 1.05fr 1fr; gap: 5mm; }
   h3 { font-size: 7.6pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); font-weight: 700; margin-bottom: 2mm; }
   table { width: 100%; border-collapse: collapse; }
-  .costs td { padding: 1.35mm 0; border-bottom: 0.25mm solid var(--line); }
+  .costs td { padding: 1.1mm 0; border-bottom: 0.25mm solid var(--line); }
   .costs td:last-child { text-align: right; }
   .costs tr.total td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 1.8mm; }
   .rules { list-style: none; display: grid; gap: 1.6mm; }
@@ -190,7 +221,7 @@ const html = `<!doctype html>
   .holders th { font-size: 6.9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); font-weight: 700;
                 text-align: right; padding: 2mm 2mm; border-bottom: 0.4mm solid var(--ink); }
   .holders th:first-child, .holders td:first-child { text-align: left; }
-  .holders td { padding: 2.5mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
+  .holders td { padding: 2.1mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
   .holders tbody tr:nth-child(odd) td { background: #fafbfd; }
   .holders .who { font-weight: 600; }
   .holders .bar { height: 1.2mm; background: var(--line); border-radius: 1mm; margin-top: 1mm; width: 26mm; overflow: hidden; }
@@ -229,15 +260,25 @@ const html = `<!doctype html>
     <div class="tile"><div class="k">Modal kerja dana</div><div class="v num">${usd(balance, 0)}</div><div class="s num">${idr(balance * rate)}</div></div>
     <div class="tile"><div class="k">Ditarik bulan ini</div><div class="v num">${usd(withdrawn, 0)}</div><div class="s num">${idr(withdrawn * rate)}</div></div>
     <div class="tile neg"><div class="k">Biaya sistem</div><div class="v num">${usd(-costsUsd, 0)}</div><div class="s num">${idr(-costsUsd * rate)}</div></div>
-    <div class="tile hero"><div class="k">Dibagikan</div><div class="v num">${usd(pool, 0)}</div><div class="s num">${idr(Math.round(pool * rate))}</div></div>
+    <div class="tile hero"><div class="k">Dibagikan ${distributePct}%</div><div class="v num">${usd(pool, 0)}</div><div class="s num">${idr(Math.round(pool * rate))}</div></div>
   </div>
 
-  <div class="flow">
-    <span>Ditarik <b class="num">${usd(withdrawn)}</b></span><span class="op">−</span>
-    <span>biaya sistem <b class="num">${usd(costsUsd)}</b></span><span class="op">=</span>
-    <span class="res num">${usd(net)}</span><span class="op">→</span>
-    <span><b>${distributePct}%</b> dibagikan ke seluruh pemegang saham sesuai porsinya</span>
-  </div>
+  ${perf ? `<div>
+    <h3>Performa bot · ${esc(periodLabel)}</h3>
+    <div class="perf">
+      <div><div class="k">Posisi ditutup</div><div class="v num">${perf.closes}</div><div class="s">dalam ${perf.days} hari</div></div>
+      <div class="rate"><div class="k">Win rate</div><div class="v num">${pct(perf.winRate)}</div>
+        <div class="winbar"><i style="width:${(perf.wins / perf.closes * 100).toFixed(2)}%;background:var(--green)"></i><i style="width:${(perf.flat / perf.closes * 100).toFixed(2)}%;background:#cbd5e1"></i><i style="width:${(perf.losses / perf.closes * 100).toFixed(2)}%;background:var(--red)"></i></div></div>
+      <div class="win"><div class="k">Total win</div><div class="v num">${perf.wins}</div><div class="s num">+${usd(perf.winUsd).replace('$', '$')}</div></div>
+      <div class="loss"><div class="k">Total loss</div><div class="v num">${perf.losses}</div><div class="s num">${usd(perf.lossUsd)}</div></div>
+      <div><div class="k">Impas (±0,5%)</div><div class="v num">${perf.flat}</div><div class="s">tidak untung, tidak rugi</div></div>
+    </div>
+    <div class="flow" style="margin-top:2mm;justify-content:space-between">
+      <span>Hasil bersih posisi yang ditutup bulan ini</span>
+      <span class="num ${perf.netUsd >= 0 ? 'res' : ''}" style="${perf.netUsd < 0 ? 'color:var(--red);font-weight:700' : ''}">${perf.netUsd >= 0 ? '+' : ''}${usd(perf.netUsd)}</span>
+      <span style="color:var(--mute);font-size:7.4pt">win rate di antara posisi yang bergerak: ${pct(perf.decisiveRate)}</span>
+    </div>
+  </div>` : ''}
 
   <div class="two">
     <div>

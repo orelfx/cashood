@@ -451,20 +451,24 @@ function ownerValues(ledger, navUsd) {
 }
 
 function renderSummary(ledger, nav) {
-  const pnl = nav.totalUsd + ledger.withdrawn - ledger.deposited;
+  // Tiga kartu yang harus bisa dijumlah dengan mata:
+  //   nilai di bot + sudah ditarik − modal masuk = untung/rugi
+  // Kas cadangan (hasil sapuan) masuk "Sudah ditarik", jadi TIDAK ikut lagi di
+  // "Nilai sekarang" — dulu ia tampil di dua kartu dan kelihatan dobel.
+  // Hasilnya sama persis dengan rumus lama (nav.totalUsd sudah memuat kas);
+  // yang berubah hanya di kartu mana uang itu ditampilkan. Nilai saham tiap
+  // pemilik tetap memakai nav.totalUsd, karena kas cadangan tetap milik dana.
+  const swept = Number(nav.treasuryUsd) || 0;
+  const inBot = Math.max(0, nav.totalUsd - swept);
+  const pnl = inBot + (ledger.withdrawn + swept) - ledger.deposited;
   const pnlPct = ledger.deposited > 0 ? (pnl / ledger.deposited) * 100 : 0;
 
-  $('#kpiNav').innerHTML = usd(nav.totalUsd);
+  $('#kpiNav').innerHTML = usd(inBot);
   $('#kpiNavSub').innerHTML = nav.lpUsd > 0
-    ? `${usd(nav.liveUsd ?? 0, 0)} token + ${usd(nav.lpUsd, 0)} di LP`
-      + (nav.treasuryUsd > 0 ? ` + ${usd(nav.treasuryUsd, 0)} kas cadangan` : '')
+    ? `${usd(nav.liveUsd ?? 0, 0)} token + ${usd(nav.lpUsd, 0)} di LP · yang dipegang bot`
     : nav.label;
   $('#kpiDeposit').innerHTML = usd(ledger.deposited);
   // "Sudah ditarik" = pencairan investor + sapuan harian bot ke wallet tabungan.
-  // HANYA TAMPILAN: sapuan sudah ada di dalam nav.totalUsd (kas cadangan tetap
-  // milik dana), jadi ia tidak boleh ikut masuk ke rumus untung/rugi di bawah —
-  // kalau ikut, uang yang sama terhitung dua kali.
-  const swept = Number(nav.treasuryUsd) || 0;
   const sweeps = (nav.treasuryMoves || []).length;
   $('#kpiWithdraw').innerHTML = usd(ledger.withdrawn + swept);
   const opening = Number(nav.treasuryOpeningUsd) || 0;

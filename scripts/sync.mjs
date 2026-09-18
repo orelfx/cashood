@@ -146,15 +146,15 @@ const bases = [];
 for (const r of closed) {
   const netUsd = Number(r.netUsd);
   const day = dayKey(r.closedAt);
-  const row = byDay.get(day) || { date: day, usd: 0, closes: 0, wins: 0 };
+  const row = byDay.get(day) || { date: day, usd: 0, closes: 0, wins: 0, losses: 0, winUsd: 0, lossUsd: 0 };
   row.usd += netUsd;
   row.closes += 1;
 
   const pct = Number(r.netPct);
   if (Number.isFinite(pct)) {
     graded += 1;
-    if (pct > 0.005) { wins += 1; row.wins += 1; }
-    else if (pct < -0.005) losses += 1;
+    if (pct > 0.005) { wins += 1; row.wins += 1; row.winUsd += netUsd; }
+    else if (pct < -0.005) { losses += 1; row.losses += 1; row.lossUsd += netUsd; }
     // Modal per posisi tidak disimpan dalam dolar, tapi netUsd/netPct memberi
     // angka yang sama tanpa perlu tahu token kuotenya apa.
     if (Math.abs(pct) > 1e-6) bases.push(Math.abs(netUsd / pct));
@@ -163,7 +163,7 @@ for (const r of closed) {
 }
 
 const history = [...byDay.values()]
-  .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)) }))
+  .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)), winUsd: Number(r.winUsd.toFixed(2)), lossUsd: Number(r.lossUsd.toFixed(2)) }))
   .sort((a, b) => a.date.localeCompare(b.date));
 
 const realisedUsd = history.reduce((s, r) => s + r.usd, 0);

@@ -33,7 +33,7 @@
   .stamp { display: inline-block; margin-top: 2mm; border: 0.45mm solid var(--gold); color: var(--gold);
            padding: 0.7mm 2.6mm; border-radius: 1mm; font-size: 6.6pt; font-weight: 800; letter-spacing: 0.16em; }
 
-  main { padding: 7mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 5.5mm; }
+  main { padding: 6mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 4.4mm; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
   .tile { border: 0.3mm solid var(--line); border-radius: 2.2mm; padding: 3.4mm 3.6mm; background: #fff; }
   .tile .k { font-size: 6.9pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
@@ -48,10 +48,20 @@
   .flow .op { color: var(--mute); font-weight: 700; }
   .flow .res { color: var(--green); font-weight: 700; }
 
+  .perf { display: grid; grid-template-columns: repeat(5, 1fr); border: 0.3mm solid var(--line); border-radius: 2.2mm; overflow: hidden; }
+  .perf > div { padding: 2.6mm 3.2mm; border-right: 0.3mm solid var(--line); }
+  .perf > div:last-child { border-right: 0; }
+  .perf .k { font-size: 6.6pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
+  .perf .v { font-size: 12pt; font-weight: 700; margin-top: 0.8mm; }
+  .perf .s { font-size: 7.2pt; color: var(--mute); margin-top: 0.2mm; }
+  .perf .win .v { color: var(--green); } .perf .loss .v { color: var(--red); }
+  .perf .rate .v { color: var(--navy); }
+  .winbar { display: flex; height: 1.4mm; border-radius: 1mm; overflow: hidden; margin-top: 1.2mm; background: var(--line); }
+  .winbar i { display: block; height: 100%; }
   .two { display: grid; grid-template-columns: 1.05fr 1fr; gap: 5mm; }
   h3 { font-size: 7.6pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); font-weight: 700; margin-bottom: 2mm; }
   table { width: 100%; border-collapse: collapse; }
-  .costs td { padding: 1.35mm 0; border-bottom: 0.25mm solid var(--line); }
+  .costs td { padding: 1.1mm 0; border-bottom: 0.25mm solid var(--line); }
   .costs td:last-child { text-align: right; }
   .costs tr.total td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 1.8mm; }
   .rules { list-style: none; display: grid; gap: 1.6mm; }
@@ -67,7 +77,7 @@
   .holders th { font-size: 6.9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); font-weight: 700;
                 text-align: right; padding: 2mm 2mm; border-bottom: 0.4mm solid var(--ink); }
   .holders th:first-child, .holders td:first-child { text-align: left; }
-  .holders td { padding: 2.5mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
+  .holders td { padding: 2.1mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
   .holders tbody tr:nth-child(odd) td { background: #fafbfd; }
   .holders .who { font-weight: 600; }
   .holders .bar { height: 1.2mm; background: var(--line); border-radius: 1mm; margin-top: 1mm; width: 26mm; overflow: hidden; }
@@ -90,10 +100,10 @@
       <h1>CASHOOD HEADFUND</h1><p>Private AI Liquidity Provider · Robinhood Chain</p></div></div>
     <div class="doc"><div class="kind">INVOICE PEMBAGIAN DIVIDEN</div>
       <h2>Reborn Rich</h2><p>Periode September 2026</p>
-      <div class="stamp">CONTOH PERHITUNGAN</div></div>
+      </div>
   </div>
   <div class="meta">
-    <div>No. invoice<b class="num">INV/RR/2026-10/CONTOH</b></div>
+    <div>No. invoice<b class="num">INV/RR/2026-10</b></div>
     <div>Tanggal pembayaran<b>1 Oktober 2026</b></div>
     <div>Kurs yang dipakai<b class="num">1 USD = Rp 17.650</b></div>
     <div>Pemegang saham<b>4 orang</b></div>
@@ -106,14 +116,24 @@
     <div class="tile"><div class="k">Modal kerja dana</div><div class="v num">$9,300</div><div class="s num">Rp 164.145.000</div></div>
     <div class="tile"><div class="k">Ditarik bulan ini</div><div class="v num">$1,000</div><div class="s num">Rp 17.650.000</div></div>
     <div class="tile neg"><div class="k">Biaya sistem</div><div class="v num">−$250</div><div class="s num">−Rp 4.412.500</div></div>
-    <div class="tile hero"><div class="k">Dibagikan</div><div class="v num">$750</div><div class="s num">Rp 13.237.500</div></div>
+    <div class="tile hero"><div class="k">Dibagikan 100%</div><div class="v num">$750</div><div class="s num">Rp 13.237.500</div></div>
   </div>
 
-  <div class="flow">
-    <span>Ditarik <b class="num">$1,000.00</b></span><span class="op">−</span>
-    <span>biaya sistem <b class="num">$250.00</b></span><span class="op">=</span>
-    <span class="res num">$750.00</span><span class="op">→</span>
-    <span><b>100%</b> dibagikan ke seluruh pemegang saham sesuai porsinya</span>
+  <div>
+    <h3>Performa bot · September 2026</h3>
+    <div class="perf">
+      <div><div class="k">Posisi ditutup</div><div class="v num">300</div><div class="s">dalam 7 hari</div></div>
+      <div class="rate"><div class="k">Win rate</div><div class="v num">44,00%</div>
+        <div class="winbar"><i style="width:44.00%;background:var(--green)"></i><i style="width:41.00%;background:#cbd5e1"></i><i style="width:15.00%;background:var(--red)"></i></div></div>
+      <div class="win"><div class="k">Total win</div><div class="v num">132</div><div class="s num">+$4,909.95</div></div>
+      <div class="loss"><div class="k">Total loss</div><div class="v num">45</div><div class="s num">−$3,369.22</div></div>
+      <div><div class="k">Impas (±0,5%)</div><div class="v num">123</div><div class="s">tidak untung, tidak rugi</div></div>
+    </div>
+    <div class="flow" style="margin-top:2mm;justify-content:space-between">
+      <span>Hasil bersih posisi yang ditutup bulan ini</span>
+      <span class="num res" style="">+$1,558.12</span>
+      <span style="color:var(--mute);font-size:7.4pt">win rate di antara posisi yang bergerak: 74,58%</span>
+    </div>
   </div>
 
   <div class="two">
@@ -177,8 +197,8 @@
 <footer>
   <div class="notes">
     <div><b>Kurs.</b> Nilai rupiah memakai kurs yang ditetapkan pengelola, 1 USD = Rp 17.650, bukan kurs pasar. Dana dikirim dalam USD; rupiah yang diterima dapat berbeda mengikuti kurs saat pencairan.</div>
-    <div><b>Catatan.</b> Data aktual profit bisa berbeda karena gas fee yang fluktuatif, slippage, price impact, dan biaya bridge. Porsi saham dihitung dengan metode unit dan dapat diperiksa di cashood.id. <b>Dokumen ini adalah contoh perhitungan.</b></div>
+    <div><b>Catatan.</b> Data aktual profit bisa berbeda karena gas fee yang fluktuatif, slippage, price impact, dan biaya bridge. Porsi saham dihitung dengan metode unit dan dapat diperiksa di cashood.id.</div>
   </div>
-  <div class="base"><span class="site">cashood.id</span><span>Dibuat 18 September 2026 pukul 14.56 WIB</span></div>
+  <div class="base"><span class="site">cashood.id</span><span>Dibuat 18 September 2026 pukul 16.20 WIB</span></div>
 </footer>
 </div></body></html>

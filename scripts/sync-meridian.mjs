@@ -131,14 +131,16 @@ const closes = (tracking.entries || [])
 const byDay = new Map();
 for (const c of closes) {
   const day = new Date(c.closedAt + WIB).toISOString().slice(0, 10);
-  const row = byDay.get(day) || { date: day, usd: 0, closes: 0, wins: 0 };
+  const row = byDay.get(day) || { date: day, usd: 0, closes: 0, wins: 0, losses: 0, winUsd: 0, lossUsd: 0 };
   row.usd += c.netUsd;
   row.closes += 1;
-  if (c.netPct > 0) row.wins += 1;
+  // Sama dengan ambang win rate di bawah (±0,05%): di dalamnya dihitung impas.
+  if (c.netPct > 0.05) { row.wins += 1; row.winUsd += c.netUsd; }
+  else if (c.netPct < -0.05) { row.losses += 1; row.lossUsd += c.netUsd; }
   byDay.set(day, row);
 }
 const history = [...byDay.values()]
-  .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)) }))
+  .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)), winUsd: Number(r.winUsd.toFixed(2)), lossUsd: Number(r.lossUsd.toFixed(2)) }))
   .sort((a, b) => a.date.localeCompare(b.date));
 
 const wins = closes.filter((c) => c.netPct > 0.05).length;
