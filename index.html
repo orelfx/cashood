@@ -109,12 +109,12 @@
            masuk di harga unit yang berbeda — sama seperti dua orang membeli saham
            perusahaan yang sama di dua tanggal berbeda.</p>
 
-        <p><strong>Dividen dibagikan setiap tanggal 1.</strong> Laba bulan itu dikurangi dulu biaya
-           sistem (MiniMax, Claude, VPS, RPC, LP Agent). Dari laba bersihnya, <strong>70%
-           dibagikan</strong> ke seluruh investor menurut proporsi saham, dan <strong>30% kembali ke
-           dana</strong> — tetap bekerja dan menaikkan harga saham semua orang. Pemegang 10% saham
-           menerima 10% dari yang dibagikan. Rincian lengkap dan simulasinya ada di tab
-           <em>Data investor</em>.</p>
+        <p><strong>Dividen dibagikan setiap tanggal 1.</strong> Bot bekerja dengan modal tetap, dan
+           setiap kelebihan di atasnya ditarik harian. Tanggal 1, total yang ditarik sebulan dikurangi
+           dulu biaya sistem (MiniMax, Claude, VPS, RPC, LP Agent, bridge). Sisanya <strong>dibagikan
+           100%</strong> ke seluruh investor menurut proporsi saham — tidak ada bagian yang mengendap.
+           Pemegang 3% saham menerima 3% dari yang dibagikan. Rincian, simulasi, dan contoh laporannya
+           ada di tab <em>Data investor</em>.</p>
 
         <p><strong>Penarikan</strong> mengurangi unit sebesar nilai yang ditarik pada
            harga unit hari itu, jadi porsi pemilik lain tidak ikut berubah. Simulasinya ada di
@@ -314,6 +314,14 @@
           </table>
         </div>
         <div class="explain-body" id="divRule"></div>
+      </section>
+
+      <section class="card" id="reportsCard">
+        <div class="card-head">
+          <h2>Laporan pembagian</h2>
+          <span class="hint" id="reportsHint">satu lembar untuk semua pemegang saham</span>
+        </div>
+        <div id="reportsList"></div>
       </section>
     </div>
 

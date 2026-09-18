@@ -59,17 +59,25 @@ function nextPayday(now = Date.now()) {
   return { at: next, days: Math.max(1, Math.ceil((next - now) / 86400e3)) };
 }
 
+/** Persentase dari config; kosong → bawaan, tapi 0 tetap 0. */
+function pctOr(value, fallback) {
+  const n = Number(value);
+  return value !== null && value !== undefined && value !== '' && Number.isFinite(n) ? n : fallback;
+}
+
 /** Dividen menurut aturan dana, dipakai ulang untuk tiap skenario. */
 function dividendAt(navUsd, cfg, ledgerBase, costs) {
   const d = cfg.dividend || {};
   const gross = Math.max(0, navUsd - ledgerBase);
   const net = Math.max(0, gross - costs);
-  const distributePct = num(d.distributePct) || 70;
+  // `?? ` bukan `||`: 0% mengendap adalah aturan yang sah (sejak 2026-09-18),
+  // dan `num(0) || 30` diam-diam mengembalikan sistem 30% yang sudah dihapus.
+  const distributePct = pctOr(d.distributePct, 70);
   return {
     gross: Number(gross.toFixed(2)),
     net: Number(net.toFixed(2)),
     distributed: Number((net * (distributePct / 100)).toFixed(2)),
-    reinvested: Number((net * ((num(d.reinvestPct) || 30) / 100)).toFixed(2)),
+    reinvested: Number((net * (pctOr(d.reinvestPct, 30) / 100)).toFixed(2)),
   };
 }
 
@@ -224,8 +232,8 @@ function forecast(fund) {
   function simulate(sample, horizonDays, tag, { mechanics = false } = {}) {
     const pool = sample.map((d) => d.pct);
     const rand = rng(seed + ':' + tag);
-    const distributePct = (num(cfg.dividend?.distributePct) || 70) / 100;
-    const reinvestPct = (num(cfg.dividend?.reinvestPct) || 30) / 100;
+    const distributePct = pctOr(cfg.dividend?.distributePct, 70) / 100;
+    const reinvestPct = pctOr(cfg.dividend?.reinvestPct, 30) / 100;
     const capacity = num(cfg.fund?.capacityUsd);
     const ends = [];
 

@@ -1210,10 +1210,42 @@ function renderRules() {
         ? 'Dipotong dari bagian dividen tiap investor sebelum dibayarkan.'
         : `Normalnya ${d.investorFeeStandardPct || 10}% dari bagian dividen tiap investor. Selama masa perkenalan tidak dipungut — bagiannya diterima penuh.`],
     ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1}`,
-      `Laba dikurangi biaya sistem. Dari laba bersihnya ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct ?? 30}% kembali ke dana dan menaikkan harga saham.`],
+      Number(d.reinvestPct) > 0
+        ? `Laba dikurangi biaya sistem. Dari laba bersihnya ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct}% kembali ke dana dan menaikkan harga saham.`
+        : `Uang yang ditarik bot sebulan dikurangi biaya sistem, lalu ${d.distributePct ?? 100}% dibagikan menurut porsi saham — tidak ada bagian yang mengendap.`],
   ];
   $('#rulesTable').querySelector('tbody').innerHTML = rules
     .map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+}
+
+/**
+ * Laporan pembagian dividen (PDF satu lembar) yang dibuat scripts/statement.mjs.
+ * Daftarnya dibaca dari reports/index.json di situs ini sendiri, bukan dari
+ * cabang data — laporan dibuat sebulan sekali, bukan tiap sepuluh menit.
+ */
+let reportsCache = null;
+async function renderReports() {
+  const card = $('#reportsCard');
+  if (!card) return;
+  if (!reportsCache) {
+    try {
+      const r = await fetch('reports/index.json?v=' + Math.floor(Date.now() / 600000), { cache: 'no-store' });
+      reportsCache = r.ok ? await r.json() : [];
+    } catch { reportsCache = []; }
+  }
+  const mine = (Array.isArray(reportsCache) ? reportsCache : []).filter((m) => m.fund === state.fund);
+  card.hidden = !mine.length;
+  if (!mine.length) return;
+  $('#reportsList').innerHTML = `<div class="table-scroll"><table class="reports"><thead><tr>
+      <th>Periode</th><th>Dibayar</th><th>Ditarik</th><th>Biaya</th><th>Dibagikan</th><th></th></tr></thead><tbody>`
+    + mine.map((m) => `<tr>
+      <td>${m.periodLabel}${m.example ? ' <span class="tag">contoh</span>' : ''}</td>
+      <td>${m.payLabel}</td>
+      <td class="num">${usd(m.withdrawnUsd, 0)}</td>
+      <td class="num neg">−${usd(m.costsUsd, 0)}</td>
+      <td class="num pos">${usd(m.distributedUsd, 0)}</td>
+      <td><a class="btn-pdf" href="${m.pdf}" target="_blank" rel="noopener">Buka PDF</a></td></tr>`).join('')
+    + '</tbody></table></div>';
 }
 
 /** Kas cadangan: uang yang sudah dipindah keluar dari wallet kerja bot. */
@@ -1354,7 +1386,9 @@ function renderAbout() {
     ['Fee investor', Number(d.investorFeePct) > 0
       ? `${d.investorFeePct}% dari bagian dividen tiap investor`
       : `${d.investorFeeStandardPct || 10}% dari bagian dividen tiap investor — gratis selama masa perkenalan`],
-    ['Dividen', `tiap tanggal ${Number(d.payDayOfMonth) || 1} — laba dikurangi biaya sistem, ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct ?? 30}% kembali ke dana`],
+    ['Dividen', Number(d.reinvestPct) > 0
+      ? `tiap tanggal ${Number(d.payDayOfMonth) || 1} — laba dikurangi biaya sistem, ${d.distributePct ?? 70}% dibagikan menurut porsi saham, ${d.reinvestPct}% kembali ke dana`
+      : `tiap tanggal ${Number(d.payDayOfMonth) || 1} — yang ditarik sebulan dikurangi biaya sistem, ${d.distributePct ?? 100}% dibagikan menurut porsi saham`],
   ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
 
   $('#aboutTreHint').textContent = Number(state.nav?.treasuryUsd) > 0
@@ -1392,9 +1426,12 @@ function renderDividend() {
     row('Biaya sistem', minus(Math.min(plan.costs, plan.gross)),
       plan.costsFromFund > 0
         ? `${usd(plan.costs, 0)} per bulan — laba belum cukup, ${usd(plan.costsFromFund)} sisanya dari dana`
-        : `${usd(plan.costs, 0)} per bulan: MiniMax, Claude, VPS, RPC, LP Agent`),
-    row('Laba bersih', usd(plan.net), plan.net > 0 ? 'yang dibagi dua di bawah ini' : 'tidak ada yang dibagikan bulan ini', 'sub'),
-    row(`Kembali ke dana (${plan.reinvestPct}%)`, minus(plan.reinvest), 'tetap bekerja dan menaikkan harga saham semua orang'),
+        : `${usd(plan.costs, 0)} per bulan: ${(state.cfg?.costs?.items || []).map((i) => i.name).join(', ')}`),
+    row('Laba bersih', usd(plan.net), plan.net > 0
+      ? (plan.reinvestPct > 0 ? 'yang dibagi dua di bawah ini' : 'dibagikan seluruhnya') : 'tidak ada yang dibagikan bulan ini', 'sub'),
+    plan.reinvestPct > 0
+      ? row(`Kembali ke dana (${plan.reinvestPct}%)`, minus(plan.reinvest), 'tetap bekerja dan menaikkan harga saham semua orang')
+      : '',
     row(`Dibagikan (${plan.distributePct}%)`, usd(plan.distributed), 'dibagi menurut porsi saham', 'sub'),
     row(`Fee investor (${plan.feePct > 0 ? plan.feePct : plan.standardFeePct}%)`,
       plan.feePct > 0 ? minus(plan.fee) : '<span class="free">GRATIS</span>',
@@ -1427,9 +1464,13 @@ function renderDividend() {
     <p><strong>Biaya sistem dibayar lebih dulu.</strong> MiniMax, Claude, VPS, RPC, dan LP Agent
        adalah ongkos yang membuat bot bekerja, jadi dipotong dari laba sebelum apa pun dibagi. Kalau
        labanya belum cukup menutup biaya, sisanya diambil dari dana.</p>
-    <p><strong>${plan.distributePct}% dibagikan, ${plan.reinvestPct}% kembali ke dana.</strong>
+    ${plan.reinvestPct > 0
+      ? `<p><strong>${plan.distributePct}% dibagikan, ${plan.reinvestPct}% kembali ke dana.</strong>
        Bagian yang kembali tidak hilang: ia tetap milik semua pemegang saham menurut porsinya, dan
-       menaikkan harga saham sehingga modal tiap orang ikut tumbuh tanpa perlu menyetor lagi.</p>
+       menaikkan harga saham sehingga modal tiap orang ikut tumbuh tanpa perlu menyetor lagi.</p>`
+      : `<p><strong>${plan.distributePct}% dibagikan, tidak ada yang mengendap.</strong>
+       Bot bekerja dengan modal tetap, jadi laba tidak perlu ditahan untuk membesarkan dana. Semua
+       yang tersisa setelah biaya dibagi menurut porsi saham — pemegang 3% menerima 3%.</p>`}
     <p><strong>Fee investor ${plan.standardFeePct}% — ${plan.feePct > 0 ? 'berlaku' : 'saat ini gratis'}.</strong>
        ${plan.feePct > 0
         ? `Dipotong dari bagian dividen tiap investor sebelum dibayarkan.`
@@ -2043,7 +2084,7 @@ function renderAnalisa() {
             </tr>`).join('')}</tbody>
         </table></div>
         <p class="hint" style="margin-top:12px">Nilai dana berhenti di sekitar plafon karena aturan dananya ikut dijalankan:
-          tiap bulan biaya dipotong, ${f.scenarios.normal.dividend.distributed >= 0 ? '70% laba dibagikan keluar' : 'laba dibagikan keluar'},
+          tiap bulan biaya dipotong, ${Number(state.cfg?.dividend?.distributePct ?? 70)}% laba dibagikan keluar,
           dan modal di atas plafon tidak ikut diputar. Yang menumpuk adalah dividen yang sudah diterima, bukan saldo dananya.</p>
       </section>
 
@@ -2179,6 +2220,7 @@ function renderAll() {
   renderDividend();
   renderRules();
   renderTreasury();
+  renderReports();
   renderAbout();
   renderNavChart();
   renderProfit();

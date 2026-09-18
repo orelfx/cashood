@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<title>Laporan Dividen Reborn Rich — September 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #0b1220; --ink2: #334155; --mute: #64748b; --line: #e2e8f0; --soft: #f5f7fb;
+    --navy: #0b1220; --navy2: #16213a; --gold: #d4a64a; --green: #0f9d63; --green-soft: #e8f7f0; --red: #c2413b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 210mm; height: 297mm; }
+  body { font-family: Inter, system-ui, sans-serif; color: var(--ink); font-size: 9.2pt; line-height: 1.45;
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; }
+  .page { width: 210mm; height: 297mm; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+  header { background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%); color: #fff; padding: 11mm 14mm 9mm; position: relative; }
+  header::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1.2mm; background: linear-gradient(90deg, var(--gold), #f3d48a 50%, var(--gold)); }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand { display: flex; align-items: center; gap: 3.5mm; }
+  .mark { width: 11mm; height: 11mm; border-radius: 2.6mm; background: linear-gradient(135deg, var(--gold), #f0cf7f);
+          color: var(--navy); display: grid; place-items: center; font-weight: 800; font-size: 15pt; }
+  .brand h1 { font-size: 13.5pt; font-weight: 800; letter-spacing: 0.02em; }
+  .brand p { font-size: 7.6pt; color: #aab6cc; letter-spacing: 0.04em; margin-top: 0.5mm; }
+  .doc { text-align: right; }
+  .doc .kind { font-size: 7.4pt; letter-spacing: 0.18em; color: var(--gold); font-weight: 700; }
+  .doc h2 { font-size: 15pt; font-weight: 800; margin-top: 1mm; }
+  .doc p { font-size: 8pt; color: #c3cde0; margin-top: 0.6mm; }
+  .meta { display: flex; gap: 8mm; margin-top: 7mm; font-size: 7.6pt; color: #aab6cc; }
+  .meta b { display: block; color: #fff; font-size: 9pt; font-weight: 600; margin-top: 0.4mm; }
+  .stamp { position: absolute; right: 14mm; top: 36mm; border: 0.5mm solid var(--gold); color: var(--gold);
+           padding: 1mm 3mm; border-radius: 1mm; font-size: 7pt; font-weight: 800; letter-spacing: 0.16em; transform: rotate(-2deg); }
+
+  main { padding: 7mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 5.5mm; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
+  .tile { border: 0.3mm solid var(--line); border-radius: 2.2mm; padding: 3.4mm 3.6mm; background: #fff; }
+  .tile .k { font-size: 6.9pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
+  .tile .v { font-size: 14pt; font-weight: 700; margin-top: 1.2mm; }
+  .tile .s { font-size: 7.6pt; color: var(--mute); margin-top: 0.4mm; }
+  .tile.neg .v { color: var(--red); }
+  .tile.hero { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .tile.hero .k { color: var(--gold); } .tile.hero .s { color: #aab6cc; } .tile.hero .v { color: #fff; }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 3mm; background: var(--soft); border-radius: 2.2mm;
+          padding: 2.6mm 4mm; font-size: 8.6pt; color: var(--ink2); }
+  .flow .op { color: var(--mute); font-weight: 700; }
+  .flow .res { color: var(--green); font-weight: 700; }
+
+  .two { display: grid; grid-template-columns: 1.05fr 1fr; gap: 5mm; }
+  h3 { font-size: 7.6pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); font-weight: 700; margin-bottom: 2mm; }
+  table { width: 100%; border-collapse: collapse; }
+  .costs td { padding: 1.35mm 0; border-bottom: 0.25mm solid var(--line); }
+  .costs td:last-child { text-align: right; }
+  .costs tr.total td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 1.8mm; }
+  .rules { list-style: none; display: grid; gap: 1.6mm; }
+  .rules li { display: grid; grid-template-columns: 4.2mm 1fr; gap: 1.5mm; color: var(--ink2); }
+  .rules li span { width: 4.2mm; height: 4.2mm; border-radius: 50%; background: var(--navy); color: #fff; font-size: 6.4pt;
+                   font-weight: 700; display: grid; place-items: center; margin-top: 0.2mm; }
+  .fee { margin-top: 3mm; display: flex; align-items: center; justify-content: space-between; border: 0.3mm dashed var(--green);
+         background: var(--green-soft); border-radius: 2mm; padding: 2.4mm 3.2mm; }
+  .fee .was { color: var(--mute); text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 0.4mm; font-weight: 600; }
+  .fee .now { color: var(--green); font-weight: 800; letter-spacing: 0.08em; font-size: 9.5pt; }
+  .fee small { display: block; color: var(--ink2); font-size: 7.2pt; margin-top: 0.3mm; }
+
+  .holders th { font-size: 6.9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); font-weight: 700;
+                text-align: right; padding: 2mm 2mm; border-bottom: 0.4mm solid var(--ink); }
+  .holders th:first-child, .holders td:first-child { text-align: left; }
+  .holders td { padding: 2.5mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
+  .holders tbody tr:nth-child(odd) td { background: #fafbfd; }
+  .holders .who { font-weight: 600; }
+  .holders .bar { height: 1.2mm; background: var(--line); border-radius: 1mm; margin-top: 1mm; width: 26mm; overflow: hidden; }
+  .holders .bar i { display: block; height: 100%; background: var(--gold); }
+  .holders .struck { color: var(--mute); text-decoration: line-through; text-decoration-color: var(--red); }
+  .holders .free { color: var(--green); font-weight: 700; font-size: 7.2pt; margin-left: 1mm; }
+  .holders .get { color: var(--green); font-weight: 700; }
+  .holders tfoot td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 2.6mm; background: #fff; }
+
+  footer { padding: 5mm 14mm 8mm; margin-top: auto; }
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; font-size: 7.3pt; color: var(--mute); border-top: 0.25mm solid var(--line); padding-top: 3.5mm; }
+  .notes b { color: var(--ink2); }
+  .base { display: flex; justify-content: space-between; margin-top: 4mm; font-size: 7pt; color: var(--mute); }
+  .base .site { color: var(--ink); font-weight: 700; letter-spacing: 0.04em; }
+</style></head>
+<body><div class="page">
+<header>
+  <div class="top">
+    <div class="brand"><div class="mark">C</div><div>
+      <h1>CASHOOD HEADFUND</h1><p>Private AI Liquidity Provider · Robinhood Chain</p></div></div>
+    <div class="doc"><div class="kind">LAPORAN PEMBAGIAN DIVIDEN</div>
+      <h2>Reborn Rich</h2><p>Periode September 2026</p></div>
+  </div>
+  <div class="meta">
+    <div>Tanggal pembayaran<b>1 Oktober 2026</b></div>
+    <div>Kurs yang dipakai<b class="num">1 USD = Rp 17.650</b></div>
+    <div>Pemegang saham<b>4 orang</b></div>
+    <div>Porsi dibagikan<b>100% laba bersih</b></div>
+  </div>
+  <div class="stamp">CONTOH PERHITUNGAN</div>
+</header>
+
+<main>
+  <div class="tiles">
+    <div class="tile"><div class="k">Modal kerja dana</div><div class="v num">$9,300</div><div class="s num">Rp 164.145.000</div></div>
+    <div class="tile"><div class="k">Ditarik bulan ini</div><div class="v num">$1,000</div><div class="s num">Rp 17.650.000</div></div>
+    <div class="tile neg"><div class="k">Biaya sistem</div><div class="v num">−$250</div><div class="s num">−Rp 4.412.500</div></div>
+    <div class="tile hero"><div class="k">Dibagikan</div><div class="v num">$750</div><div class="s num">Rp 13.237.500</div></div>
+  </div>
+
+  <div class="flow">
+    <span>Ditarik <b class="num">$1,000.00</b></span><span class="op">−</span>
+    <span>biaya sistem <b class="num">$250.00</b></span><span class="op">=</span>
+    <span class="res num">$750.00</span><span class="op">→</span>
+    <span><b>100%</b> dibagikan ke seluruh pemegang saham sesuai porsinya</span>
+  </div>
+
+  <div class="two">
+    <div>
+      <h3>Rincian biaya sistem bulanan</h3>
+      <table class="costs"><tbody>
+        <tr><td>MiniMax high</td><td class="num">$50.00</td></tr><tr><td>Claude</td><td class="num">$100.00</td></tr><tr><td>VPS</td><td class="num">$15.00</td></tr><tr><td>RPC</td><td class="num">$50.00</td></tr><tr><td>LP Agent</td><td class="num">$20.00</td></tr><tr><td>Bridge jaringan ETH + price impact</td><td class="num">$15.00</td></tr>
+        <tr class="total"><td>Total biaya</td><td class="num">$250.00</td></tr>
+      </tbody></table>
+    </div>
+    <div>
+      <h3>Cara pembagian</h3>
+      <ul class="rules">
+        <li><span>1</span><div>Bot bekerja dengan modal tetap. Setiap kelebihan di atasnya ditarik harian dalam kelipatan $100.</div></li>
+        <li><span>2</span><div>Tanggal 1, total yang ditarik sebulan dikurangi biaya sistem.</div></li>
+        <li><span>3</span><div>Sisanya dibagikan <b>100%</b> menurut porsi saham — sekecil apa pun porsinya, tanpa bagian yang mengendap.</div></li>
+      </ul>
+      <div class="fee"><div><span class="was">Fee admin 15%</span><small>dari bagian tiap pemegang saham</small></div>
+        <div class="now">GRATIS BULAN INI</div></div>
+    </div>
+  </div>
+
+  <div>
+    <h3>Pembagian per pemegang saham</h3>
+    <table class="holders">
+      <thead><tr><th>Pemegang saham</th><th>Porsi</th><th>Bagian</th><th>Fee admin 15%</th><th>Diterima (USD)</th><th>Diterima (IDR)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="who">Orel</div><div class="bar"><i style="width:64.26%"></i></div></td>
+          <td class="num">64,26%</td>
+          <td class="num">$481.96</td>
+          <td class="num"><span class="struck">−$72.29</span><span class="free">FREE</span></td>
+          <td class="num get">$481.96</td>
+          <td class="num get">Rp 8.506.594</td></tr><tr>
+          <td><div class="who">A$</div><div class="bar"><i style="width:21.42%"></i></div></td>
+          <td class="num">21,42%</td>
+          <td class="num">$160.65</td>
+          <td class="num"><span class="struck">−$24.10</span><span class="free">FREE</span></td>
+          <td class="num get">$160.65</td>
+          <td class="num get">Rp 2.835.473</td></tr><tr>
+          <td><div class="who">Nomen</div><div class="bar"><i style="width:11.13%"></i></div></td>
+          <td class="num">11,13%</td>
+          <td class="num">$83.44</td>
+          <td class="num"><span class="struck">−$12.52</span><span class="free">FREE</span></td>
+          <td class="num get">$83.44</td>
+          <td class="num get">Rp 1.472.716</td></tr><tr>
+          <td><div class="who">C Winata</div><div class="bar"><i style="width:3.19%"></i></div></td>
+          <td class="num">3,19%</td>
+          <td class="num">$23.95</td>
+          <td class="num"><span class="struck">−$3.59</span><span class="free">FREE</span></td>
+          <td class="num get">$23.95</td>
+          <td class="num get">Rp 422.717</td></tr>
+      </tbody>
+      <tfoot><tr><td>Total</td><td class="num">100,00%</td><td class="num">$750.00</td>
+        <td class="num"><span class="struck">−$112.50</span><span class="free">FREE</span></td>
+        <td class="num get">$750.00</td><td class="num get">Rp 13.237.500</td></tr></tfoot>
+    </table>
+  </div>
+</main>
+
+<footer>
+  <div class="notes">
+    <div><b>Kurs.</b> Nilai rupiah memakai kurs yang ditetapkan pengelola, 1 USD = Rp 17.650, bukan kurs pasar. Dana dikirim dalam USD; rupiah yang diterima dapat berbeda mengikuti kurs saat pencairan.</div>
+    <div><b>Catatan.</b> Data aktual profit bisa berbeda karena gas fee yang fluktuatif, slippage, price impact, dan biaya bridge. Porsi saham dihitung dengan metode unit dan dapat diperiksa di cashood.id. <b>Dokumen ini adalah contoh perhitungan.</b></div>
+  </div>
+  <div class="base"><span class="site">cashood.id</span><span>Dibuat 18 September 2026 pukul 13.57 WIB</span></div>
+</footer>
+</div></body></html>
