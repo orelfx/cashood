@@ -91,25 +91,26 @@ const feeGain = Math.max(0, useSeries ? interest - num(first.fee) : interest);
 const perDay = feeGain / spanDays;
 const apyActualPct = principal > 0 ? (perDay / principal) * 365 * 100 : null;
 
-// ─── batas bunga: 0%–3% setahun (aturan pemilik, 2026-09-19) ─────────────
-// Laju yang terukur boleh 6% atau 60%; yang ditampilkan paling tinggi 3%.
-// Laju tidak pernah minus: fee tidak bisa negatif, dan rugi harga (termasuk
-// impermanent loss) memang tidak dihitung sebagai bunga — paling rendah 0%.
+// ─── batas bunga: 0%–3% PER BULAN (aturan pemilik, 2026-09-19) ───────────
+// Laju yang terukur boleh 5% atau 10% sebulan; yang ditampilkan paling tinggi
+// 3% sebulan. Laju tidak pernah minus: fee tidak bisa negatif, dan rugi harga
+// (termasuk impermanent loss) memang tidak dihitung sebagai bunga — paling
+// rendah 0%. Satu bulan = 30 hari, sama dengan "bunga per bulan" di halaman.
 //
 // Batasnya dikenakan pada DUA hal, bukan hanya pada persentasenya: bunga yang
-// terkumpul juga tidak boleh melebihi yang dihasilkan 3% setahun sejak Safe Box
-// dibuka. Kalau hanya APY yang dikunci, saldo tetap tumbuh secepat fee aslinya
-// dan angka "3% setahun" tidak akan cocok dengan saldonya sendiri.
-const minApy = Number.isFinite(Number(cfg.rate?.minApyPct)) ? Number(cfg.rate.minApyPct) : 0;
-const maxApy = Number.isFinite(Number(cfg.rate?.maxApyPct)) ? Number(cfg.rate.maxApyPct) : Infinity;
-const clampApy = (v) => Math.min(maxApy, Math.max(minApy, v));
-const apyPct = apyActualPct == null ? null : clampApy(apyActualPct);
-const perDayShown = principal > 0 && apyPct != null ? (principal * apyPct / 100) / 365 : 0;
-const monthlyPct = principal > 0 && apyPct != null ? apyPct * 30 / 365 : null;
+// terkumpul juga tidak boleh melebihi yang dihasilkan 3% sebulan sejak Safe
+// Box dibuka. Kalau hanya lajunya yang dikunci, saldo tetap tumbuh secepat fee
+// aslinya dan angka "3% sebulan" tidak akan cocok dengan saldonya sendiri.
+const monthlyActualPct = principal > 0 ? (perDay * 30 / principal) * 100 : null;
+const minMonthly = Number.isFinite(Number(cfg.rate?.minMonthlyPct)) ? Number(cfg.rate.minMonthlyPct) : 0;
+const maxMonthly = Number.isFinite(Number(cfg.rate?.maxMonthlyPct)) ? Number(cfg.rate.maxMonthlyPct) : Infinity;
+const monthlyPct = monthlyActualPct == null ? null : Math.min(maxMonthly, Math.max(minMonthly, monthlyActualPct));
+const apyPct = monthlyPct == null ? null : monthlyPct * 365 / 30;
+const perDayShown = principal > 0 && monthlyPct != null ? (principal * monthlyPct / 100) / 30 : 0;
 
 const ageDays = Math.max(0, (now - startedAt) / 86400e3);
-const interestCap = principal * (maxApy / 100) * ageDays / 365;
-const interestFloor = principal * (minApy / 100) * ageDays / 365;
+const interestCap = principal * (maxMonthly / 100) * ageDays / 30;
+const interestFloor = principal * (minMonthly / 100) * ageDays / 30;
 const interestShown = Math.min(Number.isFinite(interestCap) ? interestCap : interest, Math.max(interestFloor, interest));
 
 const snapshot = {
@@ -132,9 +133,10 @@ const snapshot = {
     monthlyPct: monthlyPct == null ? null : Number(monthlyPct.toFixed(2)),
     apyPct: apyPct == null ? null : Number(apyPct.toFixed(2)),
     apyActualPct: apyActualPct == null ? null : Number(apyActualPct.toFixed(2)),
-    minApyPct: minApy,
-    maxApyPct: Number.isFinite(maxApy) ? maxApy : null,
-    capped: apyActualPct != null && apyActualPct > maxApy,
+    monthlyActualPct: monthlyActualPct == null ? null : Number(monthlyActualPct.toFixed(2)),
+    minMonthlyPct: minMonthly,
+    maxMonthlyPct: Number.isFinite(maxMonthly) ? maxMonthly : null,
+    capped: monthlyActualPct != null && monthlyActualPct > maxMonthly,
     since: new Date((useSeries ? first.t : startedAt) + WIB).toISOString().slice(0, 10),
     basis: useSeries ? 'pertumbuhan fee tercatat' : 'seluruh fee sejak posisi dibuka',
   },
@@ -147,6 +149,6 @@ mkdirSync(DIR, { recursive: true });
 writeFileSync(resolve(DIR, 'live.json'), JSON.stringify(snapshot, null, 2) + '\n');
 console.log(`[safebox] nilai $${snapshot.valueUsd} · bunga $${snapshot.interestUsd}`
   + ` · ${snapshot.measure.perDayUsd}/hari · bulanan ${snapshot.measure.monthlyPct}% · APY ${snapshot.measure.apyPct}%`
-  + ` (terukur ${snapshot.measure.apyActualPct}%, bunga asli $${snapshot.interestActualUsd})`
+  + ` (terukur ${snapshot.measure.monthlyActualPct}%/bulan, bunga asli $${snapshot.interestActualUsd})`
   + ` (diukur ${snapshot.measure.spanDays} hari)`);
 process.exit(0);
