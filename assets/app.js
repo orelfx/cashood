@@ -1939,9 +1939,11 @@ function renderSafebox() {
             <div class="v">${usd(rate.perDayUsd, 4)}</div>
             <div class="n">diukur ${rate.spanDays} hari · ${rate.basis || 'fee tercatat'}</div></div>
         </div>
-        <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>: besarnya mengikuti fee yang
-          dihasilkan posisi likuiditas ini, dan fee mengikuti ramainya perdagangan. Angka di atas dihitung ulang
-          tiap sepuluh menit dari fee yang benar-benar tercatat, bukan dari janji persentase.</p>
+        <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>, tapi selalu di antara
+          <strong>${pct(rate.minApyPct ?? 0, 0)} dan ${rate.maxApyPct == null ? '—' : pct(rate.maxApyPct, 0)} setahun</strong>.
+          Besarnya mengikuti fee yang dihasilkan posisi likuiditas ini dan dihitung ulang tiap sepuluh menit. Saat
+          fee sedang tinggi, bunganya berhenti di batas atas; saat pasar sedang turun, bunganya berhenti di
+          ${pct(rate.minApyPct ?? 0, 0)} dan tidak pernah minus.</p>
       </section>
 
       <section class="card">

@@ -89,8 +89,28 @@ const useSeries = first && seriesDays >= 1;
 const spanDays = Math.max(0.5, useSeries ? seriesDays : (now - startedAt) / 86400e3);
 const feeGain = Math.max(0, useSeries ? interest - num(first.fee) : interest);
 const perDay = feeGain / spanDays;
-const apyPct = principal > 0 ? (perDay / principal) * 365 * 100 : null;
-const monthlyPct = principal > 0 ? (perDay * 30 / principal) * 100 : null;
+const apyActualPct = principal > 0 ? (perDay / principal) * 365 * 100 : null;
+
+// ─── batas bunga: 0%–3% setahun (aturan pemilik, 2026-09-19) ─────────────
+// Laju yang terukur boleh 6% atau 60%; yang ditampilkan paling tinggi 3%.
+// Laju tidak pernah minus: fee tidak bisa negatif, dan rugi harga (termasuk
+// impermanent loss) memang tidak dihitung sebagai bunga — paling rendah 0%.
+//
+// Batasnya dikenakan pada DUA hal, bukan hanya pada persentasenya: bunga yang
+// terkumpul juga tidak boleh melebihi yang dihasilkan 3% setahun sejak Safe Box
+// dibuka. Kalau hanya APY yang dikunci, saldo tetap tumbuh secepat fee aslinya
+// dan angka "3% setahun" tidak akan cocok dengan saldonya sendiri.
+const minApy = Number.isFinite(Number(cfg.rate?.minApyPct)) ? Number(cfg.rate.minApyPct) : 0;
+const maxApy = Number.isFinite(Number(cfg.rate?.maxApyPct)) ? Number(cfg.rate.maxApyPct) : Infinity;
+const clampApy = (v) => Math.min(maxApy, Math.max(minApy, v));
+const apyPct = apyActualPct == null ? null : clampApy(apyActualPct);
+const perDayShown = principal > 0 && apyPct != null ? (principal * apyPct / 100) / 365 : 0;
+const monthlyPct = principal > 0 && apyPct != null ? apyPct * 30 / 365 : null;
+
+const ageDays = Math.max(0, (now - startedAt) / 86400e3);
+const interestCap = principal * (maxApy / 100) * ageDays / 365;
+const interestFloor = principal * (minApy / 100) * ageDays / 365;
+const interestShown = Math.min(Number.isFinite(interestCap) ? interestCap : interest, Math.max(interestFloor, interest));
 
 const snapshot = {
   updatedAt: now,
@@ -98,16 +118,23 @@ const snapshot = {
   venue: cfg.position.venue || 'LP',
   principalUsd: Number(principal.toFixed(2)),
   valueUsd: Number(valueUsd.toFixed(2)),
-  interestUsd: Number(interest.toFixed(4)),
+  interestUsd: Number(interestShown.toFixed(4)),
+  // Fee yang benar-benar dihasilkan, sebelum dibatasi — untuk pemilik, tidak tampil.
+  interestActualUsd: Number(interest.toFixed(4)),
   unclaimedUsd: Number(unclaimedUsd.toFixed(4)),
   collectedUsd: Number(book.collectedUsd.toFixed(4)),
-  balanceUsd: Number((principal + interest).toFixed(2)),
+  balanceUsd: Number((principal + interestShown).toFixed(2)),
   inRange: pos.inRange === true,
   measure: {
     spanDays: Number(spanDays.toFixed(2)),
-    perDayUsd: Number(perDay.toFixed(4)),
+    perDayUsd: Number(perDayShown.toFixed(4)),
+    perDayActualUsd: Number(perDay.toFixed(4)),
     monthlyPct: monthlyPct == null ? null : Number(monthlyPct.toFixed(2)),
     apyPct: apyPct == null ? null : Number(apyPct.toFixed(2)),
+    apyActualPct: apyActualPct == null ? null : Number(apyActualPct.toFixed(2)),
+    minApyPct: minApy,
+    maxApyPct: Number.isFinite(maxApy) ? maxApy : null,
+    capped: apyActualPct != null && apyActualPct > maxApy,
     since: new Date((useSeries ? first.t : startedAt) + WIB).toISOString().slice(0, 10),
     basis: useSeries ? 'pertumbuhan fee tercatat' : 'seluruh fee sejak posisi dibuka',
   },
@@ -120,5 +147,6 @@ mkdirSync(DIR, { recursive: true });
 writeFileSync(resolve(DIR, 'live.json'), JSON.stringify(snapshot, null, 2) + '\n');
 console.log(`[safebox] nilai $${snapshot.valueUsd} · bunga $${snapshot.interestUsd}`
   + ` · ${snapshot.measure.perDayUsd}/hari · bulanan ${snapshot.measure.monthlyPct}% · APY ${snapshot.measure.apyPct}%`
+  + ` (terukur ${snapshot.measure.apyActualPct}%, bunga asli $${snapshot.interestActualUsd})`
   + ` (diukur ${snapshot.measure.spanDays} hari)`);
 process.exit(0);
