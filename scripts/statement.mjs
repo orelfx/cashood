@@ -55,6 +55,7 @@ const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', '
 const periodLabel = `${BULAN[pm - 1]} ${py}`;
 const payLabel = `${payDate.getUTCDate()} ${BULAN[payDate.getUTCMonth()]} ${payDate.getUTCFullYear()}`;
 
+const payLabelShort = (iso) => iso ? `${Number(iso.slice(8, 10))} ${BULAN[Number(iso.slice(5, 7)) - 1]}` : '';
 const cfg = JSON.parse(readFileSync(resolve(ROOT, 'data', fund, 'config.json'), 'utf8'));
 const funds = JSON.parse(readFileSync(resolve(ROOT, 'data', 'funds.json'), 'utf8'));
 const fundMeta = (funds.funds || []).find((f) => f.id === fund) || {};
@@ -89,46 +90,83 @@ const feeStd = Number(d.investorFeeStandardPct) || 0;
 const feeNow = Number(d.investorFeePct) || 0;
 const distributePct = Number(d.distributePct ?? 100);
 
-const net = Math.max(0, withdrawn - costsUsd);
-const pool = net * distributePct / 100;
+// ─── laba dibagi per LAPISAN ─────────────────────────────────────────────
+//
+// Pertanyaan pemilik, 2026-09-20: "$1.100 itu dihasilkan waktu Fanfuy dan Si
+// Nakal belum masuk — masa mereka ikut dapat?" Tidak. Tiap potong laba dibagi
+// menurut porsi saham SAAT laba itu dihasilkan, bukan porsi hari pembayaran.
+//
+//   lapis 1  laba yang dihasilkan SEBELUM `--new-since`, sebesar `--legacy-usd`
+//            -> dibagi menurut buku lama (uang baru belum ada di sana)
+//   lapis 2  sisanya, yang dihasilkan sesudah uang baru masuk
+//            -> dibagi menurut buku sekarang, semua orang ikut
+//
+// Biaya sistem dipotong dari kedua lapis menurut besarnya masing-masing, jadi
+// tidak ada satu kelompok pun yang menanggung ongkos bulan itu sendirian.
+//
+// Tanpa --legacy-usd, seluruh laba masuk satu lapis: buku lama kalau ada
+// --new-since, buku sekarang kalau tidak.
+const legacyUsd = Number(arg('legacy-usd'));
+const hasLayers = cutoffMs && Number.isFinite(legacyUsd) && legacyUsd > 0 && legacyUsd < withdrawn;
 
-// Sen dibagi dengan sisa terbesar, supaya jumlah baris = total persis.
-const owners = ledger.owners.filter((o) => o.units > 0);
-// Pemilik yang seluruh setorannya baru: tampil dengan $0, bukan dihilangkan.
-const waiting = cutoffMs
-  ? fullLedger.owners.filter((o) => o.units > 0 && !owners.some((e) => e.name === o.name))
-  : [];
-const cents = Math.round(pool * 100);
-const raw = owners.map((o) => ({ o, exact: (o.units / ledger.totalUnits) * cents }));
-const base = raw.map((r) => Math.floor(r.exact));
-let left = cents - base.reduce((s, c) => s + c, 0);
-raw.map((r, i) => ({ i, frac: r.exact - base[i] })).sort((a, b) => b.frac - a.frac)
-  .forEach(({ i }) => { if (left > 0) { base[i] += 1; left -= 1; } });
+const layers = hasLayers
+  ? [
+    { key: 'lama', label: `dihasilkan sebelum ${payLabelShort(newSince)}`, grossUsd: legacyUsd, ledger },
+    { key: 'baru', label: `dihasilkan sejak ${payLabelShort(newSince)}`, grossUsd: withdrawn - legacyUsd, ledger: fullLedger },
+  ]
+  : [{ key: 'tunggal', label: 'laba bulan ini', grossUsd: withdrawn, ledger }];
 
-const rows = raw.map((r, i) => {
-  const gross = base[i] / 100;
+for (const L of layers) {
+  L.costUsd = withdrawn > 0 ? costsUsd * (L.grossUsd / withdrawn) : 0;
+  L.netUsd = Math.max(0, L.grossUsd - L.costUsd) * distributePct / 100;
+  L.shares = L.ledger.owners.filter((o) => o.units > 0)
+    .map((o) => ({ name: o.name, share: o.units / L.ledger.totalUnits }));
+}
+
+// Sen dibagi dengan sisa terbesar per lapis, supaya jumlah baris = total persis.
+const share = (amountUsd, shares) => {
+  const cents = Math.round(amountUsd * 100);
+  const exact = shares.map((x) => x.share * cents);
+  const floorC = exact.map(Math.floor);
+  let left = cents - floorC.reduce((a, b) => a + b, 0);
+  exact.map((v, i) => ({ i, frac: v - floorC[i] })).sort((a, b) => b.frac - a.frac)
+    .forEach(({ i }) => { if (left > 0) { floorC[i] += 1; left -= 1; } });
+  return Object.fromEntries(shares.map((x, i) => [x.name, floorC[i] / 100]));
+};
+for (const L of layers) L.cut = share(L.netUsd, L.shares);
+
+const namesAll = [...new Set(fullLedger.owners.filter((o) => o.units > 0).map((o) => o.name))];
+const rows = namesAll.map((name) => {
+  const parts = layers.map((L) => ({
+    key: L.key,
+    label: L.label,
+    share: (L.shares.find((x) => x.name === name)?.share ?? 0) * 100,
+    usd: L.cut[name] ?? 0,
+  }));
+  const gross = parts.reduce((sum, x) => sum + x.usd, 0);
   const feeStdUsd = gross * feeStd / 100;
   const feeUsd = gross * feeNow / 100;
   const netUsd = gross - feeUsd;
-  return { name: r.o.name, share: (r.o.units / ledger.totalUnits) * 100, gross, feeStdUsd, feeUsd, netUsd, idr: Math.round(netUsd * rate) };
-}).sort((a, b) => b.share - a.share)
-  .concat(waiting.map((o) => ({
-    name: o.name, share: 0, gross: 0, feeStdUsd: 0, feeUsd: 0, netUsd: 0, idr: 0, waiting: true,
-  })));
+  const nowShare = (fullLedger.owners.find((o) => o.name === name)?.units ?? 0) / fullLedger.totalUnits * 100;
+  return { name, parts, share: nowShare, gross, feeStdUsd, feeUsd, netUsd, idr: 0, waiting: gross === 0 };
+}).sort((a, b) => b.netUsd - a.netUsd || b.share - a.share);
 
-// Rupiah juga dibagi dengan sisa terbesar: dibulatkan per baris, empat baris
+// Rupiah juga dibagi dengan sisa terbesar: dibulatkan per baris, beberapa baris
 // bisa selisih Rp 1 dari kotak "Dibagikan" di atas — kecil, tapi di laporan
 // uang, angka yang tidak cocok adalah angka yang dicurigai.
 {
   const payable = rows.filter((r) => !r.waiting);
   const targetIdr = Math.round(payable.reduce((s, r) => s + r.netUsd, 0) * rate);
   const exact = payable.map((r) => r.netUsd * rate);
-  const floor = exact.map(Math.floor);
-  let rest = targetIdr - floor.reduce((s, v) => s + v, 0);
-  exact.map((v, i) => ({ i, frac: v - floor[i] })).sort((a, b) => b.frac - a.frac)
-    .forEach(({ i }) => { if (rest > 0) { floor[i] += 1; rest -= 1; } });
-  payable.forEach((r, i) => { r.idr = floor[i]; });
+  const floorR = exact.map(Math.floor);
+  let rest = targetIdr - floorR.reduce((s, v) => s + v, 0);
+  exact.map((v, i) => ({ i, frac: v - floorR[i] })).sort((a, b) => b.frac - a.frac)
+    .forEach(({ i }) => { if (rest > 0) { floorR[i] += 1; rest -= 1; } });
+  payable.forEach((r, i) => { r.idr = floorR[i]; });
 }
+
+const pool = layers.reduce((s, L) => s + L.netUsd, 0);
+const net = Math.max(0, withdrawn - costsUsd);
 
 const totalNet = rows.reduce((s, r) => s + r.netUsd, 0);
 const totalIdr = rows.reduce((s, r) => s + r.idr, 0);
@@ -178,10 +216,24 @@ const html = `<!doctype html>
     --navy: #0b1220; --navy2: #16213a; --gold: #d4a64a; --green: #0f9d63; --green-soft: #e8f7f0; --red: #c2413b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 210mm; height: 297mm; }
+  html, body { width: 210mm; }
   body { font-family: Inter, system-ui, sans-serif; color: var(--ink); font-size: 9.2pt; line-height: 1.45;
          -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; }
   .page { width: 210mm; height: 297mm; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .page + .page { page-break-before: always; break-before: page; }
+  .p2 main { gap: 4mm; }
+  .p2 header { padding: 7mm 14mm 5mm; }
+  .layers { width: 100%; border-collapse: collapse; }
+  .layers th { font-size: 6.9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); font-weight: 700; text-align: right; padding: 2mm; border-bottom: 0.4mm solid var(--ink); }
+  .layers th:first-child, .layers td:first-child { text-align: left; }
+  .layers td { padding: 2.2mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
+  .layers tbody tr:last-child td { border-bottom: 0; border-top: 0.4mm solid var(--ink); }
+  .layers .who { font-weight: 600; }
+  .layers .zero { color: var(--mute); }
+  .steps { display: grid; gap: 2mm; font-size: 8.4pt; color: var(--ink2); }
+  .steps .step { display: grid; grid-template-columns: 5mm 1fr; gap: 2mm; align-items: start; }
+  .steps .n { width: 5mm; height: 5mm; border-radius: 50%; background: var(--navy); color: #fff; font-size: 7pt; font-weight: 700; display: grid; place-items: center; }
+  .callout { background: var(--soft); border-left: 1mm solid var(--gold); border-radius: 1.5mm; padding: 3mm 4mm; font-size: 8.4pt; color: var(--ink2); }
   .num { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
   header { background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%); color: #fff; padding: 11mm 14mm 9mm; position: relative; }
@@ -263,12 +315,12 @@ const html = `<!doctype html>
   .base { display: flex; justify-content: space-between; margin-top: 4mm; font-size: 7pt; color: var(--mute); }
   .base .site { color: var(--ink); font-weight: 700; letter-spacing: 0.04em; }
 </style></head>
-<body><div class="page">
+<body><div class="page${cutoffMs ? ' p1' : ''}">
 <header>
   <div class="top">
     <div class="brand"><div class="mark">C</div><div>
       <h1>CASHOOD HEADFUND</h1><p>Private AI Liquidity Provider · ${esc(chain)}</p></div></div>
-    <div class="doc"><div class="kind">INVOICE PEMBAGIAN DIVIDEN</div>
+    <div class="doc"><div class="kind">INVOICE PEMBAGIAN DIVIDEN${cutoffMs ? ' · LEMBAR 1 DARI 2' : ''}</div>
       <h2>${esc(fundName)}</h2><p>Periode ${esc(periodLabel)}</p>
       ${example ? '<div class="stamp">CONTOH PERHITUNGAN</div>' : ''}</div>
   </div>
@@ -276,7 +328,7 @@ const html = `<!doctype html>
     <div>No. invoice<b class="num">${esc(invoiceNo)}</b></div>
     <div>Tanggal pembayaran<b>${esc(payLabel)}</b></div>
     <div>Kurs yang dipakai<b class="num">1 USD = ${idr(rate)}</b></div>
-    <div>Pemegang saham<b>${rows.filter((r) => !r.waiting).length} orang${waiting.length ? ` (+${waiting.length} baru)` : ''}</b></div>
+    <div>Pemegang saham<b>${rows.filter((r) => !r.waiting).length} orang${rows.filter((r) => r.waiting).length ? ` (+${rows.filter((r) => r.waiting).length} baru)` : ''}</b></div>
     <div>Porsi dibagikan<b>${distributePct}% laba bersih</b></div>
   </div>
 </header>
@@ -356,10 +408,93 @@ const html = `<!doctype html>
   </div>
   <div class="base"><span class="site">cashood.id</span><span>Dibuat ${esc(generated)} WIB</span></div>
 </footer>
-</div></body></html>`;
+</div>
+
+${cutoffMs ? `<div class="page p2">
+<header>
+  <div class="top">
+    <div class="brand"><div class="mark">C</div><div>
+      <h1>CASHOOD HEADFUND</h1><p>Rincian perhitungan · ${esc(fundName)} · ${esc(periodLabel)}</p></div></div>
+    <div class="doc"><div class="kind">LEMBAR 2 DARI 2</div><p class="num">${esc(invoiceNo)}</p></div>
+  </div>
+</header>
+
+<main>
+  <div>
+    <h3>Kenapa dibagi dua lapis</h3>
+    <div class="callout">${layers.length > 1 ? '' : '<strong>Bulan ini seluruh labanya lahir sebelum modal baru masuk, jadi lapisnya cuma satu.</strong> '}Laba tidak dibagi menurut porsi saham pada hari pembayaran, melainkan menurut porsi
+      <strong>saat laba itu dihasilkan</strong>. Modal yang baru masuk ${esc(payLabelShort(newSince))} tidak ikut
+      membagi laba yang sudah ada sebelum ia datang, dan modal lama tidak kehilangan haknya atas laba yang
+      dihasilkan sebelum dana bertambah besar.</div>
+  </div>
+
+  <div>
+    <h3>${layers.length > 1 ? 'Dua lapis' : 'Lapis'} laba bulan ini</h3>
+    <table class="layers">
+      <thead><tr><th>Lapis</th><th>Dibagi menurut</th><th>Laba</th><th>Biaya sistem</th><th>Dibagikan</th></tr></thead>
+      <tbody>
+        ${layers.map((L, i) => `<tr>
+          <td><div class="who">Lapis ${i + 1}</div><div class="note">${esc(L.label)}</div></td>
+          <td style="text-align:left">${i === 0 ? 'porsi saham sebelum modal baru masuk' : 'porsi saham setelah modal baru masuk'}<div class="note">${L.shares.length} pemegang saham</div></td>
+          <td class="num">${usd(L.grossUsd)}</td>
+          <td class="num">−${usd(L.costUsd)}</td>
+          <td class="num get">${usd(L.netUsd)}</td></tr>`).join('')}
+        <tr><td colspan="2"><strong>Total</strong></td>
+          <td class="num"><strong>${usd(withdrawn)}</strong></td>
+          <td class="num"><strong>−${usd(costsUsd)}</strong></td>
+          <td class="num get"><strong>${usd(pool)}</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3>Bagian tiap pemegang saham, per lapis</h3>
+    <table class="layers">
+      <thead><tr><th>Pemegang saham</th>
+        ${layers.map((L, i) => `<th>Porsi lapis ${i + 1}</th><th>Bagian lapis ${i + 1}</th>`).join('')}
+        <th>Total (USD)</th><th>Total (IDR)</th></tr></thead>
+      <tbody>
+        ${rows.map((r) => `<tr>
+          <td class="who">${esc(r.name)}</td>
+          ${r.parts.map((x) => `<td class="num ${x.share ? '' : 'zero'}">${x.share ? pct(x.share) : '—'}</td>
+             <td class="num ${x.usd ? '' : 'zero'}">${usd(x.usd)}</td>`).join('')}
+          <td class="num get">${usd(r.netUsd)}</td>
+          <td class="num get">${idr(r.idr)}</td></tr>`).join('')}
+        <tr><td><strong>Total</strong></td>
+          ${layers.map((L) => `<td class="num">100,00%</td><td class="num"><strong>${usd(L.netUsd)}</strong></td>`).join('')}
+          <td class="num get"><strong>${usd(totalNet)}</strong></td>
+          <td class="num get"><strong>${idr(totalIdr)}</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h3>Urutan hitungannya</h3>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div>Uang yang ditarik bot sepanjang ${esc(periodLabel)} dikumpulkan: <strong class="num">${usd(withdrawn)}</strong>.</div></div>
+      <div class="step"><div class="n">2</div><div>${layers.length > 1
+        ? `Dipisah menurut kapan dihasilkan — <span class="num">${usd(layers[0].grossUsd)}</span> sebelum modal baru masuk, <span class="num">${usd(layers[1].grossUsd)}</span> sesudahnya.`
+        : `Seluruhnya dihasilkan sebelum modal baru masuk ${esc(payLabelShort(newSince))}, jadi lapisnya hanya satu: <span class="num">${usd(layers[0].grossUsd)}</span>.`}</div></div>
+      <div class="step"><div class="n">3</div><div>Biaya sistem <span class="num">${usd(costsUsd)}</span> dipotong dari kedua lapis menurut besarnya masing-masing, jadi tidak ada kelompok yang menanggungnya sendirian.</div></div>
+      <div class="step"><div class="n">4</div><div>Tiap lapis dibagi <strong>${distributePct}%</strong> menurut porsi saham yang berlaku di lapis itu; sen terakhir dibagi dengan sisa terbesar supaya jumlah kolom pas.</div></div>
+      <div class="step"><div class="n">5</div><div>Rupiah dihitung dari total tiap orang pada kurs <span class="num">${idr(rate)}</span> per dolar.</div></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="notes">
+    <div><b>Pemeriksaan.</b> Porsi saham dihitung dengan metode unit dan bisa diperiksa kapan saja di cashood.id — tab Data investor.</div>
+    <div><b>Catatan.</b> Data aktual profit bisa berbeda karena gas fee yang fluktuatif, slippage, price impact, dan biaya bridge.</div>
+  </div>
+  <div class="base"><span class="site">cashood.id</span><span>${esc(invoiceNo)} · lembar 2 dari 2</span></div>
+</footer>
+</div>` : ''}
+</body></html>`;
 
 mkdirSync(resolve(ROOT, 'reports'), { recursive: true });
-const stem = `invoice-${fund}-${payIso}${example ? '-contoh' : ''}`;
+const tag = arg('tag');
+const stem = `invoice-${fund}-${payIso}${example ? '-contoh' : ''}${tag ? '-' + String(tag).replace(/[^a-z0-9-]+/gi, '-').toLowerCase() : ''}`;
 const htmlPath = resolve(ROOT, 'reports', `${stem}.html`);
 const pdfPath = resolve(ROOT, 'reports', `${stem}.pdf`);
 writeFileSync(htmlPath, html);
@@ -371,6 +506,9 @@ const r = spawnSync(chrome, ['--headless=new', '--no-sandbox', '--disable-gpu', 
   '--virtual-time-budget=8000', `--print-to-pdf=${pdfPath}`, `file://${htmlPath}`], { encoding: 'utf8', timeout: 90_000 });
 if (r.status !== 0 || !existsSync(pdfPath)) { console.error(r.stderr || 'cetak PDF gagal'); process.exit(3); }
 
+// Daftar laporan untuk tab Data investor. `--no-index` untuk berkas coba-coba
+// yang tidak boleh muncul di situs.
+if (!flag('no-index')) {
 // Daftar laporan untuk tab Data investor. Satu entri per berkas; menjalankan
 // ulang bulan yang sama menimpa entrinya, bukan menambah duplikat.
 const manifestPath = resolve(ROOT, 'reports', 'index.json');
@@ -384,6 +522,8 @@ manifest.push({
 });
 manifest.sort((a, b) => b.payDate.localeCompare(a.payDate) || Number(a.example) - Number(b.example));
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+}
 
 console.log(`[statement] ${fundName} ${periodLabel} · ditarik ${usd(withdrawn)} − biaya ${usd(costsUsd)} = ${usd(pool)} dibagikan · kurs ${idr(rate)}`);
 for (const row of rows) console.log(`  ${row.name.padEnd(10)} ${(row.waiting ? '—' : pct(row.share)).padStart(7)}  ${usd(row.netUsd).padStart(9)}  ${row.waiting ? '(baru masuk)' : idr(row.idr)}`);
