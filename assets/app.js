@@ -2165,10 +2165,18 @@ function scenarioCard(s, kind) {
 
 function renderAnalisa() {
   const body = $('#analisaBody');
-  const fund = analisaFund || state.funds[0]?.id;
+  const bolehPrediksi = (id) => state.funds.some((f) => f.id === id && f.forecast !== false);
+  const fund = bolehPrediksi(analisaFund) ? analisaFund
+    : (state.funds.find((f) => f.forecast !== false)?.id || state.funds[0]?.id);
   const meta = fundMeta(fund);
 
-  $('#segAnalisa').innerHTML = state.funds.map((f) => `
+  // Dana yang tidak punya prediksi tidak ikut ditawarkan: mintanya cuma
+  // menghasilkan 404 dan kartu "belum tersedia" yang tidak bisa berubah.
+  // Dana yang dibaca dari dompet orang lain tidak punya riwayat posisi
+  // tertutup, dan prediksi tanpa riwayat adalah angka karangan.
+  const bisaDiprediksi = state.funds.filter((f) => f.forecast !== false);
+  $('#segAnalisa').hidden = bisaDiprediksi.length < 2;
+  $('#segAnalisa').innerHTML = bisaDiprediksi.map((f) => `
     <button data-af="${f.id}" class="${f.id === fund ? 'on' : ''}">${f.label}</button>`).join('');
 
   body.innerHTML = '<p class="hint">memuat analisa…</p>';
