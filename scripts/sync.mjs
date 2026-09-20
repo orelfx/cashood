@@ -30,7 +30,7 @@ const { bookValueUsd, readBook } = await load('manager.js');
 const { balanceOf } = await load('venue/quote.js');
 const { ethUsd } = await load('venue/price.js');
 const { getWallet } = await load('chain/signer.js');
-const { getClosed, profitSweeps } = await load('store.js');
+const { getClosed, getClosedSince, profitSweeps } = await load('store.js');
 const { NATIVE, USDG, WETH, decimalsOf } = await load('chain/addresses.js');
 const { getClient } = await load('chain/rpc.js');
 const { ERC20_ABI } = await load('chain/abi.js');
@@ -111,7 +111,13 @@ for (const book of books) {
     positions.push({
       tokenId: String(p.tokenId ?? ''),
       symbol: p.symbol ?? null,
-      strategy: book.strategy ?? null,
+      // BUKU MILIK POSISI, bukan nama siklus. Siklus manajemen dideduplikasi
+      // per dompet dan ketiga buku berbagi satu, jadi `book.strategy` selalu
+      // "multi" — itu sebabnya seluruh baris di dasbor tertulis multi. Posisi
+      // sendiri selalu tahu bukunya: big cap, mid cap (multi), atau degen.
+      strategy: p.strategy ?? book.strategy ?? null,
+      // Nama yang enak dibaca manusia: "multi" itu nama internal buku mid cap.
+      bookLabel: { bigcap: 'big cap', multi: 'mid cap', degen: 'degen' }[p.strategy] ?? null,
       inRange: p.inRange === true,
       principalUsd: Number(p.principalUsd) || 0,
       feesUsd: unclaimed,                          // belum dipanen
@@ -131,7 +137,13 @@ for (const book of books) {
 }
 
 // ─── riwayat profit yang sudah terkunci (posisi yang ditutup) ─────────────
-const closed = getClosed({ limit: 5000 }).filter((r) => Number.isFinite(Number(r.netUsd)));
+// SELURUH RIWAYAT, bukan 300 baris terakhir. getClosed() hanya membaca berkas
+// panas; sisanya pindah ke closed-archive.jsonl, dan tanpa arsip itu win rate
+// per buku di situs berbeda dari laporan bot atas data yang sama (big cap
+// terbaca 21,7% padahal 45,8%) — dua angka berbeda untuk hal yang sama adalah
+// angka yang tidak dipercaya siapa pun.
+const closed = (typeof getClosedSince === 'function' ? getClosedSince(0) : getClosed({ limit: 5000 }))
+  .filter((r) => Number.isFinite(Number(r.netUsd)));
 
 // Hari dihitung pakai jam Jakarta, bukan UTC. Posisi yang ditutup jam 2 pagi
 // WIB itu kejadian hari itu buat operatornya — kalau dibiarkan UTC, angkanya
@@ -161,6 +173,55 @@ for (const r of closed) {
   }
   byDay.set(day, row);
 }
+
+// ─── rekap per buku ──────────────────────────────────────────────────────
+// Tiga buku berbagi satu dompet, jadi tanpa pemisahan ini tidak kelihatan mana
+// yang menghasilkan. Ambangnya sama dengan win rate di atas (±0,5%): di
+// dalamnya dihitung impas, bukan menang atau kalah.
+const BOOKS = [
+  { key: 'bigcap', label: 'big cap' },
+  { key: 'multi', label: 'mid cap' },
+  { key: 'degen', label: 'degen' },
+];
+const bookStats = (() => {
+  // `now` baru lahir jauh di bawah (deret nilai); jam sendiri saja di sini.
+  const t = Date.now();
+  const todayKey = dayKey(t);
+  const cut30 = t - 30 * 86400e3;
+  const windows = [
+    { key: 'today', label: 'hari ini', keep: (r) => dayKey(r.closedAt) === todayKey },
+    { key: 'd30', label: '30 hari', keep: (r) => Number(r.closedAt) >= cut30 },
+    { key: 'all', label: 'sepanjang waktu', keep: () => true },
+  ];
+  const out = {};
+  for (const w of windows) {
+    const rows = closed.filter(w.keep);
+    out[w.key] = {
+      label: w.label,
+      books: BOOKS.map(({ key, label }) => {
+        const mine = rows.filter((r) => (r.strategy || '') === key);
+        const wins = mine.filter((r) => Number(r.netPct) > 0.005).length;
+        const losses = mine.filter((r) => Number(r.netPct) < -0.005).length;
+        const netUsd = mine.reduce((sum, r) => sum + Number(r.netUsd), 0);
+        return {
+          key, label,
+          closes: mine.length,
+          wins, losses, flat: mine.length - wins - losses,
+          netUsd: Number(netUsd.toFixed(2)),
+          // DEFINISI SAMA DENGAN LAPORAN BOT: menang dibanding posisi yang
+          // benar-benar bergerak. Posisi impas (±0,5%, sebagian besar bid yang
+          // tidak pernah tersentuh) tidak ikut membagi — kalau ikut, situs
+          // menulis 30,5% untuk hal yang bot sebut 45,8%, dan dua angka
+          // berbeda untuk hal yang sama membuat keduanya tidak dipercaya.
+          winRate: wins + losses ? Number(((wins / (wins + losses)) * 100).toFixed(1)) : null,
+          winRateAll: mine.length ? Number(((wins / mine.length) * 100).toFixed(1)) : null,
+          perCloseUsd: mine.length ? Number((netUsd / mine.length).toFixed(2)) : null,
+        };
+      }),
+    };
+  }
+  return out;
+})();
 
 const history = [...byDay.values()]
   .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)), winUsd: Number(r.winUsd.toFixed(2)), lossUsd: Number(r.lossUsd.toFixed(2)) }))
@@ -384,6 +445,7 @@ const snapshot = {
   holdings,
   positions,
   history,
+  bookStats,
   stats,
   closedRecent,
 };

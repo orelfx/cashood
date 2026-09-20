@@ -412,6 +412,7 @@ async function resolveNav(cfg, { force = false } = {}) {
     lpUsd,
     liveUsd,
     treasuryUsd: Number(snap.treasuryUsd) || 0,
+    bookStats: snap.bookStats || null,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -646,7 +647,7 @@ function renderLp(nav) {
       const band = r.throughBandPct == null ? '' : `<span class="band">${r.throughBandPct.toFixed(0)}%</span>`;
       return `<tr>
         <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${r.symbol ?? r.tokenId}</span>
-            <div class="sub2">${r.strategy ?? ''}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
+            <div class="sub2">${r.bookLabel ?? r.strategy ?? ''}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
             <div class="sub2 m-only ${r.inRange ? 'pos' : 'neg'}">${r.inRange ? 'di dalam range' : 'di luar range'}${
               r.throughBandPct == null ? '' : ' · ' + r.throughBandPct.toFixed(0) + '%'}</div></td>
         <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
@@ -1267,6 +1268,40 @@ async function renderReports() {
         <a class="btn-pdf ghost" href="${m.pdf}" target="_blank" rel="noopener">Lihat</a></td></tr>`).join('')
     + '</tbody></table></div>';
 }
+
+/**
+ * Performa per buku: big cap, mid cap, degen.
+ *
+ * Ketiganya berbagi satu dompet, jadi tanpa dipisah tidak kelihatan mana yang
+ * benar-benar menghasilkan. Win rate-nya memakai definisi yang sama dengan
+ * laporan bot: menang dibanding posisi yang bergerak, impas dihitung terpisah.
+ */
+let bookWindow = 'd30';
+function renderBooks() {
+  const card = $('#bookCard');
+  if (!card) return;
+  const all = state.nav?.bookStats || null;
+  const win = all?.[bookWindow];
+  card.hidden = !win || !win.books?.some((b) => b.closes > 0);
+  if (card.hidden) return;
+
+  $('#segBook').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-w') === bookWindow));
+  $('#bookTable').querySelector('tbody').innerHTML = win.books.map((b) => `<tr>
+      <td><span class="who"><span class="chip" style="background:${BOOK_COLOR[b.key] || '#8b95a7'}"></span>${b.label}</span></td>
+      <td class="num">${b.closes}</td>
+      <td class="num ${b.winRate == null ? '' : cls(b.winRate - 50)}">${b.winRate == null ? '—' : pct(b.winRate, 1)}</td>
+      <td class="num dim">${b.wins} / ${b.losses} / ${b.flat}</td>
+      <td class="num ${cls(b.netUsd)}">${signed(b.netUsd)}</td>
+      <td class="num ${cls(b.perCloseUsd ?? 0)}">${b.perCloseUsd == null ? '—' : signed(b.perCloseUsd)}</td>
+    </tr>`).join('');
+
+  const total = win.books.reduce((s, b) => s + b.netUsd, 0);
+  const closes = win.books.reduce((s, b) => s + b.closes, 0);
+  $('#bookHint').innerHTML = `${closes} posisi ditutup ${win.label} · hasil gabungan <strong class="${cls(total)}">${signed(total)}</strong>. `
+    + 'Win rate dihitung dari posisi yang bergerak; kolom M / K / I adalah menang, kalah, dan impas (±0,5%, termasuk posisi yang harganya tidak pernah menyentuh rentang).';
+}
+
+const BOOK_COLOR = { bigcap: '#60a5fa', multi: '#4ade80', degen: '#fbbf24' };
 
 /** Kas cadangan: uang yang sudah dipindah keluar dari wallet kerja bot. */
 function renderTreasury() {
@@ -2246,6 +2281,7 @@ function renderAll() {
   renderDividend();
   renderRules();
   renderTreasury();
+  renderBooks();
   renderReports();
   renderAbout();
   renderNavChart();
@@ -2357,6 +2393,13 @@ async function init() {
   };
   window.addEventListener('hashchange', fromHash);
   fromHash();
+
+  $('#segBook').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    bookWindow = btn.getAttribute('data-w');
+    renderBooks();
+  };
 
   // sub-bagian di dalam tab investor
   $('#segInv').onclick = (e) => {
