@@ -11,6 +11,46 @@
 
 const FUNDS_URL = 'data/funds.json';
 
+/* ── pengambilan data: paralel, bukan berantai ───────────────────────────
+ *
+ * Dulu urutannya menunggu satu sama lain: funds.json -> config.json ->
+ * live.json -> nav.json. Empat perjalanan bolak-balik berurutan, dan angka
+ * pertama baru muncul 2,4 detik setelah halaman dibuka meski seluruh
+ * berkasnya cuma 245 KB.
+ *
+ * Sekarang keempatnya berangkat bersamaan begitu skrip ini dibaca. Dana yang
+ * ditebak dari alamat halaman hampir selalu benar; kalau meleset, permintaan
+ * yang telanjur jalan cuma terbuang dan alurnya lanjut seperti biasa.
+ */
+const BOOT_T = Date.now();
+const RAW_BASE = 'https://raw.githubusercontent.com/orelfx/cashood/data/';
+const inflight = new Map();
+
+/** Satu permintaan per alamat. `fresh` melewati antrean, untuk tombol refresh. */
+function getJSON(url, { fresh = false } = {}) {
+  if (!fresh && inflight.has(url)) return inflight.get(url);
+  const full = url + (url.includes('?') ? '&' : '?') + 't=' + (fresh ? Date.now() : BOOT_T);
+  const job = fetch(full, { cache: 'no-store' }).then((res) => {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  });
+  if (!fresh) inflight.set(url, job);
+  return job;
+}
+
+// Ditembak sekarang, dipungut nanti. Kegagalan di sini tidak boleh jadi
+// unhandled rejection: yang memungut akan mencoba lagi lewat jalur normal.
+(() => {
+  try {
+    const quiet = (pr) => { pr.catch(() => {}); return pr; };
+    quiet(getJSON(FUNDS_URL));
+    const guess = (location.hash || '').replace(/^#/, '').split('/')[0] || 'reborn';
+    const fund = ['reborn', 'meridian'].includes(guess) ? guess : 'reborn';
+    quiet(getJSON(`data/${fund}/config.json`));
+    for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
+  } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
+})();
+
 /**
  * Satu situs, dua dana yang tidak berbagi apa pun kecuali tampilannya.
  *
@@ -344,14 +384,12 @@ async function fxRates() {
  * ikut berubah begitu di-push, tanpa nunggu GitHub Pages build ulang. Kalau
  * gagal, jatuh ke salinan yang ikut ke-deploy bareng situsnya.
  */
-async function readSnapshot(cfg) {
+async function readSnapshot(cfg, { force = false } = {}) {
   const urls = dataUrls(cfg, 'live.json', cfg?.app?.snapshotUrl);
   let lastErr;
   for (const url of urls) {
     try {
-      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const j = await res.json();
+      const j = await getJSON(url, { fresh: force });
       if (!Number.isFinite(Number(j.totalUsd))) throw new Error('snapshot tanpa totalUsd');
       return j;
     } catch (err) { lastErr = err; }
@@ -382,7 +420,7 @@ async function resolveNav(cfg, { force = false } = {}) {
   //    RPC publik — alamat yang lalu terbaca siapa pun yang membuka panel
   //    jaringan. Kesegaran sepuluh menit ditukar dengan alamat yang tidak
   //    pernah meninggalkan server.
-  const [snap] = await Promise.all([readSnapshot(cfg)]);
+  const [snap] = await Promise.all([readSnapshot(cfg, { force })]);
 
   const positions = snap?.positions || [];
   const history = snap?.history || [];
@@ -961,9 +999,7 @@ async function readNavSeries(cfg) {
   const urls = dataUrls(cfg, 'nav.json', cfg?.app?.navUrl);
   for (const url of urls) {
     try {
-      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) continue;
-      const j = await res.json();
+      const j = await getJSON(url);
       if (Array.isArray(j.points) && j.points.length) return j.points;
     } catch { /* coba sumber berikutnya */ }
   }
@@ -1878,9 +1914,7 @@ function renderFundBar() {
 async function loadFundConfig(id) {
   const meta = fundMeta(id);
   if (!meta) throw new Error('daftar dana kosong');
-  const res = await fetch(meta.configUrl + '?t=' + Date.now(), { cache: 'no-store' });
-  if (!res.ok) throw new Error(`${meta.configUrl}: HTTP ${res.status}`);
-  state.cfg = await res.json();
+  state.cfg = await getJSON(meta.configUrl);
   state.fund = meta.id;
 
   document.title = `${meta.label} — Cashood Headfund`;
@@ -2339,8 +2373,7 @@ async function load({ force = false } = {}) {
 
 async function init() {
   try {
-    const res = await fetch(FUNDS_URL + '?t=' + Date.now(), { cache: 'no-store' });
-    const list = await res.json();
+    const list = await getJSON(FUNDS_URL);
     state.funds = list.funds || [];
     state.coins = list.coins || ['eth'];
     state.safebox = list.safebox || null;

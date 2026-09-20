@@ -28,6 +28,12 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # Cap versi aset = commit yang di-deploy. Dengan begitu index.html boleh
+      # basi sepuluh menit di cache Pages tanpa pernah memasangkan HTML baru
+      # dengan JS lama: alamat asetnya berubah hanya kalau kodenya berubah,
+      # dan browser boleh menyimpannya selama mungkin.
+      - name: Stamp asset version
+        run: sed -i "s/__BUILD__/${GITHUB_SHA::8}/g" index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

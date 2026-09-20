@@ -62,7 +62,23 @@ const fundMeta = (funds.funds || []).find((f) => f.id === fund) || {};
 // Mesin buku yang sama dengan situs.
 const ctx = vm.createContext({ console, Date, Math, JSON, Number, Object, Array, String, Promise, Error, isNaN, Set, Map });
 vm.runInContext(readFileSync(resolve(ROOT, 'assets/app.js'), 'utf8'), ctx);
-const ledger = ctx.cashood.buildLedger(cfg);
+// SIAPA YANG IKUT DIVIDEN BULAN INI.
+//
+// Aturan pemilik, 2026-09-20: uang yang baru masuk tidak ikut membagi laba
+// yang dihasilkan sebelum ia masuk. Jadi porsinya dihitung dari buku SEBELUM
+// tanggal `--new-since`: setoran pada atau sesudah tanggal itu tidak dapat
+// bagian bulan ini, dan tidak pernah ditulis sebagai angka minus — nol, dengan
+// keterangan kapan ia mulai ikut.
+//
+// Tanpa --new-since, semua setoran ikut seperti biasa.
+const newSince = arg('new-since');
+const cutoffMs = newSince ? Date.parse(`${newSince}T00:00:00+07:00`) : null;
+const eventTime = (e) => Number(e.at) || Date.parse(`${e.date}T00:00:00+07:00`);
+const eligibleCfg = cutoffMs
+  ? { ...cfg, events: (cfg.events || []).filter((e) => eventTime(e) < cutoffMs) }
+  : cfg;
+const ledger = ctx.cashood.buildLedger(eligibleCfg);
+const fullLedger = ctx.cashood.buildLedger(cfg);
 
 // Biaya: dana yang menanggung tagihan (costs.primary) membayar penuh; dana
 // lain tidak membayar dua kali untuk sistem yang sama.
@@ -78,6 +94,10 @@ const pool = net * distributePct / 100;
 
 // Sen dibagi dengan sisa terbesar, supaya jumlah baris = total persis.
 const owners = ledger.owners.filter((o) => o.units > 0);
+// Pemilik yang seluruh setorannya baru: tampil dengan $0, bukan dihilangkan.
+const waiting = cutoffMs
+  ? fullLedger.owners.filter((o) => o.units > 0 && !owners.some((e) => e.name === o.name))
+  : [];
 const cents = Math.round(pool * 100);
 const raw = owners.map((o) => ({ o, exact: (o.units / ledger.totalUnits) * cents }));
 const base = raw.map((r) => Math.floor(r.exact));
@@ -91,19 +111,23 @@ const rows = raw.map((r, i) => {
   const feeUsd = gross * feeNow / 100;
   const netUsd = gross - feeUsd;
   return { name: r.o.name, share: (r.o.units / ledger.totalUnits) * 100, gross, feeStdUsd, feeUsd, netUsd, idr: Math.round(netUsd * rate) };
-}).sort((a, b) => b.share - a.share);
+}).sort((a, b) => b.share - a.share)
+  .concat(waiting.map((o) => ({
+    name: o.name, share: 0, gross: 0, feeStdUsd: 0, feeUsd: 0, netUsd: 0, idr: 0, waiting: true,
+  })));
 
 // Rupiah juga dibagi dengan sisa terbesar: dibulatkan per baris, empat baris
 // bisa selisih Rp 1 dari kotak "Dibagikan" di atas — kecil, tapi di laporan
 // uang, angka yang tidak cocok adalah angka yang dicurigai.
 {
-  const targetIdr = Math.round(rows.reduce((s, r) => s + r.netUsd, 0) * rate);
-  const exact = rows.map((r) => r.netUsd * rate);
+  const payable = rows.filter((r) => !r.waiting);
+  const targetIdr = Math.round(payable.reduce((s, r) => s + r.netUsd, 0) * rate);
+  const exact = payable.map((r) => r.netUsd * rate);
   const floor = exact.map(Math.floor);
   let rest = targetIdr - floor.reduce((s, v) => s + v, 0);
   exact.map((v, i) => ({ i, frac: v - floor[i] })).sort((a, b) => b.frac - a.frac)
     .forEach(({ i }) => { if (rest > 0) { floor[i] += 1; rest -= 1; } });
-  rows.forEach((r, i) => { r.idr = floor[i]; });
+  payable.forEach((r, i) => { r.idr = floor[i]; });
 }
 
 const totalNet = rows.reduce((s, r) => s + r.netUsd, 0);
@@ -177,9 +201,9 @@ const html = `<!doctype html>
   .stamp { display: inline-block; margin-top: 2mm; border: 0.45mm solid var(--gold); color: var(--gold);
            padding: 0.7mm 2.6mm; border-radius: 1mm; font-size: 6.6pt; font-weight: 800; letter-spacing: 0.16em; }
 
-  main { padding: 6mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 4.4mm; }
+  main { padding: 5mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 3.4mm; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
-  .tile { border: 0.3mm solid var(--line); border-radius: 2.2mm; padding: 3.4mm 3.6mm; background: #fff; }
+  .tile { border: 0.3mm solid var(--line); border-radius: 2.2mm; padding: 2.8mm 3.4mm; background: #fff; }
   .tile .k { font-size: 6.9pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
   .tile .v { font-size: 14pt; font-weight: 700; margin-top: 1.2mm; }
   .tile .s { font-size: 7.6pt; color: var(--mute); margin-top: 0.4mm; }
@@ -193,7 +217,7 @@ const html = `<!doctype html>
   .flow .res { color: var(--green); font-weight: 700; }
 
   .perf { display: grid; grid-template-columns: repeat(5, 1fr); border: 0.3mm solid var(--line); border-radius: 2.2mm; overflow: hidden; }
-  .perf > div { padding: 2.6mm 3.2mm; border-right: 0.3mm solid var(--line); }
+  .perf > div { padding: 2.2mm 3mm; border-right: 0.3mm solid var(--line); }
   .perf > div:last-child { border-right: 0; }
   .perf .k { font-size: 6.6pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); font-weight: 600; }
   .perf .v { font-size: 12pt; font-weight: 700; margin-top: 0.8mm; }
@@ -205,11 +229,11 @@ const html = `<!doctype html>
   .two { display: grid; grid-template-columns: 1.05fr 1fr; gap: 5mm; }
   h3 { font-size: 7.6pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); font-weight: 700; margin-bottom: 2mm; }
   table { width: 100%; border-collapse: collapse; }
-  .costs td { padding: 1.1mm 0; border-bottom: 0.25mm solid var(--line); }
+  .costs td { padding: 0.9mm 0; border-bottom: 0.25mm solid var(--line); }
   .costs td:last-child { text-align: right; }
   .costs tr.total td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 1.8mm; }
   .rules { list-style: none; display: grid; gap: 1.6mm; }
-  .rules li { display: grid; grid-template-columns: 4.2mm 1fr; gap: 1.5mm; color: var(--ink2); }
+  .rules li { display: grid; grid-template-columns: 4.2mm 1fr; gap: 1.5mm; color: var(--ink2); line-height: 1.35; }
   .rules li span { width: 4.2mm; height: 4.2mm; border-radius: 50%; background: var(--navy); color: #fff; font-size: 6.4pt;
                    font-weight: 700; display: grid; place-items: center; margin-top: 0.2mm; }
   .fee { margin-top: 3mm; display: flex; align-items: center; justify-content: space-between; border: 0.3mm dashed var(--green);
@@ -221,7 +245,7 @@ const html = `<!doctype html>
   .holders th { font-size: 6.9pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); font-weight: 700;
                 text-align: right; padding: 2mm 2mm; border-bottom: 0.4mm solid var(--ink); }
   .holders th:first-child, .holders td:first-child { text-align: left; }
-  .holders td { padding: 2.1mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
+  .holders td { padding: 1.5mm 2mm; border-bottom: 0.25mm solid var(--line); text-align: right; }
   .holders tbody tr:nth-child(odd) td { background: #fafbfd; }
   .holders .who { font-weight: 600; }
   .holders .bar { height: 1.2mm; background: var(--line); border-radius: 1mm; margin-top: 1mm; width: 26mm; overflow: hidden; }
@@ -229,9 +253,11 @@ const html = `<!doctype html>
   .holders .struck { color: var(--mute); text-decoration: line-through; text-decoration-color: var(--red); }
   .holders .free { color: var(--green); font-weight: 700; font-size: 7.2pt; margin-left: 1mm; }
   .holders .get { color: var(--green); font-weight: 700; }
+  .holders tr.waiting td { color: var(--mute); }
+  .holders .note { font-size: 7pt; color: var(--mute); margin-top: 0.6mm; }
   .holders tfoot td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 2.6mm; background: #fff; }
 
-  footer { padding: 5mm 14mm 8mm; margin-top: auto; }
+  footer { padding: 4mm 14mm 6mm; margin-top: auto; }
   .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; font-size: 7.3pt; color: var(--mute); border-top: 0.25mm solid var(--line); padding-top: 3.5mm; }
   .notes b { color: var(--ink2); }
   .base { display: flex; justify-content: space-between; margin-top: 4mm; font-size: 7pt; color: var(--mute); }
@@ -250,7 +276,7 @@ const html = `<!doctype html>
     <div>No. invoice<b class="num">${esc(invoiceNo)}</b></div>
     <div>Tanggal pembayaran<b>${esc(payLabel)}</b></div>
     <div>Kurs yang dipakai<b class="num">1 USD = ${idr(rate)}</b></div>
-    <div>Pemegang saham<b>${rows.length} orang</b></div>
+    <div>Pemegang saham<b>${rows.filter((r) => !r.waiting).length} orang${waiting.length ? ` (+${waiting.length} baru)` : ''}</b></div>
     <div>Porsi dibagikan<b>${distributePct}% laba bersih</b></div>
   </div>
 </header>
@@ -305,7 +331,10 @@ const html = `<!doctype html>
     <table class="holders">
       <thead><tr><th>Pemegang saham</th><th>Porsi</th><th>Bagian</th><th>Fee admin ${feeStd}%</th><th>Diterima (USD)</th><th>Diterima (IDR)</th></tr></thead>
       <tbody>
-        ${rows.map((r) => `<tr>
+        ${rows.map((r) => r.waiting ? `<tr class="waiting">
+          <td><div class="who">${esc(r.name)}</div><div class="note">baru masuk ${esc(newSince ? `${Number(newSince.slice(8, 10))} ${BULAN[Number(newSince.slice(5, 7)) - 1]}` : '')} — ikut dividen mulai periode berikutnya</div></td>
+          <td class="num">—</td><td class="num">${usd(0)}</td><td class="num">—</td>
+          <td class="num">${usd(0)}</td><td class="num">${idr(0)}</td></tr>` : `<tr>
           <td><div class="who">${esc(r.name)}</div><div class="bar"><i style="width:${Math.min(100, r.share).toFixed(2)}%"></i></div></td>
           <td class="num">${pct(r.share)}</td>
           <td class="num">${usd(r.gross)}</td>
@@ -357,6 +386,6 @@ manifest.sort((a, b) => b.payDate.localeCompare(a.payDate) || Number(a.example) 
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
 
 console.log(`[statement] ${fundName} ${periodLabel} · ditarik ${usd(withdrawn)} − biaya ${usd(costsUsd)} = ${usd(pool)} dibagikan · kurs ${idr(rate)}`);
-for (const row of rows) console.log(`  ${row.name.padEnd(10)} ${pct(row.share).padStart(7)}  ${usd(row.netUsd).padStart(9)}  ${idr(row.idr)}`);
+for (const row of rows) console.log(`  ${row.name.padEnd(10)} ${(row.waiting ? '—' : pct(row.share)).padStart(7)}  ${usd(row.netUsd).padStart(9)}  ${row.waiting ? '(baru masuk)' : idr(row.idr)}`);
 console.log(`  total      ${usd(totalNet).padStart(17)}  ${idr(totalIdr)}`);
 console.log(`-> ${pdfPath}`);

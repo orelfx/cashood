@@ -212,11 +212,16 @@ writeFileSync(resolve(OUT_DIR, 'live.json'), JSON.stringify(snapshot, null, 2) +
 const NAV = resolve(OUT_DIR, 'nav.json');
 const now = Date.now();
 const previous = existsSync(NAV) ? (JSON.parse(readFileSync(NAV, 'utf8')).points || []) : [];
+// Deret ini ikut diunduh tiap kali halaman dibuka, jadi kerapatannya dibayar
+// pengunjung. Dua hari penuh pada 10 menit itu 288 titik untuk garis yang di
+// layar HP lebarnya 350 piksel — halus di data, tidak kelihatan di mata.
+// Sehari terakhir tetap 10 menit (yang dilihat orang), seminggu terakhir per
+// jam, sisanya harian. 40 KB turun jadi sekitar 15 KB.
 const kept = previous.filter((p) => {
   const age = now - p.t;
-  if (age < 2 * 86400e3) return true;
+  if (age < 86400e3) return true;
   const at = new Date(p.t);
-  if (age < 30 * 86400e3) return at.getUTCMinutes() < 10;
+  if (age < 7 * 86400e3) return at.getUTCMinutes() < 10;
   return at.getUTCHours() === 0 && at.getUTCMinutes() < 10;
 });
 kept.push({ t: now, usd: snapshot.totalUsd, lp: Number(lpUsd.toFixed(2)) });

@@ -6,13 +6,18 @@
 <title>Cashood — Headfund</title>
 <meta name="description" content="Private AI liquidity provider di Robinhood — pantau nilai dana, porsi saham tiap investor, dan apa yang sedang dikerjakan bot.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
-<script>
-  // Sama alasannya dengan app.js di bawah: Pages menahan aset 600 detik, dan
-  // nomor versi yang ditulis tangan gampang lupa dinaikkan — CSS baru tidak
-  // terpakai dan halamannya tampil tanpa gaya yang baru ditulis.
-  document.write('<link rel="stylesheet" href="assets/style.css?v='
-    + Math.floor(Date.now() / 600000) + '">');
-</script>
+<!-- Versinya dicap saat deploy (__BUILD__ -> commit SHA, lihat
+     .github/workflows/pages.yml). Dulu nomornya berganti tiap 10 menit lewat
+     document.write: cache-nya memang lepas, tapi setiap pengunjung mengunduh
+     ulang 156 KB CSS+JS tiap sepuluh menit, dan document.write menahan parser
+     sampai CSS-nya selesai. Dengan cap deploy, berkasnya boleh disimpan lama
+     dan hanya berubah saat kodenya benar-benar berubah. -->
+<link rel="stylesheet" href="assets/style.css?v=__BUILD__">
+<!-- Data tinggal di host lain; sambungannya dibuka lebih awal supaya DNS dan
+     TLS tidak menunggu sampai fetch pertama. -->
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+<link rel="dns-prefetch" href="https://raw.githubusercontent.com">
+<script defer src="assets/app.js?v=__BUILD__"></script>
 </head>
 <body>
 
@@ -537,14 +542,5 @@
 
 </main>
 
-<script>
-  // GitHub Pages menyajikan aset dengan cache-control 600 detik. Kalau tag-nya
-  // statis, browser bisa menjalankan kode lama sampai sepuluh menit setelah
-  // deploy — dan itu tampil sebagai kartu kosong, bukan sebagai error. Nomor
-  // versi yang berganti tiap 10 menit bikin cache-nya lepas sendiri.
-  const s = document.createElement('script');
-  s.src = 'assets/app.js?v=' + Math.floor(Date.now() / 600000);
-  document.body.appendChild(s);
-</script>
 </body>
 </html>
