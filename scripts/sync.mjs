@@ -338,9 +338,8 @@ const treasuryMoves = (() => {
 // tanggal itu sudah terwakili di saldo awal — menjumlahkannya lagi berarti
 // menghitung uang yang sama dua kali.
 const openingUsd = Number(cfgTreasury?.treasury?.openingUsd) || 0;
-const countFromMs = cfgTreasury?.treasury?.countFrom
-  ? Date.parse(`${cfgTreasury.treasury.countFrom}T00:00:00+07:00`)
-  : -Infinity;
+const countFromMs = Number(cfgTreasury?.treasury?.countFromAt)
+  || (cfgTreasury?.treasury?.countFrom ? Date.parse(`${cfgTreasury.treasury.countFrom}T00:00:00+07:00`) : -Infinity);
 const countedMoves = treasuryMoves.filter((m) => m.at >= countFromMs);
 const treasuryUsd = Number((openingUsd + countedMoves.reduce((sum, m) => sum + m.usd, 0)).toFixed(2));
 
@@ -367,6 +366,11 @@ const snapshot = {
   botWalletUsd: Number(totalUsd.toFixed(2)),
   treasuryUsd,
   treasuryOpeningUsd: openingUsd,
+  treasuryOpeningLabel: cfgTreasury?.treasury?.openingLabel || null,
+  // Sapuan yang masuk SETELAH saldo awal ditetapkan — ditampilkan terpisah
+  // sebagai "new", supaya pemilik bisa melihat mana uang lama dan mana yang
+  // baru ditarik bot.
+  treasuryNewUsd: Number(countedMoves.reduce((sum, m) => sum + m.usd, 0).toFixed(2)),
   treasuryCountFrom: cfgTreasury?.treasury?.countFrom || null,
   treasuryMoves: countedMoves.slice(-40),
   fixedCapitalUsd,

@@ -414,6 +414,8 @@ async function resolveNav(cfg, { force = false } = {}) {
     treasuryUsd: Number(snap.treasuryUsd) || 0,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
+    treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
+    treasuryNewUsd: Number(snap.treasuryNewUsd) || 0,
     treasuryCountFrom: snap.treasuryCountFrom || null,
     fixedCapitalUsd: Number(snap.fixedCapitalUsd) || 0,
     sweepStepUsd: Number(snap.sweepStepUsd) || 100,
@@ -471,11 +473,16 @@ function renderSummary(ledger, nav) {
   // "Sudah ditarik" = pencairan investor + sapuan harian bot ke wallet tabungan.
   const sweeps = (nav.treasuryMoves || []).length;
   $('#kpiWithdraw').innerHTML = usd(ledger.withdrawn + swept);
+  // Pemilik membaca ini sebagai dua bagian: uang yang sudah ada sebelum
+  // hitungan baru dimulai ("early investor"), dan yang ditarik bot sesudahnya
+  // ("new"). Keduanya ditulis apa adanya, bukan dijumlah jadi satu angka buta.
   const opening = Number(nav.treasuryOpeningUsd) || 0;
+  const fresh = Number(nav.treasuryNewUsd) || 0;
+  const openingLabel = nav.treasuryOpeningLabel || 'saldo awal';
   $('#kpiWithdrawSub').innerHTML = swept > 0
     ? (ledger.withdrawn > 0 ? `${usd(ledger.withdrawn, 0)} investor + ` : '')
       + (opening > 0
-        ? `saldo awal ${usd(opening, 0)}` + (sweeps ? ` + ${sweeps} sapuan bot` : ' · sapuan harian ditambahkan otomatis')
+        ? `${openingLabel} ${usd(opening, 0)}` + (fresh > 0 ? ` · new ${usd(fresh, 0)}` : '')
         : `${usd(swept, 0)} disapu bot · ${sweeps} transfer`)
     : 'total penarikan';
   const el = $('#kpiPnl');
@@ -1285,7 +1292,8 @@ function renderTreasury() {
     tile('Dipegang bot sekarang', usd(inBot), above > 0 ? `${usd(above)} di atas modal` : 'di bawah atau pas di modal',
       above > 0 ? 'pos' : ''),
     tile('Sudah dipindahkan', usd(moved), Number(nav.treasuryOpeningUsd) > 0
-      ? `saldo awal ${usd(Number(nav.treasuryOpeningUsd), 0)} + ${(nav.treasuryMoves || []).length} sapuan`
+      ? `${nav.treasuryOpeningLabel || 'saldo awal'} ${usd(Number(nav.treasuryOpeningUsd), 0)}`
+        + (Number(nav.treasuryNewUsd) > 0 ? ` · new ${usd(Number(nav.treasuryNewUsd), 0)}` : '')
       : `${(nav.treasuryMoves || []).length} transfer ke wallet terpisah`, moved > 0 ? 'pos' : ''),
     tile('Antre keluar', due > 0 ? usd(due, 0) : '—',
       due > 0 ? 'dikirim pada sapuan berikutnya' : `belum genap ${usd(step, 0)}`, due > 0 ? 'pos' : ''),
@@ -1306,9 +1314,10 @@ function renderTreasury() {
       + '</tbody></table>'
     : '<p class="dim">Belum ada sapuan yang tercatat.</p>';
   if (opening > 0) {
-    const from = nav.treasuryCountFrom ? fmtDay(nav.treasuryCountFrom) : null;
-    $('#treMoves').innerHTML += `<p class="dim">Saldo awal ${usd(opening, 0)}`
-      + (from ? ` · sapuan harian dihitung mulai ${from}` : '') + '.</p>';
+    $('#treMoves').innerHTML += `<p class="dim">${nav.treasuryOpeningLabel || 'Saldo awal'} ${usd(opening, 0)}`
+      + (Number(nav.treasuryNewUsd) > 0
+        ? ` · new ${usd(Number(nav.treasuryNewUsd), 0)} dari ${(nav.treasuryMoves || []).length} sapuan bot`
+        : ' · sapuan bot berikutnya ditambahkan sebagai "new"') + '.</p>';
   }
 
   $('#treRule').innerHTML = `

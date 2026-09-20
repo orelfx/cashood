@@ -24,8 +24,13 @@ import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const CONFIG = resolve(ROOT, 'data/config.json');
-const LIVE = resolve(ROOT, 'data/live.json');
+// Sejak situs memegang dua dana, berkasnya per dana: data/<dana>/config.json.
+// Jalur lama (data/config.json) sudah tidak ada, dan script ini diam-diam
+// rusak sejak pemisahan itu sampai dipakai lagi pada 2026-09-20.
+const FUND = (process.argv.includes('--fund') ? process.argv[process.argv.indexOf('--fund') + 1] : null) || 'reborn';
+const CONFIG = resolve(ROOT, `data/${FUND}/config.json`);
+const LIVE = resolve(ROOT, `data/${FUND}/live.json`);
+const NAVFILE = resolve(ROOT, `data/${FUND}/nav.json`);
 
 const die = (msg) => { console.error('✗ ' + msg); process.exit(1); };
 
@@ -68,8 +73,8 @@ if (!Number.isFinite(navUsd) || navUsd <= 0) {
   const live = JSON.parse(readFileSync(LIVE, 'utf8'));
   const ageMin = (Date.now() - live.updatedAt) / 60000;
   if (ageMin > 30) {
-    die(`data/live.json umurnya ${ageMin.toFixed(0)} menit — terlalu tua untuk dijadikan navBefore.\n`
-      + '  Jalankan dulu: node scripts/sync.mjs   (atau paksa dengan --nav <angka>)');
+    die(`data/${FUND}/live.json umurnya ${ageMin.toFixed(0)} menit — terlalu tua untuk dijadikan navBefore.\n`
+      + `  Jalankan dulu: node scripts/sync${FUND === 'reborn' ? '' : '-' + FUND}.mjs   (atau paksa dengan --nav <angka>)`);
   }
   navUsd = live.totalUsd;
   console.log(`nilai wallet: $${navUsd.toFixed(2)} (snapshot ${ageMin.toFixed(0)} menit lalu)`);
@@ -88,7 +93,7 @@ if (!Number.isFinite(navUsd) || navUsd <= 0) {
 // saldo token sebesar setoran itu tanda yang cukup jelas.
 if (type === 'deposit' && !flag('force')) {
   try {
-    const points = JSON.parse(readFileSync(resolve(ROOT, 'data/nav.json'), 'utf8')).points || [];
+    const points = JSON.parse(readFileSync(NAVFILE, 'utf8')).points || [];
     const [prev, last] = points.slice(-2);
     if (prev && last) {
       const tokenJump = (last.usd - (last.lp ?? 0)) - (prev.usd - (prev.lp ?? 0));
@@ -158,7 +163,7 @@ console.log(`\n✓ ditulis ke ${CONFIG}`);
 
 if (flag('push')) {
   const git = (...args) => execFileSync('git', args, { cwd: ROOT, stdio: 'inherit' });
-  git('add', 'data/config.json');
+  git('add', `data/${FUND}/config.json`);
   git('commit', '-m', `chore: ${type} $${amount.toFixed(2)}${owner ? ' ' + owner : ' pro-rata'} ${date}`);
   git('push');
   console.log('✓ dipush — situs ikut berubah setelah build Pages selesai');

@@ -35,6 +35,16 @@
       "id": "abil",
       "name": "Nomen",
       "color": "#f472b6"
+    },
+    {
+      "id": "sinakal",
+      "name": "Si Nakal",
+      "color": "#c084fc"
+    },
+    {
+      "id": "fanfuy",
+      "name": "Fanfuy",
+      "color": "#38bdf8"
     }
   ],
   "_events_help": [
@@ -79,6 +89,42 @@
       "navBefore": 7988.75,
       "note": "investor baru — navBefore dikoreksi: 1000 USDG sudah masuk jam 03:17 WIB, sebelum snapshot 03:18",
       "at": 1789071420000
+    },
+    {
+      "date": "2026-09-20",
+      "at": 1789905463718,
+      "type": "deposit",
+      "owner": "sinakal",
+      "usd": 1000,
+      "navBefore": 10358.13,
+      "note": "investor baru"
+    },
+    {
+      "date": "2026-09-20",
+      "at": 1789905463811,
+      "type": "deposit",
+      "owner": "abil",
+      "usd": 1000,
+      "navBefore": 10358.13,
+      "note": "tambahan modal"
+    },
+    {
+      "date": "2026-09-20",
+      "at": 1789905463897,
+      "type": "deposit",
+      "owner": "fanfuy",
+      "usd": 700,
+      "navBefore": 10358.13,
+      "note": "investor baru"
+    },
+    {
+      "date": "2026-09-20",
+      "at": 1789905802736,
+      "type": "deposit",
+      "owner": "fanfuy",
+      "usd": 1000,
+      "navBefore": 10358.13,
+      "note": "tambahan modal"
     }
   ],
   "costs": {
@@ -123,18 +169,19 @@
     "note": "Tiap tanggal 1: seluruh uang yang ditarik bot bulan itu dikurangi biaya sistem, lalu 100% dibagikan menurut porsi saham — sekecil apa pun porsinya. Tidak ada lagi bagian 30% yang mengendap (aturan pemilik, 2026-09-18). Fee admin standar 15% dari bagian tiap investor, digratiskan selama masa perkenalan."
   },
   "fund": {
-    "capacityUsd": 10000,
+    "capacityUsd": 13000,
     "minDepositUsd": 100,
     "noticeHours": 24,
-    "note": "Plafon ditinjau ulang setelah bot terbukti sanggup memegang lebih.",
-    "fixedCapitalUsd": 9300
+    "note": "Plafon $13.000, penuh. Modal kerja bot mengikuti setoran bersih.",
+    "fixedCapitalUsd": 13000
   },
   "treasury": {
     "stepUsd": 100,
     "ledgerFile": "data/reborn/treasury.jsonl",
-    "note": "Modal bot dikunci $9.300. Kelebihannya ditarik dalam kelipatan $100 ke wallet terpisah; uangnya tetap milik dana dan tetap dihitung dalam nilai saham.",
-    "openingUsd": 300,
-    "countFrom": "2026-09-19",
-    "openingNote": "Saldo awal ditetapkan pemilik 2026-09-18: $300. Sapuan sebelum 19 Sep ($510 menurut catatan bot) tidak dihitung terpisah — sudah terwakili di angka ini. Mulai 19 Sep tiap sapuan ditambahkan di atasnya."
+    "note": "Modal bot dikunci di setoran bersih. Kelebihannya ditarik dalam kelipatan $100 ke wallet terpisah; uangnya tetap milik dana dan tetap dihitung dalam nilai saham.",
+    "openingUsd": 1100,
+    "openingNote": "Ditetapkan pemilik 2026-09-20: $1.100 sebagai 'early investor'. Sapuan setelah waktu itu dihitung terpisah sebagai 'new'.",
+    "openingLabel": "early investor",
+    "countFromAt": 1789905492919
   }
 }
