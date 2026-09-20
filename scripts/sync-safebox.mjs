@@ -84,23 +84,42 @@ writeFileSync(SERIES, JSON.stringify({ updatedAt: now, points: kept.slice(-4000)
 /**
  * Laju bunga diukur dari pertumbuhan fee yang tercatat, bukan dari angka tetap.
  *
- * Dipakai jendela terpanjang yang tersedia sampai tujuh hari; kalau catatannya
- * masih pendek, dipakai sejak awal pengamatan. Jendela yang terlalu pendek
- * membuat satu jam sepi terbaca sebagai penurunan bunga yang besar.
+ * JENDELA BERGULIR 24 JAM, bukan seluruh catatan. Mengukur dari seluruh
+ * catatan membuat lajunya nyaris tidak bergerak: pada 2026-09-20 rata-rata dua
+ * hari keluar 3,61%/bulan sementara enam jam terakhir 1,36%, jadi angkanya
+ * mentok di batas 3% berhari-hari dan terlihat seperti angka mati. 24 jam
+ * cukup panjang untuk menahan satu jam sepi, cukup pendek untuk ikut bergerak
+ * tiap kali fee-nya berubah.
+ *
+ * Kalau catatannya masih terlalu pendek untuk jendela itu, dipakai jendela
+ * yang lebih panjang, dan terakhir seluruh umur posisi.
  */
 const startedAt = Date.parse(secret.startedAt || cfg.startedAt) || book.since || now;
-const window = kept.filter((p) => now - p.t <= 7 * 86400e3);
-const first = window.length > 1 ? window[0] : null;
-const seriesDays = first ? (now - first.t) / 86400e3 : 0;
+const WINDOWS = [
+  { ms: 24 * 3600e3, minSpanMs: 3 * 3600e3, label: 'fee 24 jam terakhir' },
+  { ms: 7 * 86400e3, minSpanMs: 12 * 3600e3, label: 'fee 7 hari terakhir' },
+];
 
-// Jendela yang terlalu pendek membuat laju bunga meledak: satu jam pengamatan
-// yang kebetulan memuat panen fee akan terbaca sebagai ratusan persen setahun.
-// Di bawah satu hari catatan, dipakai seluruh umur posisi.
-const useSeries = first && seriesDays >= 1;
-const spanDays = Math.max(0.5, useSeries ? seriesDays : (now - startedAt) / 86400e3);
-const feeGain = Math.max(0, useSeries ? interest - num(first.fee) : interest);
+let measured = null;
+for (const w of WINDOWS) {
+  const inWindow = kept.filter((p) => now - p.t <= w.ms);
+  const firstPoint = inWindow.length > 1 ? inWindow[0] : null;
+  if (!firstPoint || now - firstPoint.t < w.minSpanMs) continue;
+  measured = { first: firstPoint, spanDays: (now - firstPoint.t) / 86400e3, basis: w.label };
+  break;
+}
+if (!measured) {
+  measured = {
+    first: null,
+    spanDays: Math.max(0.5, (now - startedAt) / 86400e3),
+    basis: 'seluruh fee sejak posisi dibuka',
+  };
+}
+
+const first = measured.first;
+const spanDays = measured.spanDays;
+const feeGain = Math.max(0, first ? interest - num(first.fee) : interest);
 const perDay = feeGain / spanDays;
-const apyActualPct = principal > 0 ? (perDay / principal) * 365 * 100 : null;
 
 // ─── laju bunga: 0,1%–3% per bulan ───────────────────────────────────────
 // Lajunya diukur dari fee yang benar-benar dihasilkan posisi ETH/USD: fee per
@@ -160,8 +179,8 @@ const snapshot = {
     maxMonthlyPct: Number.isFinite(maxMonthly) ? maxMonthly : null,
     capped: monthlyActualPct > maxMonthly,
     spanDays: Number(spanDays.toFixed(2)),
-    since: new Date((useSeries ? first.t : startedAt) + WIB).toISOString().slice(0, 10),
-    basis: useSeries ? 'pertumbuhan fee tercatat' : 'seluruh fee sejak posisi dibuka',
+    since: new Date((first ? first.t : startedAt) + WIB).toISOString().slice(0, 16).replace('T', ' '),
+    basis: measured.basis,
   },
   ethPrice: price,
   nativeSymbol: 'ETH',
