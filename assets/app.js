@@ -1901,6 +1901,8 @@ function renderSafebox() {
     }
 
     const rate = d.measure || {};
+    // 0,1% tidak boleh dibulatkan jadi "0%" — itu justru batas bawahnya.
+    const pctRate = (v) => pct(v, Number.isInteger(Number(v)) ? 0 : 1);
     const modal = sbCapital == null ? d.balanceUsd : sbCapital;
     const perDayRate = d.principalUsd > 0 ? rate.perDayUsd / d.principalUsd : 0;
 
@@ -1940,10 +1942,10 @@ function renderSafebox() {
             <div class="n">diukur ${rate.spanDays} hari · ${rate.basis || 'fee tercatat'}</div></div>
         </div>
         <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>, tapi selalu di antara
-          <strong>${pct(rate.minMonthlyPct ?? 0, 0)} dan ${rate.maxMonthlyPct == null ? '—' : pct(rate.maxMonthlyPct, 0)} per bulan</strong>.
+          <strong>${pctRate(rate.minMonthlyPct ?? 0)} dan ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>.
           Besarnya mengikuti fee yang dihasilkan posisi likuiditas ini dan dihitung ulang tiap sepuluh menit. Saat
           fee sedang tinggi, bunganya berhenti di batas atas; saat pasar sedang turun, bunganya berhenti di
-          ${pct(rate.minMonthlyPct ?? 0, 0)} dan tidak pernah minus.</p>
+          ${pctRate(rate.minMonthlyPct ?? 0)} dan tidak pernah minus.</p>
       </section>
 
       <section class="card">

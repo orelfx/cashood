@@ -40,12 +40,19 @@ RR_HOME="${RR_HOME:-/root/robinhood}" /usr/bin/node scripts/sync-safebox.mjs || 
 '
 
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
-for fund in reborn meridian safebox; do
+for fund in reborn meridian; do
   mkdir -p "$WORK/$fund"
   for f in live.json nav.json heartbeat.json forecast.json; do
     [ -f "data/$fund/$f" ] && cp "data/$fund/$f" "$WORK/$fund/$f"
   done
 done
+
+# Safe Box: HANYA live.json, yang isinya angka tampilan. nav.json memuat nilai
+# posisi likuiditas yang sebenarnya dan ukuran itu tidak diterbitkan; halaman
+# pun tidak membacanya.
+mkdir -p "$WORK/safebox"
+cp data/safebox/live.json "$WORK/safebox/live.json"
+rm -f "$WORK/safebox/nav.json"
 
 cd "$WORK"
 if [ -z "$(git status --porcelain)" ]; then

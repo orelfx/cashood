@@ -6,16 +6,15 @@
     "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/live.json",
     "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/nav.json"
   },
-  "position": {
-    "tokenId": "2513266",
-    "venue": "Uniswap v4"
-  },
-  "principalUsd": 300.14,
   "startedAt": "2026-09-12",
-  "note": "Satu posisi likuiditas. Nilai pokok mengikuti pasar; yang dilaporkan sebagai bunga adalah fee yang dihasilkan posisi itu.",
+  "note": "Simpanan yang imbal hasilnya mengikuti fee likuiditas. Ukuran posisi dan identitasnya tidak diterbitkan.",
   "rate": {
-    "minMonthlyPct": 0,
+    "minMonthlyPct": 0.1,
     "maxMonthlyPct": 3,
-    "note": "Aturan pemilik 2026-09-19: bunga Safe Box dikunci 0%–3% PER BULAN. Fee di atas 3%/bulan tidak ditampilkan sebagai bunga; rugi (termasuk impermanent loss) tidak pernah membuat bunga minus — paling rendah 0%."
+    "note": "Aturan pemilik 2026-09-20: bunga dikunci 0,1%–3% per bulan. Lajunya diukur dari fee yang dihasilkan posisi ETH/USD — fee per hari dibagi ukuran posisi, dikali 30 — lalu dikenakan ke nilai yang ditampilkan."
+  },
+  "display": {
+    "principalUsd": 2000,
+    "note": "Yang ditampilkan di halaman. Ukuran posisi likuiditasnya sendiri tidak ikut terbit."
   }
 }
