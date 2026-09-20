@@ -93,14 +93,19 @@ try {
       tokenId: String(r.tokenId ?? r.id ?? '').split('-').pop(),
       symbol: r.pairName ?? null,
       inRange: (r.inRange ?? r.isInRange) === true,
-      principalUsd: Number(basis.toFixed(2)),
-      // Nama yang dipakai kartu ringkasan LP di situs; tanpa ini "Modal masuk"
-      // tampil $0 padahal angkanya ada.
+      // `principalUsd` di situs berarti NILAI posisi sekarang, di luar fee yang
+      // belum dipanen — bukan modal yang dulu dimasukkan. Mengisinya dengan
+      // modal awal membuat subjudul "token + LP" tidak sama dengan totalnya
+      // ($3.059 di LP pada dana bernilai $2.838).
+      principalUsd: Number(value.toFixed(2)),
+      // Modal awal punya namanya sendiri; ini yang dipakai kartu "Modal masuk".
       investedUsd: Number(basis.toFixed(2)),
       collectedFeesUsd: Number(num(r.collectedFee).toFixed(2)),
       feesUsd: Number(fees.toFixed(2)),
       valueUsd: Number(value.toFixed(2)),
-      pnlUsd: Number.isFinite(num(r.pnl)) ? Number(num(r.pnl).toFixed(2)) : null,
+      // Dihitung sendiri: nilai sekarang + fee (dipanen dan belum) − modal.
+      // Angka `pnl` dari LP Agent tidak selalu ada dan tidak selalu berupa angka.
+      pnlUsd: basis > 0 ? Number((value + fees + num(r.collectedFee) - basis).toFixed(2)) : null,
       feePct: Number.isFinite(num(r.poolInfo?.feeTier)) ? num(r.poolInfo.feeTier) / 10000 : null,
       ageMinutes: Number.isFinite(num(r.ageHour)) ? Math.round(num(r.ageHour) * 60) : null,
     };
