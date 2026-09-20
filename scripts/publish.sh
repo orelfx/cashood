@@ -16,6 +16,10 @@ WORK="$ROOT/.databranch"
 /usr/bin/node scripts/sync.mjs || echo "PERINGATAN: snapshot reborn gagal"
 MERIDIAN_HOME="${MERIDIAN_HOME:-/root/main/meridian}" /usr/bin/node scripts/sync-meridian.mjs || echo "PERINGATAN: snapshot meridian gagal"
 RR_HOME="${RR_HOME:-/root/robinhood}" /usr/bin/node scripts/sync-safebox.mjs || echo "PERINGATAN: snapshot safebox gagal"
+# Dana ini membaca dompet milik orang lain lewat RPC yang juga dipakai bot;
+# saat RPC-nya sibuk, pembacaan bisa menggantung. Dibatasi supaya cron sepuluh
+# menit tidak menumpuk proses di belakangnya.
+RR_HOME="${RR_HOME:-/root/robinhood}" timeout 240 /usr/bin/node scripts/sync-ferari.mjs || echo "PERINGATAN: snapshot ferari gagal"
 
 # Tagihan sistem $155 itu satu tagihan untuk seluruh sistem, bukan satu per
 # dana. Dibayar sekali dari dana yang ditandai `costs.primary` di config-nya;
@@ -40,7 +44,7 @@ RR_HOME="${RR_HOME:-/root/robinhood}" /usr/bin/node scripts/sync-safebox.mjs || 
 '
 
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
-for fund in reborn meridian; do
+for fund in reborn meridian ferari; do
   mkdir -p "$WORK/$fund"
   for f in live.json nav.json heartbeat.json forecast.json; do
     [ -f "data/$fund/$f" ] && cp "data/$fund/$f" "$WORK/$fund/$f"

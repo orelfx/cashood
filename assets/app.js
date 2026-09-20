@@ -45,7 +45,7 @@ function getJSON(url, { fresh = false } = {}) {
     const quiet = (pr) => { pr.catch(() => {}); return pr; };
     quiet(getJSON(FUNDS_URL));
     const guess = (location.hash || '').replace(/^#/, '').split('/')[0] || 'reborn';
-    const fund = ['reborn', 'meridian'].includes(guess) ? guess : 'reborn';
+    const fund = ['reborn', 'meridian', 'ferari'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
   } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
@@ -489,6 +489,23 @@ function ownerValues(ledger, navUsd) {
       pnl: value + o.withdrawn - o.deposited,
     };
   });
+}
+
+/**
+ * Kartu yang tidak punya isi disembunyikan.
+ *
+ * Dana yang dibaca dari dompet orang lain tidak punya catatan posisi tertutup
+ * maupun riwayat harian — bot yang menutup posisinya bukan bot kita. Sebelum
+ * ini, dua kartunya berdiri kosong dengan tulisan "mengambil riwayat dari
+ * snapshot…" yang tidak akan pernah selesai.
+ */
+function hideEmptyCards(nav) {
+  const punyaRiwayat = Array.isArray(nav?.history) && nav.history.length > 0;
+  const punyaTutup = Array.isArray(nav?.closedRecent) && nav.closedRecent.length > 0;
+  const siap = nav?.source === 'snapshot';
+  const card = (id, ada) => { const el = $(id); if (el) el.hidden = siap && !ada; };
+  card('#profitCard', punyaRiwayat);
+  card('#closedCard', punyaTutup);
 }
 
 function renderSummary(ledger, nav) {
@@ -948,8 +965,17 @@ async function loadHeartbeat(cfg) {
 
 /* ── tab ─────────────────────────────────────────────────────────────── */
 
+/** Tab yang dimiliki dana ini; tanpa daftar di funds.json, semuanya. */
+function tabsOf(fundId) {
+  const listed = fundMeta(fundId)?.tabs;
+  return Array.isArray(listed) && listed.length ? listed.filter((t) => TABS.includes(t)) : TABS;
+}
+
 function showTab(name) {
-  const tab = TABS.includes(name) ? name : 'portfolio';
+  // Dana dengan satu pemilik tidak punya buku investor atau halaman
+  // pengenalan; memintanya lewat alamat pun jatuh ke Portofolio.
+  const allowed = tabsOf(state.fund);
+  const tab = allowed.includes(name) ? name : allowed[0] || 'portfolio';
   currentTab = tab;
   state.view = 'fund';
   $('#tabs').hidden = false;
@@ -962,10 +988,14 @@ function showTab(name) {
   $('#tab-tentang').hidden = tab !== 'tentang';
   const bot = tab === 'bot';
   document.querySelectorAll('#tabs button').forEach((b) => {
-    const on = b.getAttribute('data-tab') === tab;
+    const t = b.getAttribute('data-tab');
+    b.hidden = !allowed.includes(t);
+    const on = t === tab;
     b.classList.toggle('on', on);
     b.setAttribute('aria-selected', String(on));
   });
+  // Satu tab saja: barisnya tidak perlu ditampilkan sama sekali.
+  $('#tabs').hidden = allowed.length < 2;
   // Alamat selalu memuat nama dananya, supaya link yang dibagikan membuka dana
   // yang dimaksud dan bukan dana bawaan.
   const want = `#${state.fund}/${tab}`;
@@ -1907,7 +1937,7 @@ function renderFundBar() {
       </button>` : '')
     + `<button data-view="analisa" class="analysis ${analisa ? 'on' : ''}" style="--fund-accent:#fbbf24">
         <span class="fdot" style="background:#fbbf24"></span>
-        <span class="fname">Prediksi AI</span>
+        <span class="fname">Portofolio</span>
       </button>`;
 }
 
@@ -2304,6 +2334,89 @@ function renderAnalisa() {
   });
 }
 
+/**
+ * Ringkasan seluruh dana, di atas prediksi.
+ *
+ * Tiap dana punya halamannya sendiri, dan sampai sekarang tidak ada satu pun
+ * tempat yang menjawab "totalnya berapa, siapa saja yang pegang". Ini
+ * tempatnya: satu kartu, seluruh dana, plus Safe Box.
+ */
+const portoCache = new Map();
+async function loadFundBrief(id) {
+  if (portoCache.has(id)) return portoCache.get(id);
+  const job = (async () => {
+    const meta = fundMeta(id);
+    const [cfg, snap] = await Promise.all([
+      getJSON(meta?.configUrl || `data/${id}/config.json`),
+      getJSON(`${RAW_BASE}${id}/live.json`).catch(() => getJSON(`data/${id}/live.json`)),
+    ]);
+    const ledger = buildLedger(cfg);
+    const total = Number(snap?.totalUsd) || 0;
+    const unit = ledger.totalUnits > 0 ? total / ledger.totalUnits : 0;
+    return {
+      id,
+      label: meta?.label || id,
+      chain: meta?.chain || '',
+      accent: meta?.accent || '#8b95a7',
+      totalUsd: total,
+      depositedUsd: ledger.deposited,
+      pnlUsd: total + ledger.withdrawn - ledger.deposited,
+      updatedAt: Number(snap?.updatedAt) || null,
+      owners: ledger.owners.filter((o) => o.units > 0)
+        .map((o) => ({ name: o.name, color: o.color, share: (o.units / ledger.totalUnits) * 100, value: o.units * unit }))
+        .sort((a, b) => b.share - a.share),
+    };
+  })();
+  portoCache.set(id, job);
+  return job;
+}
+
+async function renderPortofolio() {
+  const card = $('#portoCard');
+  if (!card) return;
+  const ids = (state.funds || []).map((f) => f.id);
+  const briefs = (await Promise.all(ids.map((id) => loadFundBrief(id).catch(() => null)))).filter(Boolean);
+  const box = state.safebox ? await loadSafebox().catch(() => null) : null;
+
+  const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
+  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0);
+  const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0);
+  const simpanan = Number(box?.balanceUsd) || 0;
+  const orang = new Set(briefs.flatMap((b) => b.owners.map((o) => o.name))).size;
+
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  $('#portoTotals').innerHTML = [
+    tile('Total seluruh aset', usd(dana + simpanan, 0),
+      simpanan > 0 ? `${usd(dana, 0)} dana + ${usd(simpanan, 0)} Safe Box` : `${briefs.length} dana berjalan`),
+    tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham`),
+    tile('Untung / rugi', signed(untung), setoran ? pct((untung / setoran) * 100) + ' dari modal' : '—', cls(untung)),
+  ].join('');
+  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''} · diperbarui ${ago(Math.max(...briefs.map((b) => b.updatedAt || 0)))}`;
+
+  $('#portoList').innerHTML = briefs.map((b) => `
+    <div class="porto-fund">
+      <div class="porto-head">
+        <span class="who"><span class="chip" style="background:${b.accent}"></span><strong>${b.label}</strong>
+          <span class="dim">${b.chain}</span></span>
+        <span class="porto-val">${usd(b.totalUsd)}<span class="n ${cls(b.pnlUsd)}">${signed(b.pnlUsd)}</span></span>
+      </div>
+      <div class="table-scroll"><table class="porto-tbl"><tbody>
+        ${b.owners.map((o) => `<tr>
+          <td><span class="who"><span class="chip" style="background:${o.color || '#4ade80'}"></span>${o.name}</span></td>
+          <td class="num">${pct(o.share)}</td>
+          <td class="num">${usd(o.value)}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div>`).join('')
+    + (box ? `<div class="porto-fund">
+      <div class="porto-head">
+        <span class="who"><span class="chip" style="background:${state.safebox?.accent || '#2dd4bf'}"></span><strong>${state.safebox?.label || 'Safe Box'}</strong>
+          <span class="dim">simpanan</span></span>
+        <span class="porto-val">${usd(box.balanceUsd)}<span class="n pos">+${usd(box.interestUsd, 2)} bunga</span></span>
+      </div>
+      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · ${box.measure?.monthlyPct == null ? '—' : pct(box.measure.monthlyPct)} per bulan.</p>
+    </div>` : '');
+}
+
 function showAnalisa(fund) {
   state.view = 'analisa';
   analisaFund = fund || analisaFund || state.funds[0]?.id;
@@ -2312,6 +2425,7 @@ function showAnalisa(fund) {
   $('#tab-safebox').hidden = true;
   $('#tab-analisa').hidden = false;
   renderFundBar();
+  renderPortofolio().catch(() => { const c = $('#portoCard'); if (c) c.hidden = true; });
   const want = `#analisa/${analisaFund}`;
   if (location.hash !== want) history.replaceState(null, '', want);
   renderAnalisa();
@@ -2321,6 +2435,7 @@ function showAnalisa(fund) {
 
 function renderAll() {
   const rows = ownerValues(state.ledger, state.nav.totalUsd);
+  hideEmptyCards(state.nav);
   renderSummary(state.ledger, state.nav);
   renderDonut(rows);
   renderOwners(rows);
