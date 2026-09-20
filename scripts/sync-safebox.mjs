@@ -29,6 +29,30 @@ const cfg = JSON.parse(readFileSync(resolve(DIR, 'config.json'), 'utf8'));
 const secret = JSON.parse(readFileSync(resolve(DIR, 'position.local.json'), 'utf8'));
 const tokenId = BigInt(secret.position.tokenId);
 
+// ─── secukupnya saja ─────────────────────────────────────────────────────
+// Bunganya dicatat sekali sehari, jadi membaca posisi tiap sepuluh menit tidak
+// menghasilkan apa-apa selain panggilan RPC. Cukup sejam sekali: itu masih
+// memberi 24 titik sehari untuk mengukur laju, dan baris harian tetap terbit
+// pada sinkronisasi pertama tiap hari. `--now` memaksa baca ulang.
+{
+  const LIVE = resolve(DIR, 'live.json');
+  const DAILY_FILE = resolve(DIR, 'daily.json');
+  const force = process.argv.includes('--now');
+  if (!force && existsSync(LIVE) && existsSync(DAILY_FILE)) {
+    try {
+      const prev = JSON.parse(readFileSync(LIVE, 'utf8'));
+      const led = JSON.parse(readFileSync(DAILY_FILE, 'utf8'));
+      const todayWib = new Date(Date.now() + WIB).toISOString().slice(0, 10);
+      const freshMin = (Date.now() - Number(prev.updatedAt || 0)) / 60000;
+      const postedToday = (led.days || []).some((d) => d.date === todayWib);
+      if (postedToday && freshMin < 55) {
+        console.log(`[safebox] dilewati — baris ${todayWib} sudah dicatat, snapshot ${freshMin.toFixed(0)} menit lalu`);
+        process.exit(0);
+      }
+    } catch { /* berkas belum ada atau rusak: jalan normal */ }
+  }
+}
+
 process.chdir(RR_HOME);
 const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
 await load('node_modules/dotenv/config.js').catch(() => {});
@@ -132,33 +156,55 @@ const minMonthly = Number.isFinite(Number(cfg.rate?.minMonthlyPct)) ? Number(cfg
 const maxMonthly = Number.isFinite(Number(cfg.rate?.maxMonthlyPct)) ? Number(cfg.rate.maxMonthlyPct) : Infinity;
 const monthlyPct = Math.min(maxMonthly, Math.max(minMonthly, monthlyActualPct));
 
-// ─── nilai yang ditampilkan, dan bunganya yang ditabung ──────────────────
+// ─── nilai yang ditampilkan, dan bunga yang dicatat HARIAN ───────────────
 // Yang tampil di halaman adalah nilai tetap `display.principalUsd`; ukuran
 // posisi aslinya tidak ikut terbit.
 //
-// Bunga DITABUNG, tidak dihitung ulang dari laju hari ini. Kalau dihitung
-// ulang, laju yang turun dari 3% ke 1% akan membuat saldo yang sudah tampil
-// ikut turun — padahal bunga yang sudah lewat tidak bisa ditarik kembali.
-// Tiap sepuluh menit, sepotong bunga sebesar laju saat itu ditambahkan:
+// Bunganya dicatat SEKALI SEHARI, bukan sedikit-sedikit tiap sepuluh menit.
+// Aturan pemilik, 2026-09-20: satu baris per hari — "bunga hari ini" — dan
+// totalnya jumlah seluruh baris. Hari ini $0,70, besok mungkin $1,00, dan
+// totalnya jadi $1,70. Sekali dicatat, baris hari itu tidak berubah lagi:
+// bunga yang sudah diumumkan tidak bisa ditarik kembali.
 //
-//   tambahan = nilai tampil × laju sebulan × (selisih waktu / 30 hari)
-//
-// Karena lajunya tidak pernah negatif, saldonya tidak pernah turun.
+// Besar satu hari = nilai tampil x laju sebulan / 30, memakai laju yang
+// terukur saat baris itu dicatat.
 const shownPrincipal = Number(cfg.display?.principalUsd) || principal;
-const ACCRUAL = resolve(DIR, 'accrual.json');
-const acc = existsSync(ACCRUAL)
-  ? JSON.parse(readFileSync(ACCRUAL, 'utf8'))
-  : { accruedUsd: 0, lastAt: now, startedAt: now };
-const dtDays = Math.max(0, Math.min(1, (now - Number(acc.lastAt || now)) / 86400e3));
-const added = shownPrincipal * (monthlyPct / 100) * (dtDays / 30);
-acc.accruedUsd = Number(acc.accruedUsd || 0) + added;
-acc.lastAt = now;
-acc.lastMonthlyPct = Number(monthlyPct.toFixed(4));
-writeFileSync(ACCRUAL, JSON.stringify(acc, null, 2) + '\n');
+const wibDay = (ms) => new Date(ms + WIB).toISOString().slice(0, 10);
+const today = wibDay(now);
 
-const interestShown = acc.accruedUsd;
-const perDayShown = shownPrincipal * (monthlyPct / 100) / 30;
-const apyPct = monthlyPct * 365 / 30;
+const DAILY = resolve(DIR, 'daily.json');
+const ledger = existsSync(DAILY) ? JSON.parse(readFileSync(DAILY, 'utf8')) : { days: [] };
+ledger.days = Array.isArray(ledger.days) ? ledger.days : [];
+
+// Pindahan dari cara lama yang menabung tiap sepuluh menit: bunga yang sudah
+// terkumpul jadi baris pertama, supaya saldonya tidak melompat mundur.
+const ACCRUAL = resolve(DIR, 'accrual.json');
+if (!ledger.days.length && existsSync(ACCRUAL)) {
+  const old = JSON.parse(readFileSync(ACCRUAL, 'utf8'));
+  const carried = Number(old.accruedUsd) || 0;
+  if (carried > 0) ledger.days.push({ date: today, usd: Number(carried.toFixed(4)), monthlyPct: Number(monthlyPct.toFixed(2)), at: now, note: 'pindahan dari pencatatan lama' });
+}
+
+let entry = ledger.days.find((d) => d.date === today);
+if (!entry) {
+  entry = {
+    date: today,
+    usd: Number((shownPrincipal * (monthlyPct / 100) / 30).toFixed(4)),
+    monthlyPct: Number(monthlyPct.toFixed(2)),
+    at: now,
+  };
+  ledger.days.push(entry);
+}
+ledger.days.sort((a, b) => a.date.localeCompare(b.date));
+ledger.updatedAt = now;
+writeFileSync(DAILY, JSON.stringify(ledger, null, 2) + '\n');
+
+const todayUsd = Number(entry.usd) || 0;
+const interestShown = ledger.days.reduce((sum, d) => sum + (Number(d.usd) || 0), 0);
+// Laju yang ditampilkan mengikuti baris hari ini, bukan pengukuran barusan —
+// supaya "bunga hari ini" dan "bunga per bulan" selalu bercerita hal yang sama.
+const shownMonthlyPct = shownPrincipal > 0 ? (todayUsd * 30 / shownPrincipal) * 100 : 0;
+const apyPct = shownMonthlyPct * 365 / 30;
 
 // Yang terbit hanya angka tampilan. Nilai posisi, fee asli dan lajunya yang
 // sebenarnya tidak ikut — berkas ini ada di repo publik.
@@ -169,12 +215,16 @@ const snapshot = {
   principalUsd: Number(shownPrincipal.toFixed(2)),
   valueUsd: Number((shownPrincipal + interestShown).toFixed(2)),
   interestUsd: Number(interestShown.toFixed(4)),
+  interestTodayUsd: Number(todayUsd.toFixed(4)),
+  interestDay: entry.date,
+  days: ledger.days.slice(-30).map((d) => ({ date: d.date, usd: Number(Number(d.usd).toFixed(4)) })),
   balanceUsd: Number((shownPrincipal + interestShown).toFixed(2)),
   inRange: pos.inRange === true,
   measure: {
-    monthlyPct: Number(monthlyPct.toFixed(2)),
+    monthlyPct: Number(shownMonthlyPct.toFixed(2)),
     apyPct: Number(apyPct.toFixed(2)),
-    perDayUsd: Number(perDayShown.toFixed(4)),
+    perDayUsd: Number(todayUsd.toFixed(4)),
+    measuredMonthlyPct: Number(monthlyPct.toFixed(2)),
     minMonthlyPct: minMonthly,
     maxMonthlyPct: Number.isFinite(maxMonthly) ? maxMonthly : null,
     capped: monthlyActualPct > maxMonthly,
@@ -197,12 +247,14 @@ const internal = {
   monthlyActualPct: Number(monthlyActualPct.toFixed(2)),
   shownMonthlyPct: Number(monthlyPct.toFixed(2)),
   accruedUsd: Number(interestShown.toFixed(4)),
+  todayUsd: Number(todayUsd.toFixed(4)),
+  daysRecorded: ledger.days.length,
 };
 
 mkdirSync(DIR, { recursive: true });
 writeFileSync(resolve(DIR, 'live.json'), JSON.stringify(snapshot, null, 2) + '\n');
 writeFileSync(resolve(DIR, 'internal.json'), JSON.stringify(internal, null, 2) + '\n');
-console.log(`[safebox] tampil $${snapshot.balanceUsd} (pokok $${snapshot.principalUsd} + bunga $${snapshot.interestUsd})`
+console.log(`[safebox] tampil $${snapshot.balanceUsd} (pokok $${snapshot.principalUsd} + bunga $${snapshot.interestUsd}, hari ini $${snapshot.interestTodayUsd})`
   + ` · ${snapshot.measure.monthlyPct}%/bulan`
   + ` · internal: LP $${internal.lpValueUsd}, fee $${internal.feesUsd}, terukur ${internal.monthlyActualPct}%/bulan`
   + ` (diukur ${snapshot.measure.spanDays} hari)`);
