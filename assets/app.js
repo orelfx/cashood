@@ -2061,21 +2061,23 @@ function renderSafebox() {
     const rate = d.measure || {};
     // 0,1% tidak boleh dibulatkan jadi "0%" — itu justru batas bawahnya.
     const pctRate = (v) => pct(v, Number.isInteger(Number(v)) ? 0 : 1);
-    const modal = sbCapital == null ? d.balanceUsd : sbCapital;
+    // POKOK, bukan saldo. Bunga tidak ikut diputar (aturan pemilik,
+    // 2026-09-21): yang bekerja tetap uang pokoknya, bunganya menumpuk di
+    // sampingnya. Memakai saldo di sini membuat bunga berbunga diam-diam.
+    const modal = sbCapital == null ? d.principalUsd : sbCapital;
     const perDayRate = d.principalUsd > 0 ? rate.perDayUsd / d.principalUsd : 0;
 
-    // Dua kolom sengaja: bunga diambil tiap kali, dan bunga dibiarkan ikut
-    // bekerja. Bedanya kecil di jangka pendek dan besar di jangka panjang, dan
-    // menampilkan satu angka saja menyembunyikan salah satunya.
-    const rows = [['1 minggu', 7], ['1 bulan', 30], ['3 bulan', 90], ['6 bulan', 180], ['1 tahun', 365]]
+    // Satu kolom saja. Bunga di sini TIDAK diputar lagi: yang menghasilkan
+    // tetap pokoknya, dan bunga yang sudah masuk berhenti di tempatnya. Kolom
+    // "bunga diputar lagi" yang dulu ada di sini menjanjikan hal yang tidak
+    // dilakukan Safe Box.
+    const rows = [['1 hari', 1], ['1 minggu', 7], ['1 bulan', 30], ['3 bulan', 90], ['6 bulan', 180], ['1 tahun', 365]]
       .map(([label, days]) => {
-        const simple = modal * perDayRate * days;
-        const compound = modal * ((1 + perDayRate) ** days - 1);
+        const bunga = modal * perDayRate * days;
         return `<tr>
           <td>${label}</td>
-          <td class="num pos">${usd(simple)}</td>
-          <td class="num pos">${usd(compound)}</td>
-          <td class="num"><strong>${usd(modal + compound)}</strong></td>
+          <td class="num pos">${usd(bunga)}</td>
+          <td class="num"><strong>${usd(modal + bunga)}</strong></td>
         </tr>`;
       }).join('');
 
@@ -2138,6 +2140,8 @@ function renderSafebox() {
             <li>Sekecil apa pun hasilnya, bunga tidak pernah di bawah ${pctRate(rate.minMonthlyPct ?? 0)} per bulan, dan sebesar apa pun
                 tidak melebihi ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan.</li>
             <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
+            <li><strong>Bunga tidak diputar ulang.</strong> Yang bekerja tetap uang pokok; bunga menumpuk di sampingnya
+                dan tidak ikut menghasilkan bunga baru.</li>
           </ul></div>
           <div><h3 class="sub-h">Yang dijamin dan yang tidak</h3><ul class="plain">
             <li><strong>Pokok simpanan dijamin tidak hilang.</strong> Tidak ada margin call, tidak ada likuidasi yang bisa
@@ -2167,12 +2171,13 @@ function renderSafebox() {
           </div>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Jangka</th><th class="num">Bunga diambil</th><th class="num">Bunga diputar lagi</th><th class="num">Jadi</th></tr></thead>
+          <thead><tr><th>Jangka</th><th class="num">Bunga terkumpul</th><th class="num">Pokok + bunga</th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
         <p class="hint disclaimer">Tabel ini mengalikan laju bunga hari ini ke depan — bukan ramalan. Laju itu naik
-          dan turun mengikuti perdagangan di pool. Nilai pokoknya sendiri ikut bergerak mengikuti harga pasar; yang
-          dihitung sebagai bunga di sini hanya fee yang dihasilkan posisinya.</p>
+          dan turun mengikuti perdagangan di pool. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
+          tetap uang pokok, dan bunga yang sudah masuk berhenti di tempatnya — pokok ${usd(modal, 0)} yang sudah
+          berbunga ${usd(100, 0)} tetap bekerja dengan ${usd(modal, 0)}, bukan ${usd(modal + 100, 0)}.</p>
       </section>`;
 
     $('#sbCapital').oninput = (e) => {
