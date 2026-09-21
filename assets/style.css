@@ -743,7 +743,11 @@ svg.solmark { width: .78em; height: .61em; vertical-align: 0; }
   .tabs button { white-space: nowrap; }
 
   /* Catatan pembaruan */
-  #segUpdate { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  /* `.seg` itu inline-flex, jadi ia melebar mengikuti isinya dan mendorong
+     seluruh halaman — bukan menggeser dirinya sendiri. Dikunci selebar
+     induknya dulu, baru boleh digeser. */
+  #segUpdate { display: flex; width: 100%; max-width: 100%; flex-wrap: nowrap;
+               overflow-x: auto; scrollbar-width: none; }
   #segUpdate::-webkit-scrollbar { display: none; }
   #segUpdate button { flex: none; }
   .upd { padding: 11px 12px; }
