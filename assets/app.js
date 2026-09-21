@@ -2190,7 +2190,11 @@ function renderAnalisa() {
     if (!f.enough) {
       body.innerHTML = `<section class="card"><div class="card-head"><h2>Belum cukup data</h2></div>
         <p class="miss">Proyeksi butuh minimal tiga hari hasil yang tercatat; dana ini baru punya ${f.samples || 0}.
-        Angka karangan tidak diterbitkan di sini — kartunya akan muncul sendiri begitu datanya cukup.</p></section>`;
+        Angka karangan tidak diterbitkan di sini — kartunya muncul sendiri begitu datanya cukup,
+        sekitar ${Math.max(1, 3 - (f.samples || 0))} hari lagi.</p>
+        <p class="hint">Dasarnya ${f.basis === 'perubahan nilai dana antar hari'
+          ? 'perubahan nilai dana antar hari, karena dana ini dibaca dari dompet dan tidak punya catatan posisi yang ditutup'
+          : 'hasil posisi yang ditutup tiap hari'}.</p></section>`;
       return;
     }
 
@@ -2218,24 +2222,31 @@ function renderAnalisa() {
 
       <section class="card">
         <div class="card-head">
-          <h2>Kalau bot terus berjalan seperti sekarang</h2>
+          <h2>Dividen yang terkumpul kalau bot terus berjalan</h2>
           <span class="hint">memakai seluruh data sejak bot dipantau, bukan bulan ini saja</span>
         </div>
         <div class="table-scroll"><table id="horizonTable">
-          <thead><tr><th>Jangka</th><th class="num">Nilai dana</th><th class="num">Dividen terkumpul</th><th class="num">Total diterima</th><th class="num">Terburuk</th><th class="num">Terbaik</th></tr></thead>
-          <tbody>${(f.horizons || []).map((h) => `
-            <tr>
+          <thead><tr><th>Jangka</th><th class="num">Dividen terkumpul</th><th class="num">Terburuk</th><th class="num">Terbaik</th><th class="num">Nilai dana</th></tr></thead>
+          <tbody>${(f.horizons || []).map((h) => {
+            // Jangka yang belum melewati tanggal 1 belum punya dividen sama
+            // sekali — itu nol yang benar, bukan hasil buruk. Ditulis apa
+            // adanya supaya tidak terbaca sebagai "tidak menghasilkan".
+            const belumBayar = h.best.dividendsUsd <= 0;
+            return `<tr>
               <td>${h.label}${h.speculative ? ' <span class="pill out">spekulatif</span>' : ''}</td>
+              ${belumBayar
+                ? `<td class="num dim" colspan="3">belum lewat tanggal 1 — dividen pertama ${f.days} hari lagi</td>`
+                : `<td class="num pos"><strong>${usd(h.normal.dividendsUsd, 0)}</strong></td>
+                   <td class="num dim">${usd(h.worst.dividendsUsd, 0)}</td>
+                   <td class="num dim">${usd(h.best.dividendsUsd, 0)}</td>`}
               <td class="num">${usd(h.normal.navUsd, 0)}</td>
-              <td class="num pos">${usd(h.normal.dividendsUsd, 0)}</td>
-              <td class="num"><strong>${usd(h.normal.totalUsd, 0)}</strong></td>
-              <td class="num dim">${usd(h.worst.totalUsd, 0)}</td>
-              <td class="num dim">${usd(h.best.totalUsd, 0)}</td>
-            </tr>`).join('')}</tbody>
+            </tr>`;
+          }).join('')}</tbody>
         </table></div>
-        <p class="hint" style="margin-top:12px">Nilai dana berhenti di sekitar plafon karena aturan dananya ikut dijalankan:
-          tiap bulan biaya dipotong, ${Number(state.cfg?.dividend?.distributePct ?? 70)}% laba dibagikan keluar,
-          dan modal di atas plafon tidak ikut diputar. Yang menumpuk adalah dividen yang sudah diterima, bukan saldo dananya.</p>
+        <p class="hint" style="margin-top:12px">Modal dananya dipatok ${usd(Number(state.cfg?.fund?.fixedCapitalUsd) || Number(state.cfg?.fund?.capacityUsd) || 0, 0)},
+          jadi yang tumbuh bukan saldonya melainkan <strong>dividen yang sudah diterima</strong>: tiap bulan biaya dipotong,
+          ${Number(state.cfg?.dividend?.distributePct ?? 100)}% sisanya dibagikan keluar, dan kelebihan di atas modal ditarik.
+          Kolom terburuk dan terbaik adalah rentang yang wajar, bukan batas — satu dari sepuluh perjalanan berakhir di luar keduanya.</p>
       </section>
 
       <section class="card">
@@ -2257,18 +2268,28 @@ function renderAnalisa() {
           <span class="hint">kemungkinan modal tergerus dalam-dalam</span>
         </div>
         <div class="scen">${(f.lossScenarios || []).map((l) => {
-          const peluang = f.horizons?.find((h) => h.key === 'm1')?.risk?.[`p${l.dropPct}`];
+          // Yang ditanyakan orang bukan "berapa nilainya kalau turun 10%", tapi
+          // "seberapa mungkin itu terjadi". Peluangnya dijadikan angka besar,
+          // akibatnya di bawahnya.
+          const sebulan = f.horizons?.find((h) => h.key === 'm1')?.risk?.[`p${l.dropPct}`];
+          const seminggu = f.horizons?.find((h) => h.key === 'w1')?.risk?.[`p${l.dropPct}`];
+          const setahun = f.horizons?.find((h) => h.key === 'y1')?.risk?.[`p${l.dropPct}`];
+          const berat = sebulan != null && sebulan >= 20;
           return `<div class="scen-card loss">
-            <div class="scen-k">Kalau dana turun ${l.dropPct}%</div>
-            <div class="scen-v neg">${usd(l.navUsd, 0)}</div>
-            <div class="scen-d neg">${usd(l.changeUsd, 0)} dari sekarang</div>
+            <div class="scen-k">Peluang dana turun ${l.dropPct}% bulan ini</div>
+            <div class="scen-v ${berat ? 'neg' : ''}">${sebulan == null ? '—' : pct(sebulan, 2)}</div>
+            <div class="scen-d">kalau terjadi, dana jadi <b>${usd(l.navUsd, 0)}</b> <span class="neg">${usd(l.changeUsd, 0)}</span></div>
             <div class="scen-rows">
-              <div class="scen-row"><span>Harga saham</span><b>${l.sharePrice == null ? '—' : usd(l.sharePrice, 4)}</b></div>
+              <div class="scen-row"><span>Peluang dalam seminggu</span><b>${seminggu == null ? '—' : pct(seminggu, 2)}</b></div>
+              <div class="scen-row"><span>Peluang dalam setahun</span><b>${setahun == null ? '—' : pct(setahun, 2)}</b></div>
+              <div class="scen-row"><span>Harga saham jadi</span><b>${l.sharePrice == null ? '—' : usd(l.sharePrice, 4)}</b></div>
               <div class="scen-row"><span>Dividen tanggal 1</span><b class="${l.dividend.distributed > 0 ? 'pos' : 'neg'}">${usd(l.dividend.distributed, 0)}</b></div>
-              <div class="scen-row"><span>Peluang dalam sebulan</span><b>${peluang == null ? '—' : pct(peluang, 2)}</b></div>
             </div>
           </div>`;
         }).join('')}</div>
+        <p class="hint" style="margin-top:12px">Dibaca begini: dari sepuluh ribu kemungkinan perjalanan dana satu bulan ke depan,
+          sekian persen di antaranya pernah menyentuh penurunan sebesar itu. Angka yang kecil bukan berarti mustahil,
+          dan angka yang besar bukan berarti pasti.</p>
 
         <div class="table-scroll" style="margin-top:16px"><table>
           <thead><tr><th>Jangka</th><th class="num">Di bawah modal</th><th class="num">Rugi ≥10%</th><th class="num">Rugi ≥50%</th><th class="num">Rugi ≥90%</th></tr></thead>

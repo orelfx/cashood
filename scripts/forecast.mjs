@@ -29,6 +29,7 @@ const PATHS = 10000;
 
 /** Jangka waktu untuk proyeksi seumur hidup bot. */
 const HORIZONS = [
+  { key: 'd1', label: '1 hari', days: 1 },
   { key: 'w1', label: '1 minggu', days: 7 },
   { key: 'm1', label: '1 bulan', days: 30 },
   { key: 'm3', label: '3 bulan', days: 90 },
@@ -163,8 +164,35 @@ function forecast(fund) {
     return best && Math.abs(best.t - target) < 3 * 86400e3 ? num(best.usd) : nav;
   };
 
-  const daily = history.map((h) => ({ date: h.date, pct: num(h.usd) / Math.max(1, navAt(h.date)) }));
-  if (daily.length < 3) return { fund, enough: false, days, paydayAt, navNow: nav, samples: daily.length };
+  let daily = history.map((h) => ({ date: h.date, pct: num(h.usd) / Math.max(1, navAt(h.date)) }));
+  let basis = 'hasil posisi yang ditutup tiap hari';
+
+  // DANA YANG DIBACA, BUKAN DIJALANKAN, TIDAK PUNYA CATATAN POSISI TERTUTUP.
+  // Yang ada padanya cuma nilai dana dari waktu ke waktu. Itu cukup: selisih
+  // nilai antar hari adalah hasil hariannya, hanya saja sudah termasuk
+  // pergerakan harga — bukan cuma fee. Dipakai hanya kalau catatan posisi
+  // memang tidak ada, supaya dana yang punya keduanya tetap memakai yang lebih
+  // tajam.
+  if (daily.length < 3 && navSeries.length > 3) {
+    const byDay = new Map();
+    for (const p of navSeries) {
+      const d = new Date(num(p.t) + WIB).toISOString().slice(0, 10);
+      byDay.set(d, num(p.usd));                 // nilai terakhir hari itu
+    }
+    const days2 = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    const fromNav = [];
+    for (let i = 1; i < days2.length; i += 1) {
+      const [date, value] = days2[i];
+      const before = days2[i - 1][1];
+      if (before > 0) fromNav.push({ date, pct: (value - before) / before });
+    }
+    if (fromNav.length >= 3) {
+      daily = fromNav;
+      basis = 'perubahan nilai dana antar hari';
+    }
+  }
+
+  if (daily.length < 3) return { fund, enough: false, days, paydayAt, navNow: nav, samples: daily.length, basis };
 
   // Dua contoh yang berbeda, sengaja. Proyeksi tanggal 1 memakai data BULAN
   // BERJALAN saja — itu periode yang dibayarkan. Proyeksi jangka panjang
@@ -413,11 +441,14 @@ function forecast(fund) {
     })(),
     stress: null,
     caveats: [],
-    method: `Undian ulang ${daily.length} hari hasil nyata, ${PATHS.toLocaleString('id-ID')} lintasan, ${days} hari menuju ${new Date(paydayAt + WIB).toISOString().slice(0, 10)}.`,
+    basis,
+    method: `Undian ulang ${daily.length} hari hasil nyata (${basis}), ${PATHS.toLocaleString('id-ID')} lintasan, ${days} hari menuju ${new Date(paydayAt + WIB).toISOString().slice(0, 10)}.`,
   };
 }
 
-const want = process.argv[2] ? [process.argv[2]] : ['reborn', 'meridian'];
+// Dana yang dibaca dari dompet orang lain ikut di sini: tanpa riwayat posisi,
+// prediksinya disusun dari pergerakan nilai dananya sendiri (lihat forecast()).
+const want = process.argv[2] ? [process.argv[2]] : ['reborn', 'meridian', 'ferari'];
 for (const fund of want) {
   const out = forecast(fund);
   if (!out) { console.error(`[analisa] ${fund}: data tidak lengkap`); continue; }
