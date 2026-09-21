@@ -2275,13 +2275,16 @@ function renderAnalisa() {
           const seminggu = f.horizons?.find((h) => h.key === 'w1')?.risk?.[`p${l.dropPct}`];
           const setahun = f.horizons?.find((h) => h.key === 'y1')?.risk?.[`p${l.dropPct}`];
           const berat = sebulan != null && sebulan >= 20;
+          // Peluang sekecil apa pun tidak boleh dibulatkan jadi "0.00%" —
+          // nol berarti mustahil, dan tidak ada yang mustahil di sini.
+          const peluangText = (v) => v == null ? '—' : (v < 0.01 ? '<0,01%' : pct(v, 2));
           return `<div class="scen-card loss">
             <div class="scen-k">Peluang dana turun ${l.dropPct}% bulan ini</div>
-            <div class="scen-v ${berat ? 'neg' : ''}">${sebulan == null ? '—' : pct(sebulan, 2)}</div>
+            <div class="scen-v ${berat ? 'neg' : ''}">${peluangText(sebulan)}</div>
             <div class="scen-d">kalau terjadi, dana jadi <b>${usd(l.navUsd, 0)}</b> <span class="neg">${usd(l.changeUsd, 0)}</span></div>
             <div class="scen-rows">
-              <div class="scen-row"><span>Peluang dalam seminggu</span><b>${seminggu == null ? '—' : pct(seminggu, 2)}</b></div>
-              <div class="scen-row"><span>Peluang dalam setahun</span><b>${setahun == null ? '—' : pct(setahun, 2)}</b></div>
+              <div class="scen-row"><span>Peluang dalam seminggu</span><b>${peluangText(seminggu)}</b></div>
+              <div class="scen-row"><span>Peluang dalam setahun</span><b>${peluangText(setahun)}</b></div>
               <div class="scen-row"><span>Harga saham jadi</span><b>${l.sharePrice == null ? '—' : usd(l.sharePrice, 4)}</b></div>
               <div class="scen-row"><span>Dividen tanggal 1</span><b class="${l.dividend.distributed > 0 ? 'pos' : 'neg'}">${usd(l.dividend.distributed, 0)}</b></div>
             </div>
@@ -2297,9 +2300,9 @@ function renderAnalisa() {
             <tr>
               <td>${h.label}</td>
               <td class="num ${h.belowBase?.anyPct > 5 ? 'neg' : ''}">${h.belowBase ? pct(h.belowBase.anyPct, 2) : '—'}</td>
-              <td class="num ${h.risk.p10 > 5 ? 'neg' : ''}">${pct(h.risk.p10 ?? 0.001, 2)}</td>
-              <td class="num ${h.risk.p50 > 1 ? 'neg' : 'dim'}">${pct(h.risk.p50, 3)}</td>
-              <td class="num dim">${pct(h.risk.p90, 3)}</td>
+              <td class="num ${h.risk.p10 > 5 ? 'neg' : ''}">${h.risk.p10 < 0.01 ? '<0,01%' : pct(h.risk.p10 ?? 0.001, 2)}</td>
+              <td class="num ${h.risk.p50 > 1 ? 'neg' : 'dim'}">${h.risk.p50 < 0.001 ? '<0,001%' : pct(h.risk.p50, 3)}</td>
+              <td class="num dim">${h.risk.p90 < 0.001 ? '<0,001%' : pct(h.risk.p90, 3)}</td>
             </tr>`).join('')}</tbody>
         </table></div>
         ${f.stress ? `<div class="stats three" style="margin-top:14px">
