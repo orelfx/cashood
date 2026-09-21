@@ -69,6 +69,9 @@ function pctOr(value, fallback) {
 /** Dividen menurut aturan dana, dipakai ulang untuk tiap skenario. */
 function dividendAt(navUsd, cfg, ledgerBase, costs) {
   const d = cfg.dividend || {};
+  // Untuk dana bermodal tetap, yang dibagikan adalah yang sudah ditarik keluar
+  // selama bulan itu. Nilai dana pada tanggal 1 hanya menentukan sisa yang
+  // belum sempat tersapu.
   const gross = Math.max(0, navUsd - ledgerBase);
   const net = Math.max(0, gross - costs);
   // `?? ` bukan `||`: 0% mengendap adalah aturan yang sah (sejak 2026-09-18),
@@ -260,9 +263,14 @@ function forecast(fund) {
   function simulate(sample, horizonDays, tag, { mechanics = false } = {}) {
     const pool = sample.map((d) => d.pct);
     const rand = rng(seed + ':' + tag);
-    const distributePct = pctOr(cfg.dividend?.distributePct, 70) / 100;
-    const reinvestPct = pctOr(cfg.dividend?.reinvestPct, 30) / 100;
+    const distributePct = pctOr(cfg.dividend?.distributePct, 100) / 100;
+    const reinvestPct = pctOr(cfg.dividend?.reinvestPct, 0) / 100;
     const capacity = num(cfg.fund?.capacityUsd);
+    // Modal kerja yang dipatok dan langkah sapuan — aturan bot sejak
+    // 2026-09-18. Tanpa keduanya, simulasi ini memodelkan dana yang sudah
+    // tidak ada lagi.
+    const fixed = num(cfg.fund?.fixedCapitalUsd) || capacity;
+    const step = num(cfg.treasury?.stepUsd) || 100;
     const ends = [];
 
     const marks = new Set(Array.isArray(horizonDays) ? horizonDays : [horizonDays]);
@@ -273,6 +281,7 @@ function forecast(fund) {
       let value = nav;
       let reference = base;
       let paid = 0;
+      let swept = 0;                      // sudah keluar dari meja bulan ini
       let low = nav;                      // titik terendah sepanjang lintasan
 
       for (let d = 1; d <= lastDay; d += 1) {
@@ -290,15 +299,35 @@ function forecast(fund) {
 
 
 
+        // SAPUAN HARIAN. Uang di atas modal kerja ditarik hari itu juga, dalam
+        // kelipatan `step`, dan sejak saat itu ia tidak ikut naik-turun lagi.
+        // Inilah sebabnya dividen tidak bisa nol hanya karena dananya turun
+        // menjelang tanggal 1: yang sudah disapu sudah aman.
+        //
+        // Tanpa ini, simulasi menghitung dividen dari nilai dana PADA tanggal 1
+        // dan satu penurunan di hari terakhir menghapus hasil sebulan penuh —
+        // yang di dunia nyata sudah lama berada di dompet lain.
+        if (mechanics && fixed > 0 && value > fixed) {
+          const excess = Math.floor((value - fixed) / step) * step;
+          if (excess > 0) { value -= excess; swept += excess; }
+        }
+
         if (value < low) low = value;
 
         if (mechanics && d % 30 === 0) {
-          value = Math.max(0, value - costs);
-          const gross = Math.max(0, value - reference);
-          const distributed = gross * distributePct;
-          value -= distributed;
-          reference += gross * reinvestPct;
+          // Biaya sistem dipotong dari yang sudah disapu, bukan dari dana yang
+          // sedang bekerja; kalau sapuan bulan itu belum menutup biaya, sisanya
+          // baru diambil dari dana.
+          const pool = swept;
+          const net = Math.max(0, pool - costs);
+          const kurang = Math.max(0, costs - pool);
+          if (kurang > 0) value = Math.max(0, value - kurang);
+          const distributed = net * distributePct;
+          const ditahan = net * reinvestPct;
+          value += ditahan;                 // bagian yang kembali bekerja
+          reference += ditahan;
           paid += distributed;
+          swept = 0;
         }
 
         // Titik pemeriksaan direkam di sepanjang SATU lintasan, bukan diundi
@@ -306,7 +335,10 @@ function forecast(fund) {
         // memuat jangka yang lebih pendek, dan peluang kerugiannya tidak pernah
         // mengecil saat jangkanya diperpanjang — hal yang mustahil secara logika
         // tapi muncul kalau tiap jangka punya undiannya sendiri.
-        if (marks.has(d)) snap[d] = { value: Math.max(0, value), paid, low: Math.max(0, low) };
+        // `swept` = sudah keluar dari meja tapi belum tanggal 1. Uang itu
+        // sudah aman; tanpa mencatatnya, jangka pendek terbaca seolah belum
+        // menghasilkan apa-apa.
+        if (marks.has(d)) snap[d] = { value: Math.max(0, value), paid, swept, low: Math.max(0, low) };
       }
       ends.push(snap);
     }
@@ -373,14 +405,19 @@ function forecast(fund) {
       return HORIZONS.map(({ key, label, days: hd }) => {
       const values = runs.map((r) => r[hd].value).sort((a, b) => a - b);
       const paids = runs.map((r) => r[hd].paid).sort((a, b) => a - b);
+      const swepts = runs.map((r) => num(r[hd].swept)).sort((a, b) => a - b);
       const at = (q) => {
         const value = quantile(values, q);
         const paid = quantile(paids, q);
+        const swept = quantile(swepts, q);
         return {
           navUsd: Number(value.toFixed(2)),
           changePct: Number(((value / nav - 1) * 100).toFixed(2)),
           dividendsUsd: Number(paid.toFixed(2)),
-          totalUsd: Number((value + paid).toFixed(2)),
+          // Sudah ditarik keluar, menunggu tanggal 1 — bukan bagian dari dana
+          // lagi, dan tidak bisa hilang kalau dananya turun setelah itu.
+          sweptUsd: Number(swept.toFixed(2)),
+          totalUsd: Number((value + paid + swept).toFixed(2)),
           sharePrice: units > 0 ? Number((value / units).toFixed(4)) : null,
         };
       };

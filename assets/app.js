@@ -2231,14 +2231,16 @@ function renderAnalisa() {
             // Jangka yang belum melewati tanggal 1 belum punya dividen sama
             // sekali — itu nol yang benar, bukan hasil buruk. Ditulis apa
             // adanya supaya tidak terbaca sebagai "tidak menghasilkan".
+            // Sebelum tanggal 1 pertama, yang ada bukan nol: uangnya sudah
+            // ditarik keluar tiap hari dan tinggal menunggu tanggal bayar.
             const belumBayar = h.best.dividendsUsd <= 0;
+            const kolom = (q) => belumBayar ? q.sweptUsd ?? 0 : q.dividendsUsd;
             return `<tr>
               <td>${h.label}${h.speculative ? ' <span class="pill out">spekulatif</span>' : ''}</td>
-              ${belumBayar
-                ? `<td class="num dim" colspan="3">belum lewat tanggal 1 — dividen pertama ${f.days} hari lagi</td>`
-                : `<td class="num pos"><strong>${usd(h.normal.dividendsUsd, 0)}</strong></td>
-                   <td class="num dim">${usd(h.worst.dividendsUsd, 0)}</td>
-                   <td class="num dim">${usd(h.best.dividendsUsd, 0)}</td>`}
+              <td class="num pos"><strong>${usd(kolom(h.normal), 0)}</strong>${
+                belumBayar ? '<div class="n dim">sudah ditarik, menunggu tanggal 1</div>' : ''}</td>
+              <td class="num dim">${usd(kolom(h.worst), 0)}</td>
+              <td class="num dim">${usd(kolom(h.best), 0)}</td>
               <td class="num">${usd(h.normal.navUsd, 0)}</td>
             </tr>`;
           }).join('')}</tbody>
@@ -2247,6 +2249,9 @@ function renderAnalisa() {
           jadi yang tumbuh bukan saldonya melainkan <strong>dividen yang sudah diterima</strong>: tiap bulan biaya dipotong,
           ${Number(state.cfg?.dividend?.distributePct ?? 100)}% sisanya dibagikan keluar, dan kelebihan di atas modal ditarik.
           Kolom terburuk dan terbaik adalah rentang yang wajar, bukan batas — satu dari sepuluh perjalanan berakhir di luar keduanya.</p>
+        <p class="hint">Kolom terburuk tidak pernah nol karena uangnya <strong>sudah ditarik lebih dulu</strong>: tiap hari
+          kelebihan di atas modal keluar dalam kelipatan ${usd(Number(state.nav?.sweepStepUsd) || 100, 0)}, dan sejak saat itu
+          ia tidak ikut naik-turun lagi. Dana boleh turun setelahnya — yang sudah diamankan tetap dibagikan.</p>
       </section>
 
       <section class="card">
