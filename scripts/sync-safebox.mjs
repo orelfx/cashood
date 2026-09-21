@@ -156,54 +156,67 @@ const minMonthly = Number.isFinite(Number(cfg.rate?.minMonthlyPct)) ? Number(cfg
 const maxMonthly = Number.isFinite(Number(cfg.rate?.maxMonthlyPct)) ? Number(cfg.rate.maxMonthlyPct) : Infinity;
 const monthlyPct = Math.min(maxMonthly, Math.max(minMonthly, monthlyActualPct));
 
-// ─── nilai yang ditampilkan, dan bunga yang dicatat HARIAN ───────────────
+// ─── nilai yang ditampilkan, dan bunga harian ────────────────────────────
 // Yang tampil di halaman adalah nilai tetap `display.principalUsd`; ukuran
 // posisi aslinya tidak ikut terbit.
 //
-// Bunganya dicatat SEKALI SEHARI, bukan sedikit-sedikit tiap sepuluh menit.
-// Aturan pemilik, 2026-09-20: satu baris per hari — "bunga hari ini" — dan
-// totalnya jumlah seluruh baris. Hari ini $0,70, besok mungkin $1,00, dan
-// totalnya jadi $1,70. Sekali dicatat, baris hari itu tidak berubah lagi:
-// bunga yang sudah diumumkan tidak bisa ditarik kembali.
+// ATURAN PEMILIK, 2026-09-21: bunga satu hari = FEE YANG BENAR-BENAR
+// DIHASILKAN posisi hari itu, bukan hasil perkalian persen. Kalau fee kumulatif
+// kemarin $1,25 dan hari ini $2,00, maka hari ini dapat $0,75 — itu yang
+// dicatat. Fee yang sudah dipanen tetap dihitung (buku fee menjumlahkan yang
+// dipanen dan yang belum), jadi memanen tidak pernah terbaca sebagai bunga
+// yang hilang.
 //
-// Besar satu hari = nilai tampil x laju sebulan / 30, memakai laju yang
-// terukur saat baris itu dicatat.
+// Ukuran posisinya sendiri tidak jadi soal: sebagian modal pemilik diputar di
+// tempat lain, dan yang dijadikan acuan adalah fee yang masuk. Kalau posisinya
+// nanti dibesarkan, fee-nya ikut besar dan angka ini ikut naik sendiri.
+//
+// Persentasenya lalu dihitung terhadap nilai yang ditampilkan: $0,75 sehari
+// atas $3.000 berarti 0,75%/bulan. Tetap dikurung 0,1%–3% sebulan, jadi satu
+// hari yang luar biasa ramai tidak menjanjikan hal yang tidak bisa diulang.
 const shownPrincipal = Number(cfg.display?.principalUsd) || principal;
 const wibDay = (ms) => new Date(ms + WIB).toISOString().slice(0, 10);
 const today = wibDay(now);
 
+const perDayFloor = shownPrincipal * (minMonthly / 100) / 30;
+const perDayCap = Number.isFinite(maxMonthly) ? shownPrincipal * (maxMonthly / 100) / 30 : Infinity;
+
 const DAILY = resolve(DIR, 'daily.json');
 const ledger = existsSync(DAILY) ? JSON.parse(readFileSync(DAILY, 'utf8')) : { days: [] };
 ledger.days = Array.isArray(ledger.days) ? ledger.days : [];
+ledger.days.sort((a, b) => a.date.localeCompare(b.date));
 
-// Pindahan dari cara lama yang menabung tiap sepuluh menit: bunga yang sudah
-// terkumpul jadi baris pertama, supaya saldonya tidak melompat mundur.
-const ACCRUAL = resolve(DIR, 'accrual.json');
-if (!ledger.days.length && existsSync(ACCRUAL)) {
-  const old = JSON.parse(readFileSync(ACCRUAL, 'utf8'));
-  const carried = Number(old.accruedUsd) || 0;
-  if (carried > 0) ledger.days.push({ date: today, usd: Number(carried.toFixed(4)), monthlyPct: Number(monthlyPct.toFixed(2)), at: now, note: 'pindahan dari pencatatan lama' });
-}
+// Baris hari ini dihitung ulang tiap sinkronisasi — hari belum selesai, fee-nya
+// masih bertambah. Baris hari-hari sebelumnya tidak pernah disentuh lagi.
+const prior = ledger.days.filter((d) => d.date < today);
+const lastMark = [...prior].reverse().find((d) => Number.isFinite(Number(d.feeTotal)));
+// Titik awal: fee kumulatif saat hari kemarin ditutup. Kalau belum pernah
+// dicatat (pindahan dari cara lama), pakai fee kumulatif sekarang — hari ini
+// dimulai dari nol, bukan mewarisi seluruh fee sejak posisi dibuka.
+const feeBase = lastMark ? Number(lastMark.feeTotal) : interest;
+const feeToday = Math.max(0, interest - feeBase);
+const todayUsd = Math.min(perDayCap, Math.max(perDayFloor, feeToday));
 
-let entry = ledger.days.find((d) => d.date === today);
-if (!entry) {
-  entry = {
-    date: today,
-    usd: Number((shownPrincipal * (monthlyPct / 100) / 30).toFixed(4)),
-    monthlyPct: Number(monthlyPct.toFixed(2)),
+const existing = ledger.days.find((d) => d.date === today);
+const entry = existing && existing.frozen
+  ? existing                                   // baris lama dari cara lama: dibiarkan
+  : Object.assign(existing || { date: today }, {
+    usd: Number(todayUsd.toFixed(4)),
+    feeUsd: Number(feeToday.toFixed(4)),        // fee apa adanya, sebelum dikurung
+    feeTotal: Number(interest.toFixed(4)),      // penanda untuk menghitung hari berikutnya
+    monthlyPct: Number((shownPrincipal > 0 ? (todayUsd * 30 / shownPrincipal) * 100 : 0).toFixed(3)),
     at: now,
-  };
-  ledger.days.push(entry);
-}
+  });
+if (!existing) ledger.days.push(entry);
 ledger.days.sort((a, b) => a.date.localeCompare(b.date));
 ledger.updatedAt = now;
 writeFileSync(DAILY, JSON.stringify(ledger, null, 2) + '\n');
 
-const todayUsd = Number(entry.usd) || 0;
+const shownToday = Number(entry.usd) || 0;
 const interestShown = ledger.days.reduce((sum, d) => sum + (Number(d.usd) || 0), 0);
-// Laju yang ditampilkan mengikuti baris hari ini, bukan pengukuran barusan —
+// Laju yang ditampilkan mengikuti baris hari ini, bukan pengukuran terpisah —
 // supaya "bunga hari ini" dan "bunga per bulan" selalu bercerita hal yang sama.
-const shownMonthlyPct = shownPrincipal > 0 ? (todayUsd * 30 / shownPrincipal) * 100 : 0;
+const shownMonthlyPct = shownPrincipal > 0 ? (shownToday * 30 / shownPrincipal) * 100 : 0;
 const apyPct = shownMonthlyPct * 365 / 30;
 
 // Yang terbit hanya angka tampilan. Nilai posisi, fee asli dan lajunya yang
@@ -215,7 +228,7 @@ const snapshot = {
   principalUsd: Number(shownPrincipal.toFixed(2)),
   valueUsd: Number((shownPrincipal + interestShown).toFixed(2)),
   interestUsd: Number(interestShown.toFixed(4)),
-  interestTodayUsd: Number(todayUsd.toFixed(4)),
+  interestTodayUsd: Number(shownToday.toFixed(4)),
   interestDay: entry.date,
   days: ledger.days.slice(-30).map((d) => ({ date: d.date, usd: Number(Number(d.usd).toFixed(4)) })),
   balanceUsd: Number((shownPrincipal + interestShown).toFixed(2)),
@@ -223,7 +236,7 @@ const snapshot = {
   measure: {
     monthlyPct: Number(shownMonthlyPct.toFixed(2)),
     apyPct: Number(apyPct.toFixed(2)),
-    perDayUsd: Number(todayUsd.toFixed(4)),
+    perDayUsd: Number(shownToday.toFixed(4)),
     measuredMonthlyPct: Number(monthlyPct.toFixed(2)),
     minMonthlyPct: minMonthly,
     maxMonthlyPct: Number.isFinite(maxMonthly) ? maxMonthly : null,
@@ -247,7 +260,9 @@ const internal = {
   monthlyActualPct: Number(monthlyActualPct.toFixed(2)),
   shownMonthlyPct: Number(monthlyPct.toFixed(2)),
   accruedUsd: Number(interestShown.toFixed(4)),
-  todayUsd: Number(todayUsd.toFixed(4)),
+  todayUsd: Number(shownToday.toFixed(4)),
+  feeTodayUsd: Number(feeToday.toFixed(4)),
+  feeBaseUsd: Number(feeBase.toFixed(4)),
   daysRecorded: ledger.days.length,
 };
 

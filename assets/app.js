@@ -2044,7 +2044,7 @@ function renderSafebox() {
           </div>
           <div class="stat"><div class="k">Bunga hari ini</div>
             <div class="v pos">${usd(d.interestTodayUsd ?? rate.perDayUsd ?? 0, 2)}</div>
-            <div class="n">${d.interestDay ? fmtDay(d.interestDay) : ''} · dicatat sekali sehari</div></div>
+            <div class="n">${d.interestDay ? fmtDay(d.interestDay) : ''} · fee yang masuk hari ini</div></div>
           <div class="stat"><div class="k">Total bunga</div>
             <div class="v pos">${usd(d.interestUsd, 2)}</div>
             <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>
@@ -2054,8 +2054,9 @@ function renderSafebox() {
         </div>
         <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>, tapi selalu di antara
           <strong>${pctRate(rate.minMonthlyPct ?? 0)} dan ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>.
-          Besarnya mengikuti fee yang dihasilkan posisi likuiditas ini, dicatat <strong>sekali sehari</strong>, lalu
-          ditumpuk: bunga hari ini ditambahkan ke total dan tidak pernah dikurangi. Saat fee sedang tinggi,
+          Bunga satu hari adalah <strong>fee yang benar-benar dihasilkan posisi likuiditas ini hari itu</strong> —
+          selisih fee hari ini dengan fee kemarin, termasuk yang sudah dipanen. Angkanya masih bertambah sampai
+          tengah malam WIB, lalu dikunci; hari yang sudah lewat tidak pernah berubah. Saat fee sedang tinggi,
           bunganya berhenti di batas atas; saat pasar sedang turun, bunganya berhenti di
           ${pctRate(rate.minMonthlyPct ?? 0)} dan tidak pernah minus.</p>
       </section>
@@ -2063,7 +2064,7 @@ function renderSafebox() {
       ${(d.days || []).length > 1 ? `<section class="card">
         <div class="card-head">
           <h2>Bunga harian</h2>
-          <span class="hint">satu baris per hari · total ${usd(d.interestUsd, 2)}</span>
+          <span class="hint">fee yang masuk tiap hari · total ${usd(d.interestUsd, 2)}</span>
         </div>
         <div class="table-scroll"><table class="daily"><thead><tr><th>Tanggal</th><th class="num">Bunga</th><th class="num">Total berjalan</th></tr></thead><tbody>
           ${(() => { let run = 0; return [...d.days].reverse().map((x) => { return x; }).reverse()
