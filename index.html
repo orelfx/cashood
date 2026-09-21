@@ -41,9 +41,13 @@
 <main class="wrap">
 
   <div class="strip" id="strip">
-    <span class="strip-item"><span class="led live"></span><b>Saldo token</b> <span id="stripToken">live dari chain</span></span>
+    <span class="strip-item"><span class="led live"></span><b>Saldo token</b> <span id="stripToken" class="say">live dari chain</span></span>
     <span class="strip-item"><span class="led lp"></span><b>Nilai LP</b> <span id="stripLp">—</span></span>
-    <span class="strip-item"><span class="led"></span><b>Bagi hasil</b> dihitung ulang tiap data masuk</span>
+    <span class="strip-item"><span class="led"></span><b>Bagi hasil</b> <span class="say">dihitung ulang tiap data masuk</span></span>
+    <!-- Kurs muncul di sini hanya di layar sempit: di header ia mendorong
+         tombol mata uang dan refresh keluar layar. -->
+    <span class="strip-item m-rate"><span class="led rate-led"></span><span id="stripEth">—</span></span>
+    <span class="strip-item m-rate"><span class="led rate-led"></span><span id="stripIdr">—</span></span>
   </div>
 
   <nav class="funds" id="fundBar" role="tablist" aria-label="Pilih dana"></nav>
@@ -461,6 +465,17 @@
   </div><!-- /tab-bot -->
 
   <div id="tab-safebox" hidden></div>
+
+  <div id="tab-update" hidden>
+    <section class="card">
+      <div class="card-head">
+        <h2>Update</h2>
+        <span class="hint" id="updateHint">catatan perubahan sistem dan dana</span>
+      </div>
+      <div class="seg" id="segUpdate" role="group" aria-label="Saring pembaruan"></div>
+      <div id="updateList"></div>
+    </section>
+  </div>
 
   <div id="tab-analisa" hidden>
     <section class="card" id="portoCard">

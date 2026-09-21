@@ -1,0 +1,89 @@
+{
+  "note": "Catatan pembaruan. Ditulis manual, terbaru di atas. jenis: fitur | perbaikan | sistem | data | keamanan.",
+  "updates": [
+    {
+      "date": "2026-09-21",
+      "type": "fitur",
+      "system": "Safe Box",
+      "title": "Pembaruan cara menghitung bunga",
+      "detail": "Bunga tidak lagi memakai persentase tetap. Sekarang dihitung dari fee yang benar-benar dihasilkan posisi likuiditas hari itu — selisih fee hari ini dengan fee kemarin, termasuk fee yang sudah dipanen — lalu dinyatakan sebagai persen terhadap pokok simpanan. Bunga dicatat harian, dikunci 0,1%–3% per bulan, dan tidak diputar ulang: yang bekerja tetap uang pokok."
+    },
+    {
+      "date": "2026-09-21",
+      "type": "fitur",
+      "system": "No Risk No Ferari",
+      "title": "Robot LP baru bergabung",
+      "detail": "Dana ketiga mulai dipantau: robot AI penyedia likuiditas dengan setelan risiko tinggi di jaringan Robinhood. Situs hanya membaca dompetnya — tidak ada kunci dan tidak ada perintah yang bisa menggerakkan dananya dari sini. Modal awal dicatat sebesar nilai dompet saat mulai dipantau."
+    },
+    {
+      "date": "2026-09-21",
+      "type": "perbaikan",
+      "system": "Reborn Rich",
+      "title": "Grafik nilai dana berhenti berkedut",
+      "detail": "Saat satu posisi gagal dibaca oleh jaringan, nilainya sempat hilang dari total selama satu siklus sehingga grafik terlihat terjun ±$800 lalu pulih sendiri. Nilai terakhir posisi tersebut kini dibawa maju dan ditandai, dan titik-titik keliru yang terlanjur tersimpan sudah dibersihkan. Lompatan yang tersisa adalah setoran modal, dan kini diberi keterangan."
+    },
+    {
+      "date": "2026-09-21",
+      "type": "fitur",
+      "system": "Prediksi AI",
+      "title": "Peluang ditampilkan lebih dulu, dividen jadi fokus",
+      "detail": "Worst Case kini memimpin dengan peluang kejadiannya — misalnya peluang dana turun 10% bulan ini — baru diikuti nilainya, untuk seminggu, sebulan, dan setahun. Tabel jangka panjang berpindah fokus ke dividen yang terkumpul beserta rentang terburuk dan terbaiknya, karena modal dana dipatok sehingga yang bertambah adalah dividen, bukan saldo."
+    },
+    {
+      "date": "2026-09-21",
+      "type": "perbaikan",
+      "system": "Prediksi AI",
+      "title": "Dividen yang sudah ditarik tidak bisa hilang lagi",
+      "detail": "Sebelumnya proyeksi menghitung dividen dari nilai dana pada tanggal 1, sehingga satu hari buruk di akhir bulan menghapus hasil sebulan penuh. Kini penarikan harian ikut dimodelkan: begitu dana melewati modal kerja, kelebihannya keluar dalam kelipatan $100 dan sejak saat itu tidak terpengaruh naik-turun pasar."
+    },
+    {
+      "date": "2026-09-21",
+      "type": "fitur",
+      "system": "Portofolio",
+      "title": "Ringkasan seluruh dana dalam satu halaman",
+      "detail": "Halaman Portofolio kini dibuka dengan ringkasan semua dana sekaligus: total aset, modal masuk, untung-rugi, dan daftar pemegang saham tiap dana beserta porsinya. Safe Box ikut dihitung sebagai modal dan laba pemiliknya, dan seluruh angkanya mengikuti pilihan mata uang di bagian atas halaman."
+    },
+    {
+      "date": "2026-09-20",
+      "type": "sistem",
+      "system": "Reborn Rich",
+      "title": "Modal kerja dipatok, kelebihannya ditarik harian",
+      "detail": "Bot bekerja dengan modal tetap dan tidak lagi membesarkan taruhannya mengikuti keuntungan. Setiap hari, kelebihan di atas modal kerja ditarik ke dompet terpisah dalam kelipatan $100. Ukuran tiap posisi juga dihitung dari modal tetap itu, bukan dari saldo hari berjalan."
+    },
+    {
+      "date": "2026-09-20",
+      "type": "fitur",
+      "system": "Reborn Rich",
+      "title": "Performa dipisah per buku",
+      "detail": "Tiga buku posisi — big cap, mid cap, dan degen — berbagi satu dompet sehingga hasilnya tidak terlihat terpisah. Kini setiap posisi menampilkan bukunya sendiri, dan ada kartu performa per buku berisi jumlah posisi, win rate, serta hasil bersihnya untuk hari ini, 30 hari, dan sepanjang catatan."
+    },
+    {
+      "date": "2026-09-20",
+      "type": "fitur",
+      "system": "Data investor",
+      "title": "Invoice pembagian dividen",
+      "detail": "Invoice dua lembar yang bisa diunduh: lembar pertama ringkasan pembagian dalam USD dan rupiah, lembar kedua rincian perhitungannya. Laba dibagi menurut porsi saham saat laba itu dihasilkan, sehingga modal yang baru masuk tidak ikut membagi keuntungan yang sudah ada sebelumnya."
+    },
+    {
+      "date": "2026-09-20",
+      "type": "sistem",
+      "system": "Situs",
+      "title": "Halaman dibuat lebih ringan",
+      "detail": "Permintaan data yang sebelumnya berjalan berurutan kini berangkat bersamaan, berkas tampilan tidak lagi diunduh ulang setiap sepuluh menit, dan deret nilai dana dirapatkan. Angka pertama muncul sekitar 1,4 detik dari sebelumnya 2,4 detik, dan kunjungan berikutnya di bawah setengah detik."
+    },
+    {
+      "date": "2026-09-19",
+      "type": "data",
+      "system": "Meridian",
+      "title": "Modal diperbarui menjadi $3.250",
+      "detail": "Tambahan modal dicatat dengan harga unit tepat sebelum dana masuk, sehingga porsi saham tidak bergeser oleh urutan pencatatan. Daftar biaya sistemnya juga disamakan dengan Reborn Rich."
+    },
+    {
+      "date": "2026-09-18",
+      "type": "keamanan",
+      "system": "Situs",
+      "title": "Identitas dompet tidak lagi diterbitkan",
+      "detail": "Nomor posisi likuiditas dan deret nilai dompet Safe Box berhenti diterbitkan, karena keduanya cukup untuk menemukan dompet yang sengaja disembunyikan. Yang terbit sekarang hanya angka tampilan."
+    }
+  ]
+}

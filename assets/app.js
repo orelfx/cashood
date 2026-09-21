@@ -577,6 +577,11 @@ function renderSummary(ledger, nav) {
   $('#idrRate').textContent = lastUsdIdr
     ? `$1 = Rp\u202f${Math.round(lastUsdIdr).toLocaleString('id-ID')}`
     : 'kurs Rp belum terbaca';
+  // Salinan untuk layar sempit; yang di header disembunyikan di sana.
+  const ethTeks = $('#ethRate').textContent;
+  const idrTeks = $('#idrRate').textContent;
+  if ($('#stripEth')) $('#stripEth').textContent = ethTeks;
+  if ($('#stripIdr')) $('#stripIdr').textContent = idrTeks;
 
   const every = Number(state.cfg?.app?.refreshMinutes) || 5;
   $('#stripToken').textContent = nav.source === 'manual'
@@ -998,6 +1003,7 @@ function showTab(name) {
   $('#tabs').hidden = false;
   $('#tab-analisa').hidden = true;
   $('#tab-safebox').hidden = true;
+  $('#tab-update').hidden = true;
   renderFundBar();
   $('#tab-portfolio').hidden = tab !== 'portfolio';
   $('#tab-investor').hidden = tab !== 'investor';
@@ -1944,6 +1950,7 @@ function parseHash() {
   let fund = state.fund || state.funds[0]?.id;
   let tab = 'portfolio';
   if (parts[0] === 'safebox') return { safebox: true, tab: 'portfolio' };
+  if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
   }
@@ -1967,17 +1974,19 @@ function renderFundBar() {
   $('#fundBar').innerHTML = state.funds.map((f) => `
     <button data-fund="${f.id}" class="${diDana && f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
       <span class="fdot" style="background:${f.accent}"></span>
-      <span class="fname">${f.label}</span>
-      <span class="fchain">${f.chain}</span>
+      <span class="fmeta"><span class="fname">${f.label}</span><span class="fchain">${f.chain}</span></span>
     </button>`).join('')
     + (state.safebox ? `<button data-view="safebox" class="${state.view === 'safebox' ? 'on' : ''}" style="--fund-accent:${state.safebox.accent}">
         <span class="fdot" style="background:${state.safebox.accent}"></span>
-        <span class="fname">${state.safebox.label}</span>
-        <span class="fchain">${state.safebox.subtitle}</span>
+        <span class="fmeta"><span class="fname">${state.safebox.label}</span><span class="fchain">${state.safebox.subtitle}</span></span>
       </button>` : '')
     + `<button data-view="analisa" class="analysis ${analisa ? 'on' : ''}" style="--fund-accent:#fbbf24">
         <span class="fdot" style="background:#fbbf24"></span>
-        <span class="fname">Portofolio</span>
+        <span class="fmeta"><span class="fname">Portofolio</span></span>
+      </button>`
+    + `<button data-view="update" class="analysis ${state.view === 'update' ? 'on' : ''}" style="--fund-accent:#38bdf8">
+        <span class="fdot" style="background:#38bdf8"></span>
+        <span class="fmeta"><span class="fname">Update</span></span>
       </button>`;
 }
 
@@ -2201,6 +2210,7 @@ function showSafebox() {
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
   $('#tab-analisa').hidden = true;
+  $('#tab-update').hidden = true;
   $('#tab-safebox').hidden = false;
   renderFundBar();
   if (location.hash !== '#safebox') history.replaceState(null, '', '#safebox');
@@ -2557,12 +2567,87 @@ async function renderPortofolio() {
     </div>` : '');
 }
 
+/**
+ * Catatan pembaruan.
+ *
+ * Ditulis tangan di data/updates.json — bukan diturunkan dari riwayat commit.
+ * Yang penting bagi pembaca bukan berkas apa yang berubah, melainkan apa yang
+ * berbeda bagi uangnya.
+ */
+let updateFilter = 'semua';
+let updatesCache = null;
+const UPDATE_TYPE = {
+  fitur: { label: 'fitur', color: '#4ade80' },
+  perbaikan: { label: 'perbaikan', color: '#fbbf24' },
+  sistem: { label: 'sistem', color: '#60a5fa' },
+  data: { label: 'data', color: '#a78bfa' },
+  keamanan: { label: 'keamanan', color: '#f87171' },
+};
+
+async function renderUpdates() {
+  const list = $('#updateList');
+  if (!list) return;
+  if (!updatesCache) {
+    try { updatesCache = (await getJSON('data/updates.json')).updates || []; }
+    catch { updatesCache = []; }
+  }
+  const semua = [...updatesCache].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  if (!semua.length) {
+    list.innerHTML = '<p class="miss">Belum ada catatan pembaruan.</p>';
+    return;
+  }
+
+  const jenis = [...new Set(semua.map((u) => u.type))];
+  $('#segUpdate').innerHTML = ['semua', ...jenis]
+    .map((t) => `<button data-u="${t}" class="${t === updateFilter ? 'on' : ''}">${t}</button>`).join('');
+
+  const tampil = updateFilter === 'semua' ? semua : semua.filter((u) => u.type === updateFilter);
+  $('#updateHint').textContent = `${tampil.length} catatan · terbaru ${fmtDay(semua[0].date)}`;
+
+  // Dikelompokkan per tanggal: orang membaca "apa yang berubah hari itu",
+  // bukan daftar panjang yang tanggalnya berulang-ulang.
+  const perHari = new Map();
+  for (const u of tampil) {
+    if (!perHari.has(u.date)) perHari.set(u.date, []);
+    perHari.get(u.date).push(u);
+  }
+
+  list.innerHTML = [...perHari.entries()].map(([tanggal, isi]) => `
+    <div class="upd-day">
+      <div class="upd-date">${fmtDay(tanggal)} ${String(tanggal).slice(0, 4)}</div>
+      ${isi.map((u) => {
+        const t = UPDATE_TYPE[u.type] || { label: u.type || 'lainnya', color: '#8b95a7' };
+        return `<article class="upd">
+          <div class="upd-head">
+            <span class="upd-tag" style="--tag:${t.color}">${t.label}</span>
+            <span class="upd-sys">${u.system || ''}</span>
+          </div>
+          <h3 class="upd-title">${u.title || ''}</h3>
+          ${u.detail ? `<p class="upd-detail">${u.detail}</p>` : ''}
+        </article>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function showUpdate() {
+  state.view = 'update';
+  $('#tabs').hidden = true;
+  ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  $('#tab-safebox').hidden = true;
+  $('#tab-analisa').hidden = true;
+  $('#tab-update').hidden = false;
+  renderFundBar();
+  if (location.hash !== '#update') history.replaceState(null, '', '#update');
+  renderUpdates();
+}
+
 function showAnalisa(fund) {
   state.view = 'analisa';
   analisaFund = fund || analisaFund || state.funds[0]?.id;
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
   $('#tab-safebox').hidden = true;
+  $('#tab-update').hidden = true;
   $('#tab-analisa').hidden = false;
   renderFundBar();
   renderPortofolio().catch(() => { const c = $('#portoCard'); if (c) c.hidden = true; });
@@ -2645,9 +2730,17 @@ async function init() {
     const view = btn.getAttribute('data-view');
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
+    if (view === 'update') { showUpdate(); return; }
     const id = btn.getAttribute('data-fund');
     if (state.view === 'analisa' && id === state.fund) { showTab(currentTab); return; }
     switchFund(id);
+  };
+
+  $('#segUpdate').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    updateFilter = btn.getAttribute('data-u');
+    renderUpdates();
   };
 
   $('#segAnalisa').onclick = (e) => {
@@ -2680,6 +2773,7 @@ async function init() {
     // ini angkanya tetap dolar setelah tombol rupiah ditekan.
     if (state.view === 'analisa') { renderPortofolio().catch(() => {}); renderAnalisa(); }
     else if (state.view === 'safebox') renderSafebox();
+    else if (state.view === 'update') renderUpdates();
     else renderAll();
   };
   $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-c') === currency));
@@ -2691,6 +2785,7 @@ async function init() {
   const fromHash = () => {
     const route = parseHash();
     if (route.safebox) { showSafebox(); return; }
+    if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }
     showTab(route.tab);
