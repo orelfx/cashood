@@ -94,6 +94,20 @@ main { padding-bottom: 40px; }
 .table-scroll { overflow-x: auto; }
 .tre-moves { margin: 14px 0 4px; }
 /* Tiap dana blok sendiri: kotak, bukan baris yang menempel ke tetangganya. */
+/* Garis kemajuan di paling atas: satu-satunya tanda bahwa halaman sedang
+   mengambil data. Tidak menutupi apa pun dan tidak menggeser tata letak. */
+body::before { content: ''; position: fixed; top: 0; left: 0; height: 2px; width: 0;
+  background: linear-gradient(90deg, transparent, var(--accent, #4ade80)); z-index: 90;
+  opacity: 0; transition: opacity .15s ease; pointer-events: none; }
+body.busy::before { opacity: 1; animation: memuat 1.1s ease-in-out infinite; }
+@keyframes memuat { 0% { width: 0; left: 0; } 50% { width: 70%; left: 0; } 100% { width: 0; left: 100%; } }
+@media (prefers-reduced-motion: reduce) { body.busy::before { animation: none; width: 100%; opacity: .5; } }
+
+/* Tombol harus terasa ditekan sebelum datanya sampai. */
+.seg button:active, .tabs button:active, #fundBar button:active, .btn:active { transform: scale(.97); }
+.seg button, .tabs button, #fundBar button, .btn { transition: transform .08s ease, background .15s ease, color .15s ease; }
+body.busy #fundBar button.on, body.busy .tabs button.on { opacity: .72; }
+
 .porto-fund { margin-top: 14px; padding: 14px 14px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.015); }
 .porto-fund:first-child { margin-top: 16px; }
 .porto-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap;

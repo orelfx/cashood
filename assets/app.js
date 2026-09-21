@@ -26,14 +26,31 @@ const BOOT_T = Date.now();
 const RAW_BASE = 'https://raw.githubusercontent.com/orelfx/cashood/data/';
 const inflight = new Map();
 
+/**
+ * Penanda "sedang mengambil data".
+ *
+ * Menekan tombol dana atau tab bisa memakan satu-dua detik di jaringan yang
+ * lambat, dan sebelum ini tidak ada apa pun yang berubah di layar — halaman
+ * terasa mati dan orang menekan lagi. Sebatang garis tipis di atas halaman
+ * cukup: ia muncul selama masih ada permintaan yang berjalan, dan hilang
+ * sendiri begitu semuanya selesai.
+ */
+let sibuk = 0;
+function tandaiSibuk(delta) {
+  sibuk = Math.max(0, sibuk + delta);
+  const el = typeof document !== 'undefined' ? document.body : null;
+  if (el) el.classList.toggle('busy', sibuk > 0);
+}
+
 /** Satu permintaan per alamat. `fresh` melewati antrean, untuk tombol refresh. */
 function getJSON(url, { fresh = false } = {}) {
   if (!fresh && inflight.has(url)) return inflight.get(url);
   const full = url + (url.includes('?') ? '&' : '?') + 't=' + (fresh ? Date.now() : BOOT_T);
+  tandaiSibuk(1);
   const job = fetch(full, { cache: 'no-store' }).then((res) => {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return res.json();
-  });
+  }).finally(() => tandaiSibuk(-1));
   if (!fresh) inflight.set(url, job);
   return job;
 }
@@ -1959,6 +1976,12 @@ async function loadFundConfig(id) {
 
 async function switchFund(id) {
   if (id === state.fund) return;
+  // Sorotan tombol dipindah sebelum data diminta. Menunggu jaringan dulu
+  // membuat tombol terasa tidak bereaksi, dan orang menekannya berkali-kali.
+  document.querySelectorAll('#fundBar button[data-fund]').forEach((b) => {
+    b.classList.toggle('on', b.getAttribute('data-fund') === id);
+  });
+  tandaiSibuk(1);
   state.nav = null;
   navPoints = [];
   hbLoaded = false;
@@ -1967,9 +1990,13 @@ async function switchFund(id) {
   historyRetried = false;
   view.month = null;
   $('#divNav').value = '';
-  await loadFundConfig(id);
-  showTab(currentTab);
-  await load({ force: true });
+  try {
+    await loadFundConfig(id);
+    showTab(currentTab);
+    await load({ force: true });
+  } finally {
+    tandaiSibuk(-1);
+  }
 }
 
 /* ── safe box ────────────────────────────────────────────────────────────
@@ -2072,6 +2099,34 @@ function renderSafebox() {
             .map((x) => `<tr><td>${fmtDay(x.date)}</td><td class="num pos">${usd(x.usd, 2)}</td><td class="num">${usd(x.run, 2)}</td></tr>`).join(''); })()}
         </tbody></table></div>
       </section>` : ''}
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Apa itu Safe Box</h2>
+          <span class="hint">cara kerjanya, apa adanya</span>
+        </div>
+        <p class="lead">Safe Box bekerja seperti deposito: dana yang masuk dikelola ke berbagai instrumen investasi,
+          di dalam maupun di luar Cashood, dan mengembalikan bunga <strong>${pctRate(rate.minMonthlyPct ?? 0)}–${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>
+          yang dihitung dan dibayarkan harian.</p>
+        <div class="two">
+          <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
+            <li>Besarnya mengikuti hasil perdagangan yang benar-benar terjadi hari itu, bukan janji persentase tetap.</li>
+            <li>Karena itu bunganya naik-turun: hari yang ramai membayar lebih besar, hari yang sepi lebih kecil.</li>
+            <li>Sekecil apa pun hasilnya, bunga tidak pernah di bawah ${pctRate(rate.minMonthlyPct ?? 0)} per bulan, dan sebesar apa pun
+                tidak melebihi ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan.</li>
+            <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
+          </ul></div>
+          <div><h3 class="sub-h">Yang dijamin dan yang tidak</h3><ul class="plain">
+            <li><strong>Pokok simpanan dijamin tidak hilang.</strong> Tidak ada margin call, tidak ada likuidasi yang bisa
+                menghapus dana di dalam Safe Box.</li>
+            <li><strong>Anti rugi, tapi tidak pasti untung.</strong> Pada bulan yang buruk bunganya bisa mendekati nol —
+                yang tidak terjadi adalah saldonya berkurang.</li>
+            <li>Ke instrumen mana dana ini ditempatkan bersifat rahasia dan menjadi kewenangan pengelola.</li>
+            <li>Bunga dan saldo di halaman ini dihitung ulang setiap hari dari catatan yang sama; tidak ada angka
+                yang ditulis tangan.</li>
+          </ul></div>
+        </div>
+      </section>
 
       <section class="card">
         <div class="card-head">

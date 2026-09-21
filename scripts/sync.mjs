@@ -83,10 +83,28 @@ const feeBook = existsSync(FEES_OUT)
   ? (JSON.parse(readFileSync(FEES_OUT, 'utf8')).positions || {})
   : {};
 
+// Snapshot sebelumnya, untuk menambal posisi yang gagal dibaca satu siklus.
+const prevLive = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : null;
+const prevById = new Map((prevLive?.positions || []).map((p) => [String(p.tokenId), p]));
+
 const positions = [];
+const carried = [];
 for (const book of books) {
   for (const p of book.positions || []) {
-    if (p.error) continue;
+    // SATU POSISI YANG GAGAL DIBACA BUKAN POSISI YANG HILANG.
+    //
+    // Bot membuang posisi ber-error dari total bukunya, dan situs ini ikut
+    // membuangnya — jadi satu kegagalan RPC sesaat membuat nilai dana terjun
+    // sebesar satu seat (~$800) lalu naik lagi sepuluh menit kemudian. Di
+    // grafik itu terbaca seperti dana yang jatuh, padahal tidak ada apa-apa
+    // yang terjadi. Nilai terakhir yang diketahui dibawa maju dan ditandai.
+    if (p.error) {
+      const before = prevById.get(String(p.tokenId ?? ''));
+      if (before && Number.isFinite(Number(before.valueUsd))) {
+        carried.push({ ...before, stale: true, staleReason: String(p.error).slice(0, 80) });
+      }
+      continue;
+    }
 
     const investedUsd = toUsd(p.basisQuote, p.quoteToken);
     const valueUsd = Number(p.valueUsd);          // principal + fee yang belum dipanen
@@ -332,8 +350,17 @@ const stats = {
   timezone: 'Asia/Jakarta (UTC+7)',
 };
 
-const totalUsd = await bookValueUsd('multi');
+let totalUsd = await bookValueUsd('multi');
 if (!Number.isFinite(totalUsd) || totalUsd <= 0) throw new Error(`bookValueUsd tidak masuk akal: ${totalUsd}`);
+
+// Posisi yang ditambal ikut dijumlahkan kembali: bot tidak memasukkannya ke
+// total, dan tanpa ini nilai dana tetap terbaca kurang satu seat.
+const carriedUsd = carried.reduce((t, p) => t + (Number(p.valueUsd) || 0) + (Number(p.feesUsd) || 0), 0);
+if (carriedUsd > 0) {
+  totalUsd += carriedUsd;
+  positions.push(...carried);
+  console.warn(`[cashood] ${carried.length} posisi gagal dibaca — nilai terakhirnya dipakai ($${carriedUsd.toFixed(2)})`);
+}
 
 // Kas cadangan tinggal di wallet lain, tapi ia tetap harta dana. Kalau tidak
 // ikut dihitung, memindahkannya akan terbaca sebagai kerugian sebesar uang
@@ -444,6 +471,9 @@ const snapshot = {
   ethPrice: price,
   holdings,
   positions,
+  // Berapa posisi yang nilainya dibawa maju karena gagal dibaca siklus ini.
+  stalePositions: carried.length,
+  staleUsd: Number(carriedUsd.toFixed(2)),
   history,
   bookStats,
   stats,
