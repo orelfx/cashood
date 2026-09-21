@@ -61,6 +61,34 @@ const holdings = [
 ].filter((h) => h.usd >= 0.5);
 
 // ─── posisi terbuka ───────────────────────────────────────────────────────
+//
+// SATU POSISI TIDAK BISA BERNILAI LEBIH BESAR DARI DANANYA.
+//
+// Pada 2026-09-21 pukul 21:53 WIB, posisi CATE-USDC terbaca $48.590 pada dana
+// bermodal $3.250, dan nilai dana ikut melompat 1.392% menjadi $51.647. Pool
+// itu ber-quote USDC, bukan SOL; harganya tidak terbaca benar dan angkanya
+// masuk apa adanya. Nilai yang tidak mungkin dicapai sebuah posisi adalah
+// bacaan yang salah, bukan kabar baik.
+//
+// Batasnya diturunkan dari modal dana: sebuah posisi tidak boleh melebihi
+// seluruh setoran dikali `maxPositionMultiple` (bawaan 1,5). Yang melewatinya
+// memakai nilai terakhir yang pernah terbaca benar, dan kalau belum pernah,
+// dikeluarkan dari hitungan sambil dicatat.
+const cfgFund = (() => {
+  try { return JSON.parse(readFileSync(resolve(OUT_DIR, 'config.json'), 'utf8')); }
+  catch { return {}; }
+})();
+const setoran = (cfgFund.events || [])
+  .filter((e) => e.type === 'deposit')
+  .reduce((t, e) => t + num(e.usd), 0);
+const batasPosisi = Math.max(
+  num(cfgFund.fund?.maxPositionUsd),
+  (setoran || num(cfgFund.fund?.capacityUsd) || 10000) * (num(cfgFund.fund?.maxPositionMultiple) || 1.5),
+);
+const prevLive = existsSync(resolve(OUT_DIR, 'live.json')) ? JSON.parse(readFileSync(resolve(OUT_DIR, 'live.json'), 'utf8')) : null;
+const prevPos = new Map((prevLive?.positions || []).map((x) => [String(x.tokenId), x]));
+const ditolak = [];
+
 const positions = (book.positions || []).map((p) => {
   const value = trueUsd(p, 'total_value');
   const unclaimed = trueUsd(p, 'unclaimed_fees');
@@ -86,11 +114,21 @@ const positions = (book.positions || []).map((p) => {
     outOfRangeMinutes: Math.round(num(p.minutes_out_of_range)),
     throughBandPct: through == null ? null : Number(through.toFixed(1)),
   };
+
+}).map((pos) => {
+  if (pos.valueUsd <= batasPosisi) return pos;
+  const before = prevPos.get(String(pos.tokenId));
+  ditolak.push(`${pos.symbol} terbaca $${pos.valueUsd.toFixed(2)} (batas $${batasPosisi.toFixed(0)})`);
+  if (before && Number(before.valueUsd) > 0 && Number(before.valueUsd) <= batasPosisi) {
+    return { ...pos, ...before, stale: true, staleReason: 'nilai tidak masuk akal, memakai bacaan terakhir' };
+  }
+  return { ...pos, valueUsd: 0, principalUsd: 0, feesUsd: 0, pnlUsd: 0, unreadable: true };
 });
 
 const walletUsd = holdings.reduce((t, h) => t + h.usd, 0);
 const lpUsd = positions.reduce((t, p) => t + p.valueUsd, 0);
 const totalUsd = walletUsd + lpUsd;
+if (ditolak.length) console.warn(`[meridian] nilai posisi ditolak — ${ditolak.join('; ')}`);
 
 // ─── riwayat posisi yang sudah ditutup ────────────────────────────────────
 //
@@ -224,7 +262,17 @@ const kept = previous.filter((p) => {
   if (age < 7 * 86400e3) return at.getUTCMinutes() < 10;
   return at.getUTCHours() === 0 && at.getUTCMinutes() < 10;
 });
-kept.push({ t: now, usd: snapshot.totalUsd, lp: Number(lpUsd.toFixed(2)) });
+// PENJAGA KEDUA, DI TINGKAT DERET. Batas per posisi menangkap satu posisi yang
+// salah harga; ini menangkap sumber lain — token di dompet yang salah dinilai,
+// misalnya. Nilai dana tidak melompat tiga kali lipat dalam sepuluh menit
+// tanpa setoran, dan setoran dicatat di config, bukan muncul diam-diam.
+const sebelum = kept.length ? num(kept[kept.length - 1].usd) : 0;
+const lompatGila = sebelum > 0 && snapshot.totalUsd > sebelum * 3;
+if (lompatGila) {
+  console.warn(`[meridian] titik deret dilewati — $${snapshot.totalUsd.toFixed(2)} lebih dari 3x bacaan sebelumnya ($${sebelum.toFixed(2)})`);
+} else {
+  kept.push({ t: now, usd: snapshot.totalUsd, lp: Number(lpUsd.toFixed(2)) });
+}
 writeFileSync(NAV, JSON.stringify({ updatedAt: now, points: kept.slice(-4000) }, null, 2) + '\n');
 
 console.log(`[meridian] ${new Date().toISOString()} total=$${snapshot.totalUsd}`
