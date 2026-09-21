@@ -1146,9 +1146,32 @@ function renderNavChart() {
   const first = pts[0];
   const delta = last.v - first.v;
   const movePct = first.v ? (delta / first.v) * 100 : 0;
+  // SETORAN BUKAN HASIL BOT. Uang masuk menaikkan garis ini seketika, dan
+  // tanpa keterangan lompatannya terbaca seperti keuntungan sehari. Garis
+  // "Nilai saham" tidak punya masalah itu — setoran membeli unit baru, harganya
+  // tidak ikut melompat — jadi pembaca diarahkan ke sana.
+  const masuk = (state.cfg?.events || [])
+    .filter((e) => e.type === 'deposit')
+    .map((e) => ({ at: Number(e.at) || Date.parse(`${e.date}T00:00:00+07:00`), usd: Number(e.usd) || 0 }))
+    .filter((e) => e.at >= first.t && e.at <= last.t && e.usd > 0);
+  const totalMasuk = masuk.reduce((t, e) => t + e.usd, 0);
+
   $('#navHint').innerHTML = share
     ? `1 saham = ${usd(last.v, 4)} · ${(movePct >= 0 ? '+' : '') + pct(movePct)} di rentang ini`
-    : `${pts.length} titik · ${signed(delta)} (${pct(movePct)}) di rentang ini`;
+    : `${pts.length} titik · ${signed(delta)} (${pct(movePct)}) di rentang ini`
+      + (totalMasuk > 0 && !share
+        ? ` · termasuk ${usd(totalMasuk, 0)} setoran masuk`
+        : '');
+
+  const catatan = $('#navNote');
+  if (catatan) {
+    catatan.hidden = !(totalMasuk > 0 && !share);
+    if (!catatan.hidden) {
+      catatan.innerHTML = `Lompatan tegak pada garis ini <strong>${usd(totalMasuk, 0)} setoran modal yang masuk</strong>, bukan hasil bot.
+        Untuk melihat kinerja bot tanpa pengaruh setoran, pakai <strong>Nilai saham</strong> — setoran membeli unit baru,
+        jadi harga per saham tidak ikut melompat.`;
+    }
+  }
 
   // crosshair + tooltip
   const wrap = $('#navWrap');
