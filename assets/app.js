@@ -2252,6 +2252,11 @@ function renderAnalisa() {
         <p class="hint">Kolom terburuk tidak pernah nol karena uangnya <strong>sudah ditarik lebih dulu</strong>: tiap hari
           kelebihan di atas modal keluar dalam kelipatan ${usd(Number(state.nav?.sweepStepUsd) || 100, 0)}, dan sejak saat itu
           ia tidak ikut naik-turun lagi. Dana boleh turun setelahnya — yang sudah diamankan tetap dibagikan.</p>
+        <p class="hint">Kolom nilai dana menurun bukan karena penarikan dipaksakan — di bawah modal tidak ada yang ditarik
+          sama sekali, dan sapuan baru jalan lagi setelah dana kembali ke ${usd(Number(state.cfg?.fund?.fixedCapitalUsd) || 0, 0)}.
+          Sebabnya bentuk hasil hariannya: laba dana ini datang dari beberapa hari besar, dan justru hari-hari itulah yang
+          ditarik keluar, sementara hari-hari kecil yang merugi tetap tinggal. Uangnya tidak hilang — ia pindah ke kolom
+          dividen, yang sudah diterima dan tidak bisa turun lagi.</p>
       </section>
 
       <section class="card">
@@ -2417,16 +2422,26 @@ async function renderPortofolio() {
   const box = state.safebox ? await loadSafebox().catch(() => null) : null;
 
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
-  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0);
-  const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0);
   const simpanan = Number(box?.balanceUsd) || 0;
+  // Safe Box ikut dihitung sebagai modal dan laba pemiliknya: pokoknya uang
+  // yang disetor, bunganya laba yang sudah jadi. Tanpa ini, "total aset"
+  // memuat Safe Box tapi "modal masuk" dan "untung" tidak — tiga angka yang
+  // tidak bisa dijumlahkan satu sama lain.
+  const pokokBox = Number(box?.principalUsd) || 0;
+  const bungaBox = Number(box?.interestUsd) || 0;
+  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + pokokBox;
+  const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0) + bungaBox;
   const orang = new Set(briefs.flatMap((b) => b.owners.map((o) => o.name))).size;
+
+  // Safe Box milik pemilik dana; namanya diambil dari pemegang saham terbesar
+  // supaya tidak ada nama yang ditulis tangan di kode.
+  const pemilikBox = briefs.flatMap((b) => b.owners).sort((a, b) => b.value - a.value)[0]?.name || 'Pemilik';
 
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   $('#portoTotals').innerHTML = [
     tile('Total seluruh aset', usd(dana + simpanan, 0),
       simpanan > 0 ? `${usd(dana, 0)} dana + ${usd(simpanan, 0)} Safe Box` : `${briefs.length} dana berjalan`),
-    tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham`),
+    tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham${pokokBox > 0 ? ` · termasuk ${usd(pokokBox, 0)} Safe Box` : ''}`),
     tile('Untung / rugi', signed(untung), setoran ? pct((untung / setoran) * 100) + ' dari modal' : '—', cls(untung)),
   ].join('');
   $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''} · diperbarui ${ago(Math.max(...briefs.map((b) => b.updatedAt || 0)))}`;
@@ -2449,8 +2464,12 @@ async function renderPortofolio() {
       <div class="porto-head">
         <span class="who"><span class="chip" style="background:${state.safebox?.accent || '#2dd4bf'}"></span><strong>${state.safebox?.label || 'Safe Box'}</strong>
           <span class="dim">simpanan</span></span>
-        <span class="porto-val">${usd(box.balanceUsd)}<span class="n pos">+${usd(box.interestUsd, 2)} bunga</span></span>
+        <span class="porto-val">${usd(box.balanceUsd)}<span class="n pos">+${usd(box.interestUsd, 2)}</span></span>
       </div>
+      <div class="table-scroll"><table class="porto-tbl"><tbody>
+        <tr><td><span class="who"><span class="chip" style="background:${(state.funds?.[0] && '#4ade80') || '#4ade80'}"></span>${pemilikBox}</span></td>
+          <td class="num">100.00%</td><td class="num">${usd(box.balanceUsd)}</td></tr>
+      </tbody></table></div>
       <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · ${box.measure?.monthlyPct == null ? '—' : pct(box.measure.monthlyPct)} per bulan.</p>
     </div>` : '');
 }
@@ -2576,7 +2595,7 @@ async function init() {
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     // Tampilan analisa digambar terpisah dan tidak ikut renderAll; tanpa baris
     // ini angkanya tetap dolar setelah tombol rupiah ditekan.
-    if (state.view === 'analisa') renderAnalisa();
+    if (state.view === 'analisa') { renderPortofolio().catch(() => {}); renderAnalisa(); }
     else if (state.view === 'safebox') renderSafebox();
     else renderAll();
   };
