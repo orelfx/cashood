@@ -2,6 +2,41 @@
   "note": "Catatan pembaruan. Ditulis manual, terbaru di atas. jenis: fitur | perbaikan | sistem | data | keamanan.",
   "updates": [
     {
+      "date": "2026-09-22",
+      "type": "keamanan",
+      "system": "Reborn Rich",
+      "title": "Pengaman masuk diperketat setelah satu koin di-rug",
+      "detail": "Satu posisi degen rugi $387 saat pengembangnya menarik likuiditas. Bot kini menolak koin yang sedang terjun bebas, koin yang lebih dari 20% pasokannya dipegang satu orang, dan kelompok dompet yang didanai orang yang sama. Semua batas diuji ke riwayat sendiri supaya tidak menolak koin yang selama ini untung."
+    },
+    {
+      "date": "2026-09-22",
+      "type": "perbaikan",
+      "system": "Reborn Rich",
+      "title": "Posisi yang sudah terisi tidak lagi dipasang ulang",
+      "detail": "Harga yang jatuh menembus seluruh rentang di antara dua pemeriksaan membuat posisi terbaca \"belum terisi\" dan hampir dipasang ulang ke koin yang sudah mati. Kini status terisi dibaca dari isi posisinya sendiri."
+    },
+    {
+      "date": "2026-09-22",
+      "type": "keamanan",
+      "system": "Reborn Rich",
+      "title": "Jalan keluar tiap posisi diuji ulang setiap siklus",
+      "detail": "Setiap posisi yang masih terbuka dites bisa dijual di tiap siklus. Kalau yang sebelumnya lancar tiba-tiba gagal dua kali atau pajaknya melewati 10%, posisinya langsung ditutup."
+    },
+    {
+      "date": "2026-09-22",
+      "type": "keamanan",
+      "system": "Meridian",
+      "title": "Pengaman Reborn Rich mulai diterapkan",
+      "detail": "Perlindungan yang sama sedang dipindahkan ke Meridian: penolak koin terjun bebas, pembeda dompet pribadi dan program (lock atau vesting tetap boleh), otoritas token yang dipegang pribadi, dan uji keluar tiap siklus. Tiap aturan diuji dulu ke riwayat Meridian sebelum diizinkan menolak."
+    },
+    {
+      "date": "2026-09-21",
+      "type": "perbaikan",
+      "system": "Meridian",
+      "title": "Lonjakan nilai palsu dihapus",
+      "detail": "Satu posisi sempat terbaca $48.590 sehingga nilai dana tampak $51.647. Nilai posisi yang mustahil kini ditolak dan diganti bacaan terakhir yang benar, dan titik palsunya sudah dihapus dari grafik."
+    },
+    {
       "date": "2026-09-21",
       "type": "fitur",
       "system": "Safe Box",
