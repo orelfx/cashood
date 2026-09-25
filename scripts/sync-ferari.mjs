@@ -278,6 +278,7 @@ const snapshot = {
   historyNote: 'hasil posisi yang ditutup di dompet ini — uang masuk dan keluar dompet tidak tercatat di sini, jadi angkanya tidak sama dengan perubahan nilai dana',
   stats: {
     closedCount: tutup.length,
+    openCount: positions.length,
     graded: menang + kalah,
     wins: menang,
     losses: kalah,

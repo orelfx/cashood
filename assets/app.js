@@ -1841,7 +1841,11 @@ function renderStats() {
   box.innerHTML = [
     tile('Profit terkunci', signed(st.realisedUsd), 'dari posisi yang sudah ditutup', cls(st.realisedUsd)),
     tile('Win rate', st.winRate == null ? '—' : pct(st.winRate, 1), `${st.wins} untung · ${st.losses} rugi`),
-    tile('Posisi ditutup', String(st.closedCount), `${st.openCount} masih jalan`),
+    // Dana yang snapshot-nya tidak menyertakan jumlah posisi terbuka dihitung
+    // dari daftar posisinya sendiri; sebelumnya barisnya berbunyi "undefined
+    // masih jalan".
+    tile('Posisi ditutup', String(st.closedCount ?? 0),
+      `${st.openCount ?? (state.nav?.positions || []).length} masih jalan`),
     tile('Rata-rata modal', st.avgInvestedUsd == null ? '—' : usd(st.avgInvestedUsd, 0), 'per posisi'),
     st.bestDay
       ? tile('Hari terbaik', signed(st.bestDay.usd), fmtDay(st.bestDay.date), cls(st.bestDay.usd))
@@ -1893,7 +1897,7 @@ function renderProfit() {
     ? `${rows.length} hari ada transaksi · ${state.nav.historyNote}`
     : `${rows.length} hari ada transaksi · batas hari pakai jam WIB · sumber: buku posisi bot`;
   $('#profitNote').textContent = st
-    ? `Yang dihitung di kartu ini cuma profit yang sudah terkunci. Untung/rugi ${st.openCount} posisi yang masih jalan belum masuk sini — bagian itu sudah ikut di "Nilai sekarang" paling atas.`
+    ? `Yang dihitung di kartu ini cuma profit yang sudah terkunci. Untung/rugi ${st.openCount ?? (state.nav?.positions || []).length} posisi yang masih jalan belum masuk sini — bagian itu sudah ikut di "Nilai sekarang" paling atas.`
     : '';
 }
 
