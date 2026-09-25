@@ -134,6 +134,105 @@ const lpUsd = positions.reduce((s, p) => s + p.valueUsd + p.feesUsd, 0);
 const totalUsd = Number((walletUsd + lpUsd).toFixed(2));
 if (!(totalUsd > 0)) throw new Error(`nilai dompet tidak masuk akal: ${totalUsd}`);
 
+// ─── posisi yang sudah ditutup ────────────────────────────────────────────
+//
+// LP Agent mengindeks posisi tertutup dompet ini (599 saat ditulis), tapi
+// mengambil semuanya berarti enam permintaan bertingkat dan jeda 20 detik di
+// antaranya — tidak muat dalam satu siklus sepuluh menit. Jadi: halaman
+// pertama saja tiap siklus, disimpan lokal, dan digabungkan. Yang baru
+// tertutup selalu ada di halaman pertama, jadi tidak ada yang terlewat selama
+// sinkronisasi berjalan. `--backfill` menarik seluruh riwayat sekali saja.
+const CLOSED = resolve(DIR, 'closed.json');
+const simpanan = existsSync(CLOSED) ? JSON.parse(readFileSync(CLOSED, 'utf8')) : { rows: {} };
+simpanan.rows = simpanan.rows || {};
+
+const ambilTutup = async (page = 1, pageSize = 100) => {
+  const key = String(process.env.LPAGENT_API_KEY || '').trim();
+  if (!key) return [];
+  const url = new URL('https://api.lpagent.io/open-api/v1/lp-positions/historical');
+  url.searchParams.set('chain', 'ROBINHOOD');
+  url.searchParams.set('owner', WALLET);
+  url.searchParams.set('pageSize', String(pageSize));
+  url.searchParams.set('page', String(page));
+  const res = await fetch(url, { headers: { 'x-api-key': key }, signal: AbortSignal.timeout(20000) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const body = await res.json();
+  const data = body?.data ?? body;
+  const rows = Array.isArray(data) ? data : (data?.data || data?.list || data?.rows || []);
+  return Array.isArray(rows) ? rows : [];
+};
+
+const backfill = process.argv.includes('--backfill');
+try {
+  const halaman = backfill ? 8 : 1;
+  for (let page = 1; page <= halaman; page += 1) {
+    const rows = await withTimeout(`riwayat tutup hal. ${page}`, () => ambilTutup(page), []);
+    if (!rows.length) break;
+    for (const r of rows) {
+      const id = String(r.tokenId ?? r.position ?? '').split('-').pop();
+      if (!id) continue;
+      const tutupAt = Date.parse(r.closeAt || r.close_At || r.updatedAt || '') || null;
+      const basis = num(r.inputValue);
+      // `pnl` dari LP Agent itu OBJEK {value, percent, ...}, bukan angka.
+      // Number({}) = NaN, dan NaN yang ditulis ke JSON menjadi null — seluruh
+      // riwayat sempat tersimpan tanpa hasil sama sekali karena itu.
+      const hasil = num(r.pnl?.value ?? r.pnl);
+      const hasilPct = Number.isFinite(num(r.pnl?.percent)) && r.pnl?.percent != null
+        ? num(r.pnl.percent)
+        : (basis > 0 ? (hasil / basis) * 100 : null);
+      simpanan.rows[id] = {
+        tokenId: id,
+        symbol: r.pairName ?? null,
+        closedAt: tutupAt,
+        investedUsd: Number(basis.toFixed(2)),
+        netUsd: Number(hasil.toFixed(2)),
+        netPct: hasilPct == null ? null : Number(hasilPct.toFixed(2)),
+        feesUsd: Number(num(r.collectedFee).toFixed(2)),
+        holdMinutes: Number.isFinite(num(r.ageHour)) ? Math.round(num(r.ageHour) * 60) : null,
+      };
+    }
+    if (backfill && page < halaman) await new Promise((r) => setTimeout(r, 21000));
+  }
+  simpanan.updatedAt = Date.now();   // `now` baru lahir di bagian deret, di bawah
+  writeFileSync(CLOSED, JSON.stringify(simpanan, null, 2) + '\n');
+} catch (err) {
+  console.error('[ferari] riwayat posisi tertutup tidak terbaca:', err.message);
+}
+
+// HANYA SEJAK DANA INI MULAI DICATAT. Dompetnya sudah menutup 599 posisi
+// seumur hidupnya, senilai belasan ribu dolar — jauh sebelum kita memantaunya
+// dan sebelum modalnya dicatat. Menampilkan semuanya sebagai riwayat profit
+// dana ini berarti memamerkan hasil yang bukan milik periode yang dihitung.
+const mulaiDicatat = Math.min(...(cfg.events || [])
+  .map((e) => Number(e.at) || Date.parse(`${e.date}T00:00:00+07:00`))
+  .filter((t) => Number.isFinite(t)), Date.now());
+
+const tutup = Object.values(simpanan.rows)
+  .filter((r) => Number.isFinite(r.closedAt) && Number.isFinite(r.netUsd) && r.closedAt >= mulaiDicatat)
+  .sort((a, b) => a.closedAt - b.closedAt);
+
+// Hari dihitung pakai jam Jakarta, sama seperti dana lain.
+const hariWib = (ms) => new Date(ms + WIB).toISOString().slice(0, 10);
+const perHari = new Map();
+let menang = 0, kalah = 0;
+for (const r of tutup) {
+  const hari = hariWib(r.closedAt);
+  const baris = perHari.get(hari) || { date: hari, usd: 0, closes: 0, wins: 0, losses: 0, winUsd: 0, lossUsd: 0 };
+  baris.usd += r.netUsd;
+  baris.closes += 1;
+  if (r.netPct > 0.5) { baris.wins += 1; baris.winUsd += r.netUsd; menang += 1; }
+  else if (r.netPct < -0.5) { baris.losses += 1; baris.lossUsd += r.netUsd; kalah += 1; }
+  perHari.set(hari, baris);
+}
+const history = [...perHari.values()]
+  .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)), winUsd: Number(r.winUsd.toFixed(2)), lossUsd: Number(r.lossUsd.toFixed(2)) }))
+  .sort((a, b) => a.date.localeCompare(b.date));
+
+const realisedUsd = tutup.reduce((t, r) => t + r.netUsd, 0);
+const terbaik = history.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
+const terburuk = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), null);
+const closedRecent = [...tutup].reverse().slice(0, 10);
+
 // ─── kurs rupiah, sama seperti dana lain ──────────────────────────────────
 let usdIdr = null;
 try {
@@ -172,16 +271,31 @@ const snapshot = {
   holdings,
   positions,
   lpSource,
-  history: [],
-  stats: { closedCount: 0, realisedUsd: 0, timezone: 'Asia/Jakarta (UTC+7)' },
-  closedRecent: [],
+  history,
+  // Dompet ini dibaca, bukan dijalankan: setoran dan penarikan pemiliknya
+  // tidak lewat situs ini, jadi hasil posisi yang ditutup TIDAK sama dengan
+  // perubahan nilai dana. Dikatakan terus terang di kartunya.
+  historyNote: 'hasil posisi yang ditutup di dompet ini — uang masuk dan keluar dompet tidak tercatat di sini, jadi angkanya tidak sama dengan perubahan nilai dana',
+  stats: {
+    closedCount: tutup.length,
+    graded: menang + kalah,
+    wins: menang,
+    losses: kalah,
+    winRate: menang + kalah ? Number(((menang / (menang + kalah)) * 100).toFixed(2)) : null,
+    realisedUsd: Number(realisedUsd.toFixed(2)),
+    bestDay: terbaik ? { date: terbaik.date, usd: terbaik.usd } : null,
+    worstDay: terburuk ? { date: terburuk.date, usd: terburuk.usd } : null,
+    worstClosePct: tutup.length ? Number(Math.min(...tutup.map((r) => r.netPct ?? 0)).toFixed(2)) : null,
+    timezone: 'Asia/Jakarta (UTC+7)',
+  },
+  closedRecent,
 };
 
 mkdirSync(DIR, { recursive: true });
 writeFileSync(OUT, JSON.stringify(snapshot, null, 2) + '\n');
 writeFileSync(NAV, JSON.stringify({ updatedAt: now, points: kept.slice(-4000) }, null, 2) + '\n');
 console.log(`[ferari] total=$${totalUsd} (dompet $${walletUsd.toFixed(2)} + LP $${lpUsd.toFixed(2)})`
-  + ` posisi=${positions.length} navPoints=${kept.length}`
+  + ` posisi=${positions.length} ditutup=${tutup.length} realisasi=$${realisedUsd.toFixed(2)} navPoints=${kept.length}`
   + (slow.length ? ` · lambat: ${slow.join('; ')}` : ''));
 
 // Koneksi RPC yang masih menggantung menahan proses tetap hidup walau seluruh

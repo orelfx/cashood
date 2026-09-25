@@ -28,19 +28,34 @@ RR_HOME="${RR_HOME:-/root/robinhood}" timeout 240 /usr/bin/node scripts/sync-fer
 /usr/bin/node -e '
   const fs = require("fs");
   const read = (p) => { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; } };
-  const funds = ["reborn", "meridian"];
-  const bill = (read("data/reborn/config.json")?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
+  const funds = ["reborn", "meridian", "ferari"];
+  const sum = (cfg) => (cfg?.costs?.items || []).reduce((t, c) => t + (Number(c.usd) || 0), 0);
+
+  // Dua macam biaya. Yang BERBAGI (costs.shared) satu tagihan untuk seluruh
+  // sistem, dibayar sekali oleh dana yang ditandai primary. Yang TIDAK berbagi
+  // punya tagihannya sendiri dan membayarnya penuh — dana yang botnya terpisah,
+  // seperti No Risk No Ferari dengan VPS, RPC dan modelnya sendiri.
+  const cfgs = Object.fromEntries(funds.map((f) => [f, read(`data/${f}/config.json`)]));
+  const bersamaPrimary = funds.find((f) => cfgs[f]?.costs?.shared && cfgs[f]?.costs?.primary);
+  const tagihanBersama = sum(cfgs[bersamaPrimary]);
+
   const line = [];
   for (const f of funds) {
     const live = read(`data/${f}/live.json`);
     if (!live) continue;
-    const primary = read(`data/${f}/config.json`)?.costs?.primary === true;
-    live.costsShareUsd = primary ? bill : 0;
-    live.costsTotalUsd = bill;
+    const cfg = cfgs[f];
+    if (cfg?.costs?.shared) {
+      live.costsShareUsd = cfg?.costs?.primary === true ? tagihanBersama : 0;
+      live.costsTotalUsd = tagihanBersama;
+    } else {
+      const sendiri = sum(cfg);
+      live.costsShareUsd = sendiri;
+      live.costsTotalUsd = sendiri;
+    }
     fs.writeFileSync(`data/${f}/live.json`, JSON.stringify(live, null, 2) + "\n");
     line.push(`${f} $${live.costsShareUsd}`);
   }
-  console.log(`[biaya] tagihan $${bill} → ` + line.join(" · "));
+  console.log(`[biaya] tagihan bersama $${tagihanBersama} → ` + line.join(" · "));
 '
 
 [ -d "$WORK" ] || git worktree add -q "$WORK" data

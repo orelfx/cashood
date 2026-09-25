@@ -468,6 +468,7 @@ async function resolveNav(cfg, { force = false } = {}) {
     liveUsd,
     treasuryUsd: Number(snap.treasuryUsd) || 0,
     bookStats: snap.bookStats || null,
+    historyNote: snap.historyNote || null,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -1886,7 +1887,11 @@ function renderProfit() {
   else renderCalendar();
 
   const st = state.nav?.stats;
-  $('#profitHint').textContent = `${rows.length} hari ada transaksi · batas hari pakai jam WIB · sumber: buku posisi bot`;
+  // Dana yang dibaca dari dompet orang lain menyertakan peringatannya sendiri:
+  // hasil posisi di sana tidak sama dengan perubahan nilai dananya.
+  $('#profitHint').textContent = state.nav?.historyNote
+    ? `${rows.length} hari ada transaksi · ${state.nav.historyNote}`
+    : `${rows.length} hari ada transaksi · batas hari pakai jam WIB · sumber: buku posisi bot`;
   $('#profitNote').textContent = st
     ? `Yang dihitung di kartu ini cuma profit yang sudah terkunci. Untung/rugi ${st.openCount} posisi yang masih jalan belum masuk sini — bagian itu sudah ikut di "Nilai sekarang" paling atas.`
     : '';
@@ -2121,6 +2126,30 @@ function renderSafebox() {
           bunganya berhenti di batas atas; saat pasar sedang turun, bunganya berhenti di
           ${pctRate(rate.minMonthlyPct ?? 0)} dan tidak pernah minus.</p>
       </section>
+
+      ${(d.owners || []).length ? `<section class="card">
+        <div class="card-head">
+          <h2>Pemilik simpanan</h2>
+          <span class="hint">bunga dibagi menurut porsi pokok</span>
+        </div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Pemilik</th><th class="num">Pokok</th><th class="num">Porsi</th><th class="num">Bunga hari ini</th><th class="num">Total bunga</th><th class="num">Saldo</th></tr></thead>
+          <tbody>${d.owners.map((o) => `<tr>
+            <td><span class="who"><span class="chip" style="background:${o.color || '#2dd4bf'}"></span>${o.name}</span></td>
+            <td class="num">${usd(o.principalUsd)}</td>
+            <td class="num">${pct(o.sharePct)}</td>
+            <td class="num pos">${usd(o.interestTodayUsd, 2)}</td>
+            <td class="num pos">${usd(o.interestUsd, 2)}</td>
+            <td class="num"><strong>${usd(o.balanceUsd)}</strong></td></tr>`).join('')}
+            <tr><td><strong>Total</strong></td>
+              <td class="num"><strong>${usd(d.principalUsd)}</strong></td>
+              <td class="num">100,00%</td>
+              <td class="num pos"><strong>${usd(d.interestTodayUsd ?? 0, 2)}</strong></td>
+              <td class="num pos"><strong>${usd(d.interestUsd, 2)}</strong></td>
+              <td class="num"><strong>${usd(d.balanceUsd)}</strong></td></tr>
+          </tbody>
+        </table></div>
+      </section>` : ''}
 
       ${(d.days || []).length > 1 ? `<section class="card">
         <div class="card-head">

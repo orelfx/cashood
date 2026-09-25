@@ -174,7 +174,16 @@ const monthlyPct = Math.min(maxMonthly, Math.max(minMonthly, monthlyActualPct));
 // Persentasenya lalu dihitung terhadap nilai yang ditampilkan: $0,75 sehari
 // atas $3.000 berarti 0,75%/bulan. Tetap dikurung 0,1%–3% sebulan, jadi satu
 // hari yang luar biasa ramai tidak menjanjikan hal yang tidak bisa diulang.
-const shownPrincipal = Number(cfg.display?.principalUsd) || principal;
+// PEMILIK SIMPANAN. Pokok tiap orang ditulis di config; totalnya yang tampil
+// sebagai nilai Safe Box, dan bunganya dibagi menurut porsi pokok itu —
+// bukan dibagi rata.
+const pemilik = (cfg.owners || [])
+  .map((o) => ({ id: o.id, name: o.name, color: o.color || null, principalUsd: Number(o.principalUsd) || 0 }))
+  .filter((o) => o.principalUsd > 0);
+const pokokPemilik = pemilik.reduce((t, o) => t + o.principalUsd, 0);
+const shownPrincipal = pokokPemilik > 0
+  ? pokokPemilik
+  : (Number(cfg.display?.principalUsd) || principal);
 const wibDay = (ms) => new Date(ms + WIB).toISOString().slice(0, 10);
 const today = wibDay(now);
 
@@ -229,6 +238,30 @@ const snapshot = {
   valueUsd: Number((shownPrincipal + interestShown).toFixed(2)),
   interestUsd: Number(interestShown.toFixed(4)),
   interestTodayUsd: Number(shownToday.toFixed(4)),
+  // Sen dibagi dengan sisa terbesar supaya jumlah baris = total persis.
+  owners: (() => {
+    if (!pemilik.length) return [];
+    const bagi = (total) => {
+      const sen = Math.round(total * 100);
+      const tepat = pemilik.map((o) => (o.principalUsd / pokokPemilik) * sen);
+      const dasar = tepat.map(Math.floor);
+      let sisa = sen - dasar.reduce((a, b) => a + b, 0);
+      tepat.map((v, i) => ({ i, f: v - dasar[i] })).sort((a, b) => b.f - a.f)
+        .forEach(({ i }) => { if (sisa > 0) { dasar[i] += 1; sisa -= 1; } });
+      return dasar.map((c) => c / 100);
+    };
+    const bungaTotal = bagi(interestShown);
+    const bungaHariIni = bagi(shownToday);
+    return pemilik.map((o, i) => ({
+      name: o.name,
+      color: o.color,
+      principalUsd: Number(o.principalUsd.toFixed(2)),
+      sharePct: Number(((o.principalUsd / pokokPemilik) * 100).toFixed(2)),
+      interestUsd: bungaTotal[i],
+      interestTodayUsd: bungaHariIni[i],
+      balanceUsd: Number((o.principalUsd + bungaTotal[i]).toFixed(2)),
+    }));
+  })(),
   interestDay: entry.date,
   days: ledger.days.slice(-30).map((d) => ({ date: d.date, usd: Number(Number(d.usd).toFixed(4)) })),
   balanceUsd: Number((shownPrincipal + interestShown).toFixed(2)),
