@@ -2,12 +2,12 @@
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict'),{spawn}=require('node:child_process');
 (async()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'cashood-browser-'));
- const executable=process.env.CHROME||['/usr/bin/chromium','/usr/bin/google-chrome','/root/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome'].find(fs.existsSync);
+ const executable=process.env.CHROME||['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/root/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome'].find(fs.existsSync);
  if(!executable)throw Error('Set CHROME to a Chromium executable');
- const chrome=spawn(executable,['--headless=new','--no-sandbox','--disable-gpu','--disable-background-networking','--remote-debugging-port=0',`--user-data-dir=${dir}`,'about:blank'],{stdio:['ignore','ignore','pipe'],detached:true});
+ const chrome=spawn(executable,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--remote-debugging-port=0',`--user-data-dir=${dir}`,'about:blank'],{stdio:['ignore','ignore','pipe'],detached:true});
  let ws;
  try{
- const address=await new Promise((resolve,reject)=>{let text='';chrome.stderr.on('data',d=>{text+=d;const m=text.match(/DevTools listening on (ws:\/\/[^\s]+)/);if(m)resolve(m[1]);});chrome.on('exit',c=>reject(Error('Chrome exited '+c)));setTimeout(()=>reject(Error('Chrome startup timeout')),15000).unref();});
+ const address=await new Promise((resolve,reject)=>{let text='';chrome.stderr.on('data',d=>{text+=d;const m=text.match(/DevTools listening on (ws:\/\/[^\s]+)/);if(m)resolve(m[1]);});chrome.on('exit',c=>reject(Error('Chrome exited '+c)));setTimeout(()=>reject(Error('Chrome startup timeout: '+text.slice(-2000))),30000).unref();});
  ws=new WebSocket(address);await new Promise(r=>ws.onopen=r);let n=0,sid;const pending=new Map(),errors=[],counts={};let delayReborn=false,fxDelay=0,fullForecast=false;
  const cmd=(method,params={},sessionId=sid)=>new Promise((resolve,reject)=>{const id=++n;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params,...(sessionId?{sessionId}:{})}));});
  const snapshots=Object.fromEntries(['reborn','meridian','ferari'].map((fund,i)=>[fund,{fund,schemaVersion:2,generation:'fixture',updatedAt:Date.now(),totalUsd:[14000,5000,3000][i],treasuryUsd:fund==='reborn'?1100:0,
