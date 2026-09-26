@@ -29,7 +29,39 @@ export function downsample(points, now = Date.now()) {
     const age = now - p.t, span = age < 86400000 ? 600000 : age < 7*86400000 ? 3600000 : 86400000;
     buckets.set(`${span}:${Math.floor(p.t/span)}`, p);
   }
-  return [...buckets.values()].sort((a,b)=>a.t-b.t).slice(-4000);
+  return dropSpikes([...buckets.values()].sort((a,b)=>a.t-b.t)).slice(-4000);
+}
+
+/**
+ * Lekukan satu-dua titik yang langsung kembali adalah bacaan meleset, bukan
+ * pasar. Bot Robinhood menghitung saldo token yang gagal dibaca sebagai nol,
+ * sehingga grafik Reborn Rich berulang kali turun ±$700 selama sepuluh menit
+ * lalu pulih. Yang dibuang HANYA deretan 1–2 titik yang menyimpang lebih dari
+ * `limit` ke arah yang sama dari kedua tetangganya, sementara kedua tetangga
+ * itu sendiri hampir sama (selisih < `settle`) — artinya nilainya pulih.
+ * Setoran menaikkan grafik secara permanen, jadi tidak pernah memenuhi syarat
+ * "pulih" dan tidak pernah terhapus.
+ */
+export function dropSpikes(points, limit = 0.03, settle = 0.015) {
+  let pts = [...points];
+  for (let pass = 0; pass < 3; pass += 1) {
+    const drop = new Set();
+    for (let i = 1; i < pts.length - 1; i += 1) {
+      for (const len of [1, 2]) {
+        const before = pts[i - 1], after = pts[i + len];
+        if (!before || !after) continue;
+        const base = (before.usd + after.usd) / 2;
+        if (!(base > 0) || Math.abs(before.usd - after.usd) / base > settle) continue;
+        const run = pts.slice(i, i + len);
+        const dirs = run.map((p) => Math.sign(p.usd - base));
+        const off = run.every((p) => Math.abs(p.usd - base) / base > limit);
+        if (off && dirs.every((d) => d !== 0 && d === dirs[0])) { for (let k = i; k < i + len; k += 1) drop.add(k); break; }
+      }
+    }
+    if (!drop.size) break;
+    pts = pts.filter((_, i) => !drop.has(i));
+  }
+  return pts;
 }
 export function privateId(dir, id) {
   const file = resolve(dir, 'publication-key.local.json');

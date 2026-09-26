@@ -46,7 +46,11 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
  const ev=async expression=>{const r=await cmd('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
  await cmd('Page.navigate',{url:'https://cashood.test/'});
  for(let i=0;i<100;i++){await new Promise(r=>setTimeout(r,100));if(await ev('Boolean(globalThis.cashood?.state.nav)'))break;}
- assert.equal(await ev('state.nav.totalUsd'),14000);console.log('PASS initial render');
+ assert.equal(await ev('state.nav.totalUsd'),14000);{const cells=await ev('document.querySelectorAll("#ownerTable tbody td").length');
+ // Baris tabel harus tetap berupa sel. Pembersih HTML tanpa konteks tabel
+ // pernah membuang <tr>/<td> dan seluruh tabel situs jadi tumpukan teks.
+ assert.ok(cells>=4,`tabel pemilik kehilangan selnya: ${cells}`);}
+console.log('PASS initial render');
  const before=counts['/orelfx/cashood/data/reborn/nav.json'];await ev('load({force:true})');await new Promise(r=>setTimeout(r,100));assert.ok(counts['/orelfx/cashood/data/reborn/nav.json']>before);console.log('PASS refresh requests new NAV');
  await cmd('Page.setBypassCSP',{enabled:true});
  assert.equal(await ev(`(async()=>{globalThis.__audit=0;renderHoldings({holdings:[{symbol:'<img src=x onerror="globalThis.__audit=1">',amount:1,price:1,usd:1}]});await new Promise(r=>setTimeout(r,100));return globalThis.__audit})()`),0);

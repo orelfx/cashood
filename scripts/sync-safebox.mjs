@@ -40,8 +40,17 @@ const rows=Object.values(state.balances).map(b=>{
   interestUsd:interest,interestTodayUsd:Core.money(today?.owners[b.id]||0),balanceUsd:Core.money(capital+interest)};
 });
 const interest=Core.money(rows.reduce((t,o)=>t+o.interestUsd,0));
-const elapsedToday=Math.max(1,(now-Core.eventTime({date:Core.day(now)}))/86400000);
-const todayRate=principal?(today?.usd||0)/elapsedToday*30/principal*100:0;
+// LAJU, BUKAN JUMLAH YANG BARU TERKUMPUL. Sebelumnya Math.max(1, …) memaksa
+// "lama pengamatan hari ini" minimal satu hari penuh, jadi bunga beberapa menit
+// dibagi seharian dan lajunya terbaca 0,002%/bulan — di bawah batas bawah yang
+// ditetapkan pemilik (0,1%). Laju dihitung dari waktu yang benar-benar diamati
+// hari ini (sejak tengah malam WIB, atau sejak migrasi kalau lebih baru), lalu
+// dikurung ke batas yang sama dengan mesin akrualnya.
+const midnightToday=Core.eventTime({date:Core.day(now)});
+const observedFrom=Math.max(midnightToday, Number(state.migration?.at)||midnightToday);
+const elapsedToday=Math.max(1/1440,(now-observedFrom)/86400000);
+const rawRate=principal?(today?.usd||0)/elapsedToday*30/principal*100:0;
+const todayRate=Math.min(Number(cfg.rate?.maxMonthlyPct??100),Math.max(Number(cfg.rate?.minMonthlyPct??0),rawRate));
 const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
  principalUsd:principal,interestUsd:interest,interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
  interestDay:Core.day(now),days:state.days.slice(-30).map(d=>({date:d.date,usd:d.usd,estimated:d.estimated})),inRange:pos.inRange===true,

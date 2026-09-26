@@ -611,6 +611,14 @@ ul.plain strong { color: var(--text); }
 .funds .fdot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .funds .fname { font-weight: 650; color: var(--text); }
 .funds .fchain { font-size: 11.5px; color: var(--muted); }
+/* Nama dan jaringan dibungkus satu elemen sejak tampilan HP dirombak; tanpa
+   jarak di layar lebar keduanya menempel jadi "Reborn RichRobinhood". */
+@media (min-width: 641px) { .funds .fmeta { display: flex; align-items: baseline; gap: 7px; } }
+/* Satu baris di semua layar: tujuh tombol yang membungkus menyisakan satu
+   tombol sendirian di baris kedua. */
+.funds { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.funds::-webkit-scrollbar { display: none; }
+.funds button { flex: none; }
 @media (max-width: 640px) {
   .funds { gap: 8px; }
   .funds button { padding: 9px 12px; font-size: 12.5px; flex: 1 1 0; justify-content: center; }
