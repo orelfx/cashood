@@ -69,7 +69,8 @@
     "minDepositUsd": 100,
     "noticeHours": 24,
     "note": "Modal $5.000 ditetapkan pemilik 2026-09-26. Dompet dibaca, bukan dijalankan: uang masuk dan keluar dompet harus dicatat di sini supaya tidak terbaca sebagai laba.",
-    "capacityUsd": 5000
+    "capacityUsd": 5000,
+    "cashFlowsRecorded": false
   },
   "dividend": {
     "payDayOfMonth": 1,
@@ -85,5 +86,62 @@
   "forecast": {
     "cashFlowsComplete": false,
     "note": "Uang masuk/keluar dompet eksternal belum seluruhnya tercatat. Proyeksi dinonaktifkan sampai rekonsiliasi."
+  },
+  "strategy": {
+    "title": "No Risk No Ferari — robot LP berisiko tinggi di Robinhood Chain",
+    "about": [
+      "No Risk No Ferari adalah robot AI penyedia likuiditas dengan setelan risiko tinggi di Uniswap v4, jaringan Robinhood. Robot ini membuka banyak posisi berukuran besar di pool berpasangan USDG dan berputar cepat.",
+      "Situs ini hanya MEMBACA dompetnya. Tidak ada kunci dan tidak ada perintah yang bisa menggerakkan dananya dari sini. Posisi terbuka dan riwayat posisi tertutup diambil dari indeks LP Agent."
+    ],
+    "requirements": [
+      [
+        "Setoran minimum",
+        "$100"
+      ],
+      [
+        "Pemberitahuan masuk / keluar",
+        "24 jam"
+      ],
+      [
+        "Aset kuotasi",
+        "USDG"
+      ],
+      [
+        "Profil risiko",
+        "tinggi"
+      ]
+    ],
+    "risks": [
+      "Setelan berisiko tinggi: ukuran posisi besar dan perputaran cepat membuat hasil harian bisa sangat naik-turun.",
+      "Arus kas di luar pembukuan: uang yang masuk atau keluar dompet tidak lewat situs ini dan harus dicatat manual. Selama belum dicatat, penurunan nilai tidak bisa dibedakan dari penarikan — karena itu beberapa angka risiko di halaman ini ditahan.",
+      "Rug pull, impermanent loss, dan risiko kontrak sama seperti dana LP lain.",
+      "Tanpa payung hukum: ini kesepakatan pribadi, bukan produk berizin."
+    ],
+    "system": [
+      [
+        "Jaringan",
+        "Robinhood Chain"
+      ],
+      [
+        "Tempat likuiditas",
+        "Uniswap v4"
+      ],
+      [
+        "Tipe posisi",
+        "likuiditas terkonsentrasi berpasangan USDG"
+      ],
+      [
+        "Mesin",
+        "robot AI eksternal, setelan risiko tinggi"
+      ],
+      [
+        "Pengelolaan dompet",
+        "dibaca saja; alamat tidak diterbitkan"
+      ],
+      [
+        "Sumber data situs",
+        "LP Agent + saldo dompet tiap 10 menit"
+      ]
+    ]
   }
 }

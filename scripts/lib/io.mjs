@@ -43,7 +43,17 @@ export function downsample(points, now = Date.now()) {
  * "pulih" dan tidak pernah terhapus.
  */
 export function dropSpikes(points, limit = 0.03, settle = 0.015) {
-  let pts = [...points];
+  // Bacaan yang mustahil lebih dulu: dana tidak kehilangan separuh nilainya lalu
+  // pulih dalam sepuluh menit. Satu titik yang kurang dari separuh — atau lebih
+  // dari dua kali — KEDUA tetangga langsungnya adalah bacaan gagal (misalnya
+  // posisi LP yang tidak terbaca sehingga hanya saldo dompet yang terhitung).
+  // Setoran tidak pernah membuat satu titik berdiri sendirian di sisi yang
+  // berbeda dari kedua tetangganya, jadi tidak tersentuh.
+  let pts = points.filter((p, i, all) => {
+    if (i === 0 || i === all.length - 1) return true;
+    const a = all[i - 1].usd, b = all[i + 1].usd;
+    return !(p.usd < 0.5 * Math.min(a, b) || p.usd > 2 * Math.max(a, b));
+  });
   for (let pass = 0; pass < 3; pass += 1) {
     const drop = new Set();
     for (let i = 1; i < pts.length - 1; i += 1) {

@@ -28,3 +28,8 @@ test('a sustained fall is real movement and is kept', () => {
   const vals = [10000, 9950, 9600, 9580, 9590, 9570];
   assert.deepEqual(dropSpikes(series(vals)).map((p) => p.usd), vals);
 });
+
+test('an impossible reading is dropped even when its neighbours differ', () => {
+  const out = dropSpikes(series([4700, 4720, 28.47, 4655, 4700]));
+  assert.equal(out.some((p) => p.usd === 28.47), false);
+});

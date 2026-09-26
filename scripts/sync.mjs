@@ -440,6 +440,7 @@ const snapshot = {
   closedRecent,
 };
 
+snapshot.performanceInput = { closes: closed.map((r) => ({ netUsd: Number(r.netUsd), netPct: Number(r.netPct) * 100, closedAt: Number(r.closedAt), holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null, symbol: r.symbol || null })), flatBand: 0.5 };
 saveSnapshot(OUT, snapshot, cfgTreasury);
 atomicJSON(FEES_OUT, { updatedAt: snapshot.updatedAt, positions: feeBook });
 console.log(`[cashood] total=$${snapshot.totalUsd} positions=${positions.length} treasury=$${treasuryUsd} complete=${snapshot.quality.complete}`);

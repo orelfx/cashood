@@ -396,6 +396,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     treasuryUsd: Number(snap.treasuryUsd) || 0,
     bookStats: snap.bookStats || null,
     historyNote: snap.historyNote || null,
+    performance: snap.performance || null,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -952,6 +953,8 @@ function showTab(name) {
   $('#tab-investor').hidden = tab !== 'investor';
   $('#tab-bot').hidden = tab !== 'bot';
   $('#tab-tentang').hidden = tab !== 'tentang';
+  $('#tab-analys').hidden = tab !== 'analys';
+  if (tab === 'analys') renderAnalys();
   const bot = tab === 'bot';
   document.querySelectorAll('#tabs button').forEach((b) => {
     const t = b.getAttribute('data-tab');
@@ -1801,7 +1804,7 @@ function renderCurrencyButtons() {
  * tempat ini — kalau ada yang tertinggal, angka dana lama akan muncul sekejap
  * di bawah nama dana baru, dan itu jenis kesalahan yang tidak disadari orang.
  */
-const TABS = ['portfolio', 'investor', 'bot', 'tentang'];
+const TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang'];
 let currentTab = 'portfolio';
 
 function fundMeta(id) {
@@ -2079,7 +2082,7 @@ function renderSafebox() {
 function showSafebox() {
   state.view = 'safebox';
   $('#tabs').hidden = true;
-  ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
   $('#tab-analisa').hidden = true;
   $('#tab-update').hidden = true;
   $('#tab-safebox').hidden = false;
@@ -2128,14 +2131,15 @@ function scenarioCard(s, kind) {
   </div>`;
 }
 
-function renderAnalisa() {
-  const body = $('#analisaBody');
-  const fund = analisaFund || state.fund;
-  const available = state.funds.filter(f => f.forecast !== false);
-  setHTML($('#segAnalisa'), available.map(f => `<button data-af="${esc(f.id)}" class="${f.id === fund ? 'on' : ''}">${esc(f.label)}</button>`).join(''));
+function renderAnalisa(body = $('#analisaBody'), fund = analisaFund || state.fund,
+  stillHere = () => analisaFund === fund && state.view === 'analisa') {
+  if (body === $('#analisaBody')) {
+    const available = state.funds.filter(f => f.forecast !== false);
+    setHTML($('#segAnalisa'), available.map(f => `<button data-af="${esc(f.id)}" class="${f.id === fund ? 'on' : ''}">${esc(f.label)}</button>`).join(''));
+  }
   setHTML(body, '<p class="hint">memuat analisa…</p>');
   loadForecast(fund).then(f => {
-    if (analisaFund !== fund || state.view !== 'analisa') return;
+    if (!stillHere()) return;
     if (!f || !f.enough) {
       setHTML(body, `<section class="card"><h2>Belum cukup data terverifikasi</h2><p>${esc(f?.reason || 'Analisa belum tersedia.')}</p>
         <p class="hint">${Number(f?.samples || 0)} hari memenuhi syarat. Proyeksi memerlukan sedikitnya tujuh hari selesai; setoran, penarikan, dan pembayaran harus tercatat.</p></section>`);
@@ -2184,7 +2188,7 @@ function renderAnalisa() {
         <div class="table-scroll" style="margin-top:14px"><table><thead><tr><th>Jangka</th><th class="num">Turun ≥10%</th><th class="num">Turun ≥50%</th><th class="num">Turun ≥90%</th></tr></thead><tbody>
         ${f.horizons.map(h => `<tr><td>${esc(h.label)}</td><td class="num ${h.risk.p10 > 5 ? 'neg' : ''}">${peluang(h.risk.p10)}</td><td class="num ${h.risk.p50 > 1 ? 'neg' : 'dim'}">${peluang(h.risk.p50)}</td><td class="num dim">${peluang(h.risk.p90)}</td></tr>`).join('')}</tbody></table></div></section>
       <section class="card"><h2>Batas analisa</h2><ul>${f.caveats.map(c=>`<li>${esc(c)}</li>`).join('')}</ul><p class="hint">${esc(f.method)}</p></section>`);
-  }).catch(err => { if (analisaFund === fund) setHTML(body, `<p class="miss">Analisa tidak bisa ditampilkan: ${esc(err.message)}</p>`); });
+  }).catch(err => { if (stillHere()) setHTML(body, `<p class="miss">Analisa tidak bisa ditampilkan: ${esc(err.message)}</p>`); });
 }
 
 /**
@@ -2288,6 +2292,139 @@ async function renderPortofolio() {
 }
 
 /**
+ * Analys: kinerja NYATA sebuah dana — dari posisi yang sudah ditutup dan dari
+ * deret nilai dananya — lalu prediksinya di bawah. Semua angka dihitung
+ * exporter (scripts/lib/performance.mjs) dari yang benar-benar terjadi; halaman
+ * ini hanya menggambarnya. Angka yang datanya belum cukup ditulis "—" dengan
+ * alasannya, bukan diisi perkiraan.
+ */
+let anSection = 'drawdown';
+const durasi = (m) => {
+  if (!Number.isFinite(m)) return '—';
+  if (m < 60) return `${Math.round(m)} menit`;
+  if (m < 1440) return `${Math.floor(m / 60)} j ${Math.round(m % 60)} m`;
+  return `${(m / 1440).toFixed(1)} hari`;
+};
+const tgl = (ms) => (Number.isFinite(ms) ? fmtDay(new Date(ms + 7 * 3600e3).toISOString().slice(0, 10)) : '—');
+
+function radarSvg(axes) {
+  const names = [['winRate', 'Win rate'], ['profitFactor', 'Profit factor'], ['risk', 'Risiko'], ['recovery', 'Pemulihan'], ['consistency', 'Konsistensi']];
+  const W = 300, H = 250, cx = 150, cy = 128, R = 88;
+  const pt = (i, r) => { const a = -Math.PI / 2 + (i * 2 * Math.PI) / names.length; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+  const ring = (f) => names.map((_, i) => pt(i, R * f).map((v) => v.toFixed(1)).join(',')).join(' ');
+  const grid = [0.25, 0.5, 0.75, 1].map((f) => `<polygon points="${ring(f)}" class="rd-grid"/>`).join('');
+  const spokes = names.map((_, i) => { const [x, y] = pt(i, R); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="rd-grid"/>`; }).join('');
+  const shape = names.map(([k], i) => pt(i, R * ((axes?.[k] ?? 0) / 100)).map((v) => v.toFixed(1)).join(',')).join(' ');
+  const labels = names.map(([k, n], i) => {
+    const [x, y] = pt(i, R + 22);
+    const miss = axes?.[k] == null;
+    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" class="rd-lbl${miss ? ' rd-miss' : ''}">${n}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="radar" role="img" aria-label="DNA strategi">${grid}${spokes}<polygon points="${shape}" class="rd-shape"/>${labels}</svg>`;
+}
+
+function renderAnalys() {
+  const fund = state.fund;
+  const nav = state.nav || {};
+  const perf = nav.performance || null;
+  const cfg = state.cfg || {};
+  const t = perf?.trades || null, e = perf?.equity || null, sc = perf?.score || null;
+  const withheld = perf?.equityWithheld || null;
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const pctOrDash = (v, dp = 2) => (v == null ? '—' : pct(v, dp));
+
+  // ── ringkasan kinerja ──
+  const pfNote = t?.profitFactorBasis === 'pct' ? 'dari persen per posisi' : 'laba kotor ÷ rugi kotor';
+  setHTML($('#anTiles'), perf ? [
+    tile('Untung / rugi dana', signed(perf.profitUsd), perf.profitPct == null ? '—' : `${perf.profitPct >= 0 ? '+' : ''}${pct(perf.profitPct)} dari modal`, cls(perf.profitUsd)),
+    tile('Win rate', pctOrDash(t?.winRate), t ? `${t.wins} menang · ${t.losses} kalah · ${t.flat} impas` : 'belum ada posisi ditutup'),
+    tile('Posisi per hari', t?.tradesPerDay == null ? '—' : String(t.tradesPerDay), t ? `${t.count} posisi ditutup` : '—'),
+    tile('Penurunan terdalam', withheld ? '—' : pctOrDash(e?.maxDrawdownPct), withheld ? 'ditahan — arus kas belum tercatat' : (e ? `${usd(e.maxDrawdownUsd, 0)} dari puncak` : 'data belum cukup'), withheld ? '' : 'neg'),
+    tile('Profit factor', t?.profitFactor == null ? '—' : String(t.profitFactor), pfNote, t?.profitFactor >= 1 ? 'pos' : 'neg'),
+    tile('Recovery factor', perf.recoveryFactor == null ? '—' : String(perf.recoveryFactor), withheld ? 'ditahan — arus kas belum tercatat' : 'untung ÷ penurunan terdalam', perf.recoveryFactor >= 1 ? 'pos' : ''),
+  ].join('') : '<p class="miss">Data kinerja belum tersedia untuk dana ini.</p>');
+  $('#anSnapHint').textContent = t ? `sejak ${tgl(t.firstAt)} · diperbarui ${ago(perf.generatedAt)}` : '';
+
+  // ── DNA strategi ──
+  setHTML($('#anRadar'), sc ? radarSvg(sc.axes) : '');
+  const axisRows = [['winRate', 'Win rate', 'win rate itu sendiri'], ['profitFactor', 'Profit factor', 'PF 1 → 0, PF 3 → 100'],
+    ['risk', 'Risiko', '100 − 2,5 × penurunan terdalam'], ['recovery', 'Pemulihan', 'recovery factor 5 → 100'], ['consistency', 'Konsistensi', '% hari yang naik']];
+  setHTML($('#anScore'), sc ? `
+    <div class="dna-total">${sc.complete ? `<span class="dna-num">${sc.overall}</span><span class="dim">/ 100</span>` : '<span class="dna-num dim">—</span>'}
+      <div class="n">${sc.complete ? 'skor keseluruhan' : 'skor keseluruhan butuh kelima sumbu'}</div></div>
+    <table class="dna-tbl"><tbody>${axisRows.map(([k, n, how]) => `<tr><td>${n}<div class="n dim">${how}</div></td><td class="num">${sc.axes[k] == null ? '—' : sc.axes[k]}</td></tr>`).join('')}</tbody></table>` : '');
+
+  // ── info sistem & tentang strategi ──
+  const st = cfg.strategy || {};
+  const ledger = state.ledger || {};
+  const sistem = [...(st.system || []),
+    ['Modal masuk', usdText((ledger.deposited || 0) + (ledger.reinvested || 0), 0)],
+    ['Plafon dana', cfg.fund?.capacityUsd ? usdText(cfg.fund.capacityUsd, 0) : '—'],
+    ['Biaya bulanan', usdText(monthlyCosts(), 0)],
+    ['Pemegang saham', String((ledger.owners || []).filter((o) => o.units > 0).length)]];
+  setHTML($('#anSystemBody'), `<table class="kv"><tbody>${sistem.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table>`);
+  $('#anAboutTitle').textContent = st.title || 'Tentang strategi';
+  setHTML($('#anAboutBody'), `
+    ${(st.about || []).map((x) => `<p>${esc(x)}</p>`).join('')}
+    <div class="two">
+      <div><h3 class="sub-h">Yang dibutuhkan</h3><table class="kv"><tbody>${(st.requirements || []).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>
+      <div><h3 class="sub-h">Risiko yang harus dipahami</h3><ul class="plain">${(st.risks || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+    </div>
+    <p class="hint disclaimer">Kinerja masa lalu tidak menjamin hasil ke depan. Semua angka di halaman ini dihitung dari data dana yang sebenarnya dan diperbarui otomatis; tidak ada yang ditulis tangan.</p>`);
+
+  // ── analitik rinci ──
+  $('#segAn').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-a') === anSection));
+  let detail = '';
+  if (anSection === 'drawdown') {
+    detail = withheld ? `<p class="miss">${esc(withheld)}</p>` : e ? `
+      <p class="lead">Seberapa jauh nilai dana pernah turun dari puncak sebelumnya — dihitung titik per titik tiap sepuluh menit, sesudah setoran dan penarikan dikeluarkan. Ini "floating" terdalam yang pernah dialami dana.</p>
+      <div class="dd-row"><div><div class="k">Terdalam sepanjang catatan</div><div class="n">${usd(e.maxDrawdownPeakUsd, 0)} → ${usd(e.maxDrawdownTroughUsd, 0)} · ${tgl(e.maxDrawdownAt)}</div></div><div class="v neg">${pct(e.maxDrawdownPct)}</div></div>
+      <div class="dd-bar"><i style="width:${Math.min(100, e.maxDrawdownPct * 2)}%"></i></div>
+      <div class="dd-row"><div><div class="k">Sekarang dari puncak</div><div class="n">${e.currentDrawdownPct > 0 ? `${usd(e.currentDrawdownUsd, 0)} di bawah puncak` : 'sedang di puncak'}</div></div><div class="v ${e.currentDrawdownPct > 0 ? 'neg' : 'pos'}">${pct(e.currentDrawdownPct)}</div></div>
+      <div class="dd-bar"><i style="width:${Math.min(100, e.currentDrawdownPct * 2)}%"></i></div>
+      <div class="stats three" style="margin-top:14px">
+        ${tile('Hari terbaik', pctOrDash(e.bestDayPct), `dari ${e.days} hari`, 'pos')}
+        ${tile('Hari terburuk', pctOrDash(e.worstDayPct), `dari ${e.days} hari`, 'neg')}
+        ${tile('Hari yang naik', pctOrDash(e.positiveDaysPct), 'dari seluruh hari tercatat')}
+      </div>` : '<p class="miss">Belum cukup titik nilai dana untuk menghitung penurunan.</p>';
+  } else if (anSection === 'risk') {
+    const ratio = (name, v, how, need) => `<div class="ratio"><div><div class="ratio-name">${name}</div><div class="n dim">${how}</div></div><div class="ratio-v">${v == null ? `<span class="dim" title="${need}">—</span>` : v}</div></div>`;
+    detail = withheld ? `<p class="miss">${esc(withheld)}</p>` : e ? `
+      <p class="lead">Berapa hasil yang didapat untuk setiap satuan risiko. Makin tinggi makin baik. Rasio tahunan dari periode pendek mudah melebar tak masuk akal, jadi angkanya baru terbit setelah datanya cukup.</p>
+      ${ratio('Sharpe ratio', e.sharpe, 'hasil untuk tiap satuan naik-turun harian', 'butuh minimal 14 hari')}
+      ${ratio('Sortino ratio', e.sortino, 'seperti Sharpe, tapi hanya hari yang rugi yang dihitung sebagai risiko', 'butuh minimal 14 hari')}
+      ${ratio('Calmar ratio', e.calmar, 'hasil tahunan untuk tiap satuan penurunan terdalam', 'butuh minimal 30 hari')}
+      <p class="hint">${e.days} hari tercatat sejak ${tgl(e.since)}.</p>` : '<p class="miss">Belum cukup data nilai dana.</p>';
+  } else {
+    const money = (v) => (v == null ? '—' : usd(v));
+    const both = (u, p) => (u != null ? money(u) : (p == null ? '—' : `${p >= 0 ? '+' : ''}${pct(p)}`));
+    detail = t ? `
+      <div class="stats three">
+        ${tile('Profit factor', t.profitFactor == null ? '—' : String(t.profitFactor), pfNote, t.profitFactor >= 1 ? 'pos' : 'neg')}
+        ${tile('Rata-rata per posisi', both(t.expectancyUsd, t.expectancyPct), t.usdComplete ? 'hasil bersih rata-rata' : 'dalam persen — bot tidak mencatat dolar')}
+        ${tile('Lama rata-rata', durasi(t.avgHoldMinutes), 'dari buka sampai tutup')}
+      </div>
+      <div class="table-scroll" style="margin-top:14px"><table class="wl">
+        <thead><tr><th>Ukuran</th><th class="num">Menang</th><th class="num">Kalah</th></tr></thead>
+        <tbody>
+          <tr><td>Rata-rata</td><td class="num pos">${both(t.avgWinUsd, t.avgWinPct)}</td><td class="num neg">${both(t.avgLossUsd, t.avgLossPct)}</td></tr>
+          <tr><td>Terbaik / terburuk</td><td class="num pos">${both(t.best.usd, t.best.pct)}<div class="n dim">${esc(t.best.symbol || '')}</div></td><td class="num neg">${both(t.worst.usd, t.worst.pct)}<div class="n dim">${esc(t.worst.symbol || '')}</div></td></tr>
+          <tr><td>Beruntun terpanjang</td><td class="num">${t.longestWinStreak}×</td><td class="num">${t.longestLossStreak}×</td></tr>
+          <tr><td>Total kotor</td><td class="num pos">${money(t.grossProfitUsd)}</td><td class="num neg">${money(t.grossLossUsd)}</td></tr>
+          <tr><td>Jumlah posisi</td><td class="num">${t.wins}</td><td class="num">${t.losses}</td></tr>
+        </tbody></table></div>
+      <p class="hint">Menang/kalah memakai ambang impas yang sama dengan laporan bot; ${t.flat} posisi impas tidak ikut membagi win rate.${t.usdComplete ? '' : ' Total kotor dalam dolar tidak ditampilkan karena bot tidak mencatat nilai dolar tiap posisi.'}</p>` : '<p class="miss">Belum ada posisi yang ditutup.</p>';
+  }
+  setHTML($('#anDetailBody'), detail);
+
+  // ── prediksi, pindahan dari halaman Portofolio ──
+  const box = $('#anForecast');
+  const bolehPrediksi = state.funds.some((f) => f.id === fund && f.forecast !== false);
+  if (bolehPrediksi) renderAnalisa(box, fund, () => state.fund === fund && currentTab === 'analys' && state.view === 'fund');
+  else setHTML(box, '');
+}
+
+/**
  * Catatan pembaruan.
  *
  * Ditulis tangan di data/updates.json — bukan diturunkan dari riwayat commit.
@@ -2352,7 +2489,7 @@ async function renderUpdates() {
 function showUpdate() {
   state.view = 'update';
   $('#tabs').hidden = true;
-  ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
   $('#tab-safebox').hidden = true;
   $('#tab-analisa').hidden = true;
   $('#tab-update').hidden = false;
@@ -2365,15 +2502,18 @@ function showAnalisa(fund) {
   state.view = 'analisa';
   analisaFund = fund || analisaFund || state.funds[0]?.id;
   $('#tabs').hidden = true;
-  ['portfolio', 'investor', 'bot', 'tentang'].forEach((t) => { $('#tab-' + t).hidden = true; });
+  ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
   $('#tab-safebox').hidden = true;
   $('#tab-update').hidden = true;
   $('#tab-analisa').hidden = false;
   renderFundBar();
   renderPortofolio().catch(() => { const c = $('#portoCard'); if (c) c.hidden = true; });
+  // Prediksi tiap dana pindah ke tab "Analys" dana itu sendiri (permintaan
+  // pemilik, 2026-09-26). Halaman ini tinggal ringkasan seluruh dana.
+  if ($('#segAnalisa')) $('#segAnalisa').hidden = true;
+  if ($('#analisaBody')) $('#analisaBody').hidden = true;
   const want = `#analisa/${analisaFund}`;
   if (location.hash !== want) history.replaceState(null, '', want);
-  renderAnalisa();
 }
 
 /* ── boot ────────────────────────────────────────────────────────────── */
@@ -2382,6 +2522,9 @@ function renderAll() {
   const rows = ownerValues(state.ledger, state.nav.totalUsd);
   hideEmptyCards(state.nav);
   renderSummary(state.ledger, state.nav);
+  // Tab Analys membaca blok kinerja dari snapshot; kalau tab itu yang sedang
+  // terbuka saat data tiba, ia harus digambar ulang — bukan tertinggal kosong.
+  if (currentTab === 'analys' && state.view === 'fund') renderAnalys();
   renderDonut(rows);
   renderOwners(rows);
   renderHoldings(state.nav);
@@ -2429,7 +2572,7 @@ async function load({ force = false } = {}) {
 }
 function renderVisible() {
   if (state.view === 'safebox') renderSafebox();
-  else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); renderAnalisa(); }
+  else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
   else if (state.view === 'update') renderUpdates();
   else if (state.nav && state.ledger) renderAll();
 }
@@ -2457,6 +2600,13 @@ async function init() {
     const id = btn.getAttribute('data-fund');
     if (state.view === 'analisa' && id === state.fund) { showTab(currentTab); return; }
     switchFund(id);
+  };
+
+  $('#segAn').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    anSection = btn.getAttribute('data-a');
+    renderAnalys();
   };
 
   $('#segUpdate').onclick = (e) => {
@@ -2494,7 +2644,7 @@ async function init() {
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     // Tampilan analisa digambar terpisah dan tidak ikut renderAll; tanpa baris
     // ini angkanya tetap dolar setelah tombol rupiah ditekan.
-    if (state.view === 'analisa') { renderPortofolio().catch(() => {}); renderAnalisa(); }
+    if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
     else if (state.view === 'safebox') renderSafebox();
     else if (state.view === 'update') renderUpdates();
     else if (state.nav) renderAll();

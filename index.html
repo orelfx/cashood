@@ -60,6 +60,7 @@
   <nav class="tabs" id="tabs" role="tablist">
     <button role="tab" data-tab="portfolio" class="on" aria-selected="true">Portofolio</button>
     <button role="tab" data-tab="investor" aria-selected="false">Data investor</button>
+    <button role="tab" data-tab="analys" aria-selected="false">Analys</button>
     <button role="tab" data-tab="bot" aria-selected="false">💓 Bot</button>
     <button role="tab" data-tab="tentang" aria-selected="false">Tentang</button>
   </nav>
@@ -470,6 +471,38 @@
   </div><!-- /tab-bot -->
 
   <div id="tab-safebox" hidden></div>
+
+  <div id="tab-analys" hidden>
+    <section class="card" id="anSnap">
+      <div class="card-head"><h2>Ringkasan kinerja</h2><span class="hint" id="anSnapHint"></span></div>
+      <div class="stats three" id="anTiles"></div>
+    </section>
+    <div class="an-grid">
+      <section class="card" id="anDna">
+        <div class="card-head"><h2>DNA strategi</h2><span class="hint">skor 0–100 per sumbu</span></div>
+        <div id="anRadar"></div>
+        <div id="anScore"></div>
+      </section>
+      <section class="card" id="anSystem">
+        <div class="card-head"><h2>Info sistem</h2></div>
+        <div id="anSystemBody"></div>
+      </section>
+    </div>
+    <section class="card" id="anAbout">
+      <div class="card-head"><h2 id="anAboutTitle">Tentang strategi</h2></div>
+      <div id="anAboutBody"></div>
+    </section>
+    <section class="card" id="anDetail">
+      <div class="card-head">
+        <h2>Analitik rinci</h2>
+        <div class="seg" id="segAn" role="group" aria-label="Bagian analitik">
+          <button data-a="drawdown" class="on">Penurunan</button><button data-a="risk">Risiko</button><button data-a="activity">Aktivitas</button>
+        </div>
+      </div>
+      <div id="anDetailBody"></div>
+    </section>
+    <div id="anForecast"></div>
+  </div>
 
   <div id="tab-update" hidden>
     <section class="card">

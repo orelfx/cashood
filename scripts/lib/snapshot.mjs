@@ -1,6 +1,7 @@
 import Core from '../../assets/core.js';
 import { atomicJSON, downsample, generation, publicSnapshot, readJSON } from './io.mjs';
 import { resolve, dirname } from 'node:path';
+import { buildPerformance } from './performance.mjs';
 export function reconcile(snapshot, cfg, previous = null) {
   snapshot.schemaVersion = 2;
   snapshot.generation ||= generation();
@@ -37,6 +38,30 @@ export function saveSnapshot(out, snapshot, cfg) {
   reconcile(snapshot,cfg,previous);
   const navPath=resolve(dir,'nav.json'), nav=readJSON(navPath,{points:[]});
   const points=snapshot.quality.complete ? downsample([...nav.points,{t:snapshot.updatedAt,usd:snapshot.totalUsd,lp:snapshot.lpUsd,quality:'complete',outflowTotalUsd:snapshot.outflowTotalUsd||0,generation:snapshot.generation}],snapshot.updatedAt) : nav.points;
+  // Kinerja nyata dihitung SETELAH rekonsiliasi, dari nilai akhir dan deret
+  // yang sama yang akan terbit — bukan dari angka sementara exporter.
+  if (snapshot.performanceInput) {
+    const inp = snapshot.performanceInput;
+    delete snapshot.performanceInput;
+    const flows = (cfg.events || []).filter((e) => e.type === 'deposit' || e.type === 'withdraw')
+      .map((e) => ({ at: Core.eventTime(e), usd: e.type === 'deposit' ? Number(e.usd) : -Number(e.usd) }));
+    const ledger = Core.buildLedger(cfg);
+    try {
+      // Dana yang dompetnya hanya DIBACA: uang masuk-keluar dompet tidak lewat
+      // pembukuan ini, jadi penurunan nilai bisa berarti uang ditarik pemilik,
+      // bukan rugi. Semua angka yang dihitung dari nilai dana ditahan; statistik
+      // posisi tertutup tetap terbit karena datanya lengkap.
+      const flowsKnown = cfg.fund?.cashFlowsRecorded !== false;
+      snapshot.performance = buildPerformance({
+        closes: inp.closes || [], points: flowsKnown ? points : [], flows, flatBand: inp.flatBand ?? 0.5,
+        capitalUsd: ledger.capitalBasis ?? ledger.deposited, navUsd: snapshot.totalUsd,
+      });
+      if (!flowsKnown) {
+        snapshot.performance.equityWithheld = 'Dompet dana ini dibaca, bukan dijalankan: uang yang masuk atau keluar dompet tidak tercatat di sini, jadi penurunan nilai tidak bisa dibedakan dari penarikan. Penurunan terdalam, rasio risiko, dan pemulihan ditahan sampai arus kasnya dicatat.';
+        snapshot.performance.recoveryFactor = null;
+      }
+    } catch (err) { snapshot.performance = null; }
+  }
   const publicData=publicSnapshot(snapshot,dir);
   // Only after all validation/sanitization has passed may any new generation be written.
   atomicJSON(local,snapshot);atomicJSON(navPath,{updatedAt:snapshot.updatedAt,generation:snapshot.generation,points});atomicJSON(out,publicData);

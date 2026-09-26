@@ -203,5 +203,67 @@
     "openingNote": "Ditetapkan pemilik 2026-09-20: $1.100 sebagai 'early investor'. Sapuan setelah waktu itu dihitung terpisah sebagai 'new'.",
     "openingLabel": "early investor",
     "countFromAt": 1789905492919
+  },
+  "strategy": {
+    "title": "Reborn Rich — penyedia likuiditas otomatis di Robinhood Chain",
+    "about": [
+      "Reborn Rich menaruh modal sebagai likuiditas terkonsentrasi di pool Uniswap v3 dan v4 di Robinhood Chain, lalu memanen fee dari setiap perdagangan yang melewati rentang harganya. Bot berjalan 24 jam: memindai ratusan pool, membuka posisi, memantaunya tiap lima menit, dan menutupnya saat aturan terpenuhi.",
+      "Modal dibagi ke tiga buku dengan karakter berbeda: big cap untuk koin yang lebih mapan, mid cap sebagai buku utama, dan degen untuk koin kecil yang lebih liar dengan porsi paling kecil. Tiap buku punya jumlah kursi dan ukuran posisinya sendiri.",
+      "Modal kerja dipatok. Setiap hari, kelebihan di atas modal kerja ditarik ke dompet terpisah dalam kelipatan $100, sehingga laba tidak ikut dipertaruhkan lagi. Uang yang ditarik itulah yang dibagikan sebagai dividen tiap tanggal 1."
+    ],
+    "requirements": [
+      [
+        "Setoran minimum",
+        "$100"
+      ],
+      [
+        "Pemberitahuan masuk / keluar",
+        "24 jam"
+      ],
+      [
+        "Cadangan gas",
+        "ETH di dompet bot, di luar modal yang diputar"
+      ],
+      [
+        "Aset kuotasi",
+        "USDG dan ETH"
+      ],
+      [
+        "Pembagian",
+        "tiap tanggal 1, dari laba yang sudah ditarik"
+      ]
+    ],
+    "risks": [
+      "Impermanent loss: saat harga token bergerak jauh dari saat posisi dibuka, nilai posisi bisa lebih rendah daripada kalau token hanya disimpan. Fee belum tentu menutupnya.",
+      "Rug pull dan likuiditas tipis: koin kecil bisa kehilangan seluruh likuiditasnya dalam hitungan menit. Bot memakai beberapa penyaring — penolak koin yang sedang terjun bebas, pemegang pribadi di atas 20% pasokan, kelompok dompet yang didanai satu orang — tapi tidak ada penyaring yang sempurna.",
+      "Risiko kontrak dan jaringan: bug di kontrak pool atau gangguan RPC bisa membuat posisi sulit dibaca atau ditutup tepat waktu.",
+      "Tanpa payung hukum: ini kesepakatan pribadi, bukan produk berizin. Tidak ada penjamin dan tidak ada jaminan pengembalian."
+    ],
+    "system": [
+      [
+        "Jaringan",
+        "Robinhood Chain (L2, chain 4663)"
+      ],
+      [
+        "Tempat likuiditas",
+        "Uniswap v3 & v4"
+      ],
+      [
+        "Tipe posisi",
+        "likuiditas terkonsentrasi, satu atau dua sisi"
+      ],
+      [
+        "Mesin",
+        "bot otomatis 24 jam, dipantau tiap 5 menit"
+      ],
+      [
+        "Pengelolaan dompet",
+        "dompet bot di server sendiri; alamat tidak diterbitkan"
+      ],
+      [
+        "Sumber data situs",
+        "snapshot bot tiap 10 menit"
+      ]
+    ]
   }
 }

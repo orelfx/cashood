@@ -762,3 +762,56 @@ svg.solmark { width: .78em; height: .61em; vertical-align: 0; }
   .upd-title { font-size: 13.5px; }
   .upd-detail { font-size: 12.5px; }
 }
+
+/* ── Analys ──────────────────────────────────────────────────────────── */
+.an-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+/* min-width: 0 — tanpa ini, isi tabel memaksa kolom grid lebih lebar dari
+   layar HP dan seluruh halaman ikut melebar ke samping. */
+.an-grid > .card { margin: 0; min-width: 0; }
+.an-grid table { table-layout: fixed; }
+.an-grid table.kv td:last-child { overflow-wrap: anywhere; }
+#tab-analys > .card, #tab-analys > .an-grid { margin-bottom: 16px; }
+.radar { width: 100%; max-width: 320px; display: block; margin: 0 auto; }
+.rd-grid { fill: none; stroke: var(--line); stroke-width: 1; }
+.rd-shape { fill: color-mix(in srgb, var(--accent, #4ade80) 22%, transparent); stroke: var(--accent, #4ade80); stroke-width: 2; stroke-linejoin: round; }
+.rd-lbl { fill: var(--muted); font: 600 11px var(--sans); }
+.rd-miss { opacity: .45; }
+.dna-total { text-align: center; margin: 6px 0 12px; }
+.dna-num { font: 700 34px var(--mono); color: var(--accent, #4ade80); margin-right: 6px; }
+.dna-tbl { width: 100%; }
+.dna-tbl td { padding: 7px 2px; border-bottom: 1px solid var(--line); }
+.dna-tbl tr:last-child td { border-bottom: 0; }
+table.kv { width: 100%; }
+table.kv td { padding: 8px 2px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.kv td:first-child { color: var(--muted); width: 44%; padding-right: 10px; }
+table.kv td:last-child { text-align: right; font-weight: 600; }
+table.kv tr:last-child td { border-bottom: 0; }
+#anAboutBody p { color: var(--muted); line-height: 1.6; margin: 0 0 10px; }
+.dd-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; }
+.dd-row .v { font: 700 20px var(--mono); }
+.dd-bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 8px; }
+.dd-bar i { display: block; height: 100%; background: linear-gradient(90deg, #f87171, #fb7185); }
+.ratio { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ratio:last-of-type { border-bottom: 0; }
+.ratio-name { font-weight: 650; }
+.ratio-v { font: 700 24px var(--mono); }
+table.wl td { padding: 9px 4px; }
+@media (max-width: 760px) {
+  .an-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  #segAn { display: flex; width: 100%; max-width: 100%; overflow-x: auto; scrollbar-width: none; margin-top: 8px; }
+  #segAn::-webkit-scrollbar { display: none; }
+  #segAn button { flex: 1 0 auto; }
+  #anDetail .card-head { flex-wrap: wrap; }
+  .dna-num { font-size: 28px; }
+  .ratio-v { font-size: 20px; }
+  table.kv td:first-child { width: 48%; }
+}
+#anAboutBody .two > div { min-width: 0; }
+@media (max-width: 760px) { #anAboutBody .two { grid-template-columns: 1fr; } }
+/* Tabel kunci–nilai selalu membungkus teksnya: ia tidak berada di dalam
+   penggulung horizontal, jadi aturan nowrap tabel lain membuatnya melebar
+   keluar layar HP. */
+table.kv { table-layout: fixed; }
+table.kv td { white-space: normal !important; overflow-wrap: anywhere; }

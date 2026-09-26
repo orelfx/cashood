@@ -61,8 +61,8 @@ console.log('PASS initial render');
  const raced=await ev(`(async()=>{const a=load({force:true});await new Promise(r=>setTimeout(r,40));const b=switchFund('meridian');await Promise.all([a,b]);return {fund:state.fund,nav:state.nav.totalUsd,native:state.nav.nativeSymbol,cache:JSON.parse(localStorage.getItem(cacheKey('meridian'))).totalUsd}})()`);
  assert.deepEqual(raced,{fund:'meridian',nav:5000,native:'SOL',cache:5000});console.log('PASS delayed Reborn cannot overwrite Meridian');
  delayReborn=false;fxDelay=2000;const elapsed=await ev('(async()=>{const t=performance.now();await load({force:true});return performance.now()-t})()');assert.ok(elapsed<1800,`load waited ${elapsed}ms`);console.log('PASS NAV does not wait for FX');
- await ev('showAnalisa("meridian")');await new Promise(r=>setTimeout(r,100));assert.match(await ev('document.querySelector("#analisaBody").textContent'),/belum cukup|Belum cukup/);
- fullForecast=true;await ev('delete forecastCache.meridian;showAnalisa("meridian")');await new Promise(r=>setTimeout(r,100));{const t=await ev('document.querySelector("#analisaBody").textContent');
+ await ev('showTab("analys")');await new Promise(r=>setTimeout(r,100));assert.match(await ev('document.querySelector("#anForecast").textContent'),/belum cukup|Belum cukup/);
+ fullForecast=true;await ev('delete forecastCache.meridian;showTab("analys")');await new Promise(r=>setTimeout(r,100));{const t=await ev('document.querySelector("#anForecast").textContent');
  // Tata letak yang disetujui pemilik: peluang dulu, dividen terkumpul, dan
  // tidak ada peluang yang ditulis "0%" (aturan 2026-09-19: paling kecil 0,001%).
  assert.match(t,/Worst Case/);assert.match(t,/Peluang dana turun 10% bulan ini/);

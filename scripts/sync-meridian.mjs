@@ -312,6 +312,21 @@ const snapshot = {
   closedRecent: [...closes].reverse().slice(0, 10),
 };
 
+// Bot menyimpan hasil posisi tertutup dalam PERSEN saja. Statistik kinerja
+// memakai semua posisi sejak dana dicatat, dengan persennya; nilai dolar hanya
+// dipakai kalau memang tersedia, tidak pernah diperkirakan.
+const closesForPerformance = (tracking.entries || []).filter((e) => Date.parse(e.close_ts) >= startAt).map((e) => {
+  const priced = closes.find((c) => c.closedAt === Date.parse(e.close_ts) && c.symbol === (e.pool_name || '—'));
+  const opened = state.positions?.[e.position]?.deployed_at;
+  return {
+    netUsd: priced ? Number(priced.netUsd) : NaN,
+    netPct: e.close_pnl_pct == null ? NaN : Number(e.close_pnl_pct),
+    closedAt: Date.parse(e.close_ts),
+    holdMinutes: opened ? Math.round((Date.parse(e.close_ts) - Date.parse(opened)) / 60000) : null,
+    symbol: e.pool_name || null,
+  };
+});
+snapshot.performanceInput = { closes: closesForPerformance, flatBand: 0.05 };
 saveSnapshot(resolve(OUT_DIR,'live.json'), snapshot, cfgFund);
 console.log(`[meridian] total=$${snapshot.totalUsd} positions=${positions.length} complete=${snapshot.quality.complete} unpricedCloses=${unpricedCloses}`);
 release();

@@ -288,6 +288,7 @@ const snapshot = {
   closedRecent,
 };
 
+snapshot.performanceInput = { closes: tutup.map((r) => ({ netUsd: r.netUsd, netPct: r.netPct, closedAt: r.closedAt, holdMinutes: r.holdMinutes, symbol: r.symbol || null })), flatBand: 0.5 };
 saveSnapshot(OUT,snapshot,cfg);
 console.log(`[ferari] total=$${snapshot.totalUsd} positions=${positions.length} complete=${snapshot.quality.complete}`);
 release();
