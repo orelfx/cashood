@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "Cashood",
+    "tagline": "Private AI liquidity provider · Solana",
+    "currency": "USD",
+    "refreshMinutes": 5,
+    "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/meridian/live.json",
+    "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/meridian/nav.json",
+    "heartbeatUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/meridian/heartbeat.json"
+  },
+  "wallet": {
+    "chainName": "Solana",
+    "_note": "Alamat wallet sengaja tidak dicantumkan. Seluruh angka datang dari snapshot yang ditulis bot."
+  },
+  "navOverrideUsd": null,
+  "owners": [
+    {
+      "id": "orel",
+      "name": "Orel",
+      "color": "#4ade80"
+    }
+  ],
+  "_events_help": [
+    "type: deposit | withdraw",
+    "usd: jumlah dalam dolar",
+    "founding: true hanya untuk setoran awal (harga 1 unit = $1)",
+    "navBefore: total nilai wallet SEBELUM transaksi ini. WAJIB untuk event non-founding,",
+    "           supaya bagian orang lama tidak kena encer waktu ada orang baru masuk.",
+    "note: bebas, boleh dikosongkan"
+  ],
+  "events": [
+    {
+      "date": "2026-09-17",
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 950,
+      "founding": true,
+      "note": "setoran awal — tanggal perkiraan, operator tidak ingat tanggal persisnya",
+      "id": "meridian-legacy-1"
+    },
+    {
+      "date": "2026-09-19",
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 2300,
+      "navBefore": 1084.8,
+      "at": 1789802654239,
+      "note": "tambahan modal — total modal jadi $3.250 (arahan pemilik 2026-09-19). navBefore = titik terakhir sebelum uang masuk (1084.80); nilai yang tiba di wallet $2152.71, selisihnya dari $2.300 tercatat sebagai biaya masuk",
+      "id": "meridian-legacy-2"
+    },
+    {
+      "date": "2026-09-25",
+      "at": 1790321755237,
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 1309,
+      "navBefore": 3697.06,
+      "note": "tambahan modal — uang baru yang masuk ke dompet",
+      "id": "meridian-legacy-3",
+      "batchId": "meridian-legacy-batch-3"
+    },
+    {
+      "date": "2026-09-25",
+      "at": 1790321755237,
+      "type": "reinvest",
+      "owner": "orel",
+      "usd": 441,
+      "navBefore": 3697.06,
+      "note": "Reinvestasi laba $441: penyesuaian modal acuan, tanpa uang baru dan tanpa penerbitan saham.",
+      "id": "meridian-legacy-4",
+      "batchId": "meridian-legacy-batch-3"
+    }
+  ],
+  "costs": {
+    "note": "biaya sistem sudah dibayar dari dana Reborn Rich — dana ini tidak dibebani lagi",
+    "items": [
+      {
+        "name": "MiniMax high",
+        "usd": 50
+      },
+      {
+        "name": "Claude",
+        "usd": 100
+      },
+      {
+        "name": "VPS",
+        "usd": 15
+      },
+      {
+        "name": "RPC",
+        "usd": 50
+      },
+      {
+        "name": "LP Agent",
+        "usd": 20
+      },
+      {
+        "name": "Bridge + price impact",
+        "usd": 15
+      }
+    ],
+    "shared": true,
+    "primary": false
+  },
+  "fund": {
+    "capacityUsd": 5000,
+    "minDepositUsd": 100,
+    "noticeHours": 24,
+    "note": "Plafon $5.000, mengikuti modal masuk. Ditinjau ulang kalau ada tambahan modal."
+  },
+  "dividend": {
+    "payDayOfMonth": 1,
+    "distributePct": 100,
+    "reinvestPct": 0,
+    "investorFeePct": 0,
+    "investorFeeStandardPct": 15,
+    "investorFeeNote": "gratis selama masa perkenalan",
+    "retainedUsd": 0,
+    "note": "Tiap tanggal 1: seluruh uang yang ditarik bot bulan itu dikurangi biaya sistem, lalu 100% dibagikan menurut porsi saham — sekecil apa pun porsinya. Tidak ada lagi bagian 30% yang mengendap (aturan pemilik, 2026-09-18). Fee admin standar 15% dari bagian tiap investor, digratiskan selama masa perkenalan.",
+    "basis": "treasury"
+  },
+  "treasury": {
+    "openingUsd": 0,
+    "ledgerFile": "data/meridian/treasury.jsonl",
+    "note": "Kas hanya bertambah dari transfer terkonfirmasi; penarikan/pembayaran harus dicatat."
+  }
+}
