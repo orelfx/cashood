@@ -123,5 +123,67 @@
     "openingUsd": 0,
     "ledgerFile": "data/meridian/treasury.jsonl",
     "note": "Kas hanya bertambah dari transfer terkonfirmasi; penarikan/pembayaran harus dicatat."
+  },
+  "strategy": {
+    "title": "Meridian — penyedia likuiditas otomatis di Solana",
+    "about": [
+      "Meridian menaruh modal di pool DLMM Meteora di jaringan Solana. Berbeda dengan Uniswap, likuiditas DLMM dibagi ke kotak-kotak harga yang disebut bin; posisi hanya menghasilkan fee saat harga berada di dalam rentang bin yang dipilih.",
+      "Bot memilih pool, menentukan rentang dan bentuk sebaran bin mengikuti kondisi pasar, lalu memantau dan menutup posisi sesuai aturannya. Hanya pool berpasangan SOL yang dimasuki.",
+      "Hasil setiap posisi yang ditutup dicatat bot dalam persen. Statistik di halaman ini memakai persen itu apa adanya; nilai dolar tidak diperkirakan kalau bot tidak mencatatnya."
+    ],
+    "requirements": [
+      [
+        "Setoran minimum",
+        "$100"
+      ],
+      [
+        "Pemberitahuan masuk / keluar",
+        "24 jam"
+      ],
+      [
+        "Cadangan gas",
+        "SOL di dompet bot"
+      ],
+      [
+        "Aset kuotasi",
+        "SOL"
+      ],
+      [
+        "Pembagian",
+        "tiap tanggal 1"
+      ]
+    ],
+    "risks": [
+      "Harga keluar rentang: di Solana harga memecoin bisa meninggalkan rentang bin dalam hitungan menit, dan posisi berhenti menghasilkan sementara nilai tokennya ikut turun.",
+      "Risiko token Solana: otoritas mint atau freeze yang masih dipegang pengembang, dan ekstensi Token-2022 seperti biaya transfer, bisa dipakai merugikan pemegang setelah bot masuk.",
+      "Sisa token tanpa pasar: koin yang mati bisa tertinggal di dompet tanpa pembeli; nilainya dihitung nol.",
+      "Tanpa payung hukum: ini kesepakatan pribadi, bukan produk berizin."
+    ],
+    "system": [
+      [
+        "Jaringan",
+        "Solana"
+      ],
+      [
+        "Tempat likuiditas",
+        "Meteora DLMM"
+      ],
+      [
+        "Tipe posisi",
+        "sebaran bin satu atau dua sisi, berpasangan SOL"
+      ],
+      [
+        "Mesin",
+        "bot otomatis 24 jam dengan agen AI"
+      ],
+      [
+        "Pengelolaan dompet",
+        "dompet bot di server sendiri; alamat tidak diterbitkan"
+      ],
+      [
+        "Sumber data situs",
+        "laporan bot tiap 10 menit"
+      ]
+    ]
   }
 }
