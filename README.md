@@ -193,3 +193,13 @@ Mengunggah `_headers` ke Pages saja tidak mengaktifkannya. Jangan memasukkan
 Alamat/identitas yang sudah terbit di riwayat Git atau salinan pihak lain tidak dapat
 ditarik kembali oleh perubahan kode ini. Penulisan ulang riwayat adalah tindakan
 operasional terpisah dan tidak dilakukan otomatis.
+
+## Hasil pemeriksaan sumber saat perbaikan
+
+Uji baca langsung Reborn, Ferari, dan Safe Box berhasil di checkout terpisah.
+Pemanggilan CLI Meridian kini berhenti setelah hasil selesai ditulis, meskipun bot
+memasang timer cache. Sumber wallet Meridian masih mengembalikan beberapa token
+bersaldo positif tanpa harga. Exporter menolak memperbarui NAV daripada menganggapnya
+bernilai nol. Lengkapi harga atau rekonsiliasi klasifikasi aset pada sumber bot
+sebelum mengaktifkan exporter baru di produksi. Jangan memakai saldo token yang
+belum dinilai sebagai bukti bahwa NAV sudah lengkap.

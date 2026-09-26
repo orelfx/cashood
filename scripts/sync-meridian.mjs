@@ -61,17 +61,22 @@ const book = cli('positions');
 if (!Array.isArray(book.positions) || balance.error || book.error) throw new Error('CLI mengembalikan data parsial');
 const solPrice = Core.number(balance.sol_price, 'Harga SOL', .01);
 for (const key of ['sol','sol_usd','usdc']) Core.number(balance[key], key, 0);
-for (const t of balance.tokens || []) Core.number(t.usd, 'Nilai token', 0);
+// Some balance providers include SOL/USDC again in the token list.
+const mainMints = new Set(['So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v']);
+const extraTokens = (balance.tokens || []).filter(t => !mainMints.has(t.mint));
+const unpricedTokens = extraTokens.filter(t => Core.number(t.balance,'Saldo token',0)>0 && t.usd == null);
+if (unpricedTokens.length) throw new Error(`${unpricedTokens.length} token bersaldo positif belum memiliki harga; rekonsiliasi sumber sebelum memperbarui NAV`);
+for (const t of extraTokens) if (t.balance>0) Core.number(t.usd, 'Nilai token', 0);
 
 // ─── isi dompet ───────────────────────────────────────────────────────────
 const holdings = [
   { symbol: 'SOL', amount: num(balance.sol), price: solPrice, usd: num(balance.sol_usd) },
   { symbol: 'USDC', amount: num(balance.usdc), price: 1, usd: num(balance.usdc) },
-  ...(balance.tokens || []).map((t) => ({
+  ...extraTokens.filter(t=>t.balance>0).map((t) => ({
     symbol: t.symbol || String(t.mint || '').slice(0, 8),
     amount: num(t.balance), price: null, usd: num(t.usd),
   })),
-].filter((h) => h.usd >= 0.5);
+].filter((h) => h.usd > 0);
 
 // ─── posisi terbuka ───────────────────────────────────────────────────────
 //
