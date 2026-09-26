@@ -1,42 +1,42 @@
-# Situsnya file statis apa adanya — tidak ada yang perlu dibangun.
-#
-# Dulu memakai pembangun Pages bawaan; batas build-nya bikin setiap deploy
-# gagal begitu jatah per jam habis, dengan pesan "Page build failed." tanpa
-# keterangan apa pun. Lewat Actions, isi repo diunggah langsung dan lognya
-# kelihatan kalau ada yang salah.
-name: Deploy site
-
+name: Validate and deploy site
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
-  deploy:
+  validate:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run test:browser
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      # Cap versi aset = commit yang di-deploy. Dengan begitu index.html boleh
-      # basi sepuluh menit di cache Pages tanpa pernah memasangkan HTML baru
-      # dengan JS lama: alamat asetnya berubah hanya kalau kodenya berubah,
-      # dan browser boleh menyimpannya selama mungkin.
-      - name: Stamp asset version
-        run: sed -i "s/__BUILD__/${GITHUB_SHA::8}/g" index.html
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

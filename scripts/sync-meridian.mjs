@@ -16,16 +16,21 @@
 
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
+import Core from '../assets/core.js';
+import { lock, readJSON } from './lib/io.mjs';
+import { treasury, parseTransfers } from './lib/treasury.mjs';
+import { saveSnapshot } from './lib/snapshot.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = resolve(HERE, '..', 'data', 'meridian');
+const OUT_DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'meridian');
+const release = lock(resolve(OUT_DIR, 'sync.lock.local'));
 const HOME = process.env.MERIDIAN_HOME || '/root/main/meridian';
 const WIB = 7 * 3600e3;
 
 const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
-const trueUsd = (row, name) => num(row[`${name}_true_usd`] ?? row[`${name}_usd`]);
+const trueUsd = (row, name) => Core.number(row[`${name}_true_usd`] ?? row[`${name}_usd`], name);
 
 /**
  * Jalankan CLI bot dan ambil JSON-nya.
@@ -35,9 +40,14 @@ const trueUsd = (row, name) => num(row[`${name}_true_usd`] ?? row[`${name}_usd`]
  * di sini adalah JSON yang bisa dibaca, bukan kode keluar.
  */
 function cli(command) {
-  const run = spawnSync('node', ['cli.js', command], {
+  // The bot installs cache setIntervals. Exit only after its awaited read command
+  // has returned and stdout is flushed, rather than waiting for those timers.
+  const entry = resolve(HOME, 'cli.js');
+  const wrapper = `process.argv = ${JSON.stringify([process.execPath, entry, command])}; await import(${JSON.stringify(pathToFileURL(entry).href)}); await new Promise(r => process.stdout.write('', r)); process.exit(0);`;
+  const run = spawnSync(process.execPath, ['--input-type=module', '-e', wrapper], {
     cwd: HOME, encoding: 'utf8', timeout: 180000, maxBuffer: 32 * 1024 * 1024,
   });
+  if (run.error || run.signal) throw new Error(`CLI ${command} terputus`);
   const out = run.stdout || '';
   const start = out.indexOf('{');
   if (start === -1) {
@@ -48,7 +58,10 @@ function cli(command) {
 
 const balance = cli('balance');
 const book = cli('positions');
-const solPrice = num(balance.sol_price);
+if (!Array.isArray(book.positions) || balance.error || book.error) throw new Error('CLI mengembalikan data parsial');
+const solPrice = Core.number(balance.sol_price, 'Harga SOL', .01);
+for (const key of ['sol','sol_usd','usdc']) Core.number(balance[key], key, 0);
+for (const t of balance.tokens || []) Core.number(t.usd, 'Nilai token', 0);
 
 // ─── isi dompet ───────────────────────────────────────────────────────────
 const holdings = [
@@ -73,10 +86,10 @@ const holdings = [
 // Batasnya diturunkan dari modal dana: sebuah posisi tidak boleh melebihi
 // seluruh setoran dikali `maxPositionMultiple` (bawaan 1,5). Yang melewatinya
 // memakai nilai terakhir yang pernah terbaca benar, dan kalau belum pernah,
-// dikeluarkan dari hitungan sambil dicatat.
+// snapshot dibatalkan agar NAV tidak diam-diam kehilangan posisi.
 const cfgFund = (() => {
   try { return JSON.parse(readFileSync(resolve(OUT_DIR, 'config.json'), 'utf8')); }
-  catch { return {}; }
+  catch { throw new Error('Konfigurasi dana tidak terbaca'); }
 })();
 const setoran = (cfgFund.events || [])
   .filter((e) => e.type === 'deposit')
@@ -85,7 +98,7 @@ const batasPosisi = Math.max(
   num(cfgFund.fund?.maxPositionUsd),
   (setoran || num(cfgFund.fund?.capacityUsd) || 10000) * (num(cfgFund.fund?.maxPositionMultiple) || 1.5),
 );
-const prevLive = existsSync(resolve(OUT_DIR, 'live.json')) ? JSON.parse(readFileSync(resolve(OUT_DIR, 'live.json'), 'utf8')) : null;
+const prevLive = readJSON(resolve(OUT_DIR, 'snapshot.local.json')) || readJSON(resolve(OUT_DIR, 'live.json'));
 const prevPos = new Map((prevLive?.positions || []).map((x) => [String(x.tokenId), x]));
 const ditolak = [];
 
@@ -116,13 +129,14 @@ const positions = (book.positions || []).map((p) => {
   };
 
 }).map((pos) => {
+  if (pos.valueUsd < 0) throw new Error('Nilai posisi negatif');
   if (pos.valueUsd <= batasPosisi) return pos;
   const before = prevPos.get(String(pos.tokenId));
   ditolak.push(`${pos.symbol} terbaca $${pos.valueUsd.toFixed(2)} (batas $${batasPosisi.toFixed(0)})`);
   if (before && Number(before.valueUsd) > 0 && Number(before.valueUsd) <= batasPosisi) {
     return { ...pos, ...before, stale: true, staleReason: 'nilai tidak masuk akal, memakai bacaan terakhir' };
   }
-  return { ...pos, valueUsd: 0, principalUsd: 0, feesUsd: 0, pnlUsd: 0, unreadable: true };
+  throw new Error('Nilai posisi tidak masuk akal dan tidak ada cadangan');
 });
 
 const walletUsd = holdings.reduce((t, h) => t + h.usd, 0);
@@ -142,29 +156,21 @@ const readJson = (name) => {
 const state = readJson('state.json') || { positions: {} };
 const tracking = readJson('post-close-tracking.json') || { entries: [] };
 
-const sizeOf = (address) => num(state.positions?.[address]?.amount_sol) * solPrice;
-const openedAt = (address) => state.positions?.[address]?.deployed_at || null;
-
-const closes = (tracking.entries || [])
-  .filter((e) => e.close_ts && Number.isFinite(Number(e.close_pnl_pct)))
-  .map((e) => {
-    const size = sizeOf(e.position);
-    const pct = num(e.close_pnl_pct);
-    const opened = openedAt(e.position);
-    const closedAt = Date.parse(e.close_ts);
-    return {
-      symbol: e.pool_name || '—',
-      strategy: e.mode || null,
-      netPct: Number(pct.toFixed(2)),
-      netUsd: Number(((size * pct) / 100).toFixed(2)),
-      sizeUsd: Number(size.toFixed(2)),
-      openedAt: opened ? Date.parse(opened) : null,
-      closedAt,
-      holdMinutes: opened ? Math.round((closedAt - Date.parse(opened)) / 60000) : null,
-      reason: String(e.close_reason || '').split(':')[0] || null,
-    };
-  })
-  .sort((a, b) => a.closedAt - b.closedAt);
+const startAt = Math.min(...cfgFund.events.map(Core.eventTime));
+let unpricedCloses = 0;
+const closes = (tracking.entries || []).filter(e => {
+  const at = Date.parse(e.close_ts);
+  return Number.isFinite(at) && at >= startAt;
+}).map(e => {
+  const net = e.realized_pnl_usd ?? e.close_pnl_usd;
+  if (net == null || !Number.isFinite(Number(net))) { unpricedCloses++; return null; }
+  const opened = state.positions?.[e.position]?.deployed_at;
+  return { symbol: e.pool_name || '—', strategy: e.mode || null, netUsd: Core.money(Number(net)),
+    netPct: e.close_pnl_pct == null ? null : num(e.close_pnl_pct), sizeUsd: num(e.entry_value_usd),
+    openedAt: opened ? Date.parse(opened) : null, closedAt: Date.parse(e.close_ts),
+    holdMinutes: opened ? Math.round((Date.parse(e.close_ts)-Date.parse(opened))/60000) : null,
+    reason: String(e.close_reason || '').split(':')[0] || null };
+}).filter(Boolean).sort((a,b)=>a.closedAt-b.closedAt);
 
 const byDay = new Map();
 for (const c of closes) {
@@ -212,7 +218,9 @@ const stats = {
   worstDay: worst ? { date: worst.date, usd: worst.usd } : null,
   openCount: positions.length,
   openFeesUsd: Number(positions.reduce((t, p) => t + p.feesUsd, 0).toFixed(2)),
-  estimated: true,
+  estimated: false,
+  unpricedCloses,
+  historyComplete: unpricedCloses === 0,
   timezone: 'Asia/Jakarta (UTC+7)',
 };
 
@@ -226,12 +234,17 @@ try {
   if (u > 0 && i > 0) usdIdr = Number((i / u).toFixed(2));
 } catch { /* situs mencarinya sendiri */ }
 
+const cashFile = resolve(OUT_DIR, 'treasury.jsonl');
+const cash = treasury(cfgFund, [], existsSync(cashFile) ? parseTransfers(readFileSync(cashFile,'utf8')) : []);
 const snapshot = {
+  ...cash,
+  fund: 'meridian',
+  historyNote: unpricedCloses ? `${unpricedCloses} posisi tertutup belum memiliki nilai realisasi USD; tidak dihitung sebagai nol.` : null,
   updatedAt: Date.now(),
   usdIdr,
   totalUsd: Number(totalUsd.toFixed(2)),
   botWalletUsd: Number(walletUsd.toFixed(2)),
-  treasuryUsd: 0,
+
   solPrice,
   ethPrice: null,
   nativeSymbol: 'SOL',
@@ -243,39 +256,7 @@ const snapshot = {
   closedRecent: [...closes].reverse().slice(0, 10),
 };
 
-mkdirSync(OUT_DIR, { recursive: true });
-writeFileSync(resolve(OUT_DIR, 'live.json'), JSON.stringify(snapshot, null, 2) + '\n');
-
-// ─── deret nilai dana ─────────────────────────────────────────────────────
-const NAV = resolve(OUT_DIR, 'nav.json');
-const now = Date.now();
-const previous = existsSync(NAV) ? (JSON.parse(readFileSync(NAV, 'utf8')).points || []) : [];
-// Deret ini ikut diunduh tiap kali halaman dibuka, jadi kerapatannya dibayar
-// pengunjung. Dua hari penuh pada 10 menit itu 288 titik untuk garis yang di
-// layar HP lebarnya 350 piksel — halus di data, tidak kelihatan di mata.
-// Sehari terakhir tetap 10 menit (yang dilihat orang), seminggu terakhir per
-// jam, sisanya harian. 40 KB turun jadi sekitar 15 KB.
-const kept = previous.filter((p) => {
-  const age = now - p.t;
-  if (age < 86400e3) return true;
-  const at = new Date(p.t);
-  if (age < 7 * 86400e3) return at.getUTCMinutes() < 10;
-  return at.getUTCHours() === 0 && at.getUTCMinutes() < 10;
-});
-// PENJAGA KEDUA, DI TINGKAT DERET. Batas per posisi menangkap satu posisi yang
-// salah harga; ini menangkap sumber lain — token di dompet yang salah dinilai,
-// misalnya. Nilai dana tidak melompat tiga kali lipat dalam sepuluh menit
-// tanpa setoran, dan setoran dicatat di config, bukan muncul diam-diam.
-const sebelum = kept.length ? num(kept[kept.length - 1].usd) : 0;
-const lompatGila = sebelum > 0 && snapshot.totalUsd > sebelum * 3;
-if (lompatGila) {
-  console.warn(`[meridian] titik deret dilewati — $${snapshot.totalUsd.toFixed(2)} lebih dari 3x bacaan sebelumnya ($${sebelum.toFixed(2)})`);
-} else {
-  kept.push({ t: now, usd: snapshot.totalUsd, lp: Number(lpUsd.toFixed(2)) });
-}
-writeFileSync(NAV, JSON.stringify({ updatedAt: now, points: kept.slice(-4000) }, null, 2) + '\n');
-
-console.log(`[meridian] ${new Date().toISOString()} total=$${snapshot.totalUsd}`
-  + ` (dompet $${snapshot.botWalletUsd} + LP $${lpUsd.toFixed(2)})`
-  + ` posisi=${positions.length} ditutup=${closes.length} navPoints=${kept.length}`);
+saveSnapshot(resolve(OUT_DIR,'live.json'), snapshot, cfgFund);
+console.log(`[meridian] total=$${snapshot.totalUsd} positions=${positions.length} complete=${snapshot.quality.complete} unpricedCloses=${unpricedCloses}`);
+release();
 process.exit(0);

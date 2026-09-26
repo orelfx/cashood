@@ -1,399 +1,195 @@
-# Cashood — Headfund
+# Cashood
 
-Private AI liquidity provider di **Robinhood Chain**. Satu wallet, beberapa pemilik,
-pembagian saham otomatis. Situs statis — HTML + CSS + JS polos, tanpa build,
-tanpa dependency, siap di-host di GitHub Pages.
+Dashboard statis untuk Reborn Rich, Meridian, No Risk No Ferari, dan Safe Box.
+Semua saldo berasal dari snapshot server. Browser **tidak membaca saldo wallet
+langsung dari blockchain**. Label waktu menunjukkan umur sumber, bukan waktu fetch.
 
-**Tidak ada rahasia di repo ini.** Tidak ada private key, seed, API key — dan
-sejak 12 Sep 2026, **alamat wallet pun tidak dicantumkan**.
+## Pengembangan dan validasi
 
-Halaman ini tidak lagi membaca saldo langsung dari chain. Untuk melakukannya,
-browser harus mengirim alamat wallet ke RPC publik, dan alamat itu lalu terbaca
-siapa pun yang membuka panel jaringan. Semua angka sekarang datang dari snapshot
-yang ditulis bot di server. Harganya: saldo token ikut siklus 10 menit, tidak
-lagi bergerak tiap menit.
-
-> Catatan jujur: alamat itu **masih ada di riwayat commit** repo ini (3 commit
-> awal). Menghapusnya dari file yang sekarang tidak menghapusnya dari sejarah.
-> Kalau alamatnya benar-benar harus tidak terlacak, repo ini perlu dibuat ulang
-> dari nol tanpa riwayat lama.
-
----
-
-## Cara jalanin lokal
+Node.js 22 diperlukan untuk script. Frontend memakai DOMPurify yang dikunci versinya
+(di `package-lock.json` dan `assets/vendor/`). Tidak ada CDN JavaScript runtime.
 
 ```bash
-cd cashood
-python3 -m http.server 8080
+npm ci
+npm test
+npm run test:browser   # CHROME=/path/to/chromium jika tidak terdeteksi
+npm run build
+python3 -m http.server 8080 --directory dist
 ```
 
-Buka `http://localhost:8080`. (Harus lewat http — buka file langsung lewat
-`file://` bakal gagal karena `fetch` diblok browser.)
+Build hanya menerbitkan daftar berkas yang diizinkan: HTML, aset dengan hash konten,
+konfigurasi publik, dan laporan dalam manifest. Script operator, log, state lokal,
+ledger treasury, dan input invoice tidak masuk artefak Pages.
+Workflow menjalankan pemeriksaan sebelum deployment. Snapshot diterbitkan terpisah
+ke branch `data`, dalam satu commit per siklus.
 
-## Deploy ke GitHub Pages
+## Satu mesin pembukuan
 
-1. Bikin repo baru di GitHub, push isi folder ini.
-2. Settings → Pages → Source: `Deploy from a branch`, branch `main`, folder `/ (root)`.
-3. Selesai. Situs jalan di `https://<user>.github.io/<repo>/`.
+`assets/core.js` dipakai oleh dashboard, pencatat transaksi, invoice, dan forecast.
 
----
+- `deposit`: uang baru, menerbitkan unit pada NAV sebelum transaksi.
+- `withdraw`: uang keluar investor, membakar unit; tidak boleh melebihi haknya.
+- `reinvest`: reklasifikasi laba menjadi modal acuan; bukan uang masuk dan tidak
+  menerbitkan unit. Misalnya reklasifikasi Meridian $441.
+- `founding` hanya untuk setoran pembukaan pada tanggal yang sama.
+- Setiap kejadian baru mempunyai `id` unik. Gunakan kembali ID yang sama ketika
+  mengulang perintah; script akan menolak duplikasi.
+- Transaksi simultan memakai `batchId` eksplisit dan NAV yang sama. Persamaan
+  tanggal/NAV saja tidak menyatakan transaksi simultan.
+- Tanggal memakai WIB dan harus cocok dengan timestamp `at`.
 
-## Cara ngatur pemilik & transaksi
-
-Semua diatur dari satu file: [`data/config.json`](data/config.json). Edit, commit, push.
-
-```json
-{
-  "owners": [
-    { "id": "orel", "name": "Orel", "color": "#4ade80" },
-    { "id": "as",   "name": "A$",   "color": "#60a5fa" }
-  ],
-  "events": [
-    { "date": "2026-09-01", "type": "deposit", "owner": "orel", "usd": 6000, "founding": true },
-    { "date": "2026-09-01", "type": "deposit", "owner": "as",   "usd": 2000, "founding": true }
-  ]
-}
-```
-
-### Aturan `events`
-
-| field | isi |
-|---|---|
-| `date` | `YYYY-MM-DD` |
-| `type` | `deposit` atau `withdraw` |
-| `owner` | `id` dari daftar `owners` |
-| `usd` | jumlah dolar |
-| `founding` | `true` **hanya** untuk setoran awal (harga 1 unit = $1) |
-| `navBefore` | total nilai wallet **sebelum** transaksi ini. Wajib untuk semua event non-founding |
-| `note` | bebas |
-
-`navBefore` itu yang bikin pembagiannya adil. Kalau ada orang baru masuk waktu
-wallet lagi untung, dia beli unit di harga saat itu — untung yang sudah ada
-tetap milik pemilik lama, tidak ikut kebagi.
-
-Transaksi yang terjadi barengan (mis. tarik pro-rata dibagi ke 2 orang) tulis
-dengan `date` dan `navBefore` yang sama — dihitung sebagai satu momen.
-
-### Nambah orang baru
-
-```json
-{ "id": "budi", "name": "Budi", "color": "#f472b6" }
-```
-
-lalu setorannya:
-
-```json
-{ "date": "2026-10-01", "type": "deposit", "owner": "budi", "usd": 2000, "navBefore": 10000 }
-```
-
-### Nyatat setoran / penarikan
-
-Paling aman lewat script — dia yang ngisi `navBefore` dari nilai wallet terkini
-dan mastiin penarikan pro-rata dibagi di harga unit yang sama:
+Transaksi historis lama telah diberi ID/batch eksplisit tanpa mengubah jumlah
+setoran atau bagian investor Reborn. Perubahan jenis $441 Meridian menjadi
+reinvestasi tidak memindahkan uang atau mengubah pemilik dananya.
 
 ```bash
-node scripts/record.mjs deposit  orel 500 --note "topup"
-node scripts/record.mjs withdraw as   200
-node scripts/record.mjs withdraw --prorata 800 --push
+node scripts/record.mjs deposit orel 500 --id deposit-unik \
+  --at 2026-09-26T10:00:00+07:00 --nav 13000 --dry
+node scripts/record.mjs withdraw --prorata 100 --id withdrawal-unik \
+  --at 2026-09-26T10:00:00+07:00 --nav 13000 --dry
 ```
 
-- `--dry` cuma nampilin hasilnya, config tidak disentuh
-- `--push` langsung commit + push
-- `--nav <angka>` kalau mau paksa nilai wallet sendiri
-- nolak kalau jumlahnya lebih besar dari jatah orangnya, atau kalau snapshot
-  sudah lebih tua dari 30 menit
-- nolak kalau saldo token baru saja naik sebesar setorannya — tandanya duitnya
-  **sudah** masuk wallet, jadi `navBefore` yang dipakai kelebihan sebesar
-  setoran itu. Kejadian beneran: Abil setor $1.000 jam 03:17, snapshot jam
-  03:18, dan porsinya jadi $900 — $100 pindah diam-diam ke pemilik lama.
-  Lewati dengan `--force` kalau memang duitnya belum masuk
+Lepas `--dry` hanya untuk mencatat transaksi yang sebenarnya. Script tidak mengirim
+uang. `--push` menerbitkan perubahan konfigurasi melalui Git. Snapshot otomatis
+untuk NAV hanya diterima jika lengkap dan lebih muda dari 30 menit. Transaksi
+historis membutuhkan NAV historis yang telah diverifikasi.
 
-Hitungannya bukan salinan: script ini menjalankan mesin ledger di
-`assets/app.js` apa adanya, jadi angkanya pasti sama dengan yang di situs.
+## Snapshot dan gangguan sumber
 
-Cara manual masih bisa: **kalkulator penarikan** di situsnya keluarin baris JSON
-siap tempel ke `events`.
+Setiap exporter mengunci penulisnya, memvalidasi komponen, dan menulis JSON melalui
+rename atomik. Snapshot dan grafik memakai generation yang sama. Publish menolak
+pasangan generasi berbeda. Total NAV selalu merupakan jumlah komponen snapshot itu
+sendiri; fee posisi masuk tepat satu kali.
 
----
-
-## Cara hitungnya (unit / saham)
-
-Penjelasan versi ramah-investor ada langsung di halaman, di kartu **Pembagian
-saham** — buka bagian "Bagaimana sistem sahamnya bekerja". Ringkasnya: unit itu
-lembar saham, harga unit = nilai wallet ÷ unit beredar, investor baru beli di
-harga hari itu, dividen dibagi bulanan menurut proporsi saham.
-
-
-Bukan `setoran gue ÷ total setoran`, tapi sistem unit seperti reksa dana:
-
-- Setoran awal: $1 = 1 unit. Orel 6000 unit, A$ 2000 unit → total 8000 unit.
-- Saham = unit ÷ total unit → Orel 75%, A$ 25%.
-- Nilai wallet naik jadi $10.000 → harga unit $1,25 → Orel $7.500, A$ $2.500.
-- Tarik $800 pro-rata → Orel $600, A$ $200, saham tetap 75/25.
-- Orang baru setor $2.000 saat NAV $10.000 → dia dapat 1.600 unit, bukan
-  langsung ikut untung yang lama.
-
----
-
-## Dari mana angka saldonya
-
-Nilai wallet dirakit dari dua bagian:
-
-| Bagian | Sumber | Sesegar apa |
-|---|---|---|
-| Saldo token (ETH, USDG, WETH) | RPC publik, dibaca browser langsung dari address | **live** — tiap halaman dibuka, lalu tiap 5 menit |
-| Nilai posisi LP | `data/live.json`, ditulis bot | tiap 10 menit lewat cron |
-
-Kenapa LP tidak ikut live: nilainya tidak bisa dibaca dengan satu panggilan
-RPC. Butuh tick math + quoter per posisi — itu kerjaan bot, bukan browser.
-Jadi bagian itu dititip di snapshot.
-
-Situsnya baca snapshot dari `raw.githubusercontent.com`, bukan dari file yang
-ikut ke-deploy — begitu bot push, angkanya kepakai tanpa nunggu Pages build
-ulang (CDN raw nahan maksimal 5 menit).
-
-Alamatnya **dihitung sendiri dari alamat halaman** kalau situs dibuka dari GitHub Pages: `orelfx.github.io/cashood`
-→ `raw.githubusercontent.com/orelfx/cashood/data/`. Jadi repo yang di-rename
-atau di-fork tetap baca datanya sendiri. `app.snapshotUrl`, `app.navUrl` dan
-`app.heartbeatUrl` di config dipakai kalau situs dibuka dari domain sendiri — termasuk `cashood.id` sekarang.
-
-### Kenapa datanya di branch `data`, bukan `main`
-
-GitHub Pages membangun ulang situs tiap kali `main` berubah, dan batas
-lunaknya **10 build per jam**. Cron 10 menitan sendirian sudah makan 6 — pas
-ditambah beberapa push kode, jatahnya habis dan **semua** build gagal, termasuk
-yang bawa perbaikan. Kejadian beneran tanggal 10 Sep: situs nyangkut 25 menit
-di versi lama.
-
-Sekarang `live.json`, `nav.json` dan `heartbeat.json` tinggal di branch `data`
-yang tidak pernah memicu build. `main` cuma berubah kalau kodenya berubah.
-
-Kalau RPC lagi mati, situs pakai snapshot bulat-bulat. Kalau snapshot yang
-hilang, situs tetap jalan dengan saldo token saja dan kasih peringatan bahwa
-LP belum kehitung. `navOverrideUsd` di config selalu menang di atas keduanya.
-
-Harga ETH dari CoinGecko, cadangan DexScreener. Dua-duanya gratis, tanpa API key.
-
-### Bikin `live.json`
+- Kegagalan pembacaan tidak dianggap saldo nol.
+- Posisi cadangan ditandai `stale`; snapshot parsial tidak menambah titik NAV valid.
+- Perubahan NAV lebih dari 30% tanpa arus kas tercatat dikarantina untuk diperiksa,
+  bukan dipotong atau diubah menjadi angka lain.
+- Ketidaklengkapan realisasi profit Meridian ditampilkan sebagai data tidak tersedia,
+  bukan direkonstruksi memakai harga SOL hari ini.
+- Riwayat disampling dengan bucket waktu; cron yang terlambat tidak menghapus satu hari.
 
 ```bash
 RR_HOME=/root/robinhood node scripts/sync.mjs
+MERIDIAN_HOME=/root/main/meridian node scripts/sync-meridian.mjs
+RR_HOME=/root/robinhood node scripts/sync-ferari.mjs
+RR_HOME=/root/robinhood node scripts/sync-safebox.mjs
 ```
 
-Script ini baca kode bot yang sudah ada (`bookValueUsd` + `readBook`) dan nulis
-`data/live.json`. Isinya cuma angka — total USD, saldo token, dan nilai tiap
-posisi LP. Tidak ada key yang ikut tertulis.
+Jangan menjalankan exporter produksi untuk menguji: gunakan `npm test`, yang memakai
+bot dan jaringan tiruan dalam direktori sementara. `CASHOOD_DATA_DIR` tersedia untuk
+pencatat, forecast, dan exporter selain Reborn; Reborn menerima path output eksplisit.
 
-### Auto-update
+## Kas, biaya, dan dividen
 
-Sudah terpasang di cron:
+Biaya dan persentase hanya berasal dari konfigurasi, bukan contoh angka di UI.
+Biaya bersama dibayar oleh dana dengan `costs.shared` dan `costs.primary` bernilai
+true; dana lain pada kelompok itu tidak ditagih lagi.
 
-```
-*/10 * * * * /root/cashood/scripts/publish.sh >> /root/cashood/sync.log 2>&1
-```
+Dasar dividen dinyatakan oleh `dividend.basis`:
 
-`publish.sh` = sync + commit + push, dan diam saja kalau angkanya tidak berubah.
-Jangan dibikin lebih rapat dari 10 menit: GitHub Pages punya batas lunak
-10 build per jam.
+- `treasury`: kas laba yang benar-benar tercatat dan belum dibayarkan. Reborn dan
+  Meridian menggunakan dasar ini. Saldo awal/lapisan lama mempertahankan hak
+  investor yang berhak sebelum modal baru masuk.
+- `nav`: kenaikan NAV di atas modal acuan. Ferari menampilkan simulasi dengan dasar
+  ini; uang masuk/keluar wallet eksternal tetap perlu direkonsiliasi sebelum membayar.
 
----
+Treasury mencatat masuk **dan keluar**. Setiap transfer memerlukan `tx` atau `id`
+unik. Catatan tanpa identitas tidak ditebak berdasarkan tanggal + nominal. Lihat
+`CONTRACT-treasury.md`.
 
-## Nilai wallet dari waktu ke waktu
-
-Kartu **Nilai wallet** gambar garis nilai total dari waktu ke waktu, lengkap
-sama garis putus-putus **modal** — di atas garis berarti untung.
-
-Datanya dikumpulin sendiri: tiap `sync.mjs` jalan, satu titik masuk ke
-`data/nav.json`. Chain cuma tahu saldo *sekarang*, ga nyimpen saldo kemarin,
-jadi ga ada cara lain selain nyatet sambil jalan. Artinya grafik ini mulai dari
-nol dan makin panjang tiap 10 menit (6 titik per jam).
-
-Yang lama diencerkan biar filenya ga bengkak: 2 hari terakhir utuh, sebulan
-terakhir sejam sekali, lebih tua dari itu sehari sekali.
-
----
-
-## Tab Bot — laporan heartbeat
-
-Tab **💓 Bot** nampilin laporan yang dikirim bot ke Telegram tiap jam, apa
-adanya: posisi yang lagi jalan, tick range, fee yang belum dipanen, hasil
-screening, hall of fame/shame, sampai jadwal cron-nya.
-
-Alurnya:
-
-1. Bot nulis salinan laporannya ke `.state/heartbeat.json` tiap kali ngirim ke
-   Telegram (satu blok `try/catch` di `heartbeat.js` — gagal nulis tidak
-   menghentikan denyut).
-2. `scripts/heartbeat.mjs` di sini nyalin teks itu ke `data/heartbeat.json`.
-3. `publish.sh` push, situs baca.
-
-Kalau salinannya belum ada, script-nya nyusun ulang laporan lewat `gather()` +
-`renderReport()` punya bot — sama isinya, tapi baris `Agent`, `Uptime`, `Model`
-dan `RPC calls` dibuang karena angka itu milik proses bot yang lagi jalan, bukan
-milik proses yang cuma numpang render. Situs kasih tanda kalau lagi mode ini.
-
-**Yang diambil cuma teks laporan itu.** Tidak ada `.env`, tidak ada log, tidak
-ada kunci. Sebelum nulis, script-nya nyaring: kalau nemu sesuatu sepanjang
-private key, seed phrase, token bot, atau nama variabel rahasia — dia berhenti
-dan tidak nerbitin apa-apa.
-
-Cron: `7 * * * *` (bot kirim heartbeat menit :04).
-
----
-
-## Tampilan dolar / ETH / rupiah
-
-Tombol `$` / lambang Ether / `Rp` di kanan atas menukar satuan semua angka di
-halaman. Kursnya ditulis di sebelahnya: `1 ETH = $2.513` dan `$1 = Rp 17.607`. Semua
-hitungan tetap dalam dolar — itu satuan yang dipakai bot dan yang dipakai orang
-waktu menyetor — dan ETH maupun rupiah cuma konversi di lapisan paling luar: ETH memakai harga
-yang sama dengan yang dipakai menilai wallet, rupiah memakai kurs dari
-CoinGecko (ETH dalam dolar dan rupiah sekaligus, jadi kursnya turunan dari satu
-panggilan) dengan cadangan open.er-api.com. Kurs terakhir juga ikut ditulis di
-snapshot, supaya tampilan rupiah tetap jalan kalau CoinGecko tidak bisa
-dihubungi dari browser pengunjung. Jadi tidak ada angka kedua
-yang bisa melenceng diam-diam dari yang pertama. Pilihannya diingat di browser.
-
----
-
-## Posisi LP
-
-Kartu **Posisi LP** terpisah dari **Token di wallet** — dua hal yang berbeda dan
-tidak enak dibaca kalau dicampur dalam satu tabel.
-
-Tiap baris: pool, status range, umur, modal, nilai, fee, untung/rugi.
-
-- **hijau** = harga di dalam range (posisi sedang menghasilkan fee)
-- **merah** = di luar range (diam, tidak menghasilkan)
-- angka `14%` di sebelah status = posisi harga di dalam pita, 0% tepi bawah,
-  100% tepi atas
-- untung/rugi hijau kalau plus, merah kalau minus
-
-Kolom **"Total fee"** = yang sudah dipanen + yang belum.
-
-Bot tidak mencatat fee yang sudah dipanen per posisi, jadi cashood mengawasinya
-sendiri: tiap 10 menit angka fee yang belum dipanen dicatat di `data/fees.json`,
-dan kalau ia terjun mendekati nol sementara posisinya masih terbuka, berarti
-fee-nya baru diambil — selisihnya ditambahkan ke total.
-
-Ambangnya ketat (turun di bawah 30% **dan** lebih dari $0,50) supaya harga token
-yang melemah, yang juga menggerus nilai fee dalam dolar, tidak terhitung sebagai
-panen. Konsekuensinya angkanya **konservatif**: lebih baik kurang daripada
-mengarang. Hitungannya juga dimulai sejak fitur ini dipasang, bukan sejak posisi
-dibuka — situs menyebutkan sejak kapan.
-
-Kartu **Posisi terakhir ditutup** menampilkan 10 terbaru, ikut diperbarui tiap
-snapshot.
-
----
-
-## Biaya bulanan
-
-Diatur di `data/config.json` bagian `costs`. Dibayar dari luar wallet, jadi
-tidak ikut mengurangi NAV maupun bagi hasil — ditampilkan supaya kelihatan
-berapa yang harus ditutup tiap bulan.
-
-```json
-"costs": {
-  "note": "biaya bulanan, dibayar dari luar wallet",
-  "items": [ { "name": "VPS", "usd": 15 } ]
-}
+```bash
+node scripts/treasury.mjs expense --fund reborn --id biaya-2026-09 \
+  --usd 250 --at 2026-10-01T10:00:00+07:00 --period 2026-09 --dry
+node scripts/treasury.mjs dividend --fund reborn --id bayar-2026-09 \
+  --usd 850 --at 2026-10-01T10:01:00+07:00 --period 2026-09 --dry
 ```
 
----
+Perintah ini hanya mencatat transfer yang sudah terjadi; **tidak melakukan pembayaran**.
+Jangan mencatat pembayaran sebagai withdrawal modal investor sekaligus pengeluaran
+kas: itu dua klasifikasi berbeda untuk uang yang sama.
 
-## Riwayat profit
+## Invoice
 
-Kartu **Riwayat profit** ambil angka dari buku posisi bot — semua posisi yang
-sudah ditutup, dikelompokkan per hari.
-
-- **Grafik**: batang naik = untung, turun = rugi. Bisa harian / mingguan /
-  bulanan, rentang 7 hari / 30 hari / semua. Arahkan kursor ke batangnya buat
-  lihat jumlah dan berapa posisi yang ditutup hari itu.
-- **Kalender**: satu kotak satu hari, ala LP Agent. Warna makin pekat makin
-  besar angkanya, dan tandanya tetap ditulis (`+`/`−`) biar tidak cuma
-  mengandalkan warna.
-- **Statistik**: profit terkunci, win rate, jumlah posisi ditutup, rata-rata
-  modal per posisi, hari terbaik.
-
-Yang dihitung di kartu ini cuma profit yang **sudah terkunci**. Untung/rugi
-posisi yang masih jalan tidak dicampur ke situ — bagian itu sudah kehitung di
-**Nilai sekarang** paling atas. Makanya angkanya bisa beda jauh sama LP Agent:
-mereka pakai basis dan perhitungan fee sendiri.
-
-> LP Agent tidak dipakai sebagai sumber data — API-nya ditutup Cloudflare, tidak
-> ada endpoint gratis yang bisa dipanggil browser. Semua angka di sini datang
-> dari RPC publik dan buku posisi bot sendiri.
-
----
-
-## Aturan dana
-
-| Pokok | Aturan |
-|---|---|
-| Minimum setoran | $100 |
-| Plafon kapasitas | $10.000 — di atas itu investor baru beli saham pemegang lama |
-| Masuk & keluar | pemberitahuan 24 jam |
-| Biaya operasional | $155/bln, dipotong dari dana menurut porsi saham |
-| Fee investor | 10% dari dividen tiap investor — **gratis selama masa perkenalan** |
-| Dividen | tiap tanggal 1: laba − biaya sistem, lalu **70% dibagikan**, **30% kembali ke dana** |
-
-Semuanya diatur di `data/config.json` (`fund` dan `dividend`) dan ditampilkan di
-tab **Data investor**, lengkap dengan simulasinya.
-
-### Cara menghitung dividen
-
-Contoh: modal awal $9.300, saldo tanggal 1 $10.300.
-
-```
-Saldo tanggal 1            $10.300,00
-Modal acuan                −$9.300,00   setoran bersih + bagian 30% dari pembagian sebelumnya
-Laba kotor                  $1.000,00
-Biaya sistem                 −$155,00   MiniMax, Claude, VPS, RPC, LP Agent
-Laba bersih                   $845,00
-Kembali ke dana (30%)        −$253,50   tetap bekerja, menaikkan harga saham
-Dibagikan (70%)               $591,50   menurut porsi saham
-Fee investor (10%)             GRATIS   normalnya −$59,15
-Diterima investor             $591,50
+```bash
+node scripts/statement.mjs --fund reborn --period 2026-09 \
+  --withdrawn 1100 --balance 13000 --rate 17650 --revision 1
 ```
 
-Setelah pembagian dijalankan, tambahkan bagian 30%-nya ke `dividend.retainedUsd`.
-Itu yang membuat bagian yang sudah diputar lagi tidak dihitung sebagai laba baru
-bulan berikutnya — tanpa itu, uang yang sama akan dibagi dua kali.
+Default adalah draft. Untuk sumber kas yang sama dengan dashboard, gunakan
+`--from-live --rate 17650 --period 2026-09` tanpa `--withdrawn`; snapshot lengkap
+periode itu beserta lapisan haknya dibekukan. `--final` hanya diterima setelah periode
+selesai dan harus memakai `--snapshot reports/private/<draft>.json` dari draft
+`--from-live`. Simpan draft penutupan sebelum berganti periode. `--withdrawn`
+adalah laba tersedia terverifikasi untuk perhitungan itu, bukan otomatis jumlah
+seluruh withdrawal modal. Mesin yang sama menghitung hak per lapisan dan sen per
+investor. ID investor menjadi kunci, sehingga nama sama tidak menggabungkan hak.
+Investor yang keluar tetap dapat menerima lapisan laba lama.
 
----
+Input dibekukan di `reports/private/`. Berkas yang sama tidak ditimpa; gunakan
+`--revision 2`. `--snapshot <input-json>` membuat revisi dari input beku. Jangan
+menggunakan config terbaru untuk merekonstruksi periode lama bila data tutup periode
+aslinya sudah berubah. Laporan lama yang belum memiliki status final diperlakukan
+sebagai draft di situs. Membuat invoice tidak menandai uang sudah dibayarkan.
 
-## Domain
+## Safe Box
 
-Situs dibuka di **https://cashood.id**. Link lama `orelfx.github.io/cashood`
-tetap hidup dan otomatis mengalihkan ke sana.
+Pokok dan pemilik awal ada di konfigurasi. Pada migrasi pertama, hak bunga yang sudah
+terlihat di snapshot terakhir dibekukan per pemilik; sistem tidak mengarang riwayat
+kepemilikan yang tidak tersedia. State baru ada di `accrual-v2.local.json`.
 
-- Domain dibeli di Niagahoster (sekarang Hostinger), DNS dikelola di hPanel
-- Record: empat `A @` ke `185.199.108–111.153`, dan `CNAME www` ke `orelfx.github.io`
-- File `CNAME` di akar repo **wajib ada**. Situs dideploy lewat Actions yang mengunggah
-  isi repo apa adanya, jadi setelan domain di GitHub hilang di setiap deploy kalau
-  berkas itu tidak ikut
+Perubahan pemilik/pokok berikutnya memakai `ownerEvents: [{ at, owners: [...] }]`
+dengan waktu efektif, bukan menimpa pokok awal. Hak lama tidak dibagi ulang.
+Kenaikan fee dialokasikan terhadap interval pengamatan. Jeda lebih dari dua jam
+ditandai estimasi; hari terlewat tidak dikenai batas bunga hanya satu hari.
+Nilai fee tidak wajar membatalkan pengamatan sebelum baseline berubah.
 
----
+Pembayaran bunga menggunakan `scripts/treasury.mjs interest --fund safebox
+--owner <id> --id <unik> --usd <jumlah> --at <ISO>`. Hak tercatat dikurangi pembayaran,
+bukan mengurangi bunga historis yang pernah dihasilkan. Fee posisi eksternal masih
+merupakan estimasi bila log claim yang terkonfirmasi belum tersedia.
 
-## Lisensi
+## Forecast
 
-MIT — lihat [LICENSE](LICENSE).
+Forecast memerlukan sedikitnya tujuh hari selesai dengan NAV tervalidasi dan arus
+kas tercatat. Riwayat lama yang belum diverifikasi tidak diberi stempel valid.
+Selama belum cukup, situs menampilkan alasan penundaan. Ferari ditandai arus kas
+belum lengkap, sehingga proyeksinya ditunda sampai rekonsiliasi selesai.
 
----
+Model memisahkan uang bekerja, kas cadangan, biaya, dan dividen. Pembayaran mengikuti
+kalender WIB; sapuan bukan kerugian. Skenario mengambil satu lintasan berdasarkan
+total kekayaan, bukan menjumlahkan persentil komponen yang berbeda. Angka 0% berarti
+kejadian tidak muncul dalam simulasi, bukan kejadian mustahil. Tidak ada probabilitas
+minimum buatan maupun tambahan kejutan sintetis yang tersembunyi.
 
-## Isi folder
+## Memasang perubahan pada server yang sudah berjalan
 
-```
-index.html            halaman
-assets/style.css      tampilan
-assets/app.js         ledger unit, ambil data, render
-data/config.json      pemilik + riwayat transaksi  <- yang kamu edit
-data/live.json        snapshot bot (otomatis)
-data/nav.json         deret nilai wallet (otomatis)
-data/heartbeat.json   laporan bot terakhir (otomatis)
-scripts/sync.mjs      bikin live.json + nav.json dari bot
-scripts/record.mjs    catat setoran / penarikan
-scripts/heartbeat.mjs ambil laporan bot
-scripts/publish.sh    sync + commit + push
-```
+1. Simpan backup data lokal dan konfigurasi sebelum migrasi.
+2. Jalankan `node scripts/preflight.mjs /root/cashood` dari checkout baru.
+3. Jalankan seluruh tes dan build; pasang kode secara konsisten pada checkout cron.
+4. Jalankan satu siklus exporter, periksa kualitas dan rekonsiliasi totalnya, lalu
+   terbitkan dengan `scripts/publish.sh`.
+5. Pantau exit status cron. Lock mencegah tumpang tindih; kegagalan satu dana
+   mempertahankan data terakhir dan tidak memalsukan timestamp sumber.
+
+Cron tidak diubah otomatis oleh pengujian. `publish.sh` memakai `flock` dan timeout
+per exporter. Untuk jadwal forecast, konfigurasikan zona waktu cron secara eksplisit;
+jangan menganggap zona waktu mesin sama dengan WIB.
+
+## Privasi dan batas hosting
+
+Identitas on-chain posisi tidak lagi diterbitkan. ID publik berasal dari hash dengan
+kunci lokal acak (`publication-key.local.json`). Berkas lokal tersebut jangan dipush.
+Data investor, angka, dan laporan yang memang ditampilkan tetap publik; situs ini
+bukan portal dengan autentikasi. Pola angka/waktu masih bisa dikorelasikan dengan
+blockchain, sehingga penghilangan ID bukan jaminan anonimitas.
+
+CSP dipasang pada halaman utama. GitHub Pages tidak menyediakan konfigurasi header
+HTTP kustom untuk aplikasi ini. HSTS, `frame-ancestors`, dan `nosniff` perlu dipasang
+pada proxy/CDN yang benar-benar melayani domain, lalu diverifikasi di respons HTTP.
+Mengunggah `_headers` ke Pages saja tidak mengaktifkannya. Jangan memasukkan
+`frame-ancestors` ke meta CSP: directive itu memerlukan header HTTP.
+
+Alamat/identitas yang sudah terbit di riwayat Git atau salinan pihak lain tidak dapat
+ditarik kembali oleh perubahan kode ini. Penulisan ulang riwayat adalah tindakan
+operasional terpisah dan tidak dilakukan otomatis.

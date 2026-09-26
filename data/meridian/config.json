@@ -35,7 +35,8 @@
       "owner": "orel",
       "usd": 950,
       "founding": true,
-      "note": "setoran awal — tanggal perkiraan, operator tidak ingat tanggal persisnya"
+      "note": "setoran awal — tanggal perkiraan, operator tidak ingat tanggal persisnya",
+      "id": "meridian-legacy-1"
     },
     {
       "date": "2026-09-19",
@@ -44,7 +45,8 @@
       "usd": 2300,
       "navBefore": 1084.8,
       "at": 1789802654239,
-      "note": "tambahan modal — total modal jadi $3.250 (arahan pemilik 2026-09-19). navBefore = titik terakhir sebelum uang masuk (1084.80); nilai yang tiba di wallet $2152.71, selisihnya dari $2.300 tercatat sebagai biaya masuk"
+      "note": "tambahan modal — total modal jadi $3.250 (arahan pemilik 2026-09-19). navBefore = titik terakhir sebelum uang masuk (1084.80); nilai yang tiba di wallet $2152.71, selisihnya dari $2.300 tercatat sebagai biaya masuk",
+      "id": "meridian-legacy-2"
     },
     {
       "date": "2026-09-25",
@@ -53,16 +55,20 @@
       "owner": "orel",
       "usd": 1309,
       "navBefore": 3697.06,
-      "note": "tambahan modal — uang baru yang masuk ke dompet"
+      "note": "tambahan modal — uang baru yang masuk ke dompet",
+      "id": "meridian-legacy-3",
+      "batchId": "meridian-legacy-batch-3"
     },
     {
       "date": "2026-09-25",
       "at": 1790321755237,
-      "type": "deposit",
+      "type": "reinvest",
       "owner": "orel",
       "usd": 441,
       "navBefore": 3697.06,
-      "note": "laba yang diputar kembali jadi modal, bukan uang baru (arahan pemilik 2026-09-25). Dicatat sebagai setoran supaya laba sesudah ini diukur dari modal yang sudah dibesarkan."
+      "note": "Reinvestasi laba $441: penyesuaian modal acuan, tanpa uang baru dan tanpa penerbitan saham.",
+      "id": "meridian-legacy-4",
+      "batchId": "meridian-legacy-batch-3"
     }
   ],
   "costs": {
@@ -110,6 +116,12 @@
     "investorFeeStandardPct": 15,
     "investorFeeNote": "gratis selama masa perkenalan",
     "retainedUsd": 0,
-    "note": "Tiap tanggal 1: seluruh uang yang ditarik bot bulan itu dikurangi biaya sistem, lalu 100% dibagikan menurut porsi saham — sekecil apa pun porsinya. Tidak ada lagi bagian 30% yang mengendap (aturan pemilik, 2026-09-18). Fee admin standar 15% dari bagian tiap investor, digratiskan selama masa perkenalan."
+    "note": "Tiap tanggal 1: seluruh uang yang ditarik bot bulan itu dikurangi biaya sistem, lalu 100% dibagikan menurut porsi saham — sekecil apa pun porsinya. Tidak ada lagi bagian 30% yang mengendap (aturan pemilik, 2026-09-18). Fee admin standar 15% dari bagian tiap investor, digratiskan selama masa perkenalan.",
+    "basis": "treasury"
+  },
+  "treasury": {
+    "openingUsd": 0,
+    "ledgerFile": "data/meridian/treasury.jsonl",
+    "note": "Kas hanya bertambah dari transfer terkonfirmasi; penarikan/pembayaran harus dicatat."
   }
 }
