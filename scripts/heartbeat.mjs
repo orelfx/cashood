@@ -17,8 +17,10 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { atomicJSON, assertPublic, lock } from './lib/io.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = process.argv[2] ? resolve(process.argv[2]) : resolve(HERE, '..', 'data', 'reborn', 'heartbeat.json');
+const release = lock(resolve(dirname(OUT), 'heartbeat.lock.local'));
 const RR_HOME = process.env.RR_HOME || '/root/robinhood';
 
 const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
@@ -112,14 +114,18 @@ if (existsSync(OUT)) {
   } catch { archive = []; }
 }
 
+const redactPublic = text => String(text).replace(/0x[0-9a-fA-F]{40,64}\b/g, '[identitas disembunyikan]').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g, '[identitas disembunyikan]');
 mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, JSON.stringify({
+const published = {
   updatedAt: Date.now(),
   generatedAt,
   source,
-  text,
-  archive,
-}, null, 2) + '\n');
+  text: redactPublic(text),
+  archive: archive.map(r=>({...r,text:redactPublic(r.text)})),
+};
+assertPublic(published);
+atomicJSON(OUT, published);
 
 console.log(`[cashood] heartbeat ${text.length} karakter (${source}) · arsip ${archive.length} -> ${OUT}`);
+release();
 process.exit(0);

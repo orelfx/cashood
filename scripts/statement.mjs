@@ -14,31 +14,39 @@
  *   sekecil apa pun porsinya. Fee admin standar (config: investorFeeStandardPct)
  *   dicoret selama investorFeePct = 0.
  *
- * Porsi saham dihitung oleh buildLedger() dari assets/app.js yang sama dengan
+ * Porsi saham dihitung oleh modul assets/core.js yang sama dengan
  * situsnya — angka di PDF tidak bisa berbeda dari angka di cashood.id.
  *
  * Keluaran: reports/invoice-<fund>-<tanggal bayar>[-contoh].html dan .pdf
  * (dicetak Chromium headless, tanpa dependensi npm).
  */
 
-import vm from 'node:vm';
+import Core from '../assets/core.js';
+import { atomicJSON, lock, readJSON } from './lib/io.mjs';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const DATA = process.env.CASHOOD_DATA_DIR || resolve(ROOT, 'data');
+const REPORTS = process.env.CASHOOD_REPORTS_DIR || resolve(ROOT, 'reports');
+const release = lock(resolve(REPORTS, 'statement.lock.local'));
 const arg = (name, fallback = null) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 && process.argv[i + 1] && !process.argv[i + 1].startsWith('--') ? process.argv[i + 1] : fallback;
 };
 const flag = (name) => process.argv.includes(`--${name}`);
 
-const fund = arg('fund', 'reborn');
-const withdrawn = Number(arg('withdrawn'));
-const rate = Number(arg('rate'));
-const balance = Number(arg('balance', 0));
-const example = flag('example');
+const frozen = arg('snapshot') ? JSON.parse(readFileSync(resolve(arg('snapshot')), 'utf8')) : null;
+const fund = frozen?.fund || arg('fund', 'reborn');
+if (!['reborn','meridian','ferari'].includes(fund)) throw new Error('Dana tidak dikenal');
+const sourceSnapshot = frozen?.sourceSnapshot || (flag('from-live') ? readJSON(resolve(DATA, fund, 'live.json')) : null);
+if (flag('from-live') && !frozen) Core.validateSnapshot(sourceSnapshot, { complete:true, maxAge:45*60000 });
+const withdrawn = Core.number(frozen?.withdrawn ?? (sourceSnapshot ? sourceSnapshot.treasuryDistributableUsd ?? sourceSnapshot.treasuryUsd : arg('withdrawn')), 'Laba tersedia / --withdrawn', 0);
+const rate = Core.number(frozen?.rate ?? arg('rate'), 'Kurs', 0.01);
+const balance = Core.number(frozen?.balance ?? arg('balance', 0), 'Saldo', 0);
+const example = !flag('final');
 if (!(withdrawn >= 0) || !(rate > 0)) {
   console.error('pakai: node scripts/statement.mjs --withdrawn <USD> --rate <IDR per USD> [--period YYYY-MM] [--balance USD] [--example]');
   process.exit(1);
@@ -46,110 +54,42 @@ if (!(withdrawn >= 0) || !(rate > 0)) {
 
 // Periode = bulan yang dihitung; dibayar tanggal 1 bulan berikutnya.
 const now = new Date();
-const period = arg('period') || `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+const period = frozen?.period || arg('period') || `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(period)) throw new Error('Periode tidak valid');
 const [py, pm] = period.split('-').map(Number);
 const payDate = new Date(Date.UTC(pm === 12 ? py + 1 : py, pm === 12 ? 0 : pm, 1));
 const payIso = payDate.toISOString().slice(0, 10);
+const periodEnd = Core.eventTime({ date: payIso });
+if (!example && Date.now() < periodEnd) throw new Error('Periode belum selesai; terbitkan draft, bukan final');
 
 const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const periodLabel = `${BULAN[pm - 1]} ${py}`;
 const payLabel = `${payDate.getUTCDate()} ${BULAN[payDate.getUTCMonth()]} ${payDate.getUTCFullYear()}`;
 
 const payLabelShort = (iso) => iso ? `${Number(iso.slice(8, 10))} ${BULAN[Number(iso.slice(5, 7)) - 1]}` : '';
-const cfg = JSON.parse(readFileSync(resolve(ROOT, 'data', fund, 'config.json'), 'utf8'));
+const cfg = frozen?.cfg || JSON.parse(readFileSync(resolve(DATA, fund, 'config.json'), 'utf8'));
 const funds = JSON.parse(readFileSync(resolve(ROOT, 'data', 'funds.json'), 'utf8'));
 const fundMeta = (funds.funds || []).find((f) => f.id === fund) || {};
 
-// Mesin buku yang sama dengan situs.
-const ctx = vm.createContext({ console, Date, Math, JSON, Number, Object, Array, String, Promise, Error, isNaN, Set, Map });
-vm.runInContext(readFileSync(resolve(ROOT, 'assets/app.js'), 'utf8'), ctx);
-// SIAPA YANG IKUT DIVIDEN BULAN INI.
-//
-// Aturan pemilik, 2026-09-20: uang yang baru masuk tidak ikut membagi laba
-// yang dihasilkan sebelum ia masuk. Jadi porsinya dihitung dari buku SEBELUM
-// tanggal `--new-since`: setoran pada atau sesudah tanggal itu tidak dapat
-// bagian bulan ini, dan tidak pernah ditulis sebagai angka minus — nol, dengan
-// keterangan kapan ia mulai ikut.
-//
-// Tanpa --new-since, semua setoran ikut seperti biasa.
-const newSince = arg('new-since');
-const cutoffMs = newSince ? Date.parse(`${newSince}T00:00:00+07:00`) : null;
-const eventTime = (e) => Number(e.at) || Date.parse(`${e.date}T00:00:00+07:00`);
-const eligibleCfg = cutoffMs
-  ? { ...cfg, events: (cfg.events || []).filter((e) => eventTime(e) < cutoffMs) }
-  : cfg;
-const ledger = ctx.cashood.buildLedger(eligibleCfg);
-const fullLedger = ctx.cashood.buildLedger(cfg);
-
-// Biaya: dana yang menanggung tagihan (costs.primary) membayar penuh; dana
-// lain tidak membayar dua kali untuk sistem yang sama.
-const costItems = (cfg.costs?.items || []).map((i) => ({ name: i.name, usd: Number(i.usd) || 0 }));
-const costsUsd = cfg.costs?.shared && !cfg.costs?.primary ? 0 : costItems.reduce((s, i) => s + i.usd, 0);
-const d = cfg.dividend || {};
-const feeStd = Number(d.investorFeeStandardPct) || 0;
-const feeNow = Number(d.investorFeePct) || 0;
-const distributePct = Number(d.distributePct ?? 100);
-
-// ─── laba dibagi per LAPISAN ─────────────────────────────────────────────
-//
-// Pertanyaan pemilik, 2026-09-20: "$1.100 itu dihasilkan waktu Fanfuy dan Si
-// Nakal belum masuk — masa mereka ikut dapat?" Tidak. Tiap potong laba dibagi
-// menurut porsi saham SAAT laba itu dihasilkan, bukan porsi hari pembayaran.
-//
-//   lapis 1  laba yang dihasilkan SEBELUM `--new-since`, sebesar `--legacy-usd`
-//            -> dibagi menurut buku lama (uang baru belum ada di sana)
-//   lapis 2  sisanya, yang dihasilkan sesudah uang baru masuk
-//            -> dibagi menurut buku sekarang, semua orang ikut
-//
-// Biaya sistem dipotong dari kedua lapis menurut besarnya masing-masing, jadi
-// tidak ada satu kelompok pun yang menanggung ongkos bulan itu sendirian.
-//
-// Tanpa --legacy-usd, seluruh laba masuk satu lapis: buku lama kalau ada
-// --new-since, buku sekarang kalau tidak.
-const legacyUsd = Number(arg('legacy-usd'));
-const hasLayers = cutoffMs && Number.isFinite(legacyUsd) && legacyUsd > 0 && legacyUsd < withdrawn;
-
-const layers = hasLayers
-  ? [
-    { key: 'lama', label: `dihasilkan sebelum ${payLabelShort(newSince)}`, grossUsd: legacyUsd, ledger },
-    { key: 'baru', label: `dihasilkan sejak ${payLabelShort(newSince)}`, grossUsd: withdrawn - legacyUsd, ledger: fullLedger },
-  ]
-  : [{ key: 'tunggal', label: 'laba bulan ini', grossUsd: withdrawn, ledger }];
-
-for (const L of layers) {
-  L.costUsd = withdrawn > 0 ? costsUsd * (L.grossUsd / withdrawn) : 0;
-  L.netUsd = Math.max(0, L.grossUsd - L.costUsd) * distributePct / 100;
-  L.shares = L.ledger.owners.filter((o) => o.units > 0)
-    .map((o) => ({ name: o.name, share: o.units / L.ledger.totalUnits }));
-}
-
-// Sen dibagi dengan sisa terbesar per lapis, supaya jumlah baris = total persis.
-const share = (amountUsd, shares) => {
-  const cents = Math.round(amountUsd * 100);
-  const exact = shares.map((x) => x.share * cents);
-  const floorC = exact.map(Math.floor);
-  let left = cents - floorC.reduce((a, b) => a + b, 0);
-  exact.map((v, i) => ({ i, frac: v - floorC[i] })).sort((a, b) => b.frac - a.frac)
-    .forEach(({ i }) => { if (left > 0) { floorC[i] += 1; left -= 1; } });
-  return Object.fromEntries(shares.map((x, i) => [x.name, floorC[i] / 100]));
-};
-for (const L of layers) L.cut = share(L.netUsd, L.shares);
-
-const namesAll = [...new Set(fullLedger.owners.filter((o) => o.units > 0).map((o) => o.name))];
-const rows = namesAll.map((name) => {
-  const parts = layers.map((L) => ({
-    key: L.key,
-    label: L.label,
-    share: (L.shares.find((x) => x.name === name)?.share ?? 0) * 100,
-    usd: L.cut[name] ?? 0,
-  }));
-  const gross = parts.reduce((sum, x) => sum + x.usd, 0);
-  const feeStdUsd = gross * feeStd / 100;
-  const feeUsd = gross * feeNow / 100;
-  const netUsd = gross - feeUsd;
-  const nowShare = (fullLedger.owners.find((o) => o.name === name)?.units ?? 0) / fullLedger.totalUnits * 100;
-  return { name, parts, share: nowShare, gross, feeStdUsd, feeUsd, netUsd, idr: 0, waiting: gross === 0 };
-}).sort((a, b) => b.netUsd - a.netUsd || b.share - a.share);
+// A closed period is reconstructed only from events effective before its end.
+const eligibleCfg = { ...cfg, events: cfg.events.filter(e => Core.eventTime(e) < periodEnd) };
+const newSince = frozen?.newSince || arg('new-since') || (cfg.dividend?.legacy?.period === period ? cfg.dividend.legacy.cutoff : null);
+const cutoffMs = newSince ? Core.eventTime({date:newSince}) : null;
+const legacyUsd = frozen?.legacyUsd ?? (arg('legacy-usd') == null ? (cfg.dividend?.legacy?.period === period ? cfg.dividend.legacy.grossUsd : null) : Core.number(arg('legacy-usd'), 'Laba lama', 0));
+if (newSince) eligibleCfg.dividend = { ...cfg.dividend, legacy: { cutoff:newSince, grossUsd:legacyUsd ?? withdrawn, period } };
+const snapshot = sourceSnapshot;
+if (snapshot && cfg.dividend?.basis !== 'treasury') throw new Error('--from-live memerlukan basis kas treasury');
+if (snapshot && (snapshot.updatedAt >= periodEnd || Core.day(snapshot.updatedAt).slice(0,7) !== period)) throw new Error('Snapshot harus berasal dari periode laporan');
+if (!example && (!frozen || !snapshot)) throw new Error('Final memerlukan --snapshot dari draft --from-live periode tersebut');
+const result = Core.distribution(eligibleCfg, snapshot || {}, { ...(snapshot ? {} : {gross:withdrawn}), nav:snapshot?.totalUsd ?? balance+withdrawn, period, before:periodEnd });
+const fullLedger = result.ledger, ledger = fullLedger;
+const layers = result.layers, hasLayers = layers.length > 1;
+const costItems = (cfg.costs?.items || []).map(i => ({name:i.name,usd:Core.number(i.usd,'Biaya',0)}));
+const costsUsd = result.plan.costs;
+const d = cfg.dividend || {}, feeStd = result.plan.standardFeePct, feeNow = result.plan.feePct, distributePct = result.plan.distributePct;
+const rows = result.rows.map(r => ({ ...r, parts: layers.map(l => ({ key:l.key,label:l.label,share:(l.shares.find(o=>o.id===r.id)?.share||0)*100,usd:l.cut[r.id]||0 })),
+ share: fullLedger.totalUnits ? (fullLedger.owners.find(o=>o.id===r.id)?.units||0)/fullLedger.totalUnits*100 : 0,
+ idr:0,waiting:r.netUsd===0 })).sort((a,b)=>b.netUsd-a.netUsd);
 
 // Rupiah juga dibagi dengan sisa terbesar: dibulatkan per baris, beberapa baris
 // bisa selisih Rp 1 dari kotak "Dibagikan" di atas — kecil, tapi di laporan
@@ -181,7 +121,8 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 // (history per hari WIB: closes, wins, losses, winUsd, lossUsd, usd).
 const perf = (() => {
   try {
-    const live = JSON.parse(readFileSync(resolve(ROOT, 'data', fund, 'live.json'), 'utf8'));
+    const live = snapshot;
+    if (!live) return null;
     const days = (live.history || []).filter((r) => String(r.date).startsWith(period));
     if (!days.length) return null;
     const sum = (k) => days.reduce((t, r) => t + (Number(r[k]) || 0), 0);
@@ -198,10 +139,12 @@ const perf = (() => {
   } catch { return null; }
 })();
 
-const fundName = fundMeta.name || (fund === 'reborn' ? 'Reborn Rich' : fund);
+const fundName = fundMeta.label || (fund === 'reborn' ? 'Reborn Rich' : fund);
 const chain = fundMeta.chain || (fund === 'reborn' ? 'Robinhood Chain' : 'Solana');
 // Nomor invoice: INV/<kode dana>/<tahun-bulan bayar>, ditandai CONTOH kalau contoh.
-const invoiceNo = `INV/${fund === 'reborn' ? 'RR' : fund.slice(0, 3).toUpperCase()}/${payIso.slice(0, 7)}${example ? '/CONTOH' : ''}`;
+const revision = arg('revision', '1');
+if (!/^[1-9]\d*$/.test(revision)) throw new Error('Revisi tidak valid');
+const invoiceNo = `INV/${fund === 'reborn' ? 'RR' : fund.slice(0,3).toUpperCase()}/${payIso.slice(0,7)}/R${revision}${example ? '/DRAFT' : ''}`;
 const generated = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(now);
 
 const html = `<!doctype html>
@@ -346,7 +289,7 @@ const html = `<!doctype html>
     <div class="perf">
       <div><div class="k">Posisi ditutup</div><div class="v num">${perf.closes}</div><div class="s">dalam ${perf.days} hari</div></div>
       <div class="rate"><div class="k">Win rate</div><div class="v num">${pct(perf.winRate)}</div>
-        <div class="winbar"><i style="width:${(perf.wins / perf.closes * 100).toFixed(2)}%;background:var(--green)"></i><i style="width:${(perf.flat / perf.closes * 100).toFixed(2)}%;background:#cbd5e1"></i><i style="width:${(perf.losses / perf.closes * 100).toFixed(2)}%;background:var(--red)"></i></div></div>
+        <div class="winbar"><i style="width:${(perf.closes ? perf.wins / perf.closes * 100 : 0).toFixed(2)}%;background:var(--green)"></i><i style="width:${(perf.closes ? perf.flat / perf.closes * 100 : 0).toFixed(2)}%;background:#cbd5e1"></i><i style="width:${(perf.closes ? perf.losses / perf.closes * 100 : 0).toFixed(2)}%;background:var(--red)"></i></div></div>
       <div class="win"><div class="k">Total win</div><div class="v num">${perf.wins}</div><div class="s num">+${usd(perf.winUsd).replace('$', '$')}</div></div>
       <div class="loss"><div class="k">Total loss</div><div class="v num">${perf.losses}</div><div class="s num">${usd(perf.lossUsd)}</div></div>
       <div><div class="k">Impas (±0,5%)</div><div class="v num">${perf.flat}</div><div class="s">tidak untung, tidak rugi</div></div>
@@ -492,12 +435,15 @@ ${cutoffMs ? `<div class="page p2">
 </div>` : ''}
 </body></html>`;
 
-mkdirSync(resolve(ROOT, 'reports'), { recursive: true });
+mkdirSync(REPORTS, { recursive: true });
 const tag = arg('tag');
-const stem = `invoice-${fund}-${payIso}${example ? '-contoh' : ''}${tag ? '-' + String(tag).replace(/[^a-z0-9-]+/gi, '-').toLowerCase() : ''}`;
-const htmlPath = resolve(ROOT, 'reports', `${stem}.html`);
-const pdfPath = resolve(ROOT, 'reports', `${stem}.pdf`);
+const stem = `invoice-${fund}-${payIso}-r${revision}${example ? '-draft' : ''}${tag ? '-' + String(tag).replace(/[^a-z0-9-]+/gi, '-').toLowerCase() : ''}`;
+const htmlPath = resolve(REPORTS, `${stem}.html`);
+const pdfPath = resolve(REPORTS, `${stem}.pdf`);
+if (existsSync(htmlPath) || existsSync(pdfPath)) throw new Error('Laporan sudah ada; gunakan --revision baru, jangan timpa riwayat');
+atomicJSON(resolve(REPORTS,'private',`${stem}.json`),{version:2,fund,cfg,withdrawn,rate,balance,period,newSince,legacyUsd,sourceSnapshot:snapshot,generatedAt:now.toISOString(),rows,plan:result.plan});
 writeFileSync(htmlPath, html);
+if (flag('html-only')) { console.log(htmlPath); release(); process.exit(0); }
 
 const chrome = [process.env.CHROME, '/root/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome', '/usr/bin/chromium', '/usr/bin/google-chrome']
   .find((p) => p && existsSync(p));
@@ -511,17 +457,17 @@ if (r.status !== 0 || !existsSync(pdfPath)) { console.error(r.stderr || 'cetak P
 if (!flag('no-index')) {
 // Daftar laporan untuk tab Data investor. Satu entri per berkas; menjalankan
 // ulang bulan yang sama menimpa entrinya, bukan menambah duplikat.
-const manifestPath = resolve(ROOT, 'reports', 'index.json');
+const manifestPath = resolve(REPORTS, 'index.json');
 let manifest = [];
 try { manifest = JSON.parse(readFileSync(manifestPath, 'utf8')); } catch { /* laporan pertama */ }
-manifest = manifest.filter((m) => m.pdf !== `reports/${stem}.pdf` && existsSync(resolve(ROOT, m.pdf)));
+manifest = manifest.filter(m => m.pdf !== `reports/${stem}.pdf`);
 manifest.push({
-  fund, period, periodLabel, payDate: payIso, payLabel, example, invoiceNo,
+  fund, period, periodLabel, payDate: payIso, payLabel, example, status:example?'draft':'final', revision:Number(revision), invoiceNo,
   withdrawnUsd: withdrawn, costsUsd, distributedUsd: Number(pool.toFixed(2)), rate,
   pdf: `reports/${stem}.pdf`, html: `reports/${stem}.html`, generatedAt: now.toISOString(),
 });
 manifest.sort((a, b) => b.payDate.localeCompare(a.payDate) || Number(a.example) - Number(b.example));
-writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+atomicJSON(manifestPath, manifest);
 
 }
 
@@ -529,3 +475,5 @@ console.log(`[statement] ${fundName} ${periodLabel} · ditarik ${usd(withdrawn)}
 for (const row of rows) console.log(`  ${row.name.padEnd(10)} ${(row.waiting ? '—' : pct(row.share)).padStart(7)}  ${usd(row.netUsd).padStart(9)}  ${row.waiting ? '(baru masuk)' : idr(row.idr)}`);
 console.log(`  total      ${usd(totalNet).padStart(17)}  ${idr(totalIdr)}`);
 console.log(`-> ${pdfPath}`);
+
+release();

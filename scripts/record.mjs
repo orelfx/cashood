@@ -1,172 +1,60 @@
 #!/usr/bin/env node
-/*
- * cashood — catat setoran / penarikan.
- *
- *   node scripts/record.mjs deposit  orel 500          --note "topup"
- *   node scripts/record.mjs withdraw as   200
- *   node scripts/record.mjs withdraw --prorata 800     --push
- *
- * Kenapa lewat script, bukan ngetik JSON sendiri: `navBefore` harus nilai
- * wallet TEPAT sebelum transaksi, dan penarikan pro-rata harus dibagi dengan
- * harga unit yang sama untuk semua orang. Dua hal itu gampang meleset kalau
- * diketik manual, dan salahnya baru kelihatan berbulan-bulan kemudian sebagai
- * porsi saham yang bergeser sendiri.
- *
- * Hitungannya bukan disalin dari situs — script ini menjalankan mesin ledger
- * di assets/app.js apa adanya, jadi angka yang keluar di sini sama dengan yang
- * dilihat orang di halaman.
- */
-
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import vm from 'node:vm';
-
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-// Sejak situs memegang dua dana, berkasnya per dana: data/<dana>/config.json.
-// Jalur lama (data/config.json) sudah tidak ada, dan script ini diam-diam
-// rusak sejak pemisahan itu sampai dipakai lagi pada 2026-09-20.
-const FUND = (process.argv.includes('--fund') ? process.argv[process.argv.indexOf('--fund') + 1] : null) || 'reborn';
-const CONFIG = resolve(ROOT, `data/${FUND}/config.json`);
-const LIVE = resolve(ROOT, `data/${FUND}/live.json`);
-const NAVFILE = resolve(ROOT, `data/${FUND}/nav.json`);
-
-const die = (msg) => { console.error('✗ ' + msg); process.exit(1); };
-
-// ─── mesin ledger, diambil dari kode situs ────────────────────────────────
-const ctx = vm.createContext({ console, Date, Math, JSON, Number, Object, Array, String, Promise, Error, isNaN, Set, Map });
-ctx.globalThis = ctx;
-vm.runInContext(readFileSync(resolve(ROOT, 'assets/app.js'), 'utf8'), ctx);
-const { buildLedger } = ctx.cashood;
-
-// ─── argumen ──────────────────────────────────────────────────────────────
-const argv = process.argv.slice(2);
-const flag = (name) => {
-  const i = argv.indexOf('--' + name);
-  return i === -1 ? null : (argv[i + 1]?.startsWith('--') ? true : argv[i + 1] ?? true);
-};
-const positional = argv.filter((a, i) => !a.startsWith('--') && !argv[i - 1]?.startsWith('--'));
-
-const type = positional[0];
-if (!['deposit', 'withdraw'].includes(type)) {
-  die('pakai: node scripts/record.mjs <deposit|withdraw> <owner> <usd> [--note "..."] [--push]\n'
-    + '       node scripts/record.mjs withdraw --prorata <usd> [--push]');
+import Core from '../assets/core.js';
+import { atomicJSON, lock } from './lib/io.mjs';
+const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const args=process.argv.slice(2), flags={}, positional=[];
+const booleans=new Set(['dry','push','force']);
+for(let i=0;i<args.length;i++){
+  if(!args[i].startsWith('--')){positional.push(args[i]);continue;}
+  const name=args[i].slice(2);if(!['dry','push','force','fund','id','nav','at','date','note','prorata','batch'].includes(name))throw new Error(`Opsi tidak dikenal: ${name}`);
+  if(flags[name]!==undefined)throw new Error(`Opsi duplikat: ${name}`);
+  flags[name]=booleans.has(name)?true:args[++i];if(flags[name]==null||String(flags[name]).startsWith('--'))throw new Error(`Nilai --${name} wajib`);
 }
-
-const prorata = flag('prorata');
-const owner = prorata ? null : positional[1];
-const amount = Number(prorata === true ? positional[1] : (prorata ?? positional[2]));
-if (!Number.isFinite(amount) || amount <= 0) die(`jumlah tidak masuk akal: ${amount}`);
-if (prorata && type !== 'withdraw') die('--prorata cuma untuk withdraw');
-
-const cfg = JSON.parse(readFileSync(CONFIG, 'utf8'));
-const known = new Set(cfg.owners.map((o) => o.id));
-if (owner && !known.has(owner)) die(`owner "${owner}" tidak ada. Yang terdaftar: ${[...known].join(', ')}`);
-
-// ─── nilai wallet sekarang ────────────────────────────────────────────────
-// flag() balikin null kalau tidak dipakai, dan Number(null) itu 0 — bukan NaN.
-// Kalau dibiarkan, navBefore jadi $0 dan semua orang seolah tidak punya apa-apa.
-const navFlag = flag('nav');
-let navUsd = navFlag == null || navFlag === true ? NaN : Number(navFlag);
-if (!Number.isFinite(navUsd) || navUsd <= 0) {
-  const live = JSON.parse(readFileSync(LIVE, 'utf8'));
-  const ageMin = (Date.now() - live.updatedAt) / 60000;
-  if (ageMin > 30) {
-    die(`data/${FUND}/live.json umurnya ${ageMin.toFixed(0)} menit — terlalu tua untuk dijadikan navBefore.\n`
-      + `  Jalankan dulu: node scripts/sync${FUND === 'reborn' ? '' : '-' + FUND}.mjs   (atau paksa dengan --nav <angka>)`);
+const fund=flags.fund||'reborn';if(!['reborn','meridian','ferari'].includes(fund))throw new Error('Dana tidak dikenal');
+const type=positional[0];if(!['deposit','withdraw','reinvest'].includes(type))throw new Error('Pakai: record.mjs deposit|withdraw|reinvest owner usd --id ID --at ISO [--nav USD] [--dry]');
+const prorata=flags.prorata!==undefined;if(prorata&&type!=='withdraw')throw new Error('Pro-rata hanya untuk withdrawal');
+const owner=prorata?null:positional[1];const amount=Core.number(prorata?flags.prorata:positional[2],'Nominal',0.01);
+if(Math.abs(amount-Core.money(amount))>1e-8)throw new Error('Nominal maksimal dua desimal');
+if(!/^[a-zA-Z0-9_.:-]{3,160}$/.test(flags.id||''))throw new Error('--id unik wajib; gunakan ID transaksi yang sama saat mengulang');
+const at=flags.at ? Date.parse(flags.at) : flags.date ? Core.eventTime({date:flags.date}) : Date.now();
+if(!Number.isFinite(at)||at>Date.now()+60000)throw new Error('Waktu transaksi tidak valid');
+const date=flags.date||Core.day(at);Core.eventTime({at,date});
+const dir=resolve(process.env.CASHOOD_DATA_DIR||resolve(ROOT,'data'),fund),configPath=resolve(dir,'config.json');
+const release=lock(resolve(dir,'record.lock.local'));
+try{
+ const cfg=JSON.parse(readFileSync(configPath,'utf8'));
+ const duplicate=(cfg.events||[]).filter(e=>e.id===flags.id||e.id?.startsWith(flags.id+':'));
+ if(duplicate.length)throw new Error(`ID ${flags.id} sudah tercatat; tidak menulis ulang`);
+ const ledger=Core.buildLedger(cfg);
+ if(ledger.events.some(e=>e.at>at)&&!flags.nav&&type!=='reinvest')throw new Error('Transaksi historis memerlukan --nav pada waktu transaksi');
+ let nav;
+ if(type==='reinvest') nav=1;
+ else if(flags.nav!==undefined)nav=Core.number(flags.nav,'NAV sebelum transaksi',0.01);
+ else{
+  const live=JSON.parse(readFileSync(resolve(dir,'live.json'),'utf8'));
+  Core.validateSnapshot(live,{maxAge:30*60000,complete:true});nav=live.totalUsd;
+  if(Math.abs(at-live.updatedAt)>30*60000)throw new Error('Waktu transaksi jauh dari snapshot; gunakan NAV historis');
+  if(type==='deposit'&&!flags.force){
+   const series=JSON.parse(readFileSync(resolve(dir,'nav.json'),'utf8')).points||[];
+   const [a,b]=series.slice(-2);if(a&&b&&Date.now()-b.t<30*60000){
+    const jump=(b.usd-(b.lp||0))-(a.usd-(a.lp||0));
+    if(Math.abs(jump-amount)<Math.max(5,amount*.05))throw new Error(`Dana tampaknya sudah masuk; verifikasi --nav sebelum transfer (perkiraan ${Core.money(nav-amount)})`);
+   }
   }
-  navUsd = live.totalUsd;
-  console.log(`nilai wallet: $${navUsd.toFixed(2)} (snapshot ${ageMin.toFixed(0)} menit lalu)`);
-}
-
-// ─── apakah duitnya sudah masuk sebelum snapshot ini? ────────────────────
-//
-// `navBefore` harus nilai wallet SEBELUM setoran mendarat. Kalau transfernya
-// sampai lebih dulu, snapshot terbaru sudah memuat uang itu, dan menghitung
-// harga unit dari situ berarti si penyetor membeli unit dengan uangnya sendiri
-// yang sudah dihitung — dia dapat lebih sedikit dari yang dia setor, dan
-// selisihnya pindah diam-diam ke pemilik lama. Ini pernah kejadian: Abil
-// setor $1000 jam 03:17, snapshot jam 03:18, dan porsinya turun jadi $900.
-//
-// Deret nilai wallet menyimpan komponen token terpisah dari LP, jadi lonjakan
-// saldo token sebesar setoran itu tanda yang cukup jelas.
-if (type === 'deposit' && !flag('force')) {
-  try {
-    const points = JSON.parse(readFileSync(NAVFILE, 'utf8')).points || [];
-    const [prev, last] = points.slice(-2);
-    if (prev && last) {
-      const tokenJump = (last.usd - (last.lp ?? 0)) - (prev.usd - (prev.lp ?? 0));
-      if (Math.abs(tokenJump - amount) < Math.max(5, amount * 0.05)) {
-        die(`saldo token naik $${tokenJump.toFixed(2)} tepat sebelum snapshot ini — sepertinya $${amount.toFixed(2)} itu SUDAH masuk wallet.\n`
-          + `  Kalau benar, navBefore yang betul adalah $${(navUsd - amount).toFixed(2)}:\n`
-          + `      node scripts/record.mjs ${argv.join(' ')} --nav ${(navUsd - amount).toFixed(2)}\n`
-          + '  Kalau uangnya memang belum masuk, ulangi dengan --force.');
-      }
-    }
-  } catch { /* tidak ada deret; lanjut tanpa pemeriksaan */ }
-}
-
-// ─── siapkan event ────────────────────────────────────────────────────────
-const before = buildLedger(cfg);
-const unitPrice = before.totalUnits > 0 ? navUsd / before.totalUnits : 1;
-const valueOf = (id) => (before.owners.find((o) => o.id === id)?.units ?? 0) * unitPrice;
-
-const date = String(flag('date') || new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10));
-const note = typeof flag('note') === 'string' ? flag('note') : '';
-
-// Jam disimpan, bukan cuma tanggal: grafik harga saham membagi nilai wallet
-// dengan jumlah unit beredar, dan unit yang bertambah sejak 00:00 padahal
-// uangnya baru mendarat sore hari membuat harga saham tampak jatuh berjam-jam
-// tanpa ada yang terjadi.
-const events = [];
-if (prorata) {
-  for (const o of before.owners) {
-    const share = before.totalUnits > 0 ? o.units / before.totalUnits : 0;
-    const cut = Number((amount * share).toFixed(2));
-    if (cut > 0) events.push({ date, at: Date.now(), type, owner: o.id, usd: cut, navBefore: Number(navUsd.toFixed(2)), note });
-  }
-} else {
-  events.push({ date, at: Date.now(), type, owner, usd: Number(amount.toFixed(2)), navBefore: Number(navUsd.toFixed(2)), note });
-}
-
-// ─── penarikan tidak boleh melebihi jatah ─────────────────────────────────
-for (const e of events.filter((x) => x.type === 'withdraw')) {
-  const have = valueOf(e.owner);
-  if (e.usd - have > 0.01) {
-    die(`${e.owner} cuma punya $${have.toFixed(2)}, tidak bisa tarik $${e.usd.toFixed(2)}`);
-  }
-}
-
-// ─── tulis ────────────────────────────────────────────────────────────────
-cfg.events.push(...events);
-const after = buildLedger(cfg);
-if (after.warnings.length) console.log('catatan:', after.warnings.join(' · '));
-
-console.log('\ntransaksi yang dicatat:');
-for (const e of events) {
-  const name = cfg.owners.find((o) => o.id === e.owner)?.name ?? e.owner;
-  console.log(`  ${e.date}  ${e.type.padEnd(8)} ${name.padEnd(6)} $${e.usd.toFixed(2)}  (harga unit $${unitPrice.toFixed(4)})`);
-}
-
-const navAfter = navUsd + events.reduce((s, e) => s + (e.type === 'withdraw' ? -e.usd : e.usd), 0);
-console.log('\nsesudahnya:');
-for (const o of after.owners) {
-  const share = after.totalUnits > 0 ? (o.units / after.totalUnits) * 100 : 0;
-  console.log(`  ${o.name.padEnd(6)} ${share.toFixed(2).padStart(6)}%  $${(share / 100 * navAfter).toFixed(2)}`);
-}
-
-if (flag('dry')) { console.log('\n--dry: config.json tidak diubah'); process.exit(0); }
-
-writeFileSync(CONFIG, JSON.stringify(cfg, null, 2) + '\n');
-console.log(`\n✓ ditulis ke ${CONFIG}`);
-
-if (flag('push')) {
-  const git = (...args) => execFileSync('git', args, { cwd: ROOT, stdio: 'inherit' });
-  git('add', `data/${FUND}/config.json`);
-  git('commit', '-m', `chore: ${type} $${amount.toFixed(2)}${owner ? ' ' + owner : ' pro-rata'} ${date}`);
-  git('push');
-  console.log('✓ dipush — situs ikut berubah setelah build Pages selesai');
-} else {
-  console.log('  jalankan dengan --push kalau mau langsung naik ke situs');
-}
+ }
+ const before=Core.buildLedger(cfg,{before:at+1});
+ const shares=before.owners.filter(o=>o.units>0).map(o=>({id:o.id,share:o.units}));
+ const cuts=prorata?Core.allocate(amount,shares):{[owner]:amount};
+ const batch=flags.batch||(prorata?flags.id:undefined);
+ const events=Object.entries(cuts).filter(([,usd])=>usd>0).map(([id,usd])=>({id:prorata?`${flags.id}:${id}`:flags.id,date,at,type,owner:id,usd,
+  ...(type==='reinvest'?{}:{navBefore:nav}),...(batch?{batchId:batch}:{}),note:flags.note||''}));
+ const after={...cfg,events:[...cfg.events,...events]};Core.buildLedger(after);
+ console.log(JSON.stringify({fund,events,afterUnits:Core.buildLedger(after).totalUnits},null,2));
+ if(!flags.dry){atomicJSON(configPath,after);console.log('Transaksi tersimpan atomik.');}
+ if(flags.push&&!flags.dry){if(process.env.CASHOOD_DATA_DIR)throw new Error('--push tidak tersedia pada direktori data alternatif');
+  for(const command of [['add',`data/${fund}/config.json`],['commit','-m',`data: ${fund} ${type} ${flags.id}`],['push']])execFileSync('git',command,{cwd:ROOT,stdio:'inherit'});}
+}finally{release();}

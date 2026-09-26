@@ -19,8 +19,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
+import { atomicJSON, assertPublic, lock } from './lib/io.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, '..', 'data', 'meridian', 'heartbeat.json');
+const release = lock(resolve(dirname(OUT), 'heartbeat.lock.local'));
 const HOME = process.env.MERIDIAN_HOME || '/root/main/meridian';
 const WIB = 7 * 3600e3;
 
@@ -80,7 +82,7 @@ const system = [
 
 const portfolio = [
   `Nilai dana: ${usd(snap.totalUsd)}`,
-  `Dompet: ${usd(snap.botWalletUsd)} · LP: ${usd(snap.totalUsd - snap.botWalletUsd)}`,
+  `Dompet: ${usd(snap.walletUsd)} · LP: ${usd(snap.lpUsd)} · Kas: ${usd(snap.treasuryUsd)}`,
   `Posisi: ${open.length} terbuka, ${inRange} di dalam range`,
   `Fee belum dipanen: ${usd(s.openFeesUsd)}`,
 ].join('\n');
@@ -102,7 +104,7 @@ const recent = (snap.closedRecent || []).slice(0, 8)
 
 const record = [
   `Ditutup: ${s.closedCount ?? 0} posisi · menang ${s.winRate ?? 0}%`,
-  `Hasil terkunci (perkiraan): ${usd(s.realisedUsd)}`,
+  `Hasil realisasi USD yang tercatat: ${usd(s.realisedUsd)}`,
   `Rata-rata ukuran posisi: ${usd(s.avgInvestedUsd)}`,
   s.bestDay ? `Hari terbaik: ${s.bestDay.date} ${usd(s.bestDay.usd)}` : null,
 ].filter(Boolean).join('\n');
@@ -115,7 +117,7 @@ const text = [
   section('TERAKHIR DITUTUP', recent),
   section('REKOR', record),
   section('BRIEFING BOT', briefing || '(kosong)'),
-  '\nHasil dalam dolar adalah perkiraan: bot mencatat hasil posisi dalam persen, dan dolarnya dihitung dari ukuran posisi saat dibuka.',
+  `\n${s.unpricedCloses || 0} penutupan tidak memiliki realisasi USD; tidak dianggap nol. ${snap.quality?.complete ? 'Snapshot lengkap.' : 'Snapshot belum terverifikasi lengkap.'}`,
 ].join('\n\n');
 
 // ─── arsip sepuluh laporan terakhir ───────────────────────────────────────
@@ -130,10 +132,14 @@ if (existsSync(OUT)) {
   } catch { archive = []; }
 }
 
+const redactPublic = text => String(text).replace(/0x[0-9a-fA-F]{40,64}\b/g, '[identitas disembunyikan]').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g, '[identitas disembunyikan]');
 mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, JSON.stringify({
-  updatedAt: Date.now(), generatedAt: wib(Date.now()), source: 'built', text, archive,
-}, null, 2) + '\n');
+const published = {
+  updatedAt: Date.now(), generatedAt: wib(Date.now()), source: 'built', text: redactPublic(text), archive: archive.map(r=>({...r,text:redactPublic(r.text)})),
+};
+assertPublic(published);
+atomicJSON(OUT, published);
 
 console.log(`[meridian] laporan ${text.length} karakter · arsip ${archive.length} -> ${OUT}`);
+release();
 process.exit(0);

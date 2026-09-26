@@ -17,8 +17,15 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import Core from '../assets/core.js';
+import { atomicJSON, readJSON, lock } from './lib/io.mjs';
+import { saveSnapshot } from './lib/snapshot.mjs';
+import { treasury, parseTransfers } from './lib/treasury.mjs';
+
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = process.argv[2] ? resolve(process.argv[2]) : resolve(HERE, '..', 'data', 'reborn', 'live.json');
+const release = lock(resolve(dirname(OUT), 'sync.lock.local'));
+const cfgTreasury = JSON.parse(readFileSync(resolve(dirname(OUT), 'config.json'), 'utf8'));
 const RR_HOME = process.env.RR_HOME || '/root/robinhood';
 
 const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
@@ -26,11 +33,11 @@ const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
 process.chdir(RR_HOME);                       // .env dan .state dibaca relatif ke sini
 await load('node_modules/dotenv/config.js').catch(() => {});
 
-const { bookValueUsd, readBook } = await load('manager.js');
+const { readBook } = await load('manager.js');
 const { balanceOf } = await load('venue/quote.js');
 const { ethUsd } = await load('venue/price.js');
 const { getWallet } = await load('chain/signer.js');
-const { getClosed, getClosedSince, profitSweeps } = await load('store.js');
+const { getClosed, getClosedSince, profitSweeps, getOpen } = await load('store.js');
 const { NATIVE, USDG, WETH, decimalsOf } = await load('chain/addresses.js');
 const { getClient } = await load('chain/rpc.js');
 const { ERC20_ABI } = await load('chain/abi.js');
@@ -38,11 +45,11 @@ const { ERC20_ABI } = await load('chain/abi.js');
 const wallet = getWallet('multi');
 if (!wallet) throw new Error('wallet "multi" tidak ketemu — cek RR_* di .env');
 
-const price = await ethUsd();
+const price = Core.number(await ethUsd(), 'Harga ETH', 0.01);
 const [eth, usdg, weth] = await Promise.all([
-  balanceOf(NATIVE, wallet.address).catch(() => 0n),
-  balanceOf(USDG, wallet.address).catch(() => 0n),
-  balanceOf(WETH, wallet.address).catch(() => 0n),
+  balanceOf(NATIVE, wallet.address),
+  balanceOf(USDG, wallet.address),
+  balanceOf(WETH, wallet.address),
 ]);
 
 const holdings = [
@@ -66,6 +73,8 @@ const toUsd = (amount, token) => {
 };
 
 const books = await readBook();
+for (const book of books) if (book.integrity?.complete === false) throw new Error('Daftar posisi belum lengkap');
+const openRecords = new Map(getOpen().map(r => [String(r.tokenId), r]));
 
 // ─── fee yang sudah dipanen ──────────────────────────────────────────────
 //
@@ -84,7 +93,7 @@ const feeBook = existsSync(FEES_OUT)
   : {};
 
 // Snapshot sebelumnya, untuk menambal posisi yang gagal dibaca satu siklus.
-const prevLive = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : null;
+const prevLive = readJSON(resolve(dirname(OUT), 'snapshot.local.json')) || readJSON(OUT);
 const prevById = new Map((prevLive?.positions || []).map((p) => [String(p.tokenId), p]));
 
 const positions = [];
@@ -101,10 +110,12 @@ for (const book of books) {
     if (p.error) {
       const before = prevById.get(String(p.tokenId ?? ''));
       if (before && Number.isFinite(Number(before.valueUsd))) {
-        carried.push({ ...before, stale: true, staleReason: String(p.error).slice(0, 80) });
-      }
+        carried.push({ ...before, stale: true, staleReason: 'pembacaan posisi gagal' });
+      } else throw new Error('Posisi gagal dibaca tanpa nilai cadangan');
       continue;
     }
+    if (p.feesError) throw new Error('Fee posisi belum bisa diverifikasi');
+    Core.number(p.principalUsd, 'Nilai posisi', 0); Core.number(p.feesUsd, 'Fee posisi', 0);
 
     const investedUsd = toUsd(p.basisQuote, p.quoteToken);
     const valueUsd = Number(p.valueUsd);          // principal + fee yang belum dipanen
@@ -118,11 +129,17 @@ for (const book of books) {
       : null;
 
     const id = String(p.tokenId ?? '');
-    const unclaimed = Number(p.feesUsd) || 0;
+    const unclaimed = Core.number(p.feesUsd, 'Fee posisi', 0);
     const seen = feeBook[id] || { collectedUsd: 0, lastUnclaimedUsd: unclaimed, since: Date.now() };
-    if (seen.lastUnclaimedUsd - unclaimed > 0.5 && unclaimed < seen.lastUnclaimedUsd * 0.3) {
-      seen.collectedUsd += seen.lastUnclaimedUsd - unclaimed;
-    }
+    const record = openRecords.get(id);
+    // The bot's claim ledger is authoritative; no inference from USD price drops.
+    const claimed = record?.claimedQuote;
+    if (claimed != null) {
+      const actual = toUsd(claimed, p.quoteToken);
+      if (actual == null || !Number.isFinite(actual) || actual < 0) throw new Error('Claim fee belum dapat dinilai');
+      seen.collectedUsd = actual;
+      seen.source = 'bot-claims';
+    } else seen.source = 'legacy-estimate';
     seen.lastUnclaimedUsd = unclaimed;
     feeBook[id] = seen;
 
@@ -140,6 +157,7 @@ for (const book of books) {
       principalUsd: Number(p.principalUsd) || 0,
       feesUsd: unclaimed,                          // belum dipanen
       collectedFeesUsd: Number(seen.collectedUsd.toFixed(2)),
+      feesEstimated: seen.source !== 'bot-claims',
       totalFeesUsd: Number((seen.collectedUsd + unclaimed).toFixed(2)),
       feesTrackedSince: seen.since || null,
       valueUsd: Number.isFinite(valueUsd) ? Number(valueUsd.toFixed(2)) : null,
@@ -274,34 +292,36 @@ try {
     try {
       const [raw, dec] = await Promise.all([
         client.readContract({ address: token, abi: ERC20_ABI, functionName: 'balanceOf', args: [wallet.address] }),
-        client.readContract({ address: token, abi: ERC20_ABI, functionName: 'decimals' }).catch(() => 18),
+        client.readContract({ address: token, abi: ERC20_ABI, functionName: 'decimals' }),
       ]);
       if (raw > 0n) held.push({ token, amount: Number(raw) / 10 ** Number(dec) });
-    } catch { /* token tidak menjawab; lewati */ }
+    } catch { throw new Error('Saldo token tambahan belum dapat diverifikasi'); }
   }
 
-  for (const h of held.slice(0, 12)) {
+  for (const h of held) {
     let unit = null, symbol = h.token.slice(0, 8);
     try {
       const r = await fetch('https://api.dexscreener.com/latest/dex/tokens/' + h.token, { signal: AbortSignal.timeout(8000) });
       const j = await r.json();
       const pair = (j.pairs || []).find((x) => String(x.baseToken?.address || '').toLowerCase() === h.token);
       if (pair) { unit = Number(pair.priceUsd) || null; symbol = pair.baseToken?.symbol || symbol; }
-    } catch { /* tanpa harga, barisnya tidak diterbitkan */ }
-    const value = unit == null ? null : h.amount * unit;
+    } catch { throw new Error('Harga token tambahan tidak tersedia'); }
+    if (unit == null) throw new Error('Token bersaldo belum mempunyai harga');
+    const value = h.amount * unit;
     if (value != null && value >= 0.5) extra.push({ symbol, amount: h.amount, price: unit, usd: value });
   }
 } catch (error) {
-  console.error('[cashood] gagal membaca token sisa:', error.message);
+  throw new Error('Snapshot tidak lengkap: ' + error.message);
 }
 
 holdings.push(...extra);
+positions.push(...carried);
 
 // Posisi yang sudah ditutup tidak perlu diawasi lagi; catatannya dibuang
 // supaya berkasnya tidak tumbuh selamanya.
 const openIds = new Set(positions.map((p) => p.tokenId));
 for (const id of Object.keys(feeBook)) if (!openIds.has(id)) delete feeBook[id];
-writeFileSync(FEES_OUT, JSON.stringify({ updatedAt: Date.now(), positions: feeBook }, null, 2) + '\n');
+// Fee book is saved only after snapshot validation succeeds.
 
 // Sepuluh posisi terakhir yang ditutup — cukup untuk melihat apa yang baru
 // saja terjadi tanpa mengunduh dua ratus baris yang tidak dibaca siapa pun.
@@ -350,17 +370,9 @@ const stats = {
   timezone: 'Asia/Jakarta (UTC+7)',
 };
 
-let totalUsd = await bookValueUsd('multi');
-if (!Number.isFinite(totalUsd) || totalUsd <= 0) throw new Error(`bookValueUsd tidak masuk akal: ${totalUsd}`);
-
-// Posisi yang ditambal ikut dijumlahkan kembali: bot tidak memasukkannya ke
-// total, dan tanpa ini nilai dana tetap terbaca kurang satu seat.
-const carriedUsd = carried.reduce((t, p) => t + (Number(p.valueUsd) || 0) + (Number(p.feesUsd) || 0), 0);
-if (carriedUsd > 0) {
-  totalUsd += carriedUsd;
-  positions.push(...carried);
-  console.warn(`[cashood] ${carried.length} posisi gagal dibaca — nilai terakhirnya dipakai ($${carriedUsd.toFixed(2)})`);
-}
+let totalUsd = holdings.reduce((t,h)=>t+Number(h.usd),0) + positions.reduce((t,p)=>t+Number(p.principalUsd)+Number(p.feesUsd),0);
+if (!Number.isFinite(totalUsd) || totalUsd < 0) throw new Error('NAV tidak valid');
+const carriedUsd = carried.reduce((t,p)=>t+Number(p.principalUsd)+Number(p.feesUsd),0);
 
 // Kas cadangan tinggal di wallet lain, tapi ia tetap harta dana. Kalau tidak
 // ikut dihitung, memindahkannya akan terbaca sebagai kerugian sebesar uang
@@ -379,57 +391,11 @@ if (carriedUsd > 0) {
 // yang tercatat di sana lebih dulu. Baris yang sama bisa muncul di keduanya,
 // jadi keduanya disatukan dan di-dedup: pakai hash transaksi kalau ada, kalau
 // tidak pakai tanggal + nominal.
-const cfgTreasury = (() => {
-  try { return JSON.parse(readFileSync(resolve(dirname(OUT), 'config.json'), 'utf8')); }
-  catch { return {}; }
-})();
-const fixedCapitalUsd = Number(cfgTreasury?.fund?.fixedCapitalUsd) || 0;
-const sweepStepUsd = Number(cfgTreasury?.treasury?.stepUsd) || 100;
-
-const treasuryMoves = (() => {
-  const seen = new Map();
-  const add = (at, usd, asset, tx) => {
-    const value = Number(usd);
-    // Nol, negatif atau bukan angka: barisnya dilewati, sisanya tetap dihitung.
-    if (!Number.isFinite(value) || value <= 0) return;
-    const when = Number.isFinite(Number(at)) ? Number(at) : Date.parse(at);
-    if (!Number.isFinite(when)) return;
-    const hash = String(tx || '').trim().toLowerCase();
-    const key = hash || `${new Date(when).toISOString().slice(0, 10)}:${value.toFixed(2)}`;
-    if (seen.has(key)) return;
-    seen.set(key, { at: when, usd: Number(value.toFixed(2)), asset: String(asset || 'USDG') });
-  };
-
-  try {
-    for (const row of profitSweeps()) add(row?.at ?? Date.parse(row?.day), row?.amountUsd, 'USDG', row?.tx);
-  } catch { /* tanpa catatan bot, tinggal berkas pencatat */ }
-
-  const ledger = resolve(HERE, '..', String(cfgTreasury?.treasury?.ledgerFile || 'data/reborn/treasury.jsonl'));
-  if (existsSync(ledger)) {
-    for (const line of readFileSync(ledger, 'utf8').split('\n')) {
-      const text = line.trim();
-      if (!text || text.startsWith('#')) continue;
-      try {
-        const row = JSON.parse(text);
-        add(row.at, row.usd, row.asset, row.tx);
-      } catch { /* satu baris rusak tidak boleh menjatuhkan seluruh sinkronisasi */ }
-    }
-  }
-  // Hash transaksi dan alamat tujuan sengaja tidak ikut: berkas ini terbit di
-  // repo publik, dan satu hash sudah cukup untuk menemukan dompetnya.
-  return [...seen.values()].sort((a, b) => a.at - b.at);
-})();
-
-// SALDO AWAL. Pemilik menetapkan kas cadangan mulai dari angka tertentu
-// (`treasury.openingUsd`, $300 per 2026-09-18) dan hanya sapuan sejak
-// `treasury.countFrom` (hari WIB) yang ditambahkan di atasnya. Sapuan sebelum
-// tanggal itu sudah terwakili di saldo awal — menjumlahkannya lagi berarti
-// menghitung uang yang sama dua kali.
-const openingUsd = Number(cfgTreasury?.treasury?.openingUsd) || 0;
-const countFromMs = Number(cfgTreasury?.treasury?.countFromAt)
-  || (cfgTreasury?.treasury?.countFrom ? Date.parse(`${cfgTreasury.treasury.countFrom}T00:00:00+07:00`) : -Infinity);
-const countedMoves = treasuryMoves.filter((m) => m.at >= countFromMs);
-const treasuryUsd = Number((openingUsd + countedMoves.reduce((sum, m) => sum + m.usd, 0)).toFixed(2));
+const fixedCapitalUsd = Number(cfgTreasury.fund?.fixedCapitalUsd) || 0;
+const sweepStepUsd = Number(cfgTreasury.treasury?.stepUsd) || 100;
+const transferFile = resolve(HERE, '..', cfgTreasury.treasury?.ledgerFile || 'data/reborn/treasury.jsonl');
+const cash = treasury(cfgTreasury, profitSweeps(), existsSync(transferFile) ? parseTransfers(readFileSync(transferFile,'utf8')) : []);
+const treasuryUsd = cash.treasuryUsd;
 
 // Alamat wallet sengaja TIDAK ditulis ke snapshot: berkas ini terbit di repo
 // publik, dan satu baris saja sudah cukup untuk menghubungkan situs ini dengan
@@ -446,6 +412,8 @@ try {
 } catch { /* tanpa kurs, situs mencarinya sendiri */ }
 
 const snapshot = {
+  fund: 'reborn',
+  ...cash,
   updatedAt: Date.now(),
   usdIdr,
   nativeSymbol: 'ETH',
@@ -453,14 +421,6 @@ const snapshot = {
   totalUsd: Number((totalUsd + treasuryUsd).toFixed(2)),
   botWalletUsd: Number(totalUsd.toFixed(2)),
   treasuryUsd,
-  treasuryOpeningUsd: openingUsd,
-  treasuryOpeningLabel: cfgTreasury?.treasury?.openingLabel || null,
-  // Sapuan yang masuk SETELAH saldo awal ditetapkan — ditampilkan terpisah
-  // sebagai "new", supaya pemilik bisa melihat mana uang lama dan mana yang
-  // baru ditarik bot.
-  treasuryNewUsd: Number(countedMoves.reduce((sum, m) => sum + m.usd, 0).toFixed(2)),
-  treasuryCountFrom: cfgTreasury?.treasury?.countFrom || null,
-  treasuryMoves: countedMoves.slice(-40),
   fixedCapitalUsd,
   sweepStepUsd,
   // Yang akan tersapu kalau sapuan jalan sekarang — supaya situs bisa bilang
@@ -480,41 +440,8 @@ const snapshot = {
   closedRecent,
 };
 
-mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, JSON.stringify(snapshot, null, 2) + '\n');
-
-// ─── deret nilai wallet ───────────────────────────────────────────────────
-//
-// Satu titik tiap kali script ini jalan. Yang lama diencerkan, bukan dibuang:
-// dua hari terakhir disimpan utuh, sebulan terakhir sejam sekali, sisanya
-// sehari sekali. Tanpa itu, tiap 10 menit selama setahun jadi 52 ribu titik —
-// file yang harus diunduh ulang tiap kali orang buka halamannya.
-const NAV_OUT = resolve(dirname(OUT), 'nav.json');
-const now = Date.now();
-
-const previous = existsSync(NAV_OUT)
-  ? (JSON.parse(readFileSync(NAV_OUT, 'utf8')).points || [])
-  : [];
-
-// Deret ini ikut diunduh tiap kali halaman dibuka, jadi kerapatannya dibayar
-// pengunjung. Dua hari penuh pada 10 menit itu 288 titik untuk garis yang di
-// layar HP lebarnya 350 piksel — halus di data, tidak kelihatan di mata.
-// Sehari terakhir tetap 10 menit (yang dilihat orang), seminggu terakhir per
-// jam, sisanya harian. 40 KB turun jadi sekitar 15 KB.
-const kept = previous.filter((p) => {
-  const age = now - p.t;
-  if (age < 86400e3) return true;
-  const at = new Date(p.t);
-  if (age < 7 * 86400e3) return at.getUTCMinutes() < 10;
-  return at.getUTCHours() === 0 && at.getUTCMinutes() < 10;
-});
-
-kept.push({ t: now, usd: snapshot.totalUsd, lp: Number(positions.reduce((s, p) => s + p.principalUsd + p.feesUsd, 0).toFixed(2)) });
-
-writeFileSync(NAV_OUT, JSON.stringify({
-  updatedAt: now,
-  points: kept.slice(-4000),
-}, null, 2) + '\n');
-console.log(`[cashood] ${new Date().toISOString()} total=$${snapshot.totalUsd} positions=${positions.length}`
-  + ` treasury=$${treasuryUsd} closed=${stats.closedCount} realised=$${stats.realisedUsd} navPoints=${kept.length} -> ${OUT}`);
+saveSnapshot(OUT, snapshot, cfgTreasury);
+atomicJSON(FEES_OUT, { updatedAt: snapshot.updatedAt, positions: feeBook });
+console.log(`[cashood] total=$${snapshot.totalUsd} positions=${positions.length} treasury=$${treasuryUsd} complete=${snapshot.quality.complete}`);
+release();
 process.exit(0);
