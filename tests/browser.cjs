@@ -58,7 +58,12 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
  assert.deepEqual(raced,{fund:'meridian',nav:5000,native:'SOL',cache:5000});console.log('PASS delayed Reborn cannot overwrite Meridian');
  delayReborn=false;fxDelay=2000;const elapsed=await ev('(async()=>{const t=performance.now();await load({force:true});return performance.now()-t})()');assert.ok(elapsed<1800,`load waited ${elapsed}ms`);console.log('PASS NAV does not wait for FX');
  await ev('showAnalisa("meridian")');await new Promise(r=>setTimeout(r,100));assert.match(await ev('document.querySelector("#analisaBody").textContent'),/belum cukup|Belum cukup/);
- fullForecast=true;await ev('delete forecastCache.meridian;showAnalisa("meridian")');await new Promise(r=>setTimeout(r,100));assert.match(await ev('document.querySelector("#analisaBody").textContent'),/Frekuensi penurunan/);console.log('PASS complete forecast render');
+ fullForecast=true;await ev('delete forecastCache.meridian;showAnalisa("meridian")');await new Promise(r=>setTimeout(r,100));{const t=await ev('document.querySelector("#analisaBody").textContent');
+ // Tata letak yang disetujui pemilik: peluang dulu, dividen terkumpul, dan
+ // tidak ada peluang yang ditulis "0%" (aturan 2026-09-19: paling kecil 0,001%).
+ assert.match(t,/Worst Case/);assert.match(t,/Peluang dana turun 10% bulan ini/);
+ assert.match(t,/Dividen yang terkumpul/);assert.doesNotMatch(t,/(^|[^0-9,.<])0(\.0+)?%/);}
+console.log('PASS complete forecast render');
  await ev('showTab("investor");renderAll()');assert.ok(await ev('document.querySelector("#divFlow").textContent.includes("Diterima")'));console.log('PASS dividend and insufficient-data views');
  await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});const width=await ev('({width:innerWidth,scroll:document.documentElement.scrollWidth})');assert.equal(width.scroll,width.width);console.log('PASS mobile layout');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');

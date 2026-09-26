@@ -65,7 +65,55 @@ for (const key of ['sol','sol_usd','usdc']) Core.number(balance[key], key, 0);
 const mainMints = new Set(['So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v']);
 const extraTokens = (balance.tokens || []).filter(t => !mainMints.has(t.mint));
 const unpricedTokens = extraTokens.filter(t => Core.number(t.balance,'Saldo token',0)>0 && t.usd == null);
-if (unpricedTokens.length) throw new Error(`${unpricedTokens.length} token bersaldo positif belum memiliki harga; rekonsiliasi sumber sebelum memperbarui NAV`);
+
+// ─── rekonsiliasi token tanpa harga ─────────────────────────────────────
+//
+// Sumber saldo bot tidak memberi harga untuk sebagian token — sisa koin dari
+// posisi DLMM yang sudah ditutup. Menganggapnya nol diam-diam bisa
+// menyembunyikan uang sungguhan; menolak memperbarui NAV selamanya membekukan
+// dana. Jadi tiap token tanpa harga ditanyakan ke dua pasar lain:
+//
+//   - ada harga di Jupiter atau DexScreener  -> dinilai dengan harga itu
+//   - kedua sumber menjawab dan tidak ada pasar sama sekali -> $0, dicatat
+//     sebagai "tanpa pasar" di snapshot (koin mati, tidak bisa dijual)
+//   - salah satu sumber tidak bisa dihubungi -> TETAP menolak, seperti
+//     sebelumnya: diam bukan bukti tidak ada pasar
+//
+// Pada 2026-09-26 enam token masuk golongan kedua: tidak ada harga di Jupiter,
+// tidak ada satu pun pair di DexScreener.
+const deadTokens = [];
+if (unpricedTokens.length) {
+  const tanya = async (url) => {
+    const res = await fetch(url, { headers: { 'user-agent': 'cashood' }, signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
+  const mints = unpricedTokens.map((t) => t.mint).filter(Boolean);
+  const jup = await tanya(`https://lite-api.jup.ag/price/v3?ids=${mints.join(',')}`);
+  for (const t of unpricedTokens) {
+    const hargaJup = Number(jup?.[t.mint]?.usdPrice);
+    let harga = Number.isFinite(hargaJup) && hargaJup > 0 ? hargaJup : null;
+    let sumber = harga ? 'jupiter' : null;
+    if (harga == null) {
+      const dex = await tanya(`https://api.dexscreener.com/latest/dex/tokens/${t.mint}`);
+      const pair = (dex?.pairs || [])
+        .filter((x) => x.chainId === 'solana' && x.baseToken?.address === t.mint)
+        .sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+      const hargaDex = Number(pair?.priceUsd);
+      if (Number.isFinite(hargaDex) && hargaDex > 0) { harga = hargaDex; sumber = 'dexscreener'; }
+    }
+    if (harga != null) {
+      t.usd = Number((Core.number(t.balance, 'Saldo token', 0) * harga).toFixed(2));
+      t.priceSource = sumber;
+    } else {
+      // Kedua sumber menjawab dan tidak menemukan pasar.
+      t.usd = 0;
+      t.noMarket = true;
+      deadTokens.push({ mint: String(t.mint).slice(0, 8), amount: Number(t.balance) });
+    }
+  }
+  if (deadTokens.length) console.warn(`[meridian] ${deadTokens.length} token tanpa pasar dinilai $0 (bukan kurang harga — tidak ada pair sama sekali)`);
+}
 for (const t of extraTokens) if (t.balance>0) Core.number(t.usd, 'Nilai token', 0);
 
 // ─── isi dompet ───────────────────────────────────────────────────────────
@@ -242,6 +290,9 @@ try {
 const cashFile = resolve(OUT_DIR, 'treasury.jsonl');
 const cash = treasury(cfgFund, [], existsSync(cashFile) ? parseTransfers(readFileSync(cashFile,'utf8')) : []);
 const snapshot = {
+  // Token yang dinilai $0 karena memang tidak punya pasar — dicatat supaya
+  // angka nolnya bisa diperiksa, bukan hilang diam-diam.
+  noMarketTokens: deadTokens,
   ...cash,
   fund: 'meridian',
   historyNote: unpricedCloses ? `${unpricedCloses} posisi tertutup belum memiliki nilai realisasi USD; tidak dihitung sebagai nol.` : null,

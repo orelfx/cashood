@@ -158,9 +158,13 @@ belum lengkap, sehingga proyeksinya ditunda sampai rekonsiliasi selesai.
 
 Model memisahkan uang bekerja, kas cadangan, biaya, dan dividen. Pembayaran mengikuti
 kalender WIB; sapuan bukan kerugian. Skenario mengambil satu lintasan berdasarkan
-total kekayaan, bukan menjumlahkan persentil komponen yang berbeda. Angka 0% berarti
-kejadian tidak muncul dalam simulasi, bukan kejadian mustahil. Tidak ada probabilitas
-minimum buatan maupun tambahan kejutan sintetis yang tersembunyi.
+total kekayaan, bukan menjumlahkan persentil komponen yang berbeda. Tidak ada kejutan
+sintetis yang tersembunyi di undiannya.
+
+Peluang yang tidak muncul dalam simulasi **ditampilkan sebagai <0,001%, bukan 0%**
+(aturan pemilik, 2026-09-19). Tidak muncul di undian bukan berarti mustahil, dan
+angka nol terbaca sebagai jaminan. Ini aturan tampilan: angka mentah di forecast.json
+tetap apa adanya.
 
 ## Memasang perubahan pada server yang sudah berjalan
 

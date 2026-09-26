@@ -2131,16 +2131,48 @@ function renderAnalisa() {
         <p class="hint">${Number(f?.samples || 0)} hari memenuhi syarat. Proyeksi memerlukan sedikitnya tujuh hari selesai; setoran, penarikan, dan pembayaran harus tercatat.</p></section>`);
       return;
     }
-    const riskPct = v => v === 0 ? '0% dalam simulasi' : pct(v, 3);
-    setHTML(body, `<section class="card"><div class="card-head"><h2>${esc(fundMeta(fund)?.label)} · proyeksi</h2><span class="hint">${esc(f.generatedAt)}</span></div>
-      <p>Nilai dana sekarang ${usd(f.navNow)} · harga saham ${usd(f.sharePriceNow, 4)}. Sampel ${f.sample.days} hari selesai, ${esc(f.sample.from)} sampai ${esc(f.sample.to)}.</p>
-      <div class="stats three">${[f.scenarios.worst,f.scenarios.normal,f.scenarios.best].map(q=>`<div class="stat"><div class="k">${esc(q.label)}</div><div class="v">${usd(q.totalUsd)}</div><div class="n">total aset + dividen diterima pada ${esc(f.paydayDate)}</div></div>`).join('')}</div></section>
-      <section class="card"><h2>Nilai dana dan pembayaran</h2><div class="table-scroll"><table><thead><tr><th>Jangka</th><th>Total P10</th><th>Total median</th><th>Total P90</th><th>Dana median</th><th>Dividen median</th></tr></thead><tbody>
-      ${f.horizons.map(h=>`<tr><td>${esc(h.label)}${h.speculative?' · spekulatif':''}</td><td>${usd(h.worst.totalUsd)}</td><td>${usd(h.normal.totalUsd)}</td><td>${usd(h.best.totalUsd)}</td><td>${usd(h.normal.navUsd)}</td><td>${usd(h.normal.dividendsUsd)}</td></tr>`).join('')}</tbody></table></div>
-      <p class="hint">Setiap skenario memakai komponen dari satu lintasan yang sama. Total mencakup dana, kas cadangan, dan dividen diterima. Kas tidak dihitung dua kali. P10/P90 bukan batas kerugian atau keuntungan.</p></section>
-      <section class="card"><h2>Frekuensi penurunan total aset dalam simulasi</h2><div class="table-scroll"><table><thead><tr><th>Jangka</th><th>Turun 10%</th><th>Turun 50%</th><th>Turun 90%</th></tr></thead><tbody>
-      ${f.horizons.map(h=>`<tr><td>${esc(h.label)}</td><td>${riskPct(h.risk.p10)}</td><td>${riskPct(h.risk.p50)}</td><td>${riskPct(h.risk.p90)}</td></tr>`).join('')}</tbody></table></div>
-      <p>0% berarti kejadian tidak muncul dalam lintasan yang diundi. Itu bukan jaminan kejadian tersebut mustahil. Sapuan dan pembayaran dividen tidak dianggap uang hilang.</p></section>
+    // Peluang sekecil apa pun tidak ditulis "0%": aturan pemilik, 2026-09-19 —
+    // "kasih paling kecil pun 0.001%, jangan bener-bener 0%". Nol di simulasi
+    // berarti kejadiannya tidak muncul di undian, bukan mustahil; menulisnya
+    // "<0,001%" mengatakan hal yang sama tanpa terbaca sebagai jaminan.
+    const peluang = v => v == null ? '—' : (v < 0.001 ? '<0,001%' : v < 0.01 ? '<0,01%' : pct(v, 2));
+    const hor = key => f.horizons.find(h => h.key === key);
+    const kartuRugi = (f.lossScenarios || []).map(l => {
+      const sebulan = hor('m1')?.risk?.[`p${l.dropPct}`];
+      const seminggu = hor('w1')?.risk?.[`p${l.dropPct}`];
+      const setahun = hor('y1')?.risk?.[`p${l.dropPct}`];
+      return `<div class="scen-card loss">
+        <div class="scen-k">Peluang dana turun ${l.dropPct}% bulan ini</div>
+        <div class="scen-v ${sebulan >= 20 ? 'neg' : ''}">${peluang(sebulan)}</div>
+        <div class="scen-d">kalau terjadi, dana jadi <b>${usd(l.navUsd, 0)}</b> <span class="neg">${usd(l.changeUsd, 0)}</span></div>
+        <div class="scen-rows">
+          <div class="scen-row"><span>Peluang dalam seminggu</span><b>${peluang(seminggu)}</b></div>
+          <div class="scen-row"><span>Peluang dalam setahun</span><b>${peluang(setahun)}</b></div>
+          <div class="scen-row"><span>Harga saham jadi</span><b>${l.sharePrice ? usd(l.sharePrice, 4) : '—'}</b></div>
+        </div></div>`;
+    }).join('');
+    // Dividen yang terkumpul, bukan total aset: modal dana dipatok, jadi yang
+    // bertambah adalah dividen. Sebelum tanggal 1 pertama, uang yang sudah
+    // disapu keluar ditampilkan sebagai yang menunggu dibayar — bukan nol.
+    const barisDividen = f.horizons.map(h => {
+      const belum = (h.best.dividendsUsd || 0) <= 0;
+      const kol = q => belum ? (q.sweptUsd || 0) : q.dividendsUsd;
+      return `<tr><td>${esc(h.label)}${h.speculative ? ' <span class="pill out">spekulatif</span>' : ''}</td>
+        <td class="num pos"><strong>${usd(kol(h.normal), 0)}</strong>${belum ? '<div class="n dim">sudah ditarik, menunggu tanggal 1</div>' : ''}</td>
+        <td class="num dim">${usd(kol(h.worst), 0)}</td><td class="num dim">${usd(kol(h.best), 0)}</td>
+        <td class="num">${usd(h.normal.navUsd, 0)}</td></tr>`;
+    }).join('');
+    setHTML(body, `<section class="card"><div class="card-head"><h2>${esc(fundMeta(fund)?.label)} · perkiraan nilai dana pada ${esc(f.paydayDate)}</h2><span class="hint">${esc(f.generatedAt)}</span></div>
+      <p>Nilai dana sekarang ${usd(f.navNow)} · harga saham ${usd(f.sharePriceNow, 4)}. Diundi ulang dari ${f.sample.days} hari hasil nyata yang sudah terverifikasi, ${esc(f.sample.from)} sampai ${esc(f.sample.to)}.</p>
+      <div class="stats three">${[['Terburuk', f.scenarios.worst], ['Normal', f.scenarios.normal], ['Terbaik', f.scenarios.best]].map(([k, q]) => `<div class="stat"><div class="k">${k}</div><div class="v">${usd(q.totalUsd, 0)}</div><div class="n">total aset + dividen diterima</div></div>`).join('')}</div></section>
+      <section class="card"><div class="card-head"><h2>Dividen yang terkumpul kalau bot terus berjalan</h2><span class="hint">nilai tengah, terburuk, terbaik</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Jangka</th><th class="num">Dividen terkumpul</th><th class="num">Terburuk</th><th class="num">Terbaik</th><th class="num">Nilai dana</th></tr></thead><tbody>${barisDividen}</tbody></table></div>
+        <p class="hint">Kolom terburuk dan terbaik adalah rentang yang wajar, bukan batas — satu dari sepuluh perjalanan berakhir di luar keduanya. Uang yang sudah disapu keluar tidak ikut naik-turun lagi, jadi dana yang turun setelahnya tidak mengurangi dividen yang sudah diamankan.</p></section>
+      <section class="card"><div class="card-head"><h2>Worst Case</h2><span class="hint">seberapa mungkin, dan seberapa dalam</span></div>
+        <div class="scen">${kartuRugi}</div>
+        <p class="hint" style="margin-top:12px">Dibaca begini: dari seluruh kemungkinan perjalanan dana ke depan yang diundi, sekian persen di antaranya pernah menyentuh penurunan sebesar itu. Angka kecil bukan berarti mustahil, dan angka besar bukan berarti pasti.</p>
+        <div class="table-scroll" style="margin-top:14px"><table><thead><tr><th>Jangka</th><th class="num">Turun ≥10%</th><th class="num">Turun ≥50%</th><th class="num">Turun ≥90%</th></tr></thead><tbody>
+        ${f.horizons.map(h => `<tr><td>${esc(h.label)}</td><td class="num ${h.risk.p10 > 5 ? 'neg' : ''}">${peluang(h.risk.p10)}</td><td class="num ${h.risk.p50 > 1 ? 'neg' : 'dim'}">${peluang(h.risk.p50)}</td><td class="num dim">${peluang(h.risk.p90)}</td></tr>`).join('')}</tbody></table></div></section>
       <section class="card"><h2>Batas analisa</h2><ul>${f.caveats.map(c=>`<li>${esc(c)}</li>`).join('')}</ul><p class="hint">${esc(f.method)}</p></section>`);
   }).catch(err => { if (analisaFund === fund) setHTML(body, `<p class="miss">Analisa tidak bisa ditampilkan: ${esc(err.message)}</p>`); });
 }
