@@ -468,14 +468,24 @@ function renderSummary(ledger, nav) {
   // pemilik tetap memakai nav.totalUsd, karena kas cadangan tetap milik dana.
   const swept = Number(nav.treasuryUsd) || 0;
   const inBot = Math.max(0, nav.totalUsd - swept);
-  const pnl = inBot + (ledger.withdrawn + swept) - ledger.deposited;
-  const pnlPct = ledger.deposited > 0 ? (pnl / ledger.deposited) * 100 : 0;
+  // MODAL = setoran + laba yang sengaja diputar kembali jadi modal. Aturan
+  // pemilik untuk Meridian (2026-09-25): "$441 itu reinvest, modal masuknya
+  // $5.000" — laba sesudah itu diukur dari modal yang sudah dibesarkan, jadi
+  // $441 tidak dihitung dua kali sebagai modal DAN sebagai untung.
+  const reinvested = Number(ledger.reinvested) || 0;
+  const modal = ledger.deposited + reinvested;
+  const pnl = inBot + (ledger.withdrawn + swept) - modal;
+  const pnlPct = modal > 0 ? (pnl / modal) * 100 : 0;
 
   setHTML($('#kpiNav'), usd(inBot));
   setHTML($('#kpiNavSub'), nav.lpUsd > 0
     ? `${usd(nav.liveUsd ?? 0, 0)} token + ${usd(nav.lpUsd, 0)} di LP · yang dipegang bot`
     : nav.label);
-  setHTML($('#kpiDeposit'), usd(ledger.deposited));
+  setHTML($('#kpiDeposit'), usd(modal));
+  const depSub = $('#kpiDepositSub') || document.querySelector('#kpiDeposit')?.nextElementSibling;
+  if (depSub) depSub.textContent = reinvested > 0
+    ? `${usdText(ledger.deposited, 0)} setoran + ${usdText(reinvested, 0)} laba diputar kembali`
+    : 'total setoran semua pemilik';
   // "Sudah ditarik" = pencairan investor + sapuan harian bot ke wallet tabungan.
   const sweeps = (nav.treasuryMoves || []).length;
   setHTML($('#kpiWithdraw'), usd(ledger.withdrawn + swept));
@@ -1264,7 +1274,7 @@ async function renderReports() {
   setHTML($('#reportsList'), `<div class="table-scroll"><table class="reports"><thead><tr>
       <th>Invoice</th><th>Rencana bayar</th><th>Ditarik</th><th>Biaya</th><th>Dibagikan</th><th></th></tr></thead><tbody>`
     + mine.map((m) => `<tr>
-      <td><div>${esc(m.periodLabel)}${m.example ? ' <span class="inv-tag">contoh</span>' : ''}</div><div class="inv-no">${String(m.invoiceNo || '').split('/').join('/<wbr>')}</div></td>
+      <td><div>${esc(m.periodLabel)}${m.example ? ' <span class="inv-tag">contoh</span>' : m.status === 'draft' ? ' <span class="inv-tag">draf · belum final</span>' : ''}</div><div class="inv-no">${String(m.invoiceNo || '').split('/').join('/<wbr>')}</div></td>
       <td>${esc(m.payLabel)}</td>
       <td class="num">${usd(m.withdrawnUsd, 0)}</td>
       <td class="num neg">−${usd(m.costsUsd, 0)}</td>
@@ -2202,8 +2212,9 @@ async function loadFundBrief(id) {
       chain: meta?.chain || '',
       accent: meta?.accent || '#8b95a7',
       totalUsd: total,
-      depositedUsd: ledger.deposited,
-      pnlUsd: total + ledger.withdrawn - ledger.deposited,
+      // Sama dengan kartu dana: laba yang diputar kembali ikut jadi modal.
+      depositedUsd: ledger.deposited + (Number(ledger.reinvested) || 0),
+      pnlUsd: total + ledger.withdrawn - ledger.deposited - (Number(ledger.reinvested) || 0),
       updatedAt: Number(snap?.updatedAt) || null,
       owners: ledger.owners.filter((o) => o.units > 0)
         .map((o) => ({ name: o.name, color: o.color, share: (o.units / ledger.totalUnits) * 100, value: o.units * unit }))

@@ -20,7 +20,7 @@ for(const file of ['data/funds.json','data/updates.json',...['reborn','meridian'
  mkdirSync(dirname(resolve(out,file)),{recursive:true});writeFileSync(resolve(out,file),JSON.stringify(value));
 }
 const reports=JSON.parse(readFileSync(resolve(root,'reports/index.json'),'utf8'));assertPublic(reports);mkdirSync(resolve(out,'reports'),{recursive:true});
-const manifest=reports.map(r=>({...r,status:r.status||(r.generatedAt<`${r.payDate}T00:00:00+07:00`?'draft':'legacy'),example:r.example||!r.status}));
+const manifest=reports.map(r=>({...r,status:r.status||(r.generatedAt<`${r.payDate}T00:00:00+07:00`?'draft':'legacy'),example:Boolean(r.example)}));  // draf bukan contoh: invoice asli yang periodenya belum ditutup
 for(const r of manifest){
  if(!/^reports\/[a-z0-9-]+\.pdf$/i.test(r.pdf))throw new Error('Path laporan tidak valid');
  cpSync(resolve(root,r.pdf),resolve(out,r.pdf));
