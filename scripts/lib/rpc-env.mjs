@@ -36,5 +36,8 @@ export function useCashoodRobinhoodRpc() {
 export function cashoodSolanaEnv(base = process.env) {
   const url = pick('CASHOOD_SOLANA_RPC');
   if (!url) return base;
-  return { ...base, RPC_URL: url, RPC_URL_BACKUP: '', OPPORTUNITY_RPC_URL: '', RPC_EXTRA_URLS: '', RPC_WS_URL: '', RPC_WS_URL_BACKUP: '' };
+  return { ...base, RPC_URL: url, RPC_URL_BACKUP: '', OPPORTUNITY_RPC_URL: '', RPC_EXTRA_URLS: '', RPC_WS_URL: '', RPC_WS_URL_BACKUP: '',
+    // Saldo dompet: tanpa kunci Helius bot membaca saldo lewat RPC di atas
+    // (getBalance + daftar token) dan harga Jupiter/DexScreener.
+    HELIUS_API_KEY: '' };
 }
