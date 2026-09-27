@@ -23,6 +23,7 @@ import Core from '../assets/core.js';
 import { lock, readJSON } from './lib/io.mjs';
 import { treasury, parseTransfers } from './lib/treasury.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
+import { cashoodSolanaEnv } from './lib/rpc-env.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'meridian');
 const release = lock(resolve(OUT_DIR, 'sync.lock.local'));
@@ -45,7 +46,7 @@ function cli(command) {
   const entry = resolve(HOME, 'cli.js');
   const wrapper = `process.argv = ${JSON.stringify([process.execPath, entry, command])}; await import(${JSON.stringify(pathToFileURL(entry).href)}); await new Promise(r => process.stdout.write('', r)); process.exit(0);`;
   const run = spawnSync(process.execPath, ['--input-type=module', '-e', wrapper], {
-    cwd: HOME, encoding: 'utf8', timeout: 180000, maxBuffer: 32 * 1024 * 1024,
+    cwd: HOME, env: cashoodSolanaEnv(), encoding: 'utf8', timeout: 180000, maxBuffer: 32 * 1024 * 1024,
   });
   if (run.error || run.signal) throw new Error(`CLI ${command} terputus`);
   const out = run.stdout || '';

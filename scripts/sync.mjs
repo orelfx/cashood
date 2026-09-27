@@ -20,6 +20,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import Core from '../assets/core.js';
 import { atomicJSON, readJSON, lock } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
+import { useCashoodRobinhoodRpc } from './lib/rpc-env.mjs';
 import { treasury, parseTransfers } from './lib/treasury.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -31,6 +32,7 @@ const RR_HOME = process.env.RR_HOME || '/root/robinhood';
 const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
 
 process.chdir(RR_HOME);                       // .env dan .state dibaca relatif ke sini
+useCashoodRobinhoodRpc();                     // RPC situs sendiri, kalau sudah diisi
 await load('node_modules/dotenv/config.js').catch(() => {});
 
 const { readBook } = await load('manager.js');

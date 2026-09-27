@@ -19,6 +19,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import Core from '../assets/core.js';
 import { atomicJSON, lock } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
+import { useCashoodRobinhoodRpc } from './lib/rpc-env.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'ferari');
 const OUT = resolve(DIR, 'live.json');
@@ -33,6 +34,7 @@ const secret = JSON.parse(readFileSync(resolve(DIR, 'wallet.local.json'), 'utf8'
 const WALLET = String(secret.address);
 
 process.chdir(RR_HOME);
+useCashoodRobinhoodRpc();
 const load = (rel) => import(pathToFileURL(resolve(RR_HOME, rel)).href);
 await load('node_modules/dotenv/config.js').catch(() => {});
 

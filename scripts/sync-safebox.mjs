@@ -6,12 +6,13 @@ import Core from '../assets/core.js';
 import { atomicJSON, readJSON, lock, downsample, generation, assertPublic } from './lib/io.mjs';
 import { accrue } from './lib/accrual.mjs';
 import { parseTransfers } from './lib/treasury.mjs';
+import { useCashoodRobinhoodRpc } from './lib/rpc-env.mjs';
 const DIR=resolve(process.env.CASHOOD_DATA_DIR || resolve(dirname(fileURLToPath(import.meta.url)),'..','data'),'safebox');
 const release=lock(resolve(DIR,'sync.lock.local'));
 const cfg=readJSON(resolve(DIR,'config.json')),secret=readJSON(resolve(DIR,'position.local.json'));
 const prev=readJSON(resolve(DIR,'live.json'));
 if(!process.argv.includes('--now')&&prev?.schemaVersion===2&&Date.now()-prev.updatedAt<55*60000){release();process.exit(0);}
-const home=process.env.RR_HOME||'/root/robinhood';process.chdir(home);
+const home=process.env.RR_HOME||'/root/robinhood';process.chdir(home);useCashoodRobinhoodRpc();
 const load=rel=>import(pathToFileURL(resolve(home,rel)).href);
 await load('node_modules/dotenv/config.js');
 const {getPositionPnl}=await load('venue/univ4.js'),{ethUsd}=await load('venue/price.js');
