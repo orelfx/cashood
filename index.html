@@ -47,8 +47,8 @@
 
   <div class="strip" id="strip">
     <span class="strip-item"><span class="led live"></span><b>Saldo token</b> <span id="stripToken" class="say">live dari chain</span></span>
-    <span class="strip-item"><span class="led lp"></span><b>Nilai LP</b> <span id="stripLp">—</span></span>
-    <span class="strip-item"><span class="led"></span><b>Bagi hasil</b> <span class="say">dihitung ulang tiap data masuk</span></span>
+    <span class="strip-item"><span class="led lp"></span><b id="stripLpLabel">Nilai LP</b> <span id="stripLp">—</span></span>
+    <span class="strip-item" id="stripShare"><span class="led"></span><b>Bagi hasil</b> <span class="say">dihitung ulang tiap data masuk</span></span>
     <!-- Kurs muncul di sini hanya di layar sempit: di header ia mendorong
          tombol mata uang dan refresh keluar layar. -->
     <span class="strip-item m-rate"><span class="led rate-led"></span><span id="stripEth">—</span></span>
@@ -69,6 +69,17 @@
 
   <div id="tab-portfolio">
 
+  <!-- ── status bot simulasi (hanya dana trading paper) ───── -->
+  <section class="card paper-card" id="paperCard" hidden>
+    <div class="card-head">
+      <h2>Status bot</h2>
+      <span class="pill sim">SIMULASI · dry-run</span>
+    </div>
+    <p class="lead" id="paperLead"></p>
+    <div class="stats" id="paperStats"></div>
+    <div id="paperDecision"></div>
+  </section>
+
   <!-- ── ringkasan ─────────────────────────────────────────── -->
   <section class="grid grid-4" id="summary">
     <div class="card kpi">
@@ -77,12 +88,12 @@
       <div class="sub" id="kpiNavSub">memuat…</div>
     </div>
     <div class="card kpi">
-      <div class="label">Modal masuk</div>
+      <div class="label" id="lblDeposit">Modal masuk</div>
       <div class="big" id="kpiDeposit">—</div>
       <div class="sub">total setoran semua pemilik</div>
     </div>
     <div class="card kpi">
-      <div class="label">Sudah ditarik</div>
+      <div class="label" id="lblWithdraw">Sudah ditarik</div>
       <div class="big" id="kpiWithdraw">—</div>
       <div class="sub" id="kpiWithdrawSub">total penarikan</div>
     </div>
@@ -94,7 +105,7 @@
   </section>
 
   <!-- ── pembagian saham ───────────────────────────────────── -->
-  <section class="card">
+  <section class="card" id="shareCard">
     <div class="card-head">
       <h2>Pembagian saham</h2>
       <span class="hint" id="unitHint"></span>
@@ -221,7 +232,7 @@
     </div>
 
     <p class="hint" id="profitNote"></p>
-    <p class="hint disclaimer">Angka pada kartu ini adalah hasil yang tercatat di buku posisi
+    <p class="hint disclaimer" id="profitDisclaimer">Angka pada kartu ini adalah hasil yang tercatat di buku posisi
       bot. Realisasi akhir dapat berbeda: biaya gas berfluktuasi mengikuti kepadatan
       jaringan, dan setiap keluar-masuk posisi menanggung slippage serta price impact yang
       besarnya bergantung pada kedalaman likuiditas pool saat transaksi dieksekusi. Selisih
@@ -232,7 +243,7 @@
   <!-- ── token di wallet ───────────────────────────────────── -->
   <section class="card">
     <div class="card-head">
-      <h2>Token di wallet</h2>
+      <h2 id="holdTitle">Token di wallet</h2>
       <span class="hint" id="holdHint"></span>
     </div>
     <div class="table-scroll">
@@ -266,13 +277,13 @@
   <!-- ── posisi LP ─────────────────────────────────────────── -->
   <section class="card" id="lpCard">
     <div class="card-head">
-      <h2>Posisi LP <span class="count" id="lpCount"></span></h2>
+      <h2><span id="lpTitle">Posisi LP</span> <span class="count" id="lpCount"></span></h2>
       <span class="hint" id="lpHint"></span>
     </div>
     <div class="stats lp-sum" id="lpSummary"></div>
     <div class="table-scroll">
       <table id="lpTable">
-        <thead>
+        <thead id="lpHead">
           <tr>
             <th>Pool</th><th>Status</th><th class="num">Umur</th><th class="num">Modal</th>
             <th class="num">Nilai</th><th class="num">Total fee</th><th class="num">Untung / rugi</th>
@@ -292,7 +303,7 @@
     <div class="table-scroll">
       <table id="closedTable">
         <thead>
-          <tr><th>Pool</th><th>Strategi</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr>
+          <tr><th id="closedFirst">Pool</th><th>Strategi</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -594,7 +605,7 @@
         <div class="risk"><span class="dot amber"></span><div><h3>Satu pengelola, satu mesin</h3><p>Tidak ada tim dan tidak ada cadangan. Kalau pengelolanya berhenti, dananya harus dibongkar.</p></div></div>
         <div class="risk"><span class="dot amber"></span><div><h3>Tanpa payung hukum</h3><p>Ini kesepakatan pribadi, bukan produk berizin. Tidak ada penjamin, tidak ada pengawas, tidak ada jaminan pengembalian.</p></div></div>
       </div>
-      <p class="hint disclaimer">Seluruh angka di situs ini berasal dari catatan bot dan diperbarui setiap sepuluh menit. Posisi yang sedang berjalan, riwayat posisi yang sudah ditutup, biaya, dan porsi tiap pemegang saham terbuka untuk diperiksa siapa pun. Alamat wallet sengaja tidak dicantumkan.</p>
+      <p class="hint disclaimer">Seluruh angka di situs ini berasal dari catatan bot dan diperbarui setiap lima menit. Posisi yang sedang berjalan, riwayat posisi yang sudah ditutup, biaya, dan porsi tiap pemegang saham terbuka untuk diperiksa siapa pun. Alamat wallet sengaja tidak dicantumkan.</p>
     </section>
   </div><!-- /tab-tentang -->
 

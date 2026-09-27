@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publish validated snapshots; cron: */10 * * * * /root/cashood/scripts/publish.sh
+# Publish validated snapshots; cron: */5 * * * * /root/cashood/scripts/publish.sh
 set -euo pipefail
 export PATH="/usr/local/bin:/usr/bin:/bin"
 cd "$(dirname "$0")/.."
@@ -20,11 +20,12 @@ run_snapshot scripts/sync.mjs
 run_snapshot scripts/sync-meridian.mjs
 run_snapshot scripts/sync-safebox.mjs
 run_snapshot scripts/sync-ferari.mjs
+run_snapshot scripts/sync-charon.mjs
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
 /usr/bin/node scripts/stage-data.mjs "$WORK" || failed=1
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
-  git add -- reborn meridian ferari safebox
+  git add -- reborn meridian ferari charon safebox
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 # Retry an earlier unpushed commit even when there are no file changes this run.

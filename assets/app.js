@@ -64,7 +64,7 @@ function getJSON(url, { fresh = false } = {}) {
     const quiet = (pr) => { pr.catch(() => {}); return pr; };
     quiet(getJSON(FUNDS_URL));
     const guess = (location.hash || '').replace(/^#/, '').split('/')[0] || 'reborn';
-    const fund = ['reborn', 'meridian', 'ferari'].includes(guess) ? guess : 'reborn';
+    const fund = ['reborn', 'meridian', 'ferari', 'charon'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
   } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
@@ -397,6 +397,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     bookStats: snap.bookStats || null,
     historyNote: snap.historyNote || null,
     performance: snap.performance || null,
+    trading: snap.trading || null,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -502,6 +503,17 @@ function renderSummary(ledger, nav) {
         ? `${esc(openingLabel)} ${usd(opening, 0)}` + (fresh > 0 ? ` · new ${usd(fresh, 0)}` : '')
         : `${usd(swept, 0)} disapu bot · ${sweeps} transfer`)
     : 'total penarikan');
+  $('#kpiWithdraw').className = 'big';
+  // Dana trading simulasi: tidak ada yang ditarik dan tidak ada LP. Kartu yang
+  // sama dipakai untuk kas vs posisi dan untung yang sudah dikunci.
+  const tr = isTrading() ? nav.trading : null;
+  if (tr) {
+    setHTML($('#kpiNavSub'), `${usd(tr.cashUsd, 0)} kas + ${usd(tr.positionsUsd, 0)} di ${(nav.positions || []).length} posisi`);
+    if (depSub) depSub.textContent = 'modal kertas, bukan uang sungguhan';
+    setHTML($('#kpiWithdraw'), signed(tr.realizedUsd));
+    $('#kpiWithdraw').className = 'big ' + cls(tr.realizedUsd);
+    setHTML($('#kpiWithdrawSub'), `${nav.stats?.closedCount || 0} trade ditutup · berjalan ${signed(tr.unrealizedUsd)}`);
+  }
   const el = $('#kpiPnl');
   setHTML(el, signed(pnl));
   el.className = 'big ' + cls(pnl);
@@ -531,8 +543,12 @@ function renderSummary(ledger, nav) {
   $('#stripToken').textContent = nav.source === 'manual'
     ? 'dikunci manual di config.json'
     : `dihitung bot, halaman cek ulang tiap ${every} menit`;
+  if (isTrading()) {
+    $('#stripLp').textContent = `${(nav.positions || []).length} posisi · dihitung tiap 5 menit · terakhir ${ago(nav.updatedAt)}`;
+    return;
+  }
   $('#stripLp').textContent = nav.positions?.length
-    ? `dihitung bot tiap 10 menit · terakhir ${ago(nav.updatedAt)}`
+    ? `dihitung bot tiap 5 menit · terakhir ${ago(nav.updatedAt)}`
     : 'belum ada snapshot — LP belum terhitung';
 }
 
@@ -578,7 +594,10 @@ let holdPage = 0;
 const HOLD_PER_PAGE = 5;
 
 function renderHoldings(nav) {
-  const rows = [...(nav.holdings || [])].sort((a, b) => (b.usd || 0) - (a.usd || 0));
+  const tokens = isTrading()
+    ? (nav.positions || []).map((p) => ({ symbol: p.symbol, amount: p.amount, price: p.priceUsd, usd: p.principalUsd }))
+    : [];
+  const rows = [...(nav.holdings || []), ...tokens].sort((a, b) => (b.usd || 0) - (a.usd || 0));
   const body = $('#holdTable').querySelector('tbody');
   const pages = Math.max(1, Math.ceil(rows.length / HOLD_PER_PAGE));
   if (holdPage >= pages) holdPage = pages - 1;
@@ -629,6 +648,7 @@ function renderHoldings(nav) {
  * dan belum memperhitungkan biaya keluar.
  */
 function renderLp(nav) {
+  if (isTrading()) { renderTrades(nav); return; }
   const rows = nav.positions || [];
   const body = $('#lpTable').querySelector('tbody');
   $('#lpCount').textContent = rows.length ? `(${rows.length})` : '';
@@ -702,11 +722,116 @@ function renderClosed(nav) {
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
       <td class="num ${cls(r.netUsd)}">${signed(r.netUsd)}</td>
       <td class="num ${cls(r.netUsd)}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
-      <td class="dim">${esc(r.reason ?? '—')}</td>
+      <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}</td>
       <td class="num dim">${ago(r.closedAt)}</td>
     </tr>`).join(''));
   const net = rows.reduce((t, r) => t + (Number(r.netUsd) || 0), 0);
   setHTML($('#closedHint'), `${rows.length} terakhir · jumlahnya ${signed(net)}`);
+}
+
+/* ── dana trading (Charon RH) ──────────────────────────────────────────
+ *
+ * Dana LP menyediakan likuiditas; dana trading membeli token lalu menjualnya
+ * lagi. Kerangka halamannya sama — ringkasan, grafik nilai, riwayat, posisi —
+ * tapi judul, kolom, dan beberapa kartu berbeda. Teks bawaan tiap elemen
+ * disimpan sekali dan dikembalikan begitu pindah ke dana LP.
+ */
+const isTrading = (id = state.fund) => fundMeta(id)?.kind === 'trading';
+
+function swapHTML(el, trading, html) {
+  if (!el) return;
+  if (el.dataset.orig == null) el.dataset.orig = el.innerHTML;
+  const want = trading ? html : el.dataset.orig;
+  if (el.innerHTML !== want) setHTML(el, want);
+}
+
+function applyFundKind() {
+  const t = isTrading();
+  swapHTML($('#lpTitle'), t, 'Posisi trading');
+  swapHTML($('#lpHead'), t, '<tr><th>Token</th><th>Rencana</th><th class="num">Umur</th><th class="num">Modal</th>'
+    + '<th class="num">Nilai jual</th><th class="num">Stop / target</th><th class="num">Untung / rugi</th></tr>');
+  swapHTML($('#closedFirst'), t, 'Token');
+  swapHTML($('#holdTitle'), t, 'Kas &amp; token');
+  swapHTML($('#lblDeposit'), t, 'Modal simulasi');
+  swapHTML($('#lblWithdraw'), t, 'Untung terkunci');
+  swapHTML($('#stripLpLabel'), t, 'Posisi');
+  swapHTML($('#profitDisclaimer'), t, 'Ini hasil <strong>simulasi</strong>: harga dan biaya diambil dari quote pasar sungguhan, '
+    + 'tetapi tidak ada transaksi yang dikirim ke blockchain. Pembelian nyata bisa mendapat harga lebih buruk, biaya gas '
+    + 'nyata bisa berbeda dari yang dimodelkan, dan token kecil bisa saja tidak bisa dijual. Angka ini dipakai untuk '
+    + 'menilai strategi, bukan janji hasil.');
+  $('#shareCard').hidden = t;
+  if ($('#stripShare')) $('#stripShare').hidden = t;
+  $('#paperCard').hidden = !t;
+  const shareBtn = document.querySelector('#segSeries [data-s="share"]');
+  if (shareBtn) shareBtn.hidden = t;
+  if (t && navView.series === 'share') {
+    navView.series = 'wallet';
+    $('#segSeries').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-s') === 'wallet'));
+  }
+}
+
+const AKSI = { WAIT: 'menunggu', BUY: 'beli', HOLD: 'tahan', EXIT: 'jual', TAKE_PARTIAL: 'jual sebagian' };
+
+function renderPaper(nav) {
+  const tr = isTrading() ? nav?.trading : null;
+  if (!tr) return;
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const hidup = tr.heartbeatAt && nav.updatedAt - tr.heartbeatAt < 10 * 60e3;
+  const sehat = hidup && tr.status === 'healthy' && !tr.paused;
+  setHTML($('#paperLead'), `Charon RH <strong>belum memakai uang sungguhan</strong>. Ia berdagang di atas kertas dengan modal
+    ${usd(tr.initialUsd, 0)}, memakai harga pasar asli, untuk membuktikan strateginya dulu sebelum diberi dana. Berjalan sejak ${tgl(tr.startedAt)}.`);
+  const act = tr.activity24h || {};
+  const llm = tr.llm || {};
+  setHTML($('#paperStats'), [
+    tile('Kondisi bot', sehat ? 'sehat' : tr.paused ? 'dijeda' : hidup ? esc(tr.status || '—') : 'tidak aktif',
+      hidup ? `tanda hidup ${ago(tr.heartbeatAt)}` : 'tidak ada tanda hidup', sehat ? 'pos' : 'neg'),
+    tile('Pindai pasar', String(act.scans ?? '—'), `24 jam terakhir · terakhir ${ago(tr.lastScanAt)}`),
+    tile('Keputusan AI', `${llm.calls24h ?? '—'}<span class="dim"> / ${llm.dailyBudget ?? 96}</span>`, 'panggilan 24 jam / batas harian'),
+    tile('Beli · jual', `${act.buys ?? 0} · ${act.sells ?? 0}`, `24 jam · ${act.quotesRejected ?? 0} quote ditolak`),
+    tile('Turun dari puncak', pct(tr.drawdownPct), `rem darurat di 12% · puncak ${usd(tr.peakUsd, 0)}`, tr.drawdownPct >= 8 ? 'neg' : ''),
+  ].join(''));
+  const aksi = llm.lastAction ? (AKSI[llm.lastAction] || llm.lastAction.toLowerCase()) : null;
+  setHTML($('#paperDecision'), aksi ? `<div class="decision">
+      <div class="decision-head"><span class="k">Keputusan AI terakhir</span>
+        <span class="pill ${llm.lastAction === 'BUY' ? 'in' : llm.lastAction === 'WAIT' ? '' : 'out'}">${esc(aksi)}</span>
+        <span class="dim">${ago(llm.lastDecisionAt)}${llm.model ? ' · ' + esc(llm.model) : ''}</span></div>
+      ${llm.lastReason ? `<blockquote>${esc(llm.lastReason)}</blockquote><div class="n dim">catatan asli dari AI, bahasa Inggris</div>` : ''}
+    </div>` : '');
+}
+
+function renderTrades(nav) {
+  const rows = nav.positions || [];
+  const body = $('#lpTable').querySelector('tbody');
+  $('#lpCount').textContent = rows.length ? `(${rows.length})` : '';
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  if (!rows.length) {
+    setHTML(body, '<tr><td colspan="7" class="dim">Tidak ada posisi terbuka — bot sedang menunggu peluang yang layak.</td></tr>');
+    setHTML($('#lpSummary'), '');
+    $('#lpHint').textContent = `diperiksa ${ago(nav.updatedAt)}`;
+    return;
+  }
+  const value = rows.reduce((t, r) => t + (Number(r.valueUsd) || 0), 0);
+  const cost = rows.reduce((t, r) => t + (Number(r.costUsd) || 0), 0);
+  const pnl = rows.reduce((t, r) => t + (Number(r.pnlUsd) || 0), 0);
+  const total = Number(nav.totalUsd) || 0;
+  setHTML($('#lpSummary'), [
+    tile('Nilai jual sekarang', usd(value), `${rows.length} posisi`),
+    tile('Modal masuk', usd(cost), 'saat dibeli'),
+    tile('Untung / rugi', signed(pnl), cost ? pct((pnl / cost) * 100) + ' dari modal' : '—', cls(pnl)),
+    tile('Eksposur', total ? pct((value / total) * 100, 1) : '—', 'dari nilai dana · batas 60%'),
+  ].join(''));
+  setHTML(body, [...rows].sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)).map((r) => `<tr>
+      <td><span class="who"><span class="chip" style="background:${r.pnlUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span>
+        ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}</td>
+      <td>${esc(r.bookLabel || '—')}<div class="sub2">${r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : ''}${r.partialDone ? ' · sebagian sudah dijual' : ''}</div></td>
+      <td class="num dim">${dur(r.ageMinutes)}</td>
+      <td class="num">${usd(r.costUsd)}</td>
+      <td class="num"><strong>${usd(r.valueUsd)}</strong></td>
+      <td class="num"><span class="neg">−${r.stopPct == null ? '—' : pct(r.stopPct, 1)}</span> / <span class="pos">+${r.targetPct == null ? '—' : pct(r.targetPct, 1)}</span></td>
+      <td class="num ${cls(r.pnlUsd)}">${signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
+    </tr>`).join(''));
+  $('#lpHint').textContent = `nilai = hasil jual bersih menurut quote · dihitung ${ago(nav.updatedAt)}`
+    + (rows.some((p) => p.stale) ? ' · ada harga yang belum diperbarui' : '');
 }
 
 /** Biaya langganan bulanan. Dibayar dari luar wallet, jadi tidak masuk NAV. */
@@ -1143,7 +1268,9 @@ function renderNavChart() {
       + `<div class="t-v">${share ? usd(near.v, 4) : usd(near.v)}</div>`
       + (share
         ? `<div class="t-n">nilai wallet ${usd(near.usd, 0)}</div>`
-        : `<div class="t-n">${usd(near.usd - (near.lp ?? 0), 0)} token · ${usd(near.lp ?? 0, 0)} LP</div>`));
+        : near.lp == null ? ''
+          : isTrading() ? `<div class="t-n">${usd(near.usd - near.lp, 0)} kas · ${usd(near.lp, 0)} posisi</div>`
+          : `<div class="t-n">${usd(near.usd - near.lp, 0)} token · ${usd(near.lp, 0)} LP</div>`));
     tip.hidden = false;
     tip.style.left = (x(near.t) / ratio) + 'px';
     tip.style.top = ((y(near.v) - 10) / ratio) + 'px';
@@ -2233,7 +2360,9 @@ async function loadFundBrief(id) {
 async function renderPortofolio() {
   const card = $('#portoCard');
   if (!card) return;
-  const ids = (state.funds || []).map((f) => f.id);
+  // Dana simulasi tidak memegang uang sungguhan; menjumlahkannya ke total aset
+  // akan membuat total itu bohong.
+  const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
   const missing = ids.filter((id, i) => !loaded[i]);
   const briefs = loaded.filter(Boolean);
@@ -2357,7 +2486,7 @@ function renderAnalys() {
   // ── info sistem & tentang strategi ──
   const st = cfg.strategy || {};
   const ledger = state.ledger || {};
-  const sistem = [...(st.system || []),
+  const sistem = isTrading() ? [...(st.system || []), ['Modal simulasi', usdText(ledger.deposited || 0, 0)]] : [...(st.system || []),
     ['Modal masuk', usdText((ledger.deposited || 0) + (ledger.reinvested || 0), 0)],
     ['Plafon dana', cfg.fund?.capacityUsd ? usdText(cfg.fund.capacityUsd, 0) : '—'],
     ['Biaya bulanan', usdText(monthlyCosts(), 0)],
@@ -2520,8 +2649,10 @@ function showAnalisa(fund) {
 
 function renderAll() {
   const rows = ownerValues(state.ledger, state.nav.totalUsd);
+  applyFundKind();
   hideEmptyCards(state.nav);
   renderSummary(state.ledger, state.nav);
+  renderPaper(state.nav);
   // Tab Analys membaca blok kinerja dari snapshot; kalau tab itu yang sedang
   // terbuka saat data tiba, ia harus digambar ulang — bukan tertinggal kosong.
   if (currentTab === 'analys' && state.view === 'fund') renderAnalys();

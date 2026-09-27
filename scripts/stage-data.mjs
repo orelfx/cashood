@@ -7,7 +7,7 @@ import { readJSON,atomicJSON,assertPublic } from './lib/io.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),destination=resolve(process.argv[2]||'');
 if(!process.argv[2]||destination===ROOT)throw new Error('Direktori staging eksplisit wajib');
 let failed=false;
-for(const fund of ['reborn','meridian','ferari','safebox']){
+for(const fund of ['reborn','meridian','ferari','charon','safebox']){
  try{
   const dir=resolve(ROOT,'data',fund),live=readJSON(resolve(dir,'live.json'));if(!live)throw new Error('Snapshot belum ada');
   assertPublic(live);
