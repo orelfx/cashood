@@ -1964,23 +1964,22 @@ function renderFundBar() {
   // hanya mengecualikan tampilan analisa, jadi membuka Safe Box menyalakan dua
   // tombol sekaligus: Safe Box dan dana yang terakhir dilihat.
   const diDana = !state.view || state.view === 'fund';
-  setHTML($('#fundBar'), state.funds.map((f) => `
-    <button data-fund="${f.id}" class="${diDana && f.id === state.fund ? 'on' : ''}" style="--fund-accent:${f.accent}">
-      <span class="fdot" style="background:${f.accent}"></span>
-      <span class="fmeta"><span class="fname">${esc(f.label)}</span><span class="fchain">${esc(f.chain)}</span></span>
-    </button>`).join('')
-    + (state.safebox ? `<button data-view="safebox" class="${state.view === 'safebox' ? 'on' : ''}" style="--fund-accent:${state.safebox.accent}">
-        <span class="fdot" style="background:${state.safebox.accent}"></span>
-        <span class="fmeta"><span class="fname">${state.safebox.label}</span><span class="fchain">${state.safebox.subtitle}</span></span>
-      </button>` : '')
-    + `<button data-view="analisa" class="analysis ${analisa ? 'on' : ''}" style="--fund-accent:#fbbf24">
-        <span class="fdot" style="background:#fbbf24"></span>
-        <span class="fmeta"><span class="fname">Portofolio</span></span>
-      </button>`
-    + `<button data-view="update" class="analysis ${state.view === 'update' ? 'on' : ''}" style="--fund-accent:#38bdf8">
-        <span class="fdot" style="background:#38bdf8"></span>
-        <span class="fmeta"><span class="fname">Update</span></span>
-      </button>`);
+  // Kotak ringkas: hanya yang sedang dibuka memakai nama lengkap; sisanya
+  // singkatan + jaringan singkat, supaya seluruh pilihan muat tanpa terpotong
+  // di layar HP. Nama lengkap tetap ada di tooltip dan label aksesibilitas.
+  const initials = (t) => String(t || '').split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 4);
+  const box = ({ on, accent, name, chain, short, chainShort, attr, extra = '' }) => `
+    <button ${attr} class="${extra} ${on ? 'on' : ''}" style="--fund-accent:${accent}" title="${esc(name)}${chain ? ' · ' + esc(chain) : ''}" aria-label="${esc(name)}">
+      <span class="fdot" style="background:${accent}"></span>
+      <span class="fmeta"><span class="fname">${esc(name)}</span>${chain ? `<span class="fchain">${esc(chain)}</span>` : ''}</span>
+      <span class="fshort"><b>${esc(short || initials(name))}</b>${chainShort ? `<span>${esc(chainShort)}</span>` : ''}</span>
+    </button>`;
+  setHTML($('#fundBar'), state.funds.map((f) => box({ on: diDana && f.id === state.fund, accent: f.accent, name: f.label,
+      chain: f.chain, short: f.short, chainShort: f.chainShort, attr: `data-fund="${esc(f.id)}"` })).join('')
+    + (state.safebox ? box({ on: state.view === 'safebox', accent: state.safebox.accent, name: state.safebox.label,
+      chain: state.safebox.subtitle, short: state.safebox.short, attr: 'data-view="safebox"' }) : '')
+    + box({ on: analisa, accent: '#fbbf24', name: 'Portofolio', short: 'Porto', attr: 'data-view="analisa"', extra: 'analysis' })
+    + box({ on: state.view === 'update', accent: '#38bdf8', name: 'Update', short: 'Update', attr: 'data-view="update"', extra: 'analysis' }));
 }
 
 async function loadFundConfig(id, epoch = fundEpoch) {
