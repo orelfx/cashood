@@ -1188,7 +1188,9 @@ async function readNavSeries(cfg, { force = false, fund = state.fund } = {}) {
   for (const url of urls) {
     try {
       const j = await getJSON(url, { fresh: force });
-      if (Array.isArray(j.points) && j.points.length) return j.points;
+      // Deret kosong yang terbaca utuh juga jawaban sah (dana tanpa riwayat
+      // nilai); mencari ke sumber cadangan hanya menghasilkan 404.
+      if (Array.isArray(j.points)) return j.points;
     } catch { /* coba sumber berikutnya */ }
   }
   return [];
