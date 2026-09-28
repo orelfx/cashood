@@ -44,7 +44,7 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
  const target=await cmd('Target.createTarget',{url:'about:blank'},null);sid=(await cmd('Target.attachToTarget',{targetId:target.targetId,flatten:true},null)).sessionId;
  await cmd('Runtime.enable');await cmd('Page.enable');await cmd('Fetch.enable',{patterns:[{urlPattern:'*'}]});
  const ev=async expression=>{const r=await cmd('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
- await cmd('Page.navigate',{url:'https://cashood.test/'});
+ await cmd('Page.navigate',{url:'https://cashood.test/#reborn/portfolio'});
  for(let i=0;i<100;i++){await new Promise(r=>setTimeout(r,100));if(await ev('Boolean(globalThis.cashood?.state.nav)'))break;}
  assert.equal(await ev('state.nav.totalUsd'),14000);{const cells=await ev('document.querySelectorAll("#ownerTable tbody td").length');
  // Baris tabel harus tetap berupa sel. Pembersih HTML tanpa konteks tabel
@@ -57,6 +57,9 @@ console.log('PASS initial render');
  assert.equal(await ev(`(async()=>{setHTML(document.querySelector('#holdHint'),'<svg><a href="javascript:globalThis.__audit=2"><text>x</text></a><foreignObject><img src=x onerror="globalThis.__audit=3"></foreignObject></svg>');await new Promise(r=>setTimeout(r,100));return globalThis.__audit})()`),0);console.log('PASS malicious HTML and SVG cannot execute');
  assert.equal(await ev(`(async()=>{showSafebox();await new Promise(r=>setTimeout(r,50));document.querySelector('[data-fund="reborn"]').click();return state.view})()`),'fund');console.log('PASS return from Safe Box to same fund');
  const portfolio=await ev(`(async()=>{await renderPortofolio();return document.querySelector('#portoList').textContent})()`);assert.match(portfolio,/Stefani/);assert.match(portfolio,/Si Nakal/);console.log('PASS actual Safe Box owners');
+ {const home=await ev(`(async()=>{showHome();await renderHome();const aum=document.querySelector('#homeAum').textContent;const cards=document.querySelectorAll('#homeProducts .prod').length;const menu=document.querySelectorAll('#homeMenu .menu-tile').length;const visible=!document.querySelector('#tab-home').hidden&&document.querySelector('#tab-portfolio').hidden;return {aum,cards,menu,visible}})()`);
+ assert.ok(home.visible,'beranda tidak tampil sendiri');assert.match(home.aum,/Total aset dikelola/);assert.match(home.aum,/\$\s?2[0-9],[0-9]{3}/);assert.ok(home.cards>=4,`kartu produk: ${home.cards}`);assert.equal(home.menu,8);
+ assert.equal(await ev(`(async()=>{document.querySelector('[data-fund="reborn"]').click();await new Promise(r=>setTimeout(r,50));return !document.querySelector('#tab-home').hidden})()`),false);console.log('PASS homepage');}
  delayReborn=true;
  const raced=await ev(`(async()=>{const a=load({force:true});await new Promise(r=>setTimeout(r,40));const b=switchFund('meridian');await Promise.all([a,b]);return {fund:state.fund,nav:state.nav.totalUsd,native:state.nav.nativeSymbol,cache:JSON.parse(localStorage.getItem(cacheKey('meridian'))).totalUsd}})()`);
  assert.deepEqual(raced,{fund:'meridian',nav:5000,native:'SOL',cache:5000});console.log('PASS delayed Reborn cannot overwrite Meridian');

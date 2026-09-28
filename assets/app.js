@@ -64,7 +64,7 @@ function getJSON(url, { fresh = false } = {}) {
     const quiet = (pr) => { pr.catch(() => {}); return pr; };
     quiet(getJSON(FUNDS_URL));
     const guess = (location.hash || '').replace(/^#/, '').split('/')[0] || 'reborn';
-    const fund = ['reborn', 'meridian', 'ferari', 'charon'].includes(guess) ? guess : 'reborn';
+    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
   } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
@@ -1069,6 +1069,7 @@ function showTab(name) {
   const tab = allowed.includes(name) ? name : allowed[0] || 'portfolio';
   currentTab = tab;
   state.view = 'fund';
+  leaveHome();
   $('#tabs').hidden = false;
   $('#tab-analisa').hidden = true;
   $('#tab-safebox').hidden = true;
@@ -1942,6 +1943,7 @@ function parseHash() {
   const parts = location.hash.replace('#', '').split('/').filter(Boolean);
   let fund = state.fund || state.funds[0]?.id;
   let tab = 'portfolio';
+  if (!parts.length || parts[0] === 'home') return { home: true, tab: 'portfolio' };
   if (parts[0] === 'safebox') return { safebox: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
@@ -1963,7 +1965,7 @@ function renderFundBar() {
   // Dana hanya disorot saat tampilan dana yang sedang dibuka. Versi sebelumnya
   // hanya mengecualikan tampilan analisa, jadi membuka Safe Box menyalakan dua
   // tombol sekaligus: Safe Box dan dana yang terakhir dilihat.
-  const diDana = !state.view || state.view === 'fund';
+  const diDana = state.view === 'fund';
   // Kotak ringkas: hanya yang sedang dibuka memakai nama lengkap; sisanya
   // singkatan + jaringan singkat, supaya seluruh pilihan muat tanpa terpotong
   // di layar HP. Nama lengkap tetap ada di tooltip dan label aksesibilitas.
@@ -1974,7 +1976,8 @@ function renderFundBar() {
       <span class="fmeta"><span class="fname">${esc(name)}</span>${chain ? `<span class="fchain">${esc(chain)}</span>` : ''}</span>
       <span class="fshort"><b>${esc(short || initials(name))}</b>${chainShort ? `<span>${esc(chainShort)}</span>` : ''}</span>
     </button>`;
-  setHTML($('#fundBar'), state.funds.map((f) => box({ on: diDana && f.id === state.fund, accent: f.accent, name: f.label,
+  setHTML($('#fundBar'), box({ on: state.view === 'home', accent: '#e5e7eb', name: 'Beranda', short: 'Home', attr: 'data-view="home"', extra: 'analysis home-btn' })
+    + state.funds.map((f) => box({ on: diDana && f.id === state.fund, accent: f.accent, name: f.label,
       chain: f.chain, short: f.short, chainShort: f.chainShort, attr: `data-fund="${esc(f.id)}"` })).join('')
     + (state.safebox ? box({ on: state.view === 'safebox', accent: state.safebox.accent, name: state.safebox.label,
       chain: state.safebox.subtitle, short: state.safebox.short, attr: 'data-view="safebox"' }) : '')
@@ -2207,6 +2210,7 @@ function renderSafebox() {
 
 function showSafebox() {
   state.view = 'safebox';
+  leaveHome();
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
   $('#tab-analisa').hidden = true;
@@ -2346,6 +2350,11 @@ async function loadFundBrief(id) {
       depositedUsd: ledger.deposited + (Number(ledger.reinvested) || 0),
       pnlUsd: total + ledger.withdrawn - ledger.deposited - (Number(ledger.reinvested) || 0),
       updatedAt: Number(snap?.updatedAt) || null,
+      paper: Boolean(meta?.paper),
+      risk: meta?.risk || null,
+      openCount: Number(snap?.stats?.openCount ?? (snap?.positions || []).length) || 0,
+      winRate: snap?.performance?.trades?.winRate ?? snap?.stats?.winRate ?? null,
+      closedCount: Number(snap?.stats?.closedCount) || 0,
       owners: ledger.owners.filter((o) => o.units > 0)
         .map((o) => ({ name: o.name, color: o.color, share: (o.units / ledger.totalUnits) * 100, value: o.units * unit }))
         .sort((a, b) => b.share - a.share),
@@ -2354,6 +2363,20 @@ async function loadFundBrief(id) {
   portoCache.set(id, { job, at: Date.now() });
   job.catch(() => portoCache.delete(id));
   return job;
+}
+
+/** Angka global yang sama untuk halaman Portofolio dan Beranda. */
+async function portoTotals() {
+  const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
+  const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
+  const briefs = loaded.filter(Boolean);
+  const box = state.safebox ? await loadSafebox().catch(() => null) : null;
+  const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
+  const simpanan = Number(box?.balanceUsd) || 0;
+  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + (Number(box?.principalUsd) || 0);
+  const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0) + (Number(box?.interestUsd) || 0);
+  const orang = new Set([...briefs.flatMap((b) => b.owners.map((o) => o.name)), ...(box?.owners || []).map((o) => o.name)]).size;
+  return { ids, briefs, missing: ids.filter((id, i) => !loaded[i]), box, dana, simpanan, total: dana + simpanan, setoran, untung, orang };
 }
 
 async function renderPortofolio() {
@@ -2616,6 +2639,7 @@ async function renderUpdates() {
 
 function showUpdate() {
   state.view = 'update';
+  leaveHome();
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
   $('#tab-safebox').hidden = true;
@@ -2628,6 +2652,7 @@ function showUpdate() {
 
 function showAnalisa(fund) {
   state.view = 'analisa';
+  leaveHome();
   analisaFund = fund || analisaFund || state.funds[0]?.id;
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
@@ -2642,6 +2667,148 @@ function showAnalisa(fund) {
   if ($('#analisaBody')) $('#analisaBody').hidden = true;
   const want = `#analisa/${analisaFund}`;
   if (location.hash !== want) history.replaceState(null, '', want);
+}
+
+/* ── beranda ─────────────────────────────────────────────────────────────
+ *
+ * Halaman depan perusahaan: total aset seluruh dana, produk menurut tingkat
+ * risiko, dan menu. Angkanya dibaca dari snapshot yang sama dengan halaman
+ * tiap dana — tidak ada angka yang ditulis tangan di sini.
+ */
+const ICON = {
+  trend: '<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+  orbit: '<circle cx="12" cy="12" r="3"/><path d="M20.2 20.2c2-2-.9-8.1-6.4-13.6S2.8 1.8.8 3.8"/><path d="M3.8 20.2c-2-2 .9-8.1 6.4-13.6S21.2 1.8 23.2 3.8" transform="translate(-1.6 0)"/>',
+  zap: '<path d="M13 2L4 14h8l-1 8 9-12h-8l1-8z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  flask: '<path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 006.2 21h11.6a2 2 0 001.7-2.5L14 9V3"/><path d="M7 15h10"/>',
+  vault: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5V7M12 17v-1.5M15.5 12H17M7 12h1.5M7 20v1.5M17 20v1.5"/>',
+  pie: '<path d="M21 12A9 9 0 1112 3v9z"/><path d="M15 3.5A9 9 0 0120.5 9H15z"/>',
+  bell: '<path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 003.4 0"/>',
+  file: '<path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  pulse: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0"/><path d="M16 4.6a3.5 3.5 0 010 6.8M18.5 20a6.5 6.5 0 00-3-5.5"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+};
+const FUND_ICON = { reborn: 'trend', meridian: 'orbit', ferari: 'zap', robsol: 'sun', charon: 'flask' };
+const svgIcon = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ICON.info}</svg>`;
+const iconTile = (name, color) => `<span class="itile" style="--c:${color}"><i class="orb a"></i><i class="orb b"></i><i class="orb c"></i><span class="ibox">${svgIcon(name)}</span></span>`;
+
+const RISK = [
+  { key: 'high', title: 'Risiko tinggi', note: 'Hasil paling besar, naik-turun paling tajam.', color: '#fb7185' },
+  { key: 'medium', title: 'Risiko menengah', note: 'Robot LP yang lebih tenang, hasil dibagi tiap tanggal 1.', color: '#fbbf24' },
+  { key: 'low', title: 'Risiko rendah', note: 'Pokok dijaga, imbal hasil mengikuti pasar.', color: '#2dd4bf' },
+  { key: 'paper', title: 'Uji coba · dry run', note: 'Strategi baru diuji dengan modal kertas sebelum memakai uang sungguhan.', color: '#c084fc' },
+];
+
+function leaveHome() {
+  if ($('#tab-home')) $('#tab-home').hidden = true;
+  if ($('#strip')) $('#strip').hidden = false;
+  if (document.body.classList.contains('at-home')) {
+    document.body.classList.remove('at-home');
+    const meta = fundMeta(state.fund);
+    $('#tagline').textContent = state.cfg?.app?.tagline || '';
+    if (meta) document.title = `${meta.label} — Cashood Headfund`;
+  }
+}
+
+function showHome() {
+  state.view = 'home';
+  $('#tabs').hidden = true;
+  ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
+  $('#tab-home').hidden = false;
+  $('#strip').hidden = true;
+  document.body.classList.add('at-home');
+  document.title = 'Cashood Headfund — dana kripto yang dikelola AI';
+  $('#tagline').textContent = 'Dana kripto yang dikelola AI';
+  renderFundBar();
+  if (location.hash && location.hash !== '#home') history.replaceState(null, '', '#home');
+  renderHome().catch(() => {});
+}
+
+let homeEpoch = 0;
+async function renderHome() {
+  const epoch = ++homeEpoch;
+  const g = await portoTotals();
+  const paper = await Promise.all(state.funds.filter((f) => f.paper).map((f) => loadFundBrief(f.id).catch(() => null)));
+  if (epoch !== homeEpoch || state.view !== 'home') return;
+  const byId = Object.fromEntries([...g.briefs, ...paper.filter(Boolean)].map((b) => [b.id, b]));
+  const box = g.box;
+
+  // ── total aset + alokasi ──
+  const parts = [...g.briefs.map((b) => ({ name: b.label, color: b.accent, usd: b.totalUsd })),
+    ...(box ? [{ name: state.safebox.label, color: state.safebox.accent, usd: g.simpanan }] : [])]
+    .filter((p) => p.usd > 0).sort((a, b) => b.usd - a.usd);
+  const pnlPct = g.setoran ? (g.untung / g.setoran) * 100 : 0;
+  const tua = Math.min(...g.briefs.map((b) => b.updatedAt || Date.now()), box?.updatedAt || Date.now());
+  setHTML($('#homeAum'), `
+    <div class="aum-k"><span class="live-dot"></span>Total aset dikelola${g.missing.length ? ' <span class="dim">(sebagian)</span>' : ''}</div>
+    <div class="aum-v">${usd(g.total, 0)}</div>
+    <div class="aum-p ${cls(g.untung)}">${signed(g.untung)} <span>${pnlPct >= 0 ? '+' : ''}${pct(pnlPct)} dari modal ${usd(g.setoran, 0)}</span></div>
+    <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
+    <ul class="alloc-legend">${parts.map((p) => `<li><span class="chip" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
+      <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span></li>`).join('')}</ul>
+    <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
+
+  // ── angka singkat ──
+  const tile = (k, v, n) => `<div class="hs"><div class="hs-v">${v}</div><div class="hs-k">${k}</div><div class="hs-n">${n}</div></div>`;
+  const posisi = g.briefs.reduce((s, b) => s + b.openCount, 0);
+  setHTML($('#homeStats'), [
+    tile('Dana berjalan', String(g.briefs.length), `+ Safe Box${paper.length ? ` · ${paper.length} uji coba` : ''}`),
+    tile('Pemegang saham', String(g.orang), 'di seluruh produk'),
+    tile('Posisi terbuka', String(posisi), 'sedang bekerja sekarang'),
+    tile('Modal masuk', usd(g.setoran, 0), 'setoran + laba diputar'),
+  ].join(''));
+
+  // ── produk per tingkat risiko ──
+  const card = (f) => {
+    const b = byId[f.id];
+    const pnlP = b && b.depositedUsd ? (b.pnlUsd / b.depositedUsd) * 100 : null;
+    const nums = f.paper
+      ? [['Nilai simulasi', b ? usd(b.totalUsd, 0) : '—', ''], ['Hasil', b ? signed(b.pnlUsd) : '—', b ? cls(b.pnlUsd) : ''], ['Trade', b ? String(b.closedCount) : '—', '']]
+      : [['Nilai dana', b ? usd(b.totalUsd, 0) : '—', ''], ['Untung / rugi', b ? `${signed(b.pnlUsd)}<small>${pnlP == null ? '' : `${pnlP >= 0 ? '+' : ''}${pct(pnlP, 1)}`}</small>` : '—', b ? cls(b.pnlUsd) : ''],
+        ['Win rate', b?.winRate == null ? '—' : pct(b.winRate, 0), '']];
+    return `<a class="prod" href="#${esc(f.id)}/portfolio" style="--c:${f.accent}">
+      <div class="prod-top">${iconTile(FUND_ICON[f.id] || 'pulse', f.accent)}
+        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain)}${f.venue ? ' · ' + esc(f.venue) : ''}</div></div></div>
+      <p class="prod-desc">${esc(f.blurb || '')}</p>
+      <div class="prod-nums">${nums.map(([k, v, c]) => `<div><span class="k">${k}</span><span class="v ${c}">${v}</span></div>`).join('')}</div>
+      <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
+  };
+  const safeCard = () => {
+    const sb = state.safebox || {};
+    const monthly = box?.measure?.monthlyPct;
+    return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
+      <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · imbal hasil 0–3% per bulan</div></div></div>
+      <p class="prod-desc">${esc(sb.blurb || '')}</p>
+      <div class="prod-nums">
+        <div><span class="k">Simpanan</span><span class="v">${box ? usd(box.balanceUsd, 0) : '—'}</span></div>
+        <div><span class="k">Imbal hasil</span><span class="v pos">${monthly == null ? '—' : pct(monthly) + '<small>/bulan</small>'}</span></div>
+        <div><span class="k">Sudah dibayar</span><span class="v pos">${box ? usd(box.interestUsd, 2) : '—'}</span></div>
+      </div>
+      <span class="prod-go">Buka Safe Box <b>→</b></span></a>`;
+  };
+  setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
+    const items = r.key === 'low' ? (state.safebox ? [safeCard()] : []) : state.funds.filter((f) => f.risk === r.key).map(card);
+    if (!items.length) return '';
+    return `<div class="risk-group${items.length === 1 ? ' solo' : ''}" style="--rc:${r.color}">
+      <div class="rg-head"><span class="rg-badge">${r.title}</span><span class="rg-note">${r.note}</span></div>
+      <div class="prod-grid">${items.join('')}</div></div>`;
+  }).join('') + '</div>');
+
+  // ── menu ──
+  const first = state.funds[0]?.id || 'reborn';
+  const menu = [
+    ['pie', '#fbbf24', 'Portofolio global', 'Total aset & pemegang saham', '#analisa'],
+    ['vault', '#2dd4bf', 'Safe Box', 'Simpanan 0–3% per bulan', '#safebox'],
+    ['file', '#60a5fa', 'Invoice & dividen', 'Laporan PDF tiap tanggal 1', `#${first}/investor`],
+    ['pulse', '#f472b6', 'Analys', 'Win rate, drawdown, DNA', `#${first}/analys`],
+    ['bell', '#38bdf8', 'Update', 'Catatan perubahan sistem', '#update'],
+    ['users', '#a78bfa', 'Data investor', 'Saham, setoran, penarikan', `#${first}/investor`],
+    ['flask', '#c084fc', 'Uji coba', 'Bot baru dengan modal kertas', '#charon/portfolio'],
+    ['info', '#94a3b8', 'Cara kerja', 'Saham, dividen, risiko', `#${first}/tentang`],
+  ];
+  setHTML($('#homeMenu'), menu.map(([ic, c, t, n, href]) => `<a class="menu-tile" href="${href}">${iconTile(ic, c)}<b>${t}</b><span>${n}</span></a>`).join(''));
 }
 
 /* ── boot ────────────────────────────────────────────────────────────── */
@@ -2701,7 +2868,8 @@ async function load({ force = false } = {}) {
   finally { if (valid()) { btn.disabled = false; btn.textContent = 'refresh'; } }
 }
 function renderVisible() {
-  if (state.view === 'safebox') renderSafebox();
+  if (state.view === 'home') renderHome().catch(() => {});
+  else if (state.view === 'safebox') renderSafebox();
   else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
   else if (state.view === 'update') renderUpdates();
   else if (state.nav && state.ledger) renderAll();
@@ -2724,6 +2892,7 @@ async function init() {
     const btn = e.target.closest('button');
     if (!btn) return;
     const view = btn.getAttribute('data-view');
+    if (view === 'home') { showHome(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
     if (view === 'update') { showUpdate(); return; }
@@ -2752,6 +2921,11 @@ async function init() {
   };
 
   $('#refreshBtn').onclick = () => load({ force: true });
+  const brand = $('#brandHome');
+  if (brand) {
+    brand.onclick = () => showHome();
+    brand.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); } };
+  }
   wireProfitControls();
 
   $('#holdPager').onclick = (e) => {
@@ -2774,7 +2948,8 @@ async function init() {
     $('#segCur').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     // Tampilan analisa digambar terpisah dan tidak ikut renderAll; tanpa baris
     // ini angkanya tetap dolar setelah tombol rupiah ditekan.
-    if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
+    if (state.view === 'home') renderHome().catch(() => {});
+    else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
     else if (state.view === 'safebox') renderSafebox();
     else if (state.view === 'update') renderUpdates();
     else if (state.nav) renderAll();
@@ -2787,6 +2962,7 @@ async function init() {
   };
   const fromHash = () => {
     const route = parseHash();
+    if (route.home) { showHome(); return; }
     if (route.safebox) { showSafebox(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }

@@ -7,7 +7,7 @@ import Core from '../assets/core.js';
 import { lock } from './lib/io.mjs';
 import { parseTransfers } from './lib/treasury.mjs';
 const args=process.argv.slice(2),get=(k)=>{const i=args.indexOf('--'+k);return i<0?null:args[i+1];};
-const fund=get('fund')||'reborn';if(!['reborn','meridian','ferari','safebox'].includes(fund))throw new Error('Dana tidak dikenal');
+const fund=get('fund')||'reborn';if(!['reborn','meridian','ferari','robsol','safebox'].includes(fund))throw new Error('Dana tidak dikenal');
 const type=args[0];if(!['sweep','deposit','expense','dividend','withdraw','interest'].includes(type))throw new Error('Jenis transfer tidak valid');
 const id=get('id'),tx=get('tx');if(!/^[a-zA-Z0-9_.:-]{3,160}$/.test(id||tx||''))throw new Error('--id atau --tx wajib');
 const amount=Core.number(get('usd'),'Nominal',.01);const usd=Core.money(amount);if(Math.abs(amount-usd)>1e-9)throw new Error('Nominal maksimal dua desimal');const at=Date.parse(get('at')||'');if(!Number.isFinite(at)||at>Date.now()+60000)throw new Error('--at ISO waktu transfer wajib');

@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { atomicJSON, readJSON, lock, assertPublic } from './lib/io.mjs';
 import { forecastFund } from './lib/forecast.mjs';
 const DATA=process.env.CASHOOD_DATA_DIR||resolve(dirname(fileURLToPath(import.meta.url)),'..','data');
-const funds=process.argv[2]?[process.argv[2]]:['reborn','meridian','ferari'];
+const funds=process.argv[2]?[process.argv[2]]:['reborn','meridian','ferari','robsol'];
 for(const fund of funds){
- if(!['reborn','meridian','ferari'].includes(fund))throw new Error('Dana tidak dikenal');
+ if(!['reborn','meridian','ferari','robsol'].includes(fund))throw new Error('Dana tidak dikenal');
  const dir=resolve(DATA,fund),release=lock(resolve(dir,'forecast.lock.local'));
  try{
   const cfg=readJSON(resolve(dir,'config.json')),live=readJSON(resolve(dir,'live.json')),nav=readJSON(resolve(dir,'nav.json'));

@@ -14,7 +14,7 @@ for(let i=0;i<args.length;i++){
   if(flags[name]!==undefined)throw new Error(`Opsi duplikat: ${name}`);
   flags[name]=booleans.has(name)?true:args[++i];if(flags[name]==null||String(flags[name]).startsWith('--'))throw new Error(`Nilai --${name} wajib`);
 }
-const fund=flags.fund||'reborn';if(!['reborn','meridian','ferari'].includes(fund))throw new Error('Dana tidak dikenal');
+const fund=flags.fund||'reborn';if(!['reborn','meridian','ferari','robsol'].includes(fund))throw new Error('Dana tidak dikenal');
 const type=positional[0];if(!['deposit','withdraw','reinvest'].includes(type))throw new Error('Pakai: record.mjs deposit|withdraw|reinvest owner usd --id ID --at ISO [--nav USD] [--dry]');
 const prorata=flags.prorata!==undefined;if(prorata&&type!=='withdraw')throw new Error('Pro-rata hanya untuk withdrawal');
 const owner=prorata?null:positional[1];const amount=Core.number(prorata?flags.prorata:positional[2],'Nominal',0.01);

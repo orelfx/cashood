@@ -40,7 +40,7 @@ const flag = (name) => process.argv.includes(`--${name}`);
 
 const frozen = arg('snapshot') ? JSON.parse(readFileSync(resolve(arg('snapshot')), 'utf8')) : null;
 const fund = frozen?.fund || arg('fund', 'reborn');
-if (!['reborn','meridian','ferari'].includes(fund)) throw new Error('Dana tidak dikenal');
+if (!['reborn','meridian','ferari','robsol'].includes(fund)) throw new Error('Dana tidak dikenal');
 const sourceSnapshot = frozen?.sourceSnapshot || (flag('from-live') ? readJSON(resolve(DATA, fund, 'live.json')) : null);
 if (flag('from-live') && !frozen) Core.validateSnapshot(sourceSnapshot, { complete:true, maxAge:45*60000 });
 const withdrawn = Core.number(frozen?.withdrawn ?? (sourceSnapshot ? sourceSnapshot.treasuryDistributableUsd ?? sourceSnapshot.treasuryUsd : arg('withdrawn')), 'Laba tersedia / --withdrawn', 0);

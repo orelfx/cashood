@@ -1,0 +1,118 @@
+{
+  "app": {
+    "name": "Cashood",
+    "tagline": "Private AI liquidity provider · Solana",
+    "currency": "USD",
+    "refreshMinutes": 5,
+    "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/robsol/live.json",
+    "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/robsol/nav.json"
+  },
+  "wallet": {
+    "chainName": "Solana",
+    "_note": "Alamat dompet sengaja tidak ditulis di sini. Situs tidak pernah membaca chain dari browser; seluruh angkanya datang dari snapshot."
+  },
+  "owners": [
+    {
+      "id": "orel",
+      "name": "Orel",
+      "color": "#14f195"
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-09-28",
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 1000,
+      "founding": true,
+      "id": "robsol-modal-orel",
+      "batchId": "robsol-modal-2026-09-28",
+      "note": "modal sementara 2026-09-28: $1.000 milik Orel (100%). Diperkirakan dari nilai dompet dikurangi hasil posisi (±$1.014); ganti kalau angka setoran sebenarnya berbeda."
+    }
+  ],
+  "costs": {
+    "note": "Biaya bulanan belum ditetapkan pemilik.",
+    "items": [],
+    "shared": false,
+    "primary": false
+  },
+  "fund": {
+    "minDepositUsd": 100,
+    "noticeHours": 24,
+    "note": "Dompet dibaca, bukan dijalankan: uang masuk dan keluar dompet harus dicatat di sini supaya tidak terbaca sebagai laba.",
+    "capacityUsd": 1000,
+    "cashFlowsRecorded": false
+  },
+  "dividend": {
+    "payDayOfMonth": 1,
+    "distributePct": 100,
+    "reinvestPct": 0,
+    "investorFeePct": 0,
+    "investorFeeStandardPct": 15,
+    "investorFeeNote": "gratis selama masa perkenalan",
+    "retainedUsd": 0,
+    "note": "Aturan sama dengan dana lain: tiap tanggal 1, laba dikurangi biaya sistem, sisanya dibagikan 100% menurut porsi saham.",
+    "basis": "nav"
+  },
+  "forecast": {
+    "cashFlowsComplete": false,
+    "note": "Uang masuk/keluar dompet eksternal belum seluruhnya tercatat. Proyeksi dinonaktifkan sampai rekonsiliasi."
+  },
+  "strategy": {
+    "title": "Robsol — robot LP di Solana",
+    "about": [
+      "Robsol adalah robot AI penyedia likuiditas di Meteora DLMM, jaringan Solana. Ia membuka posisi di pool berpasangan TOKEN-SOL, mengumpulkan fee dari setiap transaksi yang lewat, lalu menutup dan memindahkan posisinya mengikuti pasar.",
+      "Situs ini hanya MEMBACA dompetnya. Tidak ada kunci dan tidak ada perintah yang bisa menggerakkan dananya dari sini. Posisi terbuka dan riwayat posisi tertutup diambil dari indeks LP Agent; saldo dompet dibaca langsung dari blockchain."
+    ],
+    "requirements": [
+      [
+        "Setoran minimum",
+        "$100"
+      ],
+      [
+        "Pemberitahuan masuk / keluar",
+        "24 jam"
+      ],
+      [
+        "Aset kuotasi",
+        "SOL"
+      ],
+      [
+        "Profil risiko",
+        "tinggi"
+      ]
+    ],
+    "risks": [
+      "Token pasangan di pool bisa jatuh tajam atau di-rug; posisi LP ikut menanggung penurunannya (impermanent loss).",
+      "Nilai dana ikut naik-turun dengan harga SOL, karena sisi kuotasinya SOL, bukan dolar.",
+      "Arus kas di luar pembukuan: uang yang masuk atau keluar dompet tidak lewat situs ini dan harus dicatat manual. Selama belum dicatat, beberapa angka risiko ditahan.",
+      "Tanpa payung hukum: ini kesepakatan pribadi, bukan produk berizin."
+    ],
+    "system": [
+      [
+        "Jaringan",
+        "Solana"
+      ],
+      [
+        "Tempat likuiditas",
+        "Meteora DLMM"
+      ],
+      [
+        "Tipe posisi",
+        "likuiditas terkonsentrasi berpasangan SOL"
+      ],
+      [
+        "Mesin",
+        "robot AI eksternal"
+      ],
+      [
+        "Pengelolaan dompet",
+        "dibaca saja; alamat tidak diterbitkan"
+      ],
+      [
+        "Sumber data situs",
+        "LP Agent + saldo dompet tiap 5 menit"
+      ]
+    ]
+  }
+}

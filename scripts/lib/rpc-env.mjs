@@ -41,3 +41,7 @@ export function cashoodSolanaEnv(base = process.env) {
     // (getBalance + daftar token) dan harga Jupiter/DexScreener.
     HELIUS_API_KEY: '' };
 }
+
+// Nilai lain dari .env situs (atau lingkungan proses), untuk exporter yang
+// tidak memuat .env bot mana pun.
+export const cashoodEnv = (key) => pick(key);

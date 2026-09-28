@@ -28,7 +28,7 @@
 
 <header class="top">
   <div class="wrap top-in">
-    <div class="brand">
+    <div class="brand" id="brandHome" role="link" tabindex="0" title="Beranda">
       <span class="dot"></span>
       <h1>Cashood <span class="mark">Headfund</span></h1>
       <span class="tag" id="tagline">Private AI liquidity provider · Robinhood</span>
@@ -45,7 +45,7 @@
 
 <main class="wrap">
 
-  <div class="strip" id="strip">
+  <div class="strip" id="strip" hidden>
     <span class="strip-item"><span class="led live"></span><b>Saldo token</b> <span id="stripToken" class="say">live dari chain</span></span>
     <span class="strip-item"><span class="led lp"></span><b id="stripLpLabel">Nilai LP</b> <span id="stripLp">—</span></span>
     <span class="strip-item" id="stripShare"><span class="led"></span><b>Bagi hasil</b> <span class="say">dihitung ulang tiap data masuk</span></span>
@@ -66,6 +66,48 @@
   </nav>
 
   <div id="banner" class="banner" hidden></div>
+
+  <!-- ── beranda ───────────────────────────────────────────── -->
+  <div id="tab-home" hidden>
+    <section class="home-hero">
+      <div class="hh-copy">
+        <span class="eyebrow"><span class="live-dot"></span>Dana kripto · dikelola AI · data tiap 5 menit</span>
+        <h2 class="hh-title">Uang bekerja 24 jam.<br><span class="grad">Angkanya terbuka untuk semua.</span></h2>
+        <p class="hh-sub">Cashood Headfund menjalankan robot AI di Solana dan Robinhood Chain. Setiap dolar, posisi, dan pembagian hasil bisa dicek langsung di sini.</p>
+        <div class="hh-cta">
+          <a class="cta primary" href="#analisa">Lihat portofolio</a>
+          <a class="cta ghost" href="#safebox">Buka Safe Box</a>
+        </div>
+      </div>
+      <div class="hh-aum" id="homeAum">
+        <div class="aum-k">Total aset dikelola</div>
+        <div class="aum-v">—</div>
+        <p class="hint">memuat portofolio…</p>
+      </div>
+    </section>
+
+    <section class="home-stats" id="homeStats"></section>
+
+    <section class="home-block">
+      <div class="hb-head">
+        <h2>Produk</h2>
+        <p>Pilih sesuai selera risiko. Angka di setiap kartu adalah nilai sebenarnya saat ini.</p>
+      </div>
+      <div id="homeProducts"></div>
+    </section>
+
+    <section class="home-block">
+      <div class="hb-head"><h2>Menu</h2><p>Semua yang bisa dicek di Cashood.</p></div>
+      <div class="menu-grid" id="homeMenu"></div>
+    </section>
+
+    <section class="home-trust">
+      <div><b>Hanya membaca</b><span>Situs tidak memegang kunci dompet mana pun.</span></div>
+      <div><b>Alamat dirahasiakan</b><span>Dompet dana tidak dipublikasikan.</span></div>
+      <div><b>Otomatis</b><span>Angka ditulis bot, bukan diketik tangan.</span></div>
+      <div><b>Laporan bulanan</b><span>Invoice PDF tiap tanggal 1.</span></div>
+    </section>
+  </div>
 
   <div id="tab-portfolio">
 

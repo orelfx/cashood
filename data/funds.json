@@ -10,7 +10,9 @@
       "configUrl": "data/reborn/config.json",
       "nativeSymbol": "ETH",
       "short": "RR",
-      "chainShort": "RH"
+      "chainShort": "RH",
+      "risk": "medium",
+      "blurb": "Robot LP multi-buku di Robinhood: likuiditas terkonsentrasi di pool Uniswap, hasil disapu harian dan dibagi tiap tanggal 1."
     },
     {
       "id": "meridian",
@@ -21,7 +23,9 @@
       "configUrl": "data/meridian/config.json",
       "nativeSymbol": "SOL",
       "short": "M",
-      "chainShort": "Sol"
+      "chainShort": "Sol",
+      "risk": "medium",
+      "blurb": "Robot LP di Meteora DLMM, Solana. Pasangan TOKEN-SOL dengan pengaman posisi yang ketat."
     },
     {
       "id": "ferari",
@@ -37,7 +41,27 @@
       "venue": "Uniswap v4",
       "nativeSymbol": "ETH",
       "short": "NRNF",
-      "chainShort": "RH"
+      "chainShort": "RH",
+      "risk": "high",
+      "blurb": "Setelan agresif: posisi LP besar yang berputar cepat di pool USDG, Robinhood."
+    },
+    {
+      "id": "robsol",
+      "label": "Robsol",
+      "chain": "Solana",
+      "venue": "Meteora DLMM",
+      "accent": "#14f195",
+      "configUrl": "data/robsol/config.json",
+      "tabs": [
+        "portfolio",
+        "investor",
+        "analys"
+      ],
+      "nativeSymbol": "SOL",
+      "short": "RS",
+      "chainShort": "Sol",
+      "risk": "high",
+      "blurb": "Robot LP degen di Meteora DLMM, Solana: mengejar fee tinggi di koin yang sedang ramai."
     },
     {
       "id": "charon",
@@ -55,7 +79,9 @@
       "paper": true,
       "forecast": false,
       "short": "CRH",
-      "chainShort": "sim"
+      "chainShort": "sim",
+      "risk": "paper",
+      "blurb": "Robot AI yang membeli dan menjual token meme. Masih diuji dengan modal kertas $500."
     }
   ],
   "coins": [
@@ -67,6 +93,8 @@
     "subtitle": "simpanan fluktuatif",
     "accent": "#2dd4bf",
     "configUrl": "data/safebox/config.json",
-    "short": "SB"
+    "short": "SB",
+    "risk": "low",
+    "blurb": "Simpanan seperti deposito: pokok dijaga, imbal hasil mengikuti fee LP, antara 0% dan 3% per bulan."
   }
 }
