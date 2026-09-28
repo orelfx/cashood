@@ -1,0 +1,106 @@
+{
+  "app": {
+    "name": "Cashood",
+    "tagline": "AI trader forex & emas · akun demo",
+    "currency": "USD",
+    "refreshMinutes": 5,
+    "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/forex/live.json",
+    "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/forex/nav.json"
+  },
+  "wallet": {
+    "chainName": "Exness demo",
+    "_note": "Akun demo/testnet: tidak ada uang sungguhan. Nomor akun tidak dicantumkan."
+  },
+  "owners": [
+    {
+      "id": "demo",
+      "name": "Modal demo",
+      "color": "#60a5fa"
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-05-23",
+      "type": "deposit",
+      "owner": "demo",
+      "usd": 10000,
+      "founding": true,
+      "id": "forex-demo-modal",
+      "note": "saldo awal akun DEMO Exness — dana virtual"
+    }
+  ],
+  "costs": {
+    "note": "Bot uji coba: biaya belum dibebankan.",
+    "items": [],
+    "shared": false,
+    "primary": false
+  },
+  "fund": {
+    "note": "Akun DEMO Exness, modal virtual $10.000.",
+    "paper": true
+  },
+  "strategy": {
+    "title": "Forex Bot — AI trader forex & emas (akun demo)",
+    "about": [
+      "Forex Bot memperdagangkan 13 pasangan mata uang dan emas (XAUUSD) di grafik 1 jam. Ia mencari pola Smart Money (order block, fair value gap, perebutan likuiditas), menyaring dengan kondisi pasar, lalu meminta AI menilai arah makro dua kali sehari.",
+      "Bot berjalan di akun DEMO Exness: harga dan eksekusinya pasar sungguhan, uangnya virtual. Tujuannya membuktikan strategi sebelum memakai dana asli."
+    ],
+    "requirements": [
+      [
+        "Modal demo",
+        "$10.000 (virtual)"
+      ],
+      [
+        "Pasar",
+        "forex & emas"
+      ],
+      [
+        "Status",
+        "uji coba, belum menerima investor"
+      ],
+      [
+        "Profil risiko",
+        "tinggi"
+      ]
+    ],
+    "risks": [
+      "Hasil akun demo tidak menjamin hasil akun asli: slippage, spread, dan eksekusi bisa berbeda.",
+      "Forex memakai leverage; kerugian bisa cepat membesar.",
+      "Belum ada bukti strategi ini menguntungkan — riwayatnya justru masih rugi."
+    ],
+    "system": [
+      [
+        "Mode",
+        "akun DEMO (dana virtual)"
+      ],
+      [
+        "Broker",
+        "Exness · MetaTrader 5"
+      ],
+      [
+        "Jenis",
+        "trading forex & emas"
+      ],
+      [
+        "Grafik",
+        "1 jam (H1)"
+      ],
+      [
+        "Risiko per trade",
+        "maks 1% saldo"
+      ],
+      [
+        "Rem darurat",
+        "berhenti hari itu saat rugi 3%"
+      ],
+      [
+        "Otak keputusan",
+        "AI (MiniMax) + aturan Smart Money"
+      ],
+      [
+        "Sumber data situs",
+        "database bot, dibaca tiap 5 menit"
+      ]
+    ]
+  }
+}
