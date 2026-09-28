@@ -1053,3 +1053,12 @@ body.at-home #tabs { display: none; }
   .hb-head h2 { font-size: 20px; }
 }
 .kin .prod-go { display: inline-flex; align-items: center; min-height: 40px; align-self: flex-start; }
+#closedTable td.more-row { text-align: center; padding: 12px; }
+#closedTable td.more-row .btn { min-height: 40px; }
+/* pemilih dana: sebelas pilihan → enam kolom di HP (yang dibuka dua kolom) */
+@media (max-width: 640px) {
+  .funds { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .funds button:not(.on) { padding: 7px 2px; }
+  .funds button:not(.on) .fshort b { font-size: 11px; }
+  .funds button:not(.on) .fshort span { font-size: 9.5px; }
+}

@@ -4,7 +4,7 @@ import { resolve,dirname } from 'node:path';import {fileURLToPath} from 'node:ur
 import { readJSON } from './lib/io.mjs';import { readFileSync,existsSync } from 'node:fs';
 import Core from '../assets/core.js';import {treasury,parseTransfers} from './lib/treasury.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),source=resolve(process.argv[2]||root);let failed=false;
-for(const fund of ['reborn','meridian','ferari','robsol','charon']){
+for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance']){
  try{
   const cfg=readJSON(resolve(root,'data',fund,'config.json')),ledger=Core.buildLedger(cfg);
   const old=readJSON(resolve(source,'data',fund,'live.json'));

@@ -7,7 +7,7 @@ import { readJSON,atomicJSON,assertPublic } from './lib/io.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),destination=resolve(process.argv[2]||'');
 if(!process.argv[2]||destination===ROOT)throw new Error('Direktori staging eksplisit wajib');
 let failed=false;
-for(const fund of ['reborn','meridian','ferari','robsol','charon','safebox']){
+for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','safebox']){
  try{
   const dir=resolve(ROOT,'data',fund),live=readJSON(resolve(dir,'live.json'));if(!live)throw new Error('Snapshot belum ada');
   assertPublic(live);
@@ -19,7 +19,7 @@ for(const fund of ['reborn','meridian','ferari','robsol','charon','safebox']){
   atomicJSON(resolve(destination,fund,'live.json'),live);
   atomicJSON(resolve(destination,fund,'config.json'),readJSON(resolve(dir,'config.json')));
   if(nav)atomicJSON(resolve(destination,fund,'nav.json'),nav);
-  for(const name of ['heartbeat.json','forecast.json']){
+  for(const name of ['heartbeat.json','forecast.json','trades.json']){
    if(fund==='safebox')continue;
    const value=readJSON(resolve(dir,name));if(value){assertPublic(value);atomicJSON(resolve(destination,fund,name),value);}
   }
