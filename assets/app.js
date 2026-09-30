@@ -521,7 +521,7 @@ function renderSummary(ledger, nav) {
     $('#kpiPnlSub').textContent = 'tidak dihitung tanpa modal awal';
   } else if (tr) {
     setHTML($('#kpiNavSub'), `${usd(tr.cashUsd, 0)} kas + ${usd(tr.positionsUsd, 0)} di ${(nav.positions || []).length} posisi`);
-    if (depSub) depSub.textContent = 'modal kertas, bukan uang sungguhan';
+    if (depSub) depSub.textContent = `${fundMeta(state.fund)?.money || 'modal kertas'} — bukan uang sungguhan`;
     setHTML($('#kpiWithdraw'), signed(tr.realizedUsd));
     $('#kpiWithdraw').className = 'big ' + cls(tr.realizedUsd);
     setHTML($('#kpiWithdrawSub'), `${nav.stats?.closedCount || 0} trade ditutup · berjalan ${signed(tr.unrealizedUsd)}`);

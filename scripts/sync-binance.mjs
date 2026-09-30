@@ -1,118 +1,190 @@
 #!/usr/bin/env node
 /**
- * Snapshot Binance Bot ("Budi") — bot crypto futures di Binance TESTNET.
+ * Snapshot Binance Bot — bot crypto futures di Binance TESTNET (dana virtual).
  *
- * Dana virtual, jadi tampil sebagai uji coba. Botnya sedang DIJEDA (sejak
- * 23 Juni 2026) dan prosesnya sengaja dimatikan; situs tidak menghidupkannya.
- * Yang dibaca, read-only:
- *   - data/memory/budi_trade_conflict.jsonl — satu baris per trade tertutup.
- *     Bot hanya mencatat hasil dalam PERSEN (PnL ÷ nilai posisi), bukan dolar,
- *     jadi tidak ada angka dolar per trade yang dikarang di sini.
- *   - data/equity_state.json — saldo testnet terakhir yang tercatat bot.
- *   - data/bot_paused.json — status jeda.
- * Modal awal testnet tidak tercatat di mana pun, sehingga untung/rugi dolar
- * dana ini sengaja tidak dihitung.
+ * Sejak 29 Sep 2026 bot berjalan dengan mesin baru (`demo_runner.py`,
+ * "demo-v2") yang mencatat semuanya di `data/demo_v2.sqlite3`: status akun,
+ * posisi aktif, dan tiap trade tertutup dengan hasil BERSIH dalam dolar
+ * (setelah komisi dan funding, dari fill bursa). Situs membacanya read-only.
+ *
+ * Riwayat mesin lama (Mei–Juni, `data/memory/budi_trade_conflict.jsonl`)
+ * tetap diterbitkan sebagai arsip. Mesin lama hanya mencatat persen dari nilai
+ * posisi, jadi baris-baris itu tidak punya angka dolar dan tidak ikut dihitung
+ * dalam statistik kinerja mesin baru.
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { atomicJSON, lock } from './lib/io.mjs';
+import { atomicJSON, lock, readJSON } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'binance');
 const OUT = resolve(DIR, 'live.json');
+const NAV = resolve(DIR, 'nav.json');
 const HOME = process.env.BINANCE_HOME || '/root/binance';
 const WIB = 7 * 3600e3;
 
 const release = lock(resolve(DIR, 'sync.lock.local'));
 const cfg = JSON.parse(readFileSync(resolve(DIR, 'config.json'), 'utf8'));
-const readJ = (rel) => { try { return JSON.parse(readFileSync(resolve(HOME, rel), 'utf8')); } catch { return null; } };
 const r2 = (n) => Number((Number(n) || 0).toFixed(2));
 const now = Date.now();
-
-const OUTCOME = { TP_HIT: 'target tercapai', SL_HIT: 'kena stop', SERSAN_FRONT_RUN: 'ditutup lebih awal (Sersan)', WIN_FRONT_RUN: 'untung ditutup lebih awal' };
-const rows = readFileSync(resolve(HOME, 'data/memory/budi_trade_conflict.jsonl'), 'utf8').split('\n').filter(Boolean)
-  .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
-// Hanya trade testnet; satu baris "shadow" ditandai bot sendiri untuk dikecualikan.
-const tutup = rows.filter((r) => r.metadata?.pnl_pct != null && r.metadata?.mode === 'testnet').map((r) => {
-  const m = r.metadata;
-  const conf = String(r.content || '').match(/Confidence:\s*(\d+)/);
-  return {
-    symbol: String(m.pair || '?').replace(/USDT$/, ''),
-    closedAt: Date.parse(m.timestamp || r.timestamp),
-    investedUsd: null,
-    netUsd: null,
-    netPct: Number(Number(m.pnl_pct).toFixed(2)),
-    holdMinutes: null,
-    strategy: `${m.direction === 'LONG' ? 'long' : 'short'} futures${conf && Number(conf[1]) > 0 ? ` · yakin ${conf[1]}%` : ''}`,
-    reason: OUTCOME[m.outcome] || String(m.outcome || '—').toLowerCase().replace(/_/g, ' '),
-  };
-}).filter((r) => Number.isFinite(r.closedAt)).sort((a, b) => a.closedAt - b.closedAt);
-
-const menang = tutup.filter((r) => r.netPct > 0.1).length;
-const kalah = tutup.filter((r) => r.netPct < -0.1).length;
-const eq = readJ('data/equity_state.json');
-const paused = readJ('data/bot_paused.json');
-const locked = existsSync(resolve(HOME, '.AUTO_RESTART_DISABLED'));
-const balance = r2(eq?.balance);
-if (!(balance > 0)) throw new Error('saldo testnet terakhir tidak terbaca');
-const balanceAt = Date.parse(eq?.updated_at || '') || null;
-const pausedAt = Date.parse(paused?.timestamp || '') || null;
 const tgl = (t) => new Date(t + WIB).toISOString().slice(0, 10);
+const parse = (s) => { try { return JSON.parse(s); } catch { return null; } };
+
+const Database = createRequire('/root/charon RH/package.json')('better-sqlite3');
+const db = new Database(resolve(HOME, 'data', 'demo_v2.sqlite3'), { readonly: true, fileMustExist: true });
+db.pragma('busy_timeout = 5000');
+const kv = (key) => parse(db.prepare('SELECT body FROM kv WHERE key=?').get(key)?.body);
+const status = kv('status');
+if (!status?.account) throw new Error('status akun testnet belum tercatat');
+
+// ─── mesin baru: trade tertutup, dalam dolar bersih ───────────────────────
+const EXIT = {
+  take_profit: 'target tercapai', stop_loss: 'kena stop', time_exit: 'batas waktu habis', trailing_stop: 'trailing stop',
+  protection_failed: 'ditutup: pengaman gagal dipasang', commissioning_complete: 'uji pemasangan selesai', manual: 'ditutup manual',
+};
+const label = (s) => String(s || '').replace(/_/g, ' ');
+const baru = db.prepare("SELECT body FROM trades WHERE status='CLOSED' ORDER BY closed_ms").all().map((r) => parse(r.body)).filter(Boolean)
+  .filter((t) => Number.isFinite(t.closed_ms) && Number.isFinite(t.net_usd)).map((t) => ({
+    symbol: String(t.symbol || '?').replace(/USDT$/, ''),
+    closedAt: t.closed_ms,
+    investedUsd: null,
+    netUsd: r2(t.net_usd),
+    netPct: t.equity_at_entry > 0 ? Number(((t.net_usd / t.equity_at_entry) * 100).toFixed(3)) : null,
+    rMultiple: Number.isFinite(t.r_multiple) ? r2(t.r_multiple) : null,
+    holdMinutes: Math.round((t.closed_ms - t.opened_ms) / 60000),
+    strategy: `${t.direction === 'LONG' ? 'long' : 'short'} · ${label(t.strategy)}`,
+    reason: EXIT[t.exit_reason] || (t.exit_reason ? label(t.exit_reason) : 'ditutup bursa (SL/TP)'),
+    feesUsd: r2(Number(t.commission_usd || 0) + Number(t.funding_usd || 0)),
+    equityAtEntry: Number(t.equity_at_entry) || null,
+    openedAt: t.opened_ms,
+  }));
+
+// ─── posisi aktif ─────────────────────────────────────────────────────────
+const positions = (status.active || []).map((a, i) => {
+  const t = typeof a === 'string' ? parse(db.prepare('SELECT body FROM trades WHERE id=?').get(a)?.body) || { id: a } : a;
+  return {
+    tokenId: `bn-${t.id || i}`,
+    symbol: String(t.symbol || '?').replace(/USDT$/, ''),
+    direction: t.direction || null,
+    lot: Number(t.qty ?? t.requested_qty) || null,
+    entryPrice: Number(t.entry ?? t.planned_price) || null,
+    slPrice: Number(t.sl) || null,
+    tpPrice: Number(t.tp) || null,
+    bookLabel: `${t.direction === 'LONG' ? 'long' : 'short'} · ${label(t.strategy)}${t.leverage ? ` · ${t.leverage}×` : ''}`,
+    ageMinutes: t.opened_ms ? Math.round((now - t.opened_ms) / 60000) : null,
+    principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0, pnlUsd: null,
+  };
+});
+
+// ─── aktivitas 24 jam ─────────────────────────────────────────────────────
+const since = now - 86400e3;
+const count = (kind) => db.prepare('SELECT COUNT(*) n FROM events WHERE kind=? AND time_ms>=?').get(kind, since).n;
+const act = { scans: count('scan'), skips: count('entry_skip'), opened: count('position_open'), closed: count('position_closed'), errors: count('cycle_error') };
+const lastErrAt = db.prepare("SELECT MAX(time_ms) t FROM events WHERE kind IN ('cycle_error','entry_error','reconcile_error')").get().t;
+const startedAt = Number(kv('created_ms')) || baru[0]?.openedAt || null;
+db.close();
+
+// ─── arsip mesin lama (persen saja) ───────────────────────────────────────
+const OUTCOME = { TP_HIT: 'target tercapai', SL_HIT: 'kena stop', SERSAN_FRONT_RUN: 'ditutup lebih awal (Sersan)', WIN_FRONT_RUN: 'untung ditutup lebih awal' };
+let lama = [];
+try {
+  lama = readFileSync(resolve(HOME, 'data/memory/budi_trade_conflict.jsonl'), 'utf8').split('\n').filter(Boolean).map(parse)
+    .filter((r) => r?.metadata?.pnl_pct != null && r.metadata.mode === 'testnet').map((r) => {
+      const m = r.metadata;
+      return {
+        symbol: String(m.pair || '?').replace(/USDT$/, ''), closedAt: Date.parse(m.timestamp || r.timestamp),
+        investedUsd: null, netUsd: null, netPct: Number(Number(m.pnl_pct).toFixed(2)), holdMinutes: null,
+        strategy: `${m.direction === 'LONG' ? 'long' : 'short'} · mesin lama`,
+        reason: OUTCOME[m.outcome] || label(m.outcome).toLowerCase(), legacy: true,
+      };
+    }).filter((r) => Number.isFinite(r.closedAt));
+} catch { /* arsip tidak wajib */ }
+
+// ─── nilai akun ───────────────────────────────────────────────────────────
+const equity = r2(status.account.equity);
+if (!(equity > 0)) throw new Error('equity testnet tidak masuk akal');
+const updatedAt = Number(status.updated_ms) || null;
+const hidup = updatedAt && now - updatedAt < 10 * 60e3;
+const modal = Number(cfg.events?.[0]?.usd) || null;
+
+// Deret nilai: saldo saat tiap trade dibuka (dicatat bot) sebagai titik
+// awal, lalu satu titik per siklus situs dari status akun bot.
+const nav = readJSON(NAV, { points: [] });
+if (!nav.points?.length) {
+  const seed = [...(modal && startedAt ? [{ t: startedAt, usd: modal }] : []),
+    ...baru.filter((r) => r.equityAtEntry).map((r) => ({ t: r.openedAt, usd: r2(r.equityAtEntry) }))];
+  atomicJSON(NAV, { updatedAt: now, points: seed.map((p) => ({ ...p, quality: 'complete' })) });
+}
+
+const hariWib = (t) => new Date(t + WIB).toISOString().slice(0, 10);
+const perHari = new Map();
+let menang = 0, kalah = 0;
+for (const r of baru) {
+  const b = perHari.get(hariWib(r.closedAt)) || { date: hariWib(r.closedAt), usd: 0, closes: 0, wins: 0, losses: 0, winUsd: 0, lossUsd: 0 };
+  b.usd += r.netUsd; b.closes += 1;
+  if (r.netUsd > 0.5) { b.wins += 1; b.winUsd += r.netUsd; menang += 1; } else if (r.netUsd < -0.5) { b.losses += 1; b.lossUsd += r.netUsd; kalah += 1; }
+  perHari.set(b.date, b);
+}
+const history = [...perHari.values()].map((r) => ({ ...r, usd: r2(r.usd), winUsd: r2(r.winUsd), lossUsd: r2(r.lossUsd) })).sort((a, b) => a.date.localeCompare(b.date));
+const semua = [...baru, ...lama].sort((a, b) => b.closedAt - a.closedAt);
+const bersih = ({ equityAtEntry, openedAt, ...r }) => r;
 
 const snapshot = {
   fund: 'binance',
   updatedAt: now,
   generatedAt: new Date(now + WIB).toISOString().replace('T', ' ').slice(0, 16) + ' WIB',
   usdIdr: null,
-  totalUsd: balance,
-  botWalletUsd: balance,
-  walletUsd: balance,
+  totalUsd: equity,
+  botWalletUsd: equity,
+  walletUsd: equity,
   lpUsd: 0,
-  holdings: [{ symbol: 'USDT (testnet)', amount: balance, price: 1, usd: balance }],
-  positions: [],
-  history: [],
-  historyNote: 'bot mencatat hasil tiap trade dalam persen dari nilai posisi, bukan dolar',
+  holdings: [{ symbol: 'USDT (testnet)', amount: equity, price: 1, usd: equity }],
+  positions,
+  history,
+  historyNote: 'hasil bersih mesin baru (sejak 29 Sep) setelah komisi dan funding',
   stats: {
-    closedCount: tutup.length, openCount: 0, graded: menang + kalah, wins: menang, losses: kalah,
+    closedCount: semua.length, openCount: positions.length, graded: menang + kalah, wins: menang, losses: kalah,
     winRate: menang + kalah ? r2((menang / (menang + kalah)) * 100) : null,
-    realisedUsd: null, bestDay: null, worstDay: null,
-    worstClosePct: tutup.length ? Math.min(...tutup.map((r) => r.netPct)) : null,
+    realisedUsd: r2(baru.reduce((s, r) => s + r.netUsd, 0)),
+    bestDay: history.length ? history.reduce((a, r) => (r.usd > a.usd ? r : a)) : null,
+    worstDay: history.length ? history.reduce((a, r) => (r.usd < a.usd ? r : a)) : null,
+    worstClosePct: baru.length ? Math.min(...baru.map((r) => r.netPct ?? 0)) : null,
     timezone: 'Asia/Jakarta (UTC+7)',
   },
-  // Dua puluh terakhir di snapshot; seluruh riwayat di trades.json, yang baru
-  // diambil halaman saat pembaca meminta "tampilkan semua".
-  closedRecent: [...tutup].reverse().slice(0, 20),
+  closedRecent: semua.slice(0, 20).map(bersih),
   trading: {
     paper: true,
     mode: 'testnet',
-    capitalKnown: false,
-    initialUsd: null,
-    cashUsd: balance,
+    initialUsd: modal,
+    cashUsd: equity,
     positionsUsd: 0,
-    realizedUsd: null,
+    realizedUsd: r2(baru.reduce((s, r) => s + r.netUsd, 0)),
     unrealizedUsd: 0,
-    paused: Boolean(paused?.paused),
-    startedAt: tutup[0]?.closedAt || null,
-    heartbeatAt: balanceAt,
-    status: paused?.paused ? 'dijeda' : 'tidak aktif',
-    healthy: false,
-    lead: `Bot crypto futures di Binance TESTNET — dananya virtual. Bot ini sedang dijeda${pausedAt ? ` sejak ${tgl(pausedAt)}` : ''}`
-      + `${locked ? ' dan sengaja tidak dinyalakan otomatis' : ''}. Riwayat di bawah adalah seluruh trade yang pernah ia catat.`,
+    peakUsd: null,
+    paused: Boolean(status.paused || status.daily_halt),
+    startedAt,
+    heartbeatAt: updatedAt,
+    status: !hidup ? 'tidak aktif' : status.paused ? 'dijeda' : status.daily_halt ? 'berhenti hari ini (batas rugi)' : 'berjalan',
+    healthy: Boolean(hidup && !status.paused && !status.daily_halt),
+    lead: `Bot crypto futures di Binance TESTNET — dananya virtual. Sejak ${startedAt ? tgl(startedAt) : '29 Sep'} berjalan dengan mesin baru `
+      + `yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.`,
     tiles: [
-      { k: 'Saldo testnet terakhir', usd: balance, n: balanceAt ? `tercatat ${tgl(balanceAt)} · belum terverifikasi` : 'belum terverifikasi' },
-      { k: 'Trade tercatat', v: String(tutup.length), n: tutup.length ? `${tgl(tutup[0].closedAt)} – ${tgl(tutup.at(-1).closedAt)}` : '—' },
-      { k: 'Menang · kalah', v: `${menang} · ${kalah}`, n: `${tutup.length - menang - kalah} impas` },
-      { k: 'Mode', v: 'testnet', n: 'dana virtual, bukan uang asli' },
+      { k: 'Pindai pasar', v: String(act.scans), n: `24 jam · ${act.skips} kandidat dilewati` },
+      { k: 'Buka · tutup', v: `${act.opened} · ${act.closed}`, n: '24 jam terakhir' },
+      { k: 'Error siklus', v: String(act.errors), n: lastErrAt ? `24 jam · terakhir ${tgl(lastErrAt)} ${new Date(lastErrAt + WIB).toISOString().slice(11, 16)} WIB` : '24 jam', tone: act.errors ? 'neg' : 'pos' },
+      { k: 'Mode', v: 'testnet', n: `mesin ${String(status.version || 'demo-v2')} · dana virtual` },
     ],
     llm: null,
   },
-  quality: { complete: false, reasons: [`bot dijeda; saldo terakhir tercatat ${balanceAt ? tgl(balanceAt) : '—'} dan belum terverifikasi`] },
 };
-snapshot.performanceInput = { closes: tutup.map((r) => ({ netPct: r.netPct, closedAt: r.closedAt, symbol: r.symbol })), flatBand: 0.1 };
+if (!hidup) snapshot.quality = { complete: false, reasons: [`bot tidak memperbarui status sejak ${updatedAt ? tgl(updatedAt) : '—'}`] };
+
+snapshot.performanceInput = { closes: baru.map((r) => ({ netUsd: r.netUsd, netPct: r.netPct, closedAt: r.closedAt, holdMinutes: r.holdMinutes, symbol: r.symbol })), flatBand: 0.005 };
 saveSnapshot(OUT, snapshot, cfg);
-atomicJSON(resolve(DIR, 'trades.json'), { fund: snapshot.fund, updatedAt: now, rows: [...tutup].reverse() });
-console.log(`[binance] saldo=$${balance} closed=${tutup.length} paused=${Boolean(paused?.paused)}`);
+atomicJSON(resolve(DIR, 'trades.json'), { fund: 'binance', updatedAt: now, rows: semua.map(bersih) });
+console.log(`[binance] equity=$${equity} baru=${baru.length} arsip=${lama.length} aktif=${positions.length} status=${snapshot.trading.status}`);
 release();
 process.exit(0);

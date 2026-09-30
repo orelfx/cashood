@@ -18,7 +18,17 @@
       "color": "#f0b90b"
     }
   ],
-  "events": [],
+  "events": [
+    {
+      "date": "2026-09-29",
+      "type": "deposit",
+      "owner": "testnet",
+      "usd": 8446.31,
+      "founding": true,
+      "id": "binance-v2-modal",
+      "note": "saldo testnet saat mesin baru (demo-v2) mulai, 29 Sep 2026 — dana virtual"
+    }
+  ],
   "costs": {
     "note": "Bot uji coba: biaya belum dibebankan.",
     "items": [],
@@ -26,19 +36,19 @@
     "primary": false
   },
   "fund": {
-    "note": "Binance TESTNET, dana virtual. Modal awal tidak tercatat, jadi untung/rugi dolar tidak dihitung.",
+    "note": "Binance TESTNET, dana virtual. Modal dihitung dari saldo saat mesin baru mulai (29 Sep 2026).",
     "paper": true
   },
   "strategy": {
     "title": "Binance Bot — AI trader crypto futures (testnet)",
     "about": [
       "Binance Bot (\"Budi\") memperdagangkan kontrak futures crypto — BTC, ETH, dan koin lain — dengan indikator teknikal dan penilaian AI, termasuk mode scalping.",
-      "Bot berjalan di Binance TESTNET dengan dana virtual. Sejak 23 Juni 2026 bot dijeda untuk perbaikan keamanan dan tidak dinyalakan lagi; halaman ini menyimpan seluruh riwayat yang pernah ia catat."
+      "Bot berjalan di Binance TESTNET dengan dana virtual. Sejak 29 September 2026 bot memakai mesin baru yang mencatat hasil bersih tiap trade dalam dolar (setelah komisi dan funding). Riwayat mesin lama (Mei–Juni) tetap disimpan sebagai arsip."
     ],
     "requirements": [
       [
         "Modal",
-        "virtual (testnet)"
+        "$8.446 virtual (testnet)"
       ],
       [
         "Pasar",
@@ -46,7 +56,7 @@
       ],
       [
         "Status",
-        "dijeda, uji coba"
+        "uji coba, belum menerima investor"
       ],
       [
         "Profil risiko",
@@ -55,7 +65,7 @@
     ],
     "risks": [
       "Futures memakai leverage hingga 20×: pergerakan kecil bisa menghapus posisi.",
-      "Hasil tercatat dalam persen dari nilai posisi, bukan persen dari saldo — menjumlahkannya tidak sama dengan untung akun.",
+      "Riwayat mesin lama hanya tercatat dalam persen dari nilai posisi; angka itu tidak bisa dijumlahkan menjadi untung akun.",
       "Audit 28 Sep 2026 menemukan beberapa bug pencatatan dan risiko; perlu diperbaiki sebelum dipakai lagi."
     ],
     "system": [
@@ -72,20 +82,20 @@
         "trading crypto futures"
       ],
       [
+        "Mesin",
+        "demo-v2 (sejak 29 Sep 2026)"
+      ],
+      [
+        "Strategi",
+        "trend pullback · trend breakout"
+      ],
+      [
         "Leverage",
-        "maks 20×"
-      ],
-      [
-        "Risiko per trade",
-        "1%"
-      ],
-      [
-        "Status",
-        "dijeda sejak 23 Jun 2026"
+        "5× per posisi"
       ],
       [
         "Sumber data situs",
-        "file riwayat bot, dibaca tiap 5 menit"
+        "database bot, dibaca tiap 5 menit"
       ]
     ]
   }
