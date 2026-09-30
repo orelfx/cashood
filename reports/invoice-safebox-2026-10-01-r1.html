@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<title>Invoice Imbal Hasil Safe Box — September 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --ink:#0b1220; --ink2:#334155; --mute:#64748b; --line:#e2e8f0; --soft:#f5f7fb; --navy:#0b1220; --gold:#d4a64a; --teal:#0f9d8a; --teal-soft:#e6f6f3; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 400 9pt/1.5 Inter, system-ui, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 210mm; min-height: 297mm; padding: 0 0 12mm; position: relative; }
+  .num { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  header { background: linear-gradient(135deg, #0b1220, #12213b); color: #fff; padding: 9mm 14mm 7mm; }
+  .hrow { display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand { display: flex; gap: 4mm; align-items: center; }
+  .logo { width: 11mm; height: 11mm; border-radius: 3mm; background: linear-gradient(145deg, #5eead4, #0f9d8a); display: grid; place-items: center; font: 800 14pt Inter; color: #0b1220; }
+  .brand b { font-size: 13pt; letter-spacing: .02em; display: block; }
+  .brand span { font-size: 8pt; color: #a8b3c7; }
+  .doc { text-align: right; }
+  .doc .t { font-size: 7pt; letter-spacing: .14em; color: var(--gold); font-weight: 700; text-transform: uppercase; }
+  .doc .f { font-size: 15pt; font-weight: 800; margin-top: 1mm; }
+  .doc .p { font-size: 8pt; color: #a8b3c7; }
+  .meta { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; margin-top: 7mm; padding-top: 4mm; border-top: .3mm solid rgba(255,255,255,.12); }
+  .meta .k { font-size: 6.6pt; color: #8f9bb0; text-transform: uppercase; letter-spacing: .08em; }
+  .meta .v { font-size: 9pt; font-weight: 600; margin-top: .6mm; }
+  main { padding: 7mm 14mm 0; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3.5mm; }
+  .tile { border: .3mm solid var(--line); border-radius: 2.5mm; padding: 3.5mm 4mm; }
+  .tile.hi { background: linear-gradient(145deg, #0b1220, #16213a); color: #fff; border-color: #0b1220; }
+  .tile .k { font-size: 6.6pt; letter-spacing: .09em; text-transform: uppercase; color: var(--mute); font-weight: 700; }
+  .tile.hi .k { color: var(--gold); }
+  .tile .v { font-size: 15pt; font-weight: 700; margin: 1.5mm 0 .5mm; }
+  .tile .s { font-size: 7.4pt; color: var(--mute); }
+  .tile.hi .s { color: #a8b3c7; }
+  .pos { color: var(--teal); }
+  h3 { font-size: 7.4pt; letter-spacing: .12em; text-transform: uppercase; color: var(--ink2); margin: 7mm 0 2.5mm; font-weight: 800; }
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 6.8pt; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); text-align: right; padding: 2mm; border-bottom: .4mm solid var(--ink); font-weight: 700; }
+  th:first-child, td:first-child { text-align: left; }
+  td { padding: 2.4mm 2mm; border-bottom: .25mm solid var(--line); text-align: right; }
+  tr.total td { border-bottom: 0; border-top: .4mm solid var(--ink); font-weight: 700; }
+  .who { display: flex; align-items: center; gap: 2mm; font-weight: 600; }
+  .dot { width: 2.4mm; height: 2.4mm; border-radius: 50%; }
+  .two { display: grid; grid-template-columns: 1.1fr 1fr; gap: 7mm; }
+  .steps { display: grid; gap: 2.2mm; font-size: 8.4pt; color: var(--ink2); }
+  .step { display: flex; gap: 2.5mm; }
+  .step .n { flex: none; width: 4.6mm; height: 4.6mm; border-radius: 50%; background: var(--ink); color: #fff; font-size: 7pt; font-weight: 700; display: grid; place-items: center; }
+  .box { background: var(--teal-soft); border: .3mm dashed var(--teal); border-radius: 2.5mm; padding: 3mm 4mm; margin-top: 3mm; font-size: 8.2pt; color: #0b3d36; }
+  .daily td, .daily th { padding: 1.5mm 2mm; font-size: 8pt; }
+  footer { position: absolute; left: 14mm; right: 14mm; bottom: 8mm; display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; font-size: 7.2pt; color: var(--mute); border-top: .3mm solid var(--line); padding-top: 3mm; }
+  footer .line { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 7pt; }
+</style></head>
+<body><div class="page">
+<header>
+  <div class="hrow">
+    <div class="brand"><div class="logo">C</div><div><b>CASHOOD HEADFUND</b><span>Safe Box · simpanan dengan imbal hasil fluktuatif</span></div></div>
+    <div class="doc"><div class="t">Invoice imbal hasil</div><div class="f">Safe Box</div><div class="p">Periode September 2026</div></div>
+  </div>
+  <div class="meta">
+    <div><div class="k">No. invoice</div><div class="v num">INV/SB/2026-10/R1</div></div>
+    <div><div class="k">Tanggal pembayaran</div><div class="v">1 Oktober 2026</div></div>
+    <div><div class="k">Kurs yang dipakai</div><div class="v num">1 USD = Rp 17.650</div></div>
+    <div><div class="k">Pemilik simpanan</div><div class="v">2 orang</div></div>
+    <div><div class="k">Fee pengelola</div><div class="v">tanpa fee</div></div>
+  </div>
+</header>
+<main>
+  <div class="tiles">
+    <div class="tile"><div class="k">Pokok simpanan</div><div class="v num">$3,000</div><div class="s num">Rp 52.950.000</div></div>
+    <div class="tile"><div class="k">Imbal hasil September</div><div class="v num pos">$10.35</div><div class="s">12 Sep – 30 Sep · 19 hari</div></div>
+    <div class="tile"><div class="k">Laju setara</div><div class="v num">0,54%</div><div class="s">per bulan · batas 0,1%–3%</div></div>
+    <div class="tile hi"><div class="k">Ditarik &amp; dibayarkan</div><div class="v num">$10.35</div><div class="s num">Rp 182.678</div></div>
+  </div>
+
+  <h3>Pembayaran per pemilik</h3>
+  <table>
+    <thead><tr><th>Pemilik</th><th>Pokok</th><th>Porsi</th><th>Imbal hasil (USD)</th><th>Diterima (IDR)</th><th>Saldo setelah ditarik</th></tr></thead>
+    <tbody>
+      <tr><td><span class="who"><span class="dot" style="background:#f472b6"></span>Stefani</span></td>
+        <td class="num">$2,000</td><td class="num">66,67%</td>
+        <td class="num pos"><b>$6.90</b></td><td class="num">Rp 121.785</td><td class="num">$2,000</td></tr><tr><td><span class="who"><span class="dot" style="background:#c084fc"></span>Si Nakal</span></td>
+        <td class="num">$1,000</td><td class="num">33,33%</td>
+        <td class="num pos"><b>$3.45</b></td><td class="num">Rp 60.893</td><td class="num">$1,000</td></tr>
+      <tr class="total"><td>Total</td><td class="num">$3,000</td><td class="num">100,00%</td>
+        <td class="num pos">$10.35</td><td class="num">Rp 182.678</td><td class="num">$3,000</td></tr>
+    </tbody>
+  </table>
+
+  <div class="two">
+    <div>
+      <h3>Cara pembayaran</h3>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div>Pokok $3,000 ditempatkan pengelola dan menghasilkan imbal hasil setiap hari, mengikuti fee yang benar-benar masuk.</div></div>
+        <div class="step"><div class="n">2</div><div>Imbal hasil dicatat harian dan dikunci di antara 0,1% dan 3% per bulan. Tidak pernah negatif.</div></div>
+        <div class="step"><div class="n">3</div><div>Tiap tanggal 1, seluruh imbal hasil bulan sebelumnya <b>ditarik dan dibayarkan</b> menurut porsi pokok. Pokok tetap di dalam Safe Box dan terus bekerja.</div></div>
+      </div>
+      <div class="box"><b>Pokok tetap $3,000.</b> Imbal hasil tidak diputar ulang — setelah pembayaran ini saldo tiap pemilik kembali ke pokoknya, dan imbal hasil Oktober mulai dihitung dari nol.</div>
+    </div>
+    <div>
+      <h3>Imbal hasil harian</h3>
+      <table class="daily">
+        <thead><tr><th>Tanggal</th><th>Imbal hasil</th></tr></thead>
+        <tbody>
+          <tr><td>12 Sep – 25 Sep <span style="color:var(--mute)">(akumulasi)</span></td><td class="num">$6.38</td></tr>
+          <tr><td>26 Sep</td><td class="num">$0.04</td></tr><tr><td>27 Sep</td><td class="num">$0.36</td></tr><tr><td>28 Sep</td><td class="num">$1.26</td></tr><tr><td>29 Sep</td><td class="num">$1.11</td></tr><tr><td>30 Sep</td><td class="num">$1.20</td></tr>
+          <tr class="total"><td>Total dibayarkan</td><td class="num">$10.35</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>
+  <div><b>Kurs.</b> Nilai rupiah memakai kurs yang ditetapkan pengelola, 1 USD = Rp 17.650. Dana dikirim dalam USD; rupiah yang diterima dapat berbeda mengikuti kurs saat pencairan.</div>
+  <div><b>Catatan.</b> Imbal hasil Safe Box tidak tetap dan bukan janji hasil. Pokok dijaga; pada bulan yang sepi imbal hasil bisa mendekati batas bawah. Pembulatan per sen dibawa ke bulan berikutnya.</div>
+  <div class="line"><b>cashood.id</b><span>Dibuat 1 Oktober 2026 pukul 03.18 WIB · INV/SB/2026-10/R1</span></div>
+</footer>
+</div></body></html>

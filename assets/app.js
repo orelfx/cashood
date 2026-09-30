@@ -2160,15 +2160,18 @@ function renderSafebox() {
           <div class="sb-main">
             <div class="k">Saldo simpanan</div>
             <div class="v">${usd(d.balanceUsd)}</div>
-            <div class="n">pokok ${usd(d.principalUsd)} + bunga ${usd(d.interestUsd, 2)}</div>
+            <div class="n">pokok ${usd(d.principalUsd)} + bunga berjalan ${usd(d.interestUsd, 2)}</div>
             <div class="sb-pill"><span class="led ${d.inRange ? 'live' : ''}"></span>${d.inRange ? 'sedang menghasilkan' : 'sedang tidak menghasilkan'}</div>
           </div>
           <div class="stat"><div class="k">Bunga hari ini</div>
             <div class="v pos">${usd(d.interestTodayUsd ?? rate.perDayUsd ?? 0, 2)}</div>
             <div class="n">${d.interestDay ? fmtDay(d.interestDay) : ''} · fee yang masuk hari ini</div></div>
-          <div class="stat"><div class="k">Total bunga</div>
+          ${Number(d.paidUsd) > 0 ? `<div class="stat"><div class="k">Sudah ditarik</div>
+            <div class="v pos">${usd(d.paidUsd, 2)}</div>
+            <div class="n">bunga dibayar ke pemilik${d.lastPayout?.at ? ` · terakhir ${fmtDay(new Date(d.lastPayout.at + 7 * 3600e3).toISOString().slice(0, 10))}` : ''}</div></div>`
+          : `<div class="stat"><div class="k">Total bunga</div>
             <div class="v pos">${usd(d.interestUsd, 2)}</div>
-            <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>
+            <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>`}
           <div class="stat"><div class="k">Bunga per bulan</div>
             <div class="v">${rate.monthlyPct == null ? '—' : pct(rate.monthlyPct)}</div>
             <div class="n">setara ${rate.apyPct == null ? '—' : pct(rate.apyPct)} setahun</div></div>
@@ -2183,36 +2186,48 @@ function renderSafebox() {
       ${(d.owners || []).length ? `<section class="card">
         <div class="card-head">
           <h2>Pemilik simpanan</h2>
-          <span class="hint">bunga dibagi menurut porsi pokok</span>
+          <span class="hint">bunga dibagi menurut porsi pokok · ditarik tiap tanggal 1, pokok tetap</span>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Pemilik</th><th class="num">Pokok</th><th class="num">Porsi</th><th class="num">Bunga hari ini</th><th class="num">Total bunga</th><th class="num">Saldo</th></tr></thead>
+          <thead><tr><th>Pemilik</th><th class="num">Pokok</th><th class="num">Porsi</th><th class="num">Bunga hari ini</th><th class="num">Bunga berjalan</th><th class="num">Sudah ditarik</th><th class="num">Saldo</th></tr></thead>
           <tbody>${d.owners.map((o) => `<tr>
             <td><span class="who"><span class="chip" style="background:${o.color || '#2dd4bf'}"></span>${esc(o.name)}</span></td>
             <td class="num">${usd(o.principalUsd)}</td>
             <td class="num">${pct(o.sharePct)}</td>
             <td class="num pos">${usd(o.interestTodayUsd, 2)}</td>
             <td class="num pos">${usd(o.interestUsd, 2)}</td>
+            <td class="num">${usd(o.paidUsd || 0, 2)}</td>
             <td class="num"><strong>${usd(o.balanceUsd)}</strong></td></tr>`).join('')}
             <tr><td><strong>Total</strong></td>
               <td class="num"><strong>${usd(d.principalUsd)}</strong></td>
               <td class="num">100,00%</td>
               <td class="num pos"><strong>${usd(d.interestTodayUsd ?? 0, 2)}</strong></td>
               <td class="num pos"><strong>${usd(d.interestUsd, 2)}</strong></td>
+              <td class="num"><strong>${usd(d.paidUsd || 0, 2)}</strong></td>
               <td class="num"><strong>${usd(d.balanceUsd)}</strong></td></tr>
           </tbody>
         </table></div>
       </section>` : ''}
 
+      <section class="card" id="sbInvoices"><div class="card-head"><h2>Invoice</h2><span class="hint">imbal hasil yang ditarik tiap tanggal 1</span></div>
+        <div id="sbInvoiceList"><p class="dim">memuat…</p></div></section>
+
       ${(d.days || []).length > 1 ? `<section class="card">
         <div class="card-head">
           <h2>Bunga harian</h2>
-          <span class="hint">fee yang masuk tiap hari · total ${usd(d.interestUsd, 2)}</span>
+          <span class="hint">fee yang masuk tiap hari · berjalan ${usd(d.interestUsd, 2)}${Number(d.paidUsd) > 0 ? ` · sudah ditarik ${usd(d.paidUsd, 2)}` : ''}</span>
         </div>
-        <div class="table-scroll"><table class="daily"><thead><tr><th>Tanggal</th><th class="num">Bunga</th><th class="num">Total berjalan</th></tr></thead><tbody>
-          ${(() => { let run = 0; return [...d.days].reverse().map((x) => { return x; }).reverse()
-            .map((x) => { run += Number(x.usd) || 0; return { ...x, run }; }).reverse().slice(0, 14)
-            .map((x) => `<tr><td>${fmtDay(x.date)}</td><td class="num pos">${usd(x.usd, 2)}</td><td class="num">${usd(x.run, 2)}</td></tr>`).join(''); })()}
+        <div class="table-scroll"><table class="daily"><thead><tr><th>Tanggal</th><th class="num">Bunga</th><th>Status</th></tr></thead><tbody>
+          ${(() => {
+            // Hari sebelum pembayaran terakhir sudah ditarik ke pemilik; sesudahnya
+            // masih berjalan dan akan ditarik tanggal 1 berikutnya.
+            const cut = d.lastPayout?.at ? new Date(d.lastPayout.at + 7 * 3600e3).toISOString().slice(0, 10) : null;
+            return [...d.days].reverse().slice(0, 14).map((x) => {
+              const paid = cut && x.date < cut;
+              return `<tr><td>${fmtDay(x.date)}</td><td class="num pos">${usd(x.usd, 2)}</td>
+                <td class="${paid ? 'dim' : 'pos'}">${paid ? `ditarik ${fmtDay(cut)}` : 'berjalan'}</td></tr>`;
+            }).join('');
+          })()}
         </tbody></table></div>
       </section>` : ''}
 
@@ -2223,7 +2238,7 @@ function renderSafebox() {
         </div>
         <p class="lead">Safe Box bekerja seperti deposito: dana yang masuk dikelola ke berbagai instrumen investasi,
           di dalam maupun di luar Cashood, dan mengembalikan bunga <strong>${pctRate(rate.minMonthlyPct ?? 0)}–${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>
-          yang dihitung dan dibayarkan harian.</p>
+          yang dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
         <div class="two">
           <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
             <li>Besarnya mengikuti hasil perdagangan yang benar-benar terjadi hari itu, bukan janji persentase tetap.</li>
@@ -2271,6 +2286,7 @@ function renderSafebox() {
           berbunga ${usd(100, 0)} tetap bekerja dengan ${usd(modal, 0)}, bukan ${usd(modal + 100, 0)}.</p>
       </section>`);
 
+    renderSafeboxInvoices();
     $('#sbCapital').oninput = (e) => {
       sbCapital = Math.max(0, Number(e.target.value) || 0);
       const keep = e.target.value;
@@ -2285,6 +2301,25 @@ function renderSafebox() {
       renderSafebox();
     };
   });
+}
+
+async function renderSafeboxInvoices() {
+  const box = $('#sbInvoiceList');
+  if (!box) return;
+  if (!reportsCache) {
+    try {
+      const r = await fetch('reports/index.json?v=' + Math.floor(Date.now() / 600000), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
+      reportsCache = r.ok ? await r.json() : [];
+    } catch { reportsCache = []; }
+  }
+  const mine = (Array.isArray(reportsCache) ? reportsCache : []).filter((m) => m.fund === 'safebox');
+  if (!$('#sbInvoiceList')) return;
+  setHTML($('#sbInvoiceList'), !mine.length ? '<p class="dim">Belum ada invoice. Invoice dibuat tiap tanggal 1 saat imbal hasil ditarik.</p>'
+    : `<div class="table-scroll"><table class="reports"><thead><tr><th>Invoice</th><th>Tanggal bayar</th><th class="num">Ditarik</th><th></th></tr></thead><tbody>`
+      + mine.map((m) => `<tr><td><div>${esc(m.periodLabel)}</div><div class="inv-no">${String(m.invoiceNo || '').split('/').join('/<wbr>')}</div></td>
+        <td>${esc(m.payLabel)}</td><td class="num pos">${usd(m.distributedUsd, 2)}</td>
+        <td class="pdf-actions"><a class="btn-pdf" href="${m.pdf}" download="${m.pdf.split('/').pop()}">Download</a>
+          <a class="btn-pdf ghost" href="${m.pdf}" target="_blank" rel="noopener">Lihat</a></td></tr>`).join('') + '</tbody></table></div>');
 }
 
 function showSafebox() {
@@ -2459,7 +2494,7 @@ async function portoTotals() {
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
   const simpanan = Number(box?.balanceUsd) || 0;
   const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + (Number(box?.principalUsd) || 0);
-  const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0) + (Number(box?.interestUsd) || 0);
+  const untung = briefs.reduce((s, b) => s + (b.pnlUsd || 0), 0) + (Number(box?.interestUsd) || 0) + (Number(box?.paidUsd) || 0);
   const orang = new Set([...briefs.flatMap((b) => b.owners.map((o) => o.name)), ...(box?.owners || []).map((o) => o.name)]).size;
   return { ids, briefs, missing: ids.filter((id, i) => !loaded[i]), box, dana, simpanan, total: dana + simpanan, setoran, untung, orang };
 }
@@ -2482,7 +2517,8 @@ async function renderPortofolio() {
   // memuat Safe Box tapi "modal masuk" dan "untung" tidak — tiga angka yang
   // tidak bisa dijumlahkan satu sama lain.
   const pokokBox = Number(box?.principalUsd) || 0;
-  const bungaBox = Number(box?.interestUsd) || 0;
+  // Bunga yang sudah ditarik tetap hasil Safe Box, meski saldonya kembali ke pokok.
+  const bungaBox = (Number(box?.interestUsd) || 0) + (Number(box?.paidUsd) || 0);
   const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + pokokBox;
   const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0) + bungaBox;
   const orang = new Set(briefs.flatMap((b) => b.owners.map((o) => o.name))).size;
@@ -2518,7 +2554,7 @@ async function renderPortofolio() {
       <div class="porto-head">
         <span class="who"><span class="chip" style="background:${state.safebox?.accent || '#2dd4bf'}"></span><strong>${state.safebox?.label || 'Safe Box'}</strong>
           <span class="dim">simpanan</span></span>
-        <span class="porto-val">${usd(box.balanceUsd)}<span class="n pos">+${usd(box.interestUsd, 2)}</span></span>
+        <span class="porto-val">${usd(box.balanceUsd)}<span class="n pos">+${usd((box.interestUsd || 0) + (box.paidUsd || 0), 2)}</span></span>
       </div>
       <div class="table-scroll"><table class="porto-tbl"><tbody>
         ${(box.owners || []).map(o => `<tr><td>${esc(o.name)}</td><td class="num">${pct(o.sharePct)}</td><td class="num">${usd(o.balanceUsd)}</td></tr>`).join('')}
@@ -2893,7 +2929,7 @@ async function renderHome() {
       <div class="prod-nums">
         <div><span class="k">Simpanan</span><span class="v">${box ? usd(box.balanceUsd, 0) : '—'}</span></div>
         <div><span class="k">Imbal hasil</span><span class="v pos">${monthly == null ? '—' : pct(monthly) + '<small>/bulan</small>'}</span></div>
-        <div><span class="k">Sudah dibayar</span><span class="v pos">${box ? usd(box.interestUsd, 2) : '—'}</span></div>
+        <div><span class="k">Sudah ditarik</span><span class="v pos">${box ? usd(box.paidUsd || 0, 2) : '—'}</span></div>
         <div><span class="k">Pemilik</span><span class="v">${box ? String((box.owners || []).length) : '—'}</span></div>
         <div><span class="k">Jenis</span><span class="v txt">${esc(sb.type || 'Simpanan')}</span></div>
         <div><span class="k">Pokok</span><span class="v txt">dijaga, tanpa fee</span></div>
@@ -3018,7 +3054,7 @@ async function renderPemegang() {
   }
   for (const o of g.box?.owners || []) {
     add(o.id, o.name, null, { fund: state.safebox?.label || 'Safe Box', accent: state.safebox?.accent || '#2dd4bf', share: Number(o.sharePct) || 0,
-      value: Number(o.balanceUsd) || 0, modal: Number(o.principalUsd) || 0, out: 0 });
+      value: Number(o.balanceUsd) || 0, modal: Number(o.principalUsd) || 0, out: Number(o.paidUsd) || 0 });
   }
   const list = [...people.values()].sort((a, b) => b.value - a.value);
   const total = list.reduce((s, p) => s + p.value, 0);

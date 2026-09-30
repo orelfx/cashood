@@ -38,7 +38,7 @@ const rows=Object.values(state.balances).map(b=>{
  const owner=state.owners.find(o=>o.id===b.id),capital=owner?.principalUsd||0;
  const interest=Core.money(b.accrued-b.paid);
  return {id:b.id,name:b.name,color:b.color,principalUsd:capital,sharePct:principal?capital/principal*100:0,
-  interestUsd:interest,interestTodayUsd:Core.money(today?.owners[b.id]||0),balanceUsd:Core.money(capital+interest)};
+  interestUsd:interest,paidUsd:Core.money(b.paid),interestTodayUsd:Core.money(today?.owners[b.id]||0),balanceUsd:Core.money(capital+interest)};
 });
 const interest=Core.money(rows.reduce((t,o)=>t+o.interestUsd,0));
 // LAJU, BUKAN JUMLAH YANG BARU TERKUMPUL. Sebelumnya Math.max(1, …) memaksa
@@ -53,7 +53,8 @@ const elapsedToday=Math.max(1/1440,(now-observedFrom)/86400000);
 const rawRate=principal?(today?.usd||0)/elapsedToday*30/principal*100:0;
 const todayRate=Math.min(Number(cfg.rate?.maxMonthlyPct??100),Math.max(Number(cfg.rate?.minMonthlyPct??0),rawRate));
 const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
- principalUsd:principal,interestUsd:interest,interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
+ principalUsd:principal,interestUsd:interest,paidUsd:Core.money(rows.reduce((t,o)=>t+o.paidUsd,0)),
+ lastPayout:(()=>{const p=(existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[]).filter(x=>x.type==='interest');if(!p.length)return null;const at=Math.max(...p.map(x=>Date.parse(x.at)));const same=p.filter(x=>Date.parse(x.at)===at);return {at,period:same[0].period||null,usd:Core.money(same.reduce((t,x)=>t+Number(x.usd),0))};})(),interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
  interestDay:Core.day(now),days:state.days.slice(-30).map(d=>({date:d.date,usd:d.usd,estimated:d.estimated})),inRange:pos.inRange===true,
  quality:{complete:true,feesEstimated:true,allocationEstimated:state.days.some(d=>d.estimated),migrationAt:state.migration?.at},
  measure:{monthlyPct:Number(todayRate.toFixed(3)),apyPct:Number((todayRate*365/30).toFixed(3)),perDayUsd:(today?.usd||0)/elapsedToday,

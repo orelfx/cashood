@@ -45,7 +45,7 @@ const sourceSnapshot = frozen?.sourceSnapshot || (flag('from-live') ? readJSON(r
 if (flag('from-live') && !frozen) Core.validateSnapshot(sourceSnapshot, { complete:true, maxAge:45*60000 });
 const withdrawn = Core.number(frozen?.withdrawn ?? (sourceSnapshot ? sourceSnapshot.treasuryDistributableUsd ?? sourceSnapshot.treasuryUsd : arg('withdrawn')), 'Laba tersedia / --withdrawn', 0);
 const rate = Core.number(frozen?.rate ?? arg('rate'), 'Kurs', 0.01);
-const balance = Core.number(frozen?.balance ?? arg('balance', 0), 'Saldo', 0);
+const balance = Core.number(frozen?.balance || arg('balance') || sourceSnapshot?.fixedCapitalUsd || 0, 'Saldo', 0);
 const example = !flag('final');
 if (!(withdrawn >= 0) || !(rate > 0)) {
   console.error('pakai: node scripts/statement.mjs --withdrawn <USD> --rate <IDR per USD> [--period YYYY-MM] [--balance USD] [--example]');
@@ -364,7 +364,7 @@ ${cutoffMs ? `<div class="page p2">
 
 <main>
   <div>
-    <h3>Kenapa dibagi dua lapis</h3>
+    <h3>${layers.length > 1 ? 'Kenapa dibagi dua lapis' : 'Kenapa investor baru belum menerima bagian'}</h3>
     <div class="callout">${layers.length > 1 ? '' : '<strong>Bulan ini seluruh labanya lahir sebelum modal baru masuk, jadi lapisnya cuma satu.</strong> '}Laba tidak dibagi menurut porsi saham pada hari pembayaran, melainkan menurut porsi
       <strong>saat laba itu dihasilkan</strong>. Modal yang baru masuk ${esc(payLabelShort(newSince))} tidak ikut
       membagi laba yang sudah ada sebelum ia datang, dan modal lama tidak kehilangan haknya atas laba yang
