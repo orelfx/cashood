@@ -2233,23 +2233,23 @@ function renderSafebox() {
           <h2>Pemilik simpanan</h2>
           <span class="hint">bunga dibagi menurut porsi pokok · ditarik tiap tanggal 1, pokok tetap</span>
         </div>
-        <div class="table-scroll"><table>
+        <div class="table-scroll"><table class="mcards">
           <thead><tr><th>Pemilik</th><th class="num">Pokok</th><th class="num">Porsi</th><th class="num">Bunga hari ini</th><th class="num">Bunga berjalan</th><th class="num">Sudah ditarik</th><th class="num">Saldo</th></tr></thead>
           <tbody>${d.owners.map((o) => `<tr>
-            <td><span class="who"><span class="chip" style="background:${o.color || '#2dd4bf'}"></span>${esc(o.name)}</span></td>
-            <td class="num">${usd(o.principalUsd)}</td>
-            <td class="num">${pct(o.sharePct)}</td>
-            <td class="num pos">${usd(o.interestTodayUsd, 2)}</td>
-            <td class="num pos">${usd(o.interestUsd, 2)}</td>
-            <td class="num">${usd(o.paidUsd || 0, 2)}</td>
-            <td class="num"><strong>${usd(o.balanceUsd)}</strong></td></tr>`).join('')}
-            <tr><td><strong>Total</strong></td>
-              <td class="num"><strong>${usd(d.principalUsd)}</strong></td>
-              <td class="num">100,00%</td>
-              <td class="num pos"><strong>${usd(d.interestTodayUsd ?? 0, 2)}</strong></td>
-              <td class="num pos"><strong>${usd(d.interestUsd, 2)}</strong></td>
-              <td class="num"><strong>${usd(d.paidUsd || 0, 2)}</strong></td>
-              <td class="num"><strong>${usd(d.balanceUsd)}</strong></td></tr>
+            <td class="mc-head"><span class="who"><span class="chip" style="background:${o.color || '#2dd4bf'}"></span>${esc(o.name)}</span></td>
+            <td class="num" data-k="Pokok">${usd(o.principalUsd)}</td>
+            <td class="num" data-k="Porsi">${pct(o.sharePct)}</td>
+            <td class="num pos" data-k="Bunga hari ini">${usd(o.interestTodayUsd, 2)}</td>
+            <td class="num pos" data-k="Bunga berjalan">${usd(o.interestUsd, 2)}</td>
+            <td class="num" data-k="Sudah ditarik">${usd(o.paidUsd || 0, 2)}</td>
+            <td class="num" data-k="Saldo"><strong>${usd(o.balanceUsd)}</strong></td></tr>`).join('')}
+            <tr class="mc-total"><td class="mc-head"><strong>Total</strong></td>
+              <td class="num" data-k="Pokok"><strong>${usd(d.principalUsd)}</strong></td>
+              <td class="num" data-k="Porsi">100,00%</td>
+              <td class="num pos" data-k="Bunga hari ini"><strong>${usd(d.interestTodayUsd ?? 0, 2)}</strong></td>
+              <td class="num pos" data-k="Bunga berjalan"><strong>${usd(d.interestUsd, 2)}</strong></td>
+              <td class="num" data-k="Sudah ditarik"><strong>${usd(d.paidUsd || 0, 2)}</strong></td>
+              <td class="num" data-k="Saldo"><strong>${usd(d.balanceUsd)}</strong></td></tr>
           </tbody>
         </table></div>
       </section>` : ''}
