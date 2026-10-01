@@ -113,9 +113,17 @@
       </div>
       <div class="hg-sum" id="hgSum"><span class="dim">memuat grafik…</span></div>
       <div class="hg-chart"><svg id="hgChart" viewBox="0 0 720 220" role="img" aria-label="Total dana dari waktu ke waktu"></svg></div>
+      <div class="hg-flows" id="hgFlows" hidden></div>
       <div class="hg-daily">
         <div class="hg-dhead"><h3 class="sub-h">Hasil harian</h3><span class="hint" id="hgDailyHint"></span></div>
-        <div class="hg-bars" id="hgBars"></div>
+        <div class="cal-head">
+          <button class="btn ghost" id="hgCalPrev" aria-label="Bulan sebelumnya">‹</button>
+          <strong id="hgCalTitle">—</strong>
+          <button class="btn ghost" id="hgCalNext" aria-label="Bulan berikutnya">›</button>
+        </div>
+        <div class="cal-dow" id="hgCalDow"></div>
+        <div class="cal-grid" id="hgCalGrid"></div>
+        <div class="cal-foot" id="hgCalFoot"></div>
       </div>
       <p class="hint">Grafik menjumlahkan nilai seluruh dana dan Safe Box (tanpa dana uji coba). Persen naik-turun dihitung tanpa setoran baru dan pembagian profit, jadi yang tampil murni kinerja bot. Hasil harian = profit posisi yang ditutup hari itu + imbal hasil Safe Box.</p>
     </section>

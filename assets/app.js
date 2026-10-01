@@ -3017,21 +3017,50 @@ async function renderGrowth(g, paper = []) {
     const last = grouped.at(-1);
     if (last && f.at - last.at < step * 2) last.usd += f.usd; else grouped.push({ at: f.at, usd: f.usd });
   }
-  drawGrowth($('#hgChart'), pts, rangeDelta >= 0, grouped.filter((f) => Math.abs(f.usd) >= 50));
+  drawGrowth($('#hgChart'), pts, rangeDelta >= 0);
+  const shown = grouped.filter((f) => Math.abs(f.usd) >= 50);
+  $('#hgFlows').hidden = !shown.length;
+  setHTML($('#hgFlows'), shown.length ? `<span class="hg-fl">Arus kas di rentang ini (tidak dihitung sebagai naik-turun):</span>`
+    + shown.map((f) => `<span class="hg-fi"><b>${tglJam(f.at)}</b> ${f.usd < 0 ? 'profit dibagikan / penarikan' : 'setoran masuk'} <b class="num">${signed(f.usd)}</b></span>`).join('') : '');
 
-  // Hasil harian 14 hari: profit posisi tertutup semua dana + imbal hasil Safe Box.
+  // Hasil harian: profit posisi tertutup semua dana + imbal hasil Safe Box.
   const days = new Map();
-  for (const b of briefs) for (const r of b.history || []) days.set(r.date, (days.get(r.date) || 0) + (Number(r.usd) || 0));
-  for (const d of box?.days || []) days.set(d.date, (days.get(d.date) || 0) + (Number(d.usd) || 0));
-  const list = [];
-  for (let i = 13; i >= 0; i--) { const d = new Date(now + 7 * 3600e3 - i * 86400e3).toISOString().slice(0, 10); list.push({ date: d, usd: days.get(d) || 0 }); }
-  const max = Math.max(1, ...list.map((d) => Math.abs(d.usd)));
-  const sum = list.reduce((t, d) => t + d.usd, 0);
-  setHTML($('#hgDailyHint'), `14 hari: <b class="${cls(sum)}">${signed(sum)}</b> · hari ini <b class="${cls(list.at(-1).usd)}">${signed(list.at(-1).usd)}</b>`);
-  setHTML($('#hgBars'), list.map((d) => `<div class="hb ${d.usd >= 0 ? 'up' : 'down'}" title="${fmtDay(d.date)}: ${usdText(d.usd, 2)}">
-      <span class="hb-v">${Math.abs(d.usd) >= 1 ? signedCompact(d.usd) : ''}</span>
-      <span class="hb-col"><i style="height:${Math.max(2, (Math.abs(d.usd) / max) * 100).toFixed(1)}%"></i></span>
-      <span class="hb-d">${Number(d.date.slice(8))}</span></div>`).join(''));
+  const put = (date, usdv, closes) => { const r = days.get(date) || { date, usd: 0, closes: 0 }; r.usd += usdv; r.closes += closes; days.set(date, r); };
+  for (const b of briefs) for (const r of b.history || []) put(r.date, Number(r.usd) || 0, Number(r.closes) || 0);
+  for (const d of box?.days || []) put(d.date, Number(d.usd) || 0, 0);
+  homeCal.rows = [...days.values()].sort((a, b) => a.date.localeCompare(b.date));
+  const today = homeCal.rows.find((r) => r.date === new Date(now + 7 * 3600e3).toISOString().slice(0, 10));
+  setHTML($('#hgDailyHint'), `hari ini <b class="${cls(today?.usd || 0)}">${signed(today?.usd || 0)}</b>`);
+  renderHomeCalendar();
+}
+
+const homeCal = { month: null, rows: [] };
+function renderHomeCalendar() {
+  const rows = homeCal.rows;
+  if (!$('#hgCalGrid')) return;
+  const map = new Map(rows.map((r) => [r.date, r]));
+  const months = [...new Set(rows.map((r) => r.date.slice(0, 7)))].sort();
+  if (!homeCal.month || !months.includes(homeCal.month)) homeCal.month = months.at(-1) || new Date().toISOString().slice(0, 7);
+  const [yy, mm] = homeCal.month.split('-').map(Number);
+  const first = new Date(Date.UTC(yy, mm - 1, 1)), ndays = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
+  const peak = Math.max(1, ...rows.filter((r) => r.date.startsWith(homeCal.month)).map((r) => Math.abs(r.usd)));
+  $('#hgCalTitle').textContent = `${M_SHORT[mm - 1]} ${yy}`;
+  setHTML($('#hgCalDow'), D_SHORT.map((d) => `<span>${d}</span>`).join(''));
+  $('#hgCalPrev').disabled = months.indexOf(homeCal.month) <= 0;
+  $('#hgCalNext').disabled = months.indexOf(homeCal.month) >= months.length - 1;
+  let cells = '', total = 0, closes = 0;
+  for (let i = 0; i < first.getUTCDay(); i += 1) cells += '<div class="cell void"></div>';
+  for (let d = 1; d <= ndays; d += 1) {
+    const r = map.get(`${homeCal.month}-${String(d).padStart(2, '0')}`);
+    if (!r) { cells += `<div class="cell void"><span class="d">${d}</span></div>`; continue; }
+    total += r.usd; closes += r.closes;
+    const a = 0.12 + 0.42 * (Math.abs(r.usd) / peak), rgb = r.usd >= 0 ? '74,222,128' : '248,113,113';
+    cells += `<div class="cell" style="background:rgba(${rgb},${a.toFixed(3)});border-color:rgba(${rgb},.4)">
+      <span class="d">${d}</span><span class="a ${cls(r.usd)}">${narrow() ? signedCompact(r.usd) : signed(r.usd)}</span>
+      <span class="c">${r.closes ? `${r.closes} tutup` : 'bunga'}</span></div>`;
+  }
+  setHTML($('#hgCalGrid'), cells);
+  setHTML($('#hgCalFoot'), `<span>${closes} posisi ditutup bulan ini</span><span>Total <b class="${cls(total)}">${signed(total)}</b></span>`);
 }
 
 function drawGrowth(svg, pts, up, marks = []) {
@@ -3079,8 +3108,11 @@ async function renderHome() {
   setHTML($('#homeAum'), `
     <div class="aum-k"><span class="live-dot"></span>Total aset dikelola${g.missing.length ? ' <span class="dim">(sebagian)</span>' : ''}</div>
     <div class="aum-v">${usd(g.total, 0)}</div>
-    <div class="aum-chg" id="aumChg"></div>
-    <div class="aum-p ${cls(g.untung)}">${signed(g.untung)} <span>${pnlPct >= 0 ? '+' : ''}${pct(pnlPct)} dari modal ${usd(g.setoran, 0)}</span></div>
+    <div class="aum-rows">
+      <div class="aum-row"><span class="aum-l">24 jam terakhir</span><span class="aum-chg" id="aumChg"><span class="dim">menghitung…</span></span></div>
+      <div class="aum-row"><span class="aum-l">Sejak awal</span><span><b class="${cls(g.untung)} num">${signed(g.untung)}</b>
+        <span class="dim"> · ${pnlPct >= 0 ? '+' : ''}${pct(pnlPct)} dari modal ${usd(g.setoran, 0)}</span></span></div>
+    </div>
     <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
     <ul class="alloc-legend">${parts.map((p) => `<li><span class="chip" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
       <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span></li>`).join('')}</ul>
@@ -3377,6 +3409,14 @@ async function init() {
     if (state.view === 'analisa' && id === state.fund) { showTab(currentTab); return; }
     switchFund(id);
   };
+
+  const calStep = (dir) => {
+    const months = [...new Set(homeCal.rows.map((r) => r.date.slice(0, 7)))].sort();
+    const i = months.indexOf(homeCal.month) + dir;
+    if (i >= 0 && i < months.length) { homeCal.month = months[i]; renderHomeCalendar(); }
+  };
+  $('#hgCalPrev').onclick = () => calStep(-1);
+  $('#hgCalNext').onclick = () => calStep(1);
 
   $('#segHome').onclick = (e) => {
     const btn = e.target.closest('button');
