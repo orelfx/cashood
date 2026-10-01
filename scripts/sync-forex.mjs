@@ -151,6 +151,7 @@ const snapshot = {
   // Dua puluh terakhir di snapshot; seluruh riwayat di trades.json, yang baru
   // diambil halaman saat pembaca meminta "tampilkan semua".
   closedRecent: [...tutup].reverse().slice(0, 20),
+  tradesFile: true,
   trading: {
     paper: true,
     mode: 'demo',

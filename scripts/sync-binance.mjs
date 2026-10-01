@@ -155,6 +155,7 @@ const snapshot = {
     timezone: 'Asia/Jakarta (UTC+7)',
   },
   closedRecent: semua.slice(0, 20).map(bersih),
+  tradesFile: true,
   trading: {
     paper: true,
     mode: 'testnet',

@@ -398,6 +398,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     historyNote: snap.historyNote || null,
     performance: snap.performance || null,
     trading: snap.trading || null,
+    tradesFile: Boolean(snap.tradesFile),
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -760,16 +761,19 @@ function renderClosed(nav) {
       <td><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
       <td class="dim">${esc(r.strategy ?? '—')}</td>
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
-      <td class="num ${cls(r.netUsd)}">${r.netUsd == null ? '<span class="dim">—</span>' : signed(r.netUsd)}</td>
+      <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga sekarang">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
       <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}</td>
       <td class="num dim">${all ? tglJam(r.closedAt) : ago(r.closedAt)}</td>
     </tr>`).join('')
-    + (!all && Number(nav.stats?.closedCount) > rows.length
+    + (!all && nav.tradesFile && Number(nav.stats?.closedCount) > rows.length
       ? `<tr><td colspan="7" class="more-row"><button class="btn ghost" id="closedAllBtn">Tampilkan semua ${nav.stats.closedCount} trade</button></td></tr>` : ''));
   const withUsd = shown.filter((r) => r.netUsd != null);
+  const withEst = shown.filter((r) => r.netUsd == null && r.estUsd != null);
   setHTML($('#closedHint'), `${all ? 'seluruh ' + shown.length : shown.length + ' terakhir'}`
-    + (withUsd.length ? ` · jumlahnya ${signed(withUsd.reduce((t, r) => t + r.netUsd, 0))}` : ' · hasil dalam persen dari nilai posisi'));
+    + (withUsd.length ? ` · jumlahnya ${signed(withUsd.reduce((t, r) => t + r.netUsd, 0))}`
+      : withEst.length ? ` · ≈ jumlahnya ${signed(withEst.reduce((t, r) => t + r.estUsd, 0))} (dolar diperkirakan dari persen)`
+      : ' · hasil dalam persen dari nilai posisi'));
   const btn = $('#closedAllBtn');
   if (btn) btn.onclick = async () => {
     btn.disabled = true; btn.textContent = 'memuat…';

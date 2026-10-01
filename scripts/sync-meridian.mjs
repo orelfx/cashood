@@ -20,7 +20,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import Core from '../assets/core.js';
-import { lock, readJSON } from './lib/io.mjs';
+import { atomicJSON, lock, readJSON } from './lib/io.mjs';
 import { treasury, parseTransfers } from './lib/treasury.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
 import { cashoodSolanaEnv } from './lib/rpc-env.mjs';
@@ -328,6 +328,36 @@ const closesForPerformance = (tracking.entries || []).filter((e) => Date.parse(e
   };
 });
 snapshot.performanceInput = { closes: closesForPerformance, flatBand: 0.05 };
+
+// Tabel "Posisi terakhir ditutup": SEMUA posisi tertutup, bukan hanya yang
+// punya nilai dolar. Persennya dari bot (pasti); dolarnya, kalau bot tidak
+// mencatatnya, diperkirakan dari ukuran posisi saat dibuka (SOL) × persen ×
+// harga SOL sekarang, dan ditandai sebagai perkiraan (estUsd), bukan netUsd.
+const r2 = (n) => Number(Number(n).toFixed(2));
+const closedAll = (tracking.entries || []).filter((e) => Number.isFinite(Date.parse(e.close_ts)) && Date.parse(e.close_ts) >= startAt).map((e) => {
+  const at = Date.parse(e.close_ts), pct = Number(e.close_pnl_pct);
+  const st = state.positions?.[e.position];
+  const priced = closes.find((c) => c.closedAt === at && c.symbol === (e.pool_name || '—'));
+  const est = !priced && Number(st?.amount_sol) > 0 && Number.isFinite(pct) ? Number(st.amount_sol) * pct / 100 * solPrice : null;
+  const opened = st?.deployed_at ? Date.parse(st.deployed_at) : null;
+  return {
+    symbol: e.pool_name || '—',
+    strategy: [st?.book, e.mode].filter(Boolean).join(' · ').toLowerCase() || null,
+    netUsd: priced ? priced.netUsd : null,
+    estUsd: est == null ? null : r2(est),
+    netPct: Number.isFinite(pct) ? r2(pct) : null,
+    holdMinutes: opened ? Math.round((at - opened) / 60000) : null,
+    reason: String(e.close_reason || '').split(':')[0].replace(/_/g, ' ') || null,
+    closedAt: at,
+  };
+}).sort((a, b) => b.closedAt - a.closedAt);
+snapshot.closedRecent = closedAll.slice(0, 20);
+snapshot.tradesFile = true;
+snapshot.stats.closedCount = closedAll.length;
+snapshot.stats.wins = closedAll.filter((c) => c.netPct > 0.05).length;
+snapshot.stats.losses = closedAll.filter((c) => c.netPct < -0.05).length;
+snapshot.stats.winRate = closedAll.length ? r2((snapshot.stats.wins / closedAll.length) * 100) : null;
+atomicJSON(resolve(OUT_DIR, 'trades.json'), { fund: 'meridian', updatedAt: Date.now(), rows: closedAll });
 saveSnapshot(resolve(OUT_DIR,'live.json'), snapshot, cfgFund);
 console.log(`[meridian] total=$${snapshot.totalUsd} positions=${positions.length} complete=${snapshot.quality.complete} unpricedCloses=${unpricedCloses}`);
 release();

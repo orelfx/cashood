@@ -73,7 +73,17 @@ const [nativeWei, usdg, weth, rpcPrice] = await Promise.all([
   withTimeout('saldo ETH', () => client.getBalance({ address: WALLET }), 0n),
   readErc20(USDG, 6),
   readErc20(WETH, 18),
-  withTimeout('harga ETH', () => ethUsd(), 0),
+  // Harga ETH sering tersendat di sumber bot; kegagalannya tidak boleh
+  // menggagalkan seluruh snapshot. Cadangan: harga yang baru saja dipakai
+  // Reborn Rich (dana lain di jaringan yang sama), lalu CoinGecko.
+  withTimeout('harga ETH', () => ethUsd(), 0).catch(async () => {
+    try {
+      const rr = JSON.parse(readFileSync(resolve(DIR, '..', 'reborn', 'live.json'), 'utf8'));
+      if (Number(rr.ethPrice) > 0 && Date.now() - rr.updatedAt < 30 * 60e3) return Number(rr.ethPrice);
+    } catch { /* cadangan berikutnya */ }
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd', { signal: AbortSignal.timeout(8000) });
+    return Number((await r.json())?.ethereum?.usd) || 0;
+  }),
 ]);
 const nativeEth = num(nativeWei) / 1e18;
 
