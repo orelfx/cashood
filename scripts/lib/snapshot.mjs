@@ -55,6 +55,10 @@ export function saveSnapshot(out, snapshot, cfg) {
       snapshot.performance = buildPerformance({
         closes: inp.closes || [], points: flowsKnown ? points : [], flows, flatBand: inp.flatBand ?? 0.5,
         capitalUsd: ledger.capitalBasis ?? ledger.deposited, navUsd: snapshot.totalUsd,
+        // Dividen yang dibayar mengurangi basis untuk menghitung untung/rugi
+        // (uangnya sudah diterima investor), tapi persennya tetap dibandingkan
+        // dengan modal yang disetor — bukan modal yang mengecil karena dividen.
+        pctBaseUsd: (ledger.capitalBasis ?? ledger.deposited) + (cfg.events || []).filter((e) => e.dividend).reduce((t, e) => t + Number(e.usd || 0), 0),
       });
       if (!flowsKnown) {
         snapshot.performance.equityWithheld = 'Dompet dana ini dibaca, bukan dijalankan: uang yang masuk atau keluar dompet tidak tercatat di sini, jadi penurunan nilai tidak bisa dibedakan dari penarikan. Penurunan terdalam, rasio risiko, dan pemulihan ditahan sampai arus kasnya dicatat.';

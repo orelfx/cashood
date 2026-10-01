@@ -149,7 +149,7 @@ export function strategyScore(trades, equity, recoveryFactor) {
 }
 
 /** Semua digabung jadi satu blok `performance` untuk snapshot publik. */
-export function buildPerformance({ closes = [], points = [], flows = [], capitalUsd = 0, navUsd = 0, flatBand = 0.5 }) {
+export function buildPerformance({ closes = [], points = [], flows = [], capitalUsd = 0, pctBaseUsd = null, navUsd = 0, flatBand = 0.5 }) {
   const trades = tradeStats(closes, { flatBand });
   const equity = equityStats(points, flows);
   const profit = navUsd - capitalUsd;
@@ -157,7 +157,7 @@ export function buildPerformance({ closes = [], points = [], flows = [], capital
   return {
     generatedAt: Date.now(),
     trades, equity,
-    profitUsd: round(profit), profitPct: capitalUsd > 0 ? round((profit / capitalUsd) * 100) : null,
+    profitUsd: round(profit), profitPct: (pctBaseUsd ?? capitalUsd) > 0 ? round((profit / (pctBaseUsd ?? capitalUsd)) * 100) : null,
     recoveryFactor,
     score: strategyScore(trades, equity, recoveryFactor),
   };

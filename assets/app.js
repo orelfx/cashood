@@ -479,7 +479,12 @@ function renderSummary(ledger, nav) {
   // $441 tidak dihitung dua kali sebagai modal DAN sebagai untung.
   const reinvested = Number(ledger.reinvested) || 0;
   const modal = ledger.deposited + reinvested;
-  const pnl = inBot + (ledger.withdrawn + swept) - modal;
+  // Kartu ini menunjukkan POSISI TERHADAP MODAL: modal dikunci, dan yang sudah
+  // dibagikan tiap tanggal 1 dianggap selesai (aturan pemilik 2026-10-01).
+  // Total sejak awal — termasuk dividen yang sudah diterima investor — ada di
+  // tab Analys.
+  const divPaid = (state.cfg?.events || []).filter((e) => e.dividend).reduce((t, e) => t + (Number(e.usd) || 0), 0);
+  const pnl = inBot + (ledger.withdrawn - divPaid + swept) - modal;
   const pnlPct = modal > 0 ? (pnl / modal) * 100 : 0;
 
   setHTML($('#kpiNav'), usd(inBot));
@@ -545,7 +550,8 @@ function renderSummary(ledger, nav) {
   if (!(tr && tr.capitalKnown === false)) {
     setHTML(el, signed(pnl));
     el.className = 'big ' + cls(pnl);
-    $('#kpiPnlSub').textContent = (pnl >= 0 ? '+' : '') + pct(pnlPct) + ' dari modal';
+    $('#kpiPnlSub').textContent = (pnl >= 0 ? '+' : '') + pct(pnlPct) + ' dari modal'
+      + (divPaid > 0 ? ` · sudah dibagikan ${usdText(divPaid, 0)} · total sejak awal ${signedText(pnl + divPaid)}` : '');
   }
   setHTML($('#donutVal'), usd(nav.totalUsd, 0));
   $('#footSrc').textContent = nav.source === 'manual' ? 'config manual' : 'snapshot bot';
