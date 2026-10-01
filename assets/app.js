@@ -492,16 +492,31 @@ function renderSummary(ledger, nav) {
     ? `${usdText(ledger.deposited, 0)} setoran + ${usdText(reinvested, 0)} laba diputar kembali`
     : 'total setoran semua pemilik';
   // "Sudah ditarik" = pencairan investor + sapuan harian bot ke wallet tabungan.
-  const sweeps = (nav.treasuryMoves || []).length;
-  setHTML($('#kpiWithdraw'), usd(ledger.withdrawn + swept));
+  const sweeps = (nav.treasuryMoves || []).filter((m) => m.type === 'sweep').length;
+  // Dividen yang sudah dibagikan tanggal 1 keluar dari kartu ini: kartunya
+  // menghitung ulang dari nol tiap bulan, dan pembayarannya ada di invoice dan
+  // riwayat transaksi. Untung/rugi tetap memasukkannya (lihat `pnl`).
+  const divEvents = (state.cfg?.events || []).filter((e) => e.dividend);
+  const dividendsPaid = divEvents.reduce((t, e) => t + (Number(e.usd) || 0), 0);
+  const investorOut = Math.max(0, ledger.withdrawn - dividendsPaid);
+  setHTML($('#kpiWithdraw'), usd(investorOut + swept));
   // Pemilik membaca ini sebagai dua bagian: uang yang sudah ada sebelum
   // hitungan baru dimulai ("early investor"), dan yang ditarik bot sesudahnya
   // ("new"). Keduanya ditulis apa adanya, bukan dijumlah jadi satu angka buta.
   const opening = Number(nav.treasuryOpeningUsd) || 0;
   const fresh = Number(nav.treasuryNewUsd) || 0;
   const openingLabel = nav.treasuryOpeningLabel || 'saldo awal';
-  setHTML($('#kpiWithdrawSub'), swept > 0
-    ? (ledger.withdrawn > 0 ? `${usd(ledger.withdrawn, 0)} investor + ` : '')
+  const lastDiv = divEvents.length ? divEvents.reduce((a, e) => (e.at > a.at ? e : a)) : null;
+  const lastDivUsd = lastDiv ? divEvents.filter((e) => e.batchId === lastDiv.batchId).reduce((t, e) => t + e.usd, 0) : 0;
+  setHTML($('#kpiWithdrawSub'), swept <= 0 && lastDiv
+    ? (() => {
+      const at = lastDiv.at, moves = (nav.treasuryMoves || []).filter((m) => m.at === at);
+      const div = moves.filter((m) => m.type === 'dividend').reduce((t, m) => t + m.usd, 0);
+      const cost = moves.filter((m) => m.type === 'expense').reduce((t, m) => t + m.usd, 0);
+      return `${usd(lastDivUsd, 0)} keluar ${fmtDay(lastDiv.date)}${div || cost ? ` (${usd(div, 0)} dividen + ${usd(cost, 0)} biaya)` : ''} · mulai dari nol lagi`;
+    })()
+    : swept > 0
+    ? (investorOut > 0 ? `${usd(investorOut, 0)} investor + ` : '')
       + (opening > 0
         ? `${esc(openingLabel)} ${usd(opening, 0)}` + (fresh > 0 ? ` · new ${usd(fresh, 0)}` : '')
         : `${usd(swept, 0)} disapu bot · ${sweeps} transfer`)
@@ -930,7 +945,7 @@ function renderHistory(ledger) {
       const out = e.type === 'withdraw';
       return `<tr>
         <td>${e.date || '—'}</td>
-        <td><span class="pill ${out ? 'out' : 'in'}">${e.type === 'reinvest' ? 'reinvestasi' : out ? 'tarik' : 'setor'}</span></td>
+        <td><span class="pill ${out ? 'out' : 'in'}">${e.type === 'reinvest' ? 'reinvestasi' : e.dividend ? 'dividen' : out ? 'tarik' : 'setor'}</span></td>
         <td><span class="who"><span class="chip" style="background:${e.color || '#4ade80'}"></span>${esc(e.ownerName)}</span></td>
         <td class="num ${out ? 'neg' : 'pos'}">${out ? '-' : '+'}${usd(e.usd)}</td>
         <td class="num dim">${usd(e.unitPrice, 4)}</td>

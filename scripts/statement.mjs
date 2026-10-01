@@ -90,6 +90,14 @@ const d = cfg.dividend || {}, feeStd = result.plan.standardFeePct, feeNow = resu
 const rows = result.rows.map(r => ({ ...r, parts: layers.map(l => ({ key:l.key,label:l.label,share:(l.shares.find(o=>o.id===r.id)?.share||0)*100,usd:l.cut[r.id]||0 })),
  share: fullLedger.totalUnits ? (fullLedger.owners.find(o=>o.id===r.id)?.units||0)/fullLedger.totalUnits*100 : 0,
  idr:0,waiting:r.netUsd===0 })).sort((a,b)=>b.netUsd-a.netUsd);
+// Pemegang saham yang masuk sesudah laba bulan ini lahir tidak punya bagian di
+// lapis mana pun, tapi tetap tercantum di invoice dengan $0 dan alasannya.
+for (const o of fullLedger.owners.filter((o) => o.units > 0 && !rows.some((r) => r.id === o.id))) {
+  rows.push({ id:o.id, name:o.name, gross:0, feeUsd:0, feeStdUsd:0, netUsd:0, parts:layers.map(l=>({key:l.key,label:l.label,share:0,usd:0})), share: fullLedger.totalUnits ? o.units/fullLedger.totalUnits*100 : 0, idr:0, waiting:true });
+}
+// Setoran yang masuk setelah batas laba: ikut mulai periode berikutnya.
+const lateUsd = (id) => cutoffMs == null ? 0 : (eligibleCfg.events || []).filter((e) => e.owner === id && e.type === 'deposit' && Core.eventTime(e) >= cutoffMs).reduce((t, e) => t + Number(e.usd), 0);
+for (const r of rows) r.lateUsd = lateUsd(r.id);
 
 // Rupiah juga dibagi dengan sisa terbesar: dibulatkan per baris, beberapa baris
 // bisa selisih Rp 1 dari kotak "Dibagikan" di atas — kecil, tapi di laporan
@@ -146,6 +154,30 @@ const revision = arg('revision', '1');
 if (!/^[1-9]\d*$/.test(revision)) throw new Error('Revisi tidak valid');
 const invoiceNo = `INV/${fund === 'reborn' ? 'RR' : fund.slice(0,3).toUpperCase()}/${payIso.slice(0,7)}/R${revision}${example ? '/DRAFT' : ''}`;
 const generated = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(now);
+
+// Rincian biaya + cara pembagian: di halaman 2 kalau ada (halaman 1 penuh oleh
+// tabel pemegang saham), selain itu tetap di halaman 1.
+const costBlock = `
+  <div class="two">
+    <div>
+      <h3>Rincian biaya sistem bulanan</h3>
+      <table class="costs"><tbody>
+        ${costItems.map((c) => `<tr><td>${esc(c.name)}</td><td class="num">${usd(c.usd)}</td></tr>`).join('')}
+        <tr class="total"><td>Total biaya</td><td class="num">${usd(costsUsd)}</td></tr>
+      </tbody></table>
+    </div>
+    <div>
+      <h3>Cara pembagian</h3>
+      <ul class="rules">
+        <li><span>1</span><div>Bot bekerja dengan modal tetap. Setiap kelebihan di atasnya ditarik harian dalam kelipatan $100.</div></li>
+        <li><span>2</span><div>Tanggal 1, total yang ditarik sebulan dikurangi biaya sistem.</div></li>
+        <li><span>3</span><div>Sisanya dibagikan <b>100%</b> menurut porsi saham — sekecil apa pun porsinya, tanpa bagian yang mengendap.</div></li>
+      </ul>
+      <div class="fee"><div><span class="was">Fee admin ${feeStd}%</span><small>dari bagian tiap pemegang saham</small></div>
+        <div class="now">${feeNow > 0 ? `${feeNow}%` : 'GRATIS BULAN INI'}</div></div>
+    </div>
+  </div>
+`;
 
 const html = `<!doctype html>
 <html lang="id"><head><meta charset="utf-8">
@@ -249,6 +281,19 @@ const html = `<!doctype html>
   .holders .free { color: var(--green); font-weight: 700; font-size: 7.2pt; margin-left: 1mm; }
   .holders .get { color: var(--green); font-weight: 700; }
   .holders tr.waiting td { color: var(--mute); }
+  .ret { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin-top: 3mm; padding: 3mm 4mm; border: 0.3mm solid var(--line); border-radius: 2.5mm; background: var(--soft); }
+  .ret .k { display: block; font-size: 6.6pt; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); font-weight: 700; }
+  .ret b { display: block; font-size: 12pt; margin: .8mm 0 .3mm; }
+  .ret small { font-size: 7pt; color: var(--mute); }
+  .holders td.get, .holders tfoot td { white-space: nowrap; }
+  /* halaman 2 memuat rincian biaya juga: rapatkan supaya footer tidak terpotong */
+  .p2 .layers td { padding: 1.2mm 2mm; }
+  .p2 .layers th { padding: 1.4mm 2mm; }
+  .p2 h3 { margin-top: 4mm; margin-bottom: 2mm; }
+  .p2 .costs td { padding-top: 1mm; padding-bottom: 1mm; }
+  .p2 .steps { gap: 1.2mm; }
+  .p2 .callout { padding-top: 2.5mm; padding-bottom: 2.5mm; }
+  .holders .late { font-size: 6.8pt; color: var(--mute); margin-top: .6mm; }
   .holders .note { font-size: 7pt; color: var(--mute); margin-top: 0.6mm; }
   .holders tfoot td { border-bottom: 0; border-top: 0.4mm solid var(--ink); font-weight: 700; padding-top: 2.6mm; background: #fff; }
 
@@ -284,6 +329,21 @@ const html = `<!doctype html>
     <div class="tile hero"><div class="k">Dibagikan ${distributePct}%</div><div class="v num">${usd(pool, 0)}</div><div class="s num">${idr(Math.round(pool * rate))}</div></div>
   </div>
 
+  ${(() => {
+    // Hasil bulan ini dibanding modal kerja, dan posisi bot di akhir periode.
+    if (!(balance > 0)) return '';
+    const inBot = snapshot ? Number(snapshot.totalUsd) - Number(snapshot.treasuryUsd || 0) : null;
+    const floating = inBot == null ? null : inBot - balance;
+    return `<div class="ret">
+      <div><span class="k">Hasil terhadap modal</span><b class="num">${pct(withdrawn / balance * 100)}</b>
+        <small>${usd(withdrawn, 0)} ditarik dari modal ${usd(balance, 0)}</small></div>
+      <div><span class="k">Bersih setelah biaya</span><b class="num">${pct(pool / balance * 100)}</b>
+        <small>${usd(pool, 0)} dibagikan ÷ modal ${usd(balance, 0)}</small></div>
+      ${floating == null ? '' : `<div><span class="k">Posisi bot akhir ${esc(BULAN[pm - 1])}</span><b class="num" style="color:${floating < 0 ? 'var(--red)' : 'var(--green)'}">${floating >= 0 ? '+' : ''}${usd(floating, 0)}</b>
+        <small>nilai di bot ${usd(inBot, 0)} vs modal ${usd(balance, 0)} · ${floating < 0 ? 'masih floating minus' : 'di atas modal'}</small></div>`}
+    </div>`;
+  })()}
+
   ${perf ? `<div>
     <h3>Performa bot · ${esc(periodLabel)}</h3>
     <div class="perf">
@@ -301,25 +361,7 @@ const html = `<!doctype html>
     </div>
   </div>` : ''}
 
-  <div class="two">
-    <div>
-      <h3>Rincian biaya sistem bulanan</h3>
-      <table class="costs"><tbody>
-        ${costItems.map((c) => `<tr><td>${esc(c.name)}</td><td class="num">${usd(c.usd)}</td></tr>`).join('')}
-        <tr class="total"><td>Total biaya</td><td class="num">${usd(costsUsd)}</td></tr>
-      </tbody></table>
-    </div>
-    <div>
-      <h3>Cara pembagian</h3>
-      <ul class="rules">
-        <li><span>1</span><div>Bot bekerja dengan modal tetap. Setiap kelebihan di atasnya ditarik harian dalam kelipatan $100.</div></li>
-        <li><span>2</span><div>Tanggal 1, total yang ditarik sebulan dikurangi biaya sistem.</div></li>
-        <li><span>3</span><div>Sisanya dibagikan <b>100%</b> menurut porsi saham — sekecil apa pun porsinya, tanpa bagian yang mengendap.</div></li>
-      </ul>
-      <div class="fee"><div><span class="was">Fee admin ${feeStd}%</span><small>dari bagian tiap pemegang saham</small></div>
-        <div class="now">${feeNow > 0 ? `${feeNow}%` : 'GRATIS BULAN INI'}</div></div>
-    </div>
-  </div>
+  ${cutoffMs ? '' : costBlock}
 
   <div>
     <h3>Pembagian per pemegang saham</h3>
@@ -327,10 +369,10 @@ const html = `<!doctype html>
       <thead><tr><th>Pemegang saham</th><th>Porsi</th><th>Bagian</th><th>Fee admin ${feeStd}%</th><th>Diterima (USD)</th><th>Diterima (IDR)</th></tr></thead>
       <tbody>
         ${rows.map((r) => r.waiting ? `<tr class="waiting">
-          <td><div class="who">${esc(r.name)}</div><div class="note">baru masuk ${esc(newSince ? `${Number(newSince.slice(8, 10))} ${BULAN[Number(newSince.slice(5, 7)) - 1]}` : '')} — ikut dividen mulai periode berikutnya</div></td>
+          <td><div class="who">${esc(r.name)}</div><div class="note">masuk ${esc(newSince ? `${Number(newSince.slice(8, 10))} ${BULAN[Number(newSince.slice(5, 7)) - 1].slice(0, 3)}` : '')} · laba lahir sebelum modalnya masuk, bot masih floating minus · ikut mulai ${esc(BULAN[pm % 12])}</div></td>
           <td class="num">—</td><td class="num">${usd(0)}</td><td class="num">—</td>
           <td class="num">${usd(0)}</td><td class="num">${idr(0)}</td></tr>` : `<tr>
-          <td><div class="who">${esc(r.name)}</div><div class="bar"><i style="width:${Math.min(100, r.share).toFixed(2)}%"></i></div></td>
+          <td><div class="who">${esc(r.name)}</div><div class="bar"><i style="width:${Math.min(100, r.share).toFixed(2)}%"></i></div>${r.lateUsd > 0 ? `<div class="late">setoran ${usd(r.lateUsd, 0)} tgl ${esc(payLabelShort(newSince))} ikut mulai ${esc(BULAN[pm % 12])}</div>` : ''}</td>
           <td class="num">${pct(r.share)}</td>
           <td class="num">${usd(r.gross)}</td>
           <td class="num">${feeNow > 0 ? usd(-r.feeUsd) : `<span class="struck">${usd(-r.feeStdUsd)}</span><span class="free">FREE</span>`}</td>
@@ -397,7 +439,7 @@ ${cutoffMs ? `<div class="page p2">
         ${layers.map((L, i) => `<th>Porsi lapis ${i + 1}</th><th>Bagian lapis ${i + 1}</th>`).join('')}
         <th>Total (USD)</th><th>Total (IDR)</th></tr></thead>
       <tbody>
-        ${rows.map((r) => `<tr>
+        ${rows.filter((r) => !r.waiting).map((r) => `<tr>
           <td class="who">${esc(r.name)}</td>
           ${r.parts.map((x) => `<td class="num ${x.share ? '' : 'zero'}">${x.share ? pct(x.share) : '—'}</td>
              <td class="num ${x.usd ? '' : 'zero'}">${usd(x.usd)}</td>`).join('')}
@@ -423,6 +465,8 @@ ${cutoffMs ? `<div class="page p2">
       <div class="step"><div class="n">5</div><div>Rupiah dihitung dari total tiap orang pada kurs <span class="num">${idr(rate)}</span> per dolar.</div></div>
     </div>
   </div>
+
+  ${costBlock}
 </main>
 
 <footer>

@@ -395,7 +395,7 @@ const carriedUsd = carried.reduce((t,p)=>t+Number(p.principalUsd)+Number(p.feesU
 // tidak pakai tanggal + nominal.
 const fixedCapitalUsd = Number(cfgTreasury.fund?.fixedCapitalUsd) || 0;
 const sweepStepUsd = Number(cfgTreasury.treasury?.stepUsd) || 100;
-const transferFile = resolve(HERE, '..', cfgTreasury.treasury?.ledgerFile || 'data/reborn/treasury.jsonl');
+const transferFile = cfgTreasury.treasury?.ledgerFile ? resolve(HERE, '..', cfgTreasury.treasury.ledgerFile) : resolve(dirname(OUT), 'treasury.jsonl');
 const cash = treasury(cfgTreasury, profitSweeps(), existsSync(transferFile) ? parseTransfers(readFileSync(transferFile,'utf8')) : []);
 const treasuryUsd = cash.treasuryUsd;
 
