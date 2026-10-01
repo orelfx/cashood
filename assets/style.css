@@ -1076,3 +1076,53 @@ body.at-home #tabs { display: none; }
   #closedTable td:nth-child(2), #closedTable td:nth-child(6) { min-width: 0; max-width: 120px; overflow-wrap: anywhere; }
   #costTable td:first-child { overflow-wrap: anywhere; }
 }
+
+/* ── beranda: naik-turun, grafik total, hasil harian, kuota (2026-10-01) ── */
+.chg { display: inline-flex; align-items: baseline; gap: 4px; font: 700 12.5px var(--mono); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.chg small { font: 500 10.5px var(--sans); opacity: .8; }
+.chg.up { color: #4ade80; background: rgba(74,222,128,.10); border: 1px solid rgba(74,222,128,.25); }
+.chg.down { color: #f87171; background: rgba(248,113,113,.10); border: 1px solid rgba(248,113,113,.25); }
+.prod-top > span[data-chg], .prod-top > .chg { margin-left: auto; align-self: flex-start; }
+.aum-chg { display: flex; align-items: center; gap: 8px; margin: 2px 0 6px; min-height: 24px; }
+.aum-chg-usd { font: 600 13px var(--mono); }
+.g-base { stroke: #3a4452; stroke-width: 1; stroke-dasharray: 4 4; }
+
+.home-growth { margin-bottom: 30px; }
+.hg-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 2px 0 8px; font-size: 13px; }
+.hg-sum b { font-size: 22px; letter-spacing: -.02em; }
+.hg-chart svg { width: 100%; height: auto; display: block; }
+.hg-daily { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.hg-dhead { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.hg-dhead .sub-h { margin: 0; }
+.hg-bars { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 6px; align-items: end; }
+.hb { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.hb-v { font: 600 10px var(--mono); color: var(--muted); height: 13px; white-space: nowrap; }
+.hb.up .hb-v { color: #4ade80; } .hb.down .hb-v { color: #f87171; }
+.hb-col { width: 100%; height: 90px; display: flex; align-items: flex-end; background: rgba(255,255,255,.025); border-radius: 6px; overflow: hidden; }
+.hb-col i { display: block; width: 100%; border-radius: 6px 6px 0 0; }
+.hb.up .hb-col i { background: linear-gradient(180deg, #4ade80, rgba(74,222,128,.35)); }
+.hb.down .hb-col i { background: linear-gradient(180deg, #f87171, rgba(248,113,113,.35)); }
+.hb-d { font: 500 10.5px var(--mono); color: var(--muted); }
+
+.quota { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: rgba(255,255,255,.015); }
+.quota .q-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.quota .q-top b { color: var(--text); font: 650 12.5px var(--mono); }
+.quota .q-bar { height: 7px; border-radius: 999px; background: #1c232d; overflow: hidden; margin: 7px 0 5px; }
+.quota .q-bar i { display: block; height: 100%; border-radius: 999px; background: var(--c); }
+.quota .q-n { font-size: 11.5px; color: var(--muted); }
+.quota.full .q-n { color: #fbbf24; }
+
+/* angka panjang (mode rupiah) tidak boleh terpotong di kartu produk */
+.prod-nums .v { font-size: 14px; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+.prod-nums .v small { display: block; margin: 2px 0 0; }
+
+@media (max-width: 640px) {
+  .hg-bars { gap: 3px; }
+  .hb-v { display: none; }
+  .hb-col { height: 70px; }
+  .hg-sum b { font-size: 19px; }
+  .prod-top { flex-wrap: wrap; }
+}
+.g-flow { stroke: #fbbf24; stroke-width: 1; stroke-dasharray: 3 3; opacity: .7; }
+.g-flow-lbl { fill: #fbbf24; font: 600 10.5px var(--sans); }
+.prod-nums .v.txt small { display: inline; margin: 0 0 0 1px; }

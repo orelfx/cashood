@@ -87,9 +87,9 @@
   <div id="tab-home" hidden>
     <section class="home-hero">
       <div class="hh-copy">
-        <span class="eyebrow"><span class="live-dot"></span>Dana kripto · dikelola AI · data tiap 5 menit</span>
-        <h2 class="hh-title">Uang bekerja 24 jam.<br><span class="grad">Angkanya terbuka untuk semua.</span></h2>
-        <p class="hh-sub">Cashood Headfund menjalankan robot AI di Solana dan Robinhood Chain. Setiap dolar, posisi, dan pembagian hasil bisa dicek langsung di sini.</p>
+        <span class="eyebrow"><span class="live-dot"></span>Bot aktif 24/7 · data diperbarui tiap 5 menit</span>
+        <h2 class="hh-title">Bot yang kerja.<br><span class="grad">Kamu tinggal pantau hasilnya.</span></h2>
+        <p class="hh-sub">Setiap posisi dibuka, dijaga, dan ditutup oleh bot, siang dan malam, tanpa ada yang menekan tombol. Profitnya dibagikan tiap tanggal 1, dan semua angkanya bisa kamu cek sendiri di sini.</p>
         <div class="hh-cta">
           <a class="cta primary" href="#analisa">Lihat portofolio</a>
           <a class="cta ghost" href="#safebox">Buka Safe Box</a>
@@ -103,6 +103,22 @@
     </section>
 
     <section class="home-stats" id="homeStats"></section>
+
+    <section class="card home-growth" id="homeGrowth">
+      <div class="card-head">
+        <h2>Perkembangan total dana</h2>
+        <div class="seg" id="segHome" role="group" aria-label="Rentang grafik">
+          <button data-h="24" class="on">24 jam</button><button data-h="168">7 hari</button><button data-h="0">semua</button>
+        </div>
+      </div>
+      <div class="hg-sum" id="hgSum"><span class="dim">memuat grafik…</span></div>
+      <div class="hg-chart"><svg id="hgChart" viewBox="0 0 720 220" role="img" aria-label="Total dana dari waktu ke waktu"></svg></div>
+      <div class="hg-daily">
+        <div class="hg-dhead"><h3 class="sub-h">Hasil harian</h3><span class="hint" id="hgDailyHint"></span></div>
+        <div class="hg-bars" id="hgBars"></div>
+      </div>
+      <p class="hint">Grafik menjumlahkan nilai seluruh dana dan Safe Box (tanpa dana uji coba). Persen naik-turun dihitung tanpa setoran baru dan pembagian profit, jadi yang tampil murni kinerja bot. Hasil harian = profit posisi yang ditutup hari itu + imbal hasil Safe Box.</p>
+    </section>
 
     <section class="home-block">
       <div class="hb-head">

@@ -11,7 +11,8 @@ const DIR=resolve(process.env.CASHOOD_DATA_DIR || resolve(dirname(fileURLToPath(
 const release=lock(resolve(DIR,'sync.lock.local'));
 const cfg=readJSON(resolve(DIR,'config.json')),secret=readJSON(resolve(DIR,'position.local.json'));
 const prev=readJSON(resolve(DIR,'live.json'));
-if(!process.argv.includes('--now')&&prev?.schemaVersion===2&&Date.now()-prev.updatedAt<55*60000){release();process.exit(0);}
+// Dulu dibatasi sekali per 55 menit supaya hemat RPC bot; sejak situs punya RPC
+// sendiri, Safe Box ikut siklus 5 menit seperti dana lain.
 const home=process.env.RR_HOME||'/root/robinhood';process.chdir(home);useCashoodRobinhoodRpc();
 const load=rel=>import(pathToFileURL(resolve(home,rel)).href);
 await load('node_modules/dotenv/config.js');

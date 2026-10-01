@@ -2512,6 +2512,13 @@ async function loadFundBrief(id) {
       updatedAt: Number(snap?.updatedAt) || null,
       paper: Boolean(meta?.paper),
       risk: meta?.risk || null,
+      capacityUsd: Number(cfg.fund?.capacityUsd) || 0,
+      history: Array.isArray(snap?.history) ? snap.history : [],
+      // Arus uang masuk/keluar dana (setoran +, penarikan & dividen −), untuk
+      // memisahkan perubahan nilai karena kinerja dari perubahan karena setoran.
+      flows: (cfg.events || []).filter((e) => e.type === 'deposit' || e.type === 'withdraw')
+        .map((e) => ({ at: CashoodCore.eventTime(e), usd: e.type === 'deposit' ? Number(e.usd) : -Number(e.usd) })),
+      cfg,
       type: meta?.type || null,
       perf: snap?.performance || null,
       costsUsd: (cfg.costs?.items || []).reduce((s, i) => s + (Number(i.usd) || 0), 0),
@@ -2910,6 +2917,150 @@ function showHome() {
   renderHome().catch(() => {});
 }
 
+/**
+ * Kuota investor: setoran (modal masuk) dibanding plafon produk. Diukur dari
+ * setoran, bukan nilai sekarang — dana yang turun karena rugi tidak membuka
+ * kuota baru (aturan pemilik 2026-10-01). Dana uji coba: kuotanya = modal
+ * yang sedang dipakai, jadi selalu penuh.
+ */
+function quota(used, cap, paper) {
+  if (!(cap > 0) || used == null) return '';
+  const fill = Math.min(100, (used / cap) * 100), sisa = Math.max(0, cap - used);
+  return `<div class="quota${sisa <= 0 ? ' full' : ''}">
+    <div class="q-top"><span>${paper ? 'Modal uji coba' : 'Kuota investor'}</span><b>${usd(Math.min(used, cap), 0)} / ${usd(cap, 0)}</b></div>
+    <div class="q-bar"><i style="width:${fill.toFixed(1)}%"></i></div>
+    <div class="q-n">${paper ? 'uji coba — belum menerima investor' : sisa > 0 ? `sisa kuota ${usd(sisa, 0)}` : 'kuota penuh'}</div></div>`;
+}
+let sbCapacity = null;
+
+/* ── perkembangan total dana (beranda) ─────────────────────────────────── */
+const homeView = { hours: 24 };
+const seriesCache = new Map();
+async function loadFundSeries(b) {
+  const hit = seriesCache.get(b.id);
+  if (hit && Date.now() - hit.at < 60000) return hit.points;
+  const pts = (await readNavSeries(b.cfg, { fund: b.id })).map((p) => ({ t: Number(p.t), usd: Number(p.usd) }))
+    .filter((p) => Number.isFinite(p.t) && Number.isFinite(p.usd)).sort((a, b2) => a.t - b2.t);
+  seriesCache.set(b.id, { at: Date.now(), points: pts });
+  return pts;
+}
+const valueAt = (pts, t) => { let lo = 0, hi = pts.length - 1, ans = null; while (lo <= hi) { const m = (lo + hi) >> 1; if (pts[m].t <= t) { ans = pts[m]; lo = m + 1; } else hi = m - 1; } return ans; };
+/** Perubahan nilai dalam jendela waktu, tanpa setoran/penarikan/dividen. */
+function fundChange(pts, flows, nowUsd, ms, now = Date.now()) {
+  if (!pts.length) return null;
+  const base = valueAt(pts, now - ms) || pts[0];
+  if (!(base.usd > 0) || now - base.t < ms * 0.25) return null;
+  const flow = flows.filter((f) => f.at > base.t && f.at <= now).reduce((t, f) => t + f.usd, 0);
+  const delta = nowUsd - base.usd - flow;
+  return { delta, pct: (delta / base.usd) * 100, from: base.t, base: base.usd };
+}
+const chgBadge = (c, label = '24 jam') => (!c ? '' : `<span class="chg ${c.delta >= 0 ? 'up' : 'down'}">${c.delta >= 0 ? '▲' : '▼'} ${pct(Math.abs(c.pct), 2)}<small>${label}</small></span>`);
+
+let growthEpoch = 0;
+async function renderGrowth(g, paper = []) {
+  const epoch = ++growthEpoch;
+  const briefs = g.briefs;
+  const series = await Promise.all(briefs.map((b) => loadFundSeries(b).catch(() => [])));
+  const paperSeries = await Promise.all(paper.map((b) => loadFundSeries(b).catch(() => [])));
+  if (epoch !== growthEpoch || state.view !== 'home') return;
+  const now = Date.now(), box = g.box;
+  const boxStart = Date.parse(`${state.safebox?.startedAt || '2026-09-12'}T00:00:00+07:00`);
+
+  // Tanda naik-turun 24 jam per dana dan untuk total.
+  let totalDelta = 0, totalBase = 0;
+  const todayIso = new Date(now + 7 * 3600e3).toISOString().slice(0, 10);
+  const badge = (b, pts) => {
+    // Dompet yang hanya dibaca (setoran/penarikan pemilik tidak tercatat):
+    // perubahan nilainya bisa karena uang dipindah, bukan kinerja. Untuk dana
+    // seperti itu yang dipakai profit posisi yang ditutup hari ini.
+    const external = b.cfg?.fund?.cashFlowsRecorded === false;
+    let c, label = '24 jam';
+    if (external) {
+      const today = Number((b.history || []).find((r) => r.date === todayIso)?.usd) || 0;
+      c = b.totalUsd > 0 ? { delta: today, pct: (today / b.totalUsd) * 100, base: b.totalUsd } : null;
+      label = 'hari ini';
+    } else c = fundChange(pts, b.flows, b.totalUsd, 86400e3, now);
+    const el = document.querySelector(`[data-chg="${CSS.escape(b.id)}"]`);
+    if (el) setHTML(el, chgBadge(c, label));
+    return c;
+  };
+  briefs.forEach((b, i) => { const c = badge(b, series[i]); if (c) { totalDelta += c.delta; totalBase += c.base; } });
+  paper.forEach((b, i) => badge(b, paperSeries[i]));
+  if (box) { totalDelta += Number(box.interestTodayUsd) || 0; totalBase += Number(box.principalUsd) || 0; }
+  const tc = totalBase > 0 ? { delta: totalDelta, pct: (totalDelta / totalBase) * 100 } : null;
+  if ($('#aumChg')) setHTML($('#aumChg'), tc ? `${chgBadge(tc)} <span class="aum-chg-usd ${cls(tc.delta)}">${signed(tc.delta)}</span>` : '');
+
+  // Grafik total: nilai tiap dana dibawa maju dari titik terakhirnya, dijumlah.
+  const earliest = Math.min(...series.filter((p) => p.length).map((p) => p[0].t), box ? boxStart : now);
+  const from = homeView.hours ? Math.max(earliest, now - homeView.hours * 3600e3) : earliest;
+  const step = homeView.hours === 24 ? 15 * 60e3 : homeView.hours === 168 ? 2 * 3600e3 : 6 * 3600e3;
+  const pts = [];
+  for (let t = from; t <= now; t += step) {
+    let v = 0;
+    series.forEach((p) => { const a = valueAt(p, t); if (a) v += a.usd; });
+    if (box && t >= boxStart) v += Number(box.balanceUsd) || 0;
+    pts.push({ t, v });
+  }
+  pts.push({ t: now, v: g.total });
+  const flowIn = briefs.flatMap((b) => b.flows).filter((f) => f.at > from && f.at <= now).reduce((t, f) => t + f.usd, 0);
+  const first = pts[0]?.v || 0;
+  // 24 jam memakai jumlah perubahan per dana (sama dengan tanda di kartu
+  // produk dan kartu total aset); rentang panjang memakai deret gabungan.
+  const rangeDelta = homeView.hours === 24 && tc ? tc.delta : g.total - first - flowIn;
+  const rangeBase = homeView.hours === 24 && tc ? totalBase : first;
+  setHTML($('#hgSum'), pts.length > 1 ? `<b class="num">${usd(g.total, 0)}</b>
+    <span class="chg ${rangeDelta >= 0 ? 'up' : 'down'}">${rangeDelta >= 0 ? '▲' : '▼'} ${pct(Math.abs(rangeBase ? rangeDelta / rangeBase * 100 : 0), 2)}</span>
+    <span class="${cls(rangeDelta)} num">${signed(rangeDelta)}</span><span class="dim">${homeView.hours === 24 ? '24 jam terakhir' : homeView.hours === 168 ? '7 hari terakhir' : 'sejak awal'}${Math.abs(flowIn) >= 1 ? ` · tanpa arus kas ${signedText(flowIn)}` : ''}</span>` : '<span class="dim">belum cukup data</span>');
+  const marks = briefs.flatMap((b) => b.flows.map((f) => ({ ...f, fund: b.label }))).filter((f) => f.at > from && f.at <= now);
+  const grouped = [];
+  for (const f of marks.sort((a, b) => a.at - b.at)) {
+    const last = grouped.at(-1);
+    if (last && f.at - last.at < step * 2) last.usd += f.usd; else grouped.push({ at: f.at, usd: f.usd });
+  }
+  drawGrowth($('#hgChart'), pts, rangeDelta >= 0, grouped.filter((f) => Math.abs(f.usd) >= 50));
+
+  // Hasil harian 14 hari: profit posisi tertutup semua dana + imbal hasil Safe Box.
+  const days = new Map();
+  for (const b of briefs) for (const r of b.history || []) days.set(r.date, (days.get(r.date) || 0) + (Number(r.usd) || 0));
+  for (const d of box?.days || []) days.set(d.date, (days.get(d.date) || 0) + (Number(d.usd) || 0));
+  const list = [];
+  for (let i = 13; i >= 0; i--) { const d = new Date(now + 7 * 3600e3 - i * 86400e3).toISOString().slice(0, 10); list.push({ date: d, usd: days.get(d) || 0 }); }
+  const max = Math.max(1, ...list.map((d) => Math.abs(d.usd)));
+  const sum = list.reduce((t, d) => t + d.usd, 0);
+  setHTML($('#hgDailyHint'), `14 hari: <b class="${cls(sum)}">${signed(sum)}</b> · hari ini <b class="${cls(list.at(-1).usd)}">${signed(list.at(-1).usd)}</b>`);
+  setHTML($('#hgBars'), list.map((d) => `<div class="hb ${d.usd >= 0 ? 'up' : 'down'}" title="${fmtDay(d.date)}: ${usdText(d.usd, 2)}">
+      <span class="hb-v">${Math.abs(d.usd) >= 1 ? signedCompact(d.usd) : ''}</span>
+      <span class="hb-col"><i style="height:${Math.max(2, (Math.abs(d.usd) / max) * 100).toFixed(1)}%"></i></span>
+      <span class="hb-d">${Number(d.date.slice(8))}</span></div>`).join(''));
+}
+
+function drawGrowth(svg, pts, up, marks = []) {
+  if (!svg) return;
+  if (pts.length < 2) { setHTML(svg, ''); return; }
+  // Layar sempit: kanvas dengan proporsi HP, supaya label tidak mengecil.
+  const small = narrow();
+  const W = small ? 420 : 720, H = small ? 240 : 220, m = { t: 16, r: small ? 66 : 64, b: 26, l: 6 };
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const vs = pts.map((p) => p.v), lo = Math.min(...vs), hi = Math.max(...vs), pad = (hi - lo) * 0.12 || hi * 0.01 || 1;
+  const y0 = lo - pad, y1 = hi + pad, t0 = pts[0].t, t1 = pts.at(-1).t;
+  const x = (t) => m.l + ((t - t0) / Math.max(1, t1 - t0)) * (W - m.l - m.r);
+  const y = (v) => m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
+  const color = up ? '#4ade80' : '#f87171';
+  const last = pts.at(-1);
+  const fmtT = (t) => { const d = new Date(t + 7 * 3600e3); return homeView.hours === 24 ? d.toISOString().slice(11, 16) : `${d.getUTCDate()}/${d.getUTCMonth() + 1}`; };
+  const ticks = [t0, t0 + (t1 - t0) / 2, t1];
+  setHTML(svg, `<defs><linearGradient id="hgFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    ${[hi, (hi + lo) / 2, lo].map((v) => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" class="g-grid"/><text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${usdText(v, 0)}</text>`).join('')}
+    <line x1="${m.l}" x2="${W - m.r}" y1="${y(pts[0].v).toFixed(1)}" y2="${y(pts[0].v).toFixed(1)}" class="g-base"/>
+    <path d="${line}L${x(t1).toFixed(1)},${H - m.b}L${x(t0).toFixed(1)},${H - m.b}Z" fill="url(#hgFill)"/>
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/>
+    ${marks.map((f) => `<line x1="${x(f.at).toFixed(1)}" x2="${x(f.at).toFixed(1)}" y1="${m.t}" y2="${H - m.b}" class="g-flow"/>
+      <text x="${(x(f.at) + 4).toFixed(1)}" y="${m.t + 10}" class="g-flow-lbl">${f.usd < 0 ? 'profit dibagikan' : 'setoran'} ${signedCompact(f.usd)}</text>`).join('')}
+    <circle cx="${x(last.t).toFixed(1)}" cy="${y(last.v).toFixed(1)}" r="4.5" fill="${color}"/>
+    ${ticks.map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`).join('')}`);
+}
+
 let homeEpoch = 0;
 async function renderHome() {
   const epoch = ++homeEpoch;
@@ -2928,12 +3079,17 @@ async function renderHome() {
   setHTML($('#homeAum'), `
     <div class="aum-k"><span class="live-dot"></span>Total aset dikelola${g.missing.length ? ' <span class="dim">(sebagian)</span>' : ''}</div>
     <div class="aum-v">${usd(g.total, 0)}</div>
+    <div class="aum-chg" id="aumChg"></div>
     <div class="aum-p ${cls(g.untung)}">${signed(g.untung)} <span>${pnlPct >= 0 ? '+' : ''}${pct(pnlPct)} dari modal ${usd(g.setoran, 0)}</span></div>
     <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
     <ul class="alloc-legend">${parts.map((p) => `<li><span class="chip" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
       <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span></li>`).join('')}</ul>
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
 
+  if (sbCapacity == null && state.safebox?.configUrl) {
+    try { const c = await getJSON(state.safebox.configUrl); sbCapacity = Number(c?.display?.capacityUsd) || 0; state.safebox.startedAt = c?.startedAt; } catch { sbCapacity = 0; }
+    if (epoch !== homeEpoch || state.view !== 'home') return;
+  }
   // ── angka singkat ──
   const tile = (k, v, n) => `<div class="hs"><div class="hs-v">${v}</div><div class="hs-k">${k}</div><div class="hs-n">${n}</div></div>`;
   const posisi = g.briefs.reduce((s, b) => s + b.openCount, 0);
@@ -2960,17 +3116,21 @@ async function renderHome() {
         ['Posisi ditutup', b ? String(b.closedCount) : '—', ''], ['Jenis', esc(f.type || '—'), 'txt'], ['Fee protokol', fee, 'txt']];
     return `<a class="prod" href="#${esc(f.id)}/portfolio" style="--c:${f.accent}">
       <div class="prod-top">${iconTile(FUND_ICON[f.id] || 'pulse', f.accent)}
-        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain)}${f.venue ? ' · ' + esc(f.venue) : ''}</div></div></div>
+        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain)}${f.venue ? ' · ' + esc(f.venue) : ''}</div></div>
+        <span class="chg" data-chg="${esc(f.id)}"></span></div>
       <p class="prod-desc">${esc(f.blurb || '')}</p>
       <div class="prod-nums">${nums.map(([k, v, c]) => `<div><span class="k">${k}</span><span class="v ${c}">${v}</span></div>`).join('')}</div>
+      ${quota(b ? (f.paper ? b.depositedUsd : b.depositedUsd) : null, f.paper ? (b?.depositedUsd || 0) : (b?.capacityUsd || 0), f.paper)}
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   const safeCard = () => {
     const sb = state.safebox || {};
     const monthly = box?.measure?.monthlyPct;
+    const today = box && box.principalUsd ? ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100 : null;
     return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
       <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
-        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · imbal hasil 0–3% per bulan</div></div></div>
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · imbal hasil 0–3% per bulan</div></div>
+        ${today == null ? '' : `<span class="chg up">▲ ${pct(today, 3)}<small>hari ini</small></span>`}</div>
       <p class="prod-desc">${esc(sb.blurb || '')}</p>
       <div class="prod-nums">
         <div><span class="k">Simpanan</span><span class="v">${box ? usd(box.balanceUsd, 0) : '—'}</span></div>
@@ -2980,6 +3140,7 @@ async function renderHome() {
         <div><span class="k">Jenis</span><span class="v txt">${esc(sb.type || 'Simpanan')}</span></div>
         <div><span class="k">Pokok</span><span class="v txt">dijaga, tanpa fee</span></div>
       </div>
+      ${quota(box ? Number(box.principalUsd) : null, sbCapacity || 0, false)}
       <span class="prod-go">Buka Safe Box <b>→</b></span></a>`;
   };
   setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
@@ -3003,7 +3164,10 @@ async function renderHome() {
     ['info', '#94a3b8', 'Cara kerja', 'Saham, dividen, risiko', `#${first}/tentang`],
   ];
   setHTML($('#homeMenu'), menu.map(([ic, c, t, n, href]) => `<a class="menu-tile" href="${href}">${iconTile(ic, c)}<b>${t}</b><span>${n}</span></a>`).join(''));
+  lastHomeTotals = g; lastHomePaper = paper.filter(Boolean);
+  renderGrowth(g, lastHomePaper).catch(() => {});
 }
+let lastHomeTotals = null, lastHomePaper = [];
 
 /* ── analys seluruh bot ─────────────────────────────────────────────────
  *
@@ -3214,6 +3378,14 @@ async function init() {
     switchFund(id);
   };
 
+  $('#segHome').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    homeView.hours = Number(btn.getAttribute('data-h'));
+    $('#segHome').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
+    if (lastHomeTotals) renderGrowth(lastHomeTotals, lastHomePaper).catch(() => {});
+  };
+
   $('#segAn').onclick = (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -3333,6 +3505,7 @@ async function init() {
       if (narrow() === lastNarrow) return;
       lastNarrow = narrow();
       if (state.nav) { renderNavChart(); renderProfit(); }
+      if (state.view === 'home' && lastHomeTotals) renderGrowth(lastHomeTotals, lastHomePaper).catch(() => {});
     }, 200);
   });
   $('#wdAmount').oninput = renderCalc;
