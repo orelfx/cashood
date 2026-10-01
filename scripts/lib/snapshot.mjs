@@ -54,7 +54,10 @@ export function saveSnapshot(out, snapshot, cfg) {
       const flowsKnown = cfg.fund?.cashFlowsRecorded !== false;
       snapshot.performance = buildPerformance({
         closes: inp.closes || [], points: flowsKnown ? points : [], flows, flatBand: inp.flatBand ?? 0.5,
-        capitalUsd: ledger.capitalBasis ?? ledger.deposited, navUsd: snapshot.totalUsd,
+        // Basis untung/rugi: modal dikurangi profit yang DITERIMA investor
+        // (bersih, sesuai invoice). Tanggungan biaya sistem tidak dihitung
+        // sebagai uang yang diterima, jadi ditambahkan kembali ke basis.
+        capitalUsd: (ledger.capitalBasis ?? ledger.deposited) + (cfg.events || []).filter((e) => e.dividend).reduce((t, e) => t + Number(e.usd || 0) - Number(e.receivedUsd ?? e.usd ?? 0), 0), navUsd: snapshot.totalUsd,
         // Dividen yang dibayar mengurangi basis untuk menghitung untung/rugi
         // (uangnya sudah diterima investor), tapi persennya tetap dibandingkan
         // dengan modal yang disetor — bukan modal yang mengecil karena dividen.

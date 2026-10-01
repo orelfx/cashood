@@ -431,7 +431,24 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
 
 /* ── render ──────────────────────────────────────────────────────────── */
 
+/**
+ * Profit yang dibagikan tiap tanggal 1, per pemilik. Catatan dividen di config
+ * mengurangi unit pemilik sebesar `usd` (bagian laba + tanggungan biaya sistem);
+ * yang benar-benar ia terima ada di `receivedUsd`, sama dengan invoice.
+ */
+function dividendByOwner(cfg = state.cfg) {
+  const out = {};
+  for (const e of (cfg?.events || []).filter((x) => x.dividend)) {
+    const d = (out[e.owner] ||= { gross: 0, net: 0 });
+    d.gross += Number(e.usd) || 0;
+    d.net += Number(e.receivedUsd ?? e.usd) || 0;
+  }
+  return out;
+}
+const dividendTotals = (cfg = state.cfg) => Object.values(dividendByOwner(cfg)).reduce((t, d) => ({ gross: t.gross + d.gross, net: t.net + d.net }), { gross: 0, net: 0 });
+
 function ownerValues(ledger, navUsd) {
+  const div = dividendByOwner();
   const unitPrice = ledger.totalUnits > 0 ? navUsd / ledger.totalUnits : 0;
   return ledger.owners.map((o) => {
     const value = o.units * unitPrice;
@@ -439,7 +456,10 @@ function ownerValues(ledger, navUsd) {
       ...o,
       value,
       share: ledger.totalUnits > 0 ? (o.units / ledger.totalUnits) * 100 : 0,
-      pnl: value + o.withdrawn - o.deposited,
+      // Profit diterima = bersih sesuai invoice; "out" = penarikan modal biasa.
+      received: div[o.id]?.net || 0,
+      out: Math.max(0, o.withdrawn - (div[o.id]?.gross || 0)),
+      pnl: value + (div[o.id]?.net || 0) + Math.max(0, o.withdrawn - (div[o.id]?.gross || 0)) - o.deposited,
     };
   });
 }
@@ -519,7 +539,7 @@ function renderSummary(ledger, nav) {
       const at = lastDiv.at, moves = (nav.treasuryMoves || []).filter((m) => m.at === at);
       const div = moves.filter((m) => m.type === 'dividend').reduce((t, m) => t + m.usd, 0);
       const cost = moves.filter((m) => m.type === 'expense').reduce((t, m) => t + m.usd, 0);
-      return `${usd(lastDivUsd, 0)} keluar ${fmtDay(lastDiv.date)}${div || cost ? ` (${usd(div, 0)} dividen + ${usd(cost, 0)} biaya)` : ''} · mulai dari nol lagi`;
+      return `${usd(lastDivUsd, 0)} keluar ${fmtDay(lastDiv.date)}${div || cost ? ` (${usd(div, 0)} profit + ${usd(cost, 0)} biaya)` : ''} · mulai dari nol lagi`;
     })()
     : swept > 0
     ? (investorOut > 0 ? `${usd(investorOut, 0)} investor + ` : '')
@@ -552,7 +572,7 @@ function renderSummary(ledger, nav) {
     setHTML(el, signed(pnl));
     el.className = 'big ' + cls(pnl);
     $('#kpiPnlSub').textContent = (pnl >= 0 ? '+' : '') + pct(pnlPct) + ' dari modal'
-      + (divPaid > 0 ? ` · sudah dibagikan ${usdText(divPaid, 0)} · total sejak awal ${signedText(pnl + divPaid)}` : '');
+      + (divPaid > 0 ? ` · profit dibagikan ${usdText(dividendTotals().net, 0)} · total sejak awal ${signedText(pnl + dividendTotals().net)}` : '');
   }
   setHTML($('#donutVal'), usd(nav.totalUsd, 0));
   $('#footSrc').textContent = nav.source === 'manual' ? 'config manual' : 'snapshot bot';
@@ -611,7 +631,7 @@ function renderOwners(rows) {
       <td><span class="who"><span class="chip" style="background:${r.color || '#4ade80'}"></span>${esc(r.name)}</span></td>
       <td class="num">${pct(r.share)}</td>
       <td class="num">${usd(r.deposited)}</td>
-      <td class="num">${r.withdrawn > 0 ? usd(r.withdrawn) : '<span class="dim">—</span>'}</td>
+      <td class="num">${r.received > 0 ? `<span class="pos">${usd(r.received)}</span>` : '<span class="dim">—</span>'}${r.out > 0 ? `<div class="sub2">+ tarik modal ${usd(r.out)}</div>` : ''}</td>
       <td class="num"><strong>${usd(r.value)}</strong></td>
       <td class="num ${cls(r.pnl)}">${signed(r.pnl)}</td>
     </tr>`).join(''));
@@ -955,9 +975,9 @@ function renderHistory(ledger) {
       const out = e.type === 'withdraw';
       return `<tr>
         <td>${e.date || '—'}</td>
-        <td><span class="pill ${out ? 'out' : 'in'}">${e.type === 'reinvest' ? 'reinvestasi' : e.dividend ? 'dividen' : out ? 'tarik' : 'setor'}</span></td>
+        <td><span class="pill ${out ? 'out' : 'in'}">${e.type === 'reinvest' ? 'reinvestasi' : e.dividend ? 'profit' : out ? 'tarik' : 'setor'}</span></td>
         <td><span class="who"><span class="chip" style="background:${e.color || '#4ade80'}"></span>${esc(e.ownerName)}</span></td>
-        <td class="num ${out ? 'neg' : 'pos'}">${out ? '-' : '+'}${usd(e.usd)}</td>
+        <td class="num ${e.dividend ? 'pos' : out ? 'neg' : 'pos'}">${e.dividend ? '+' + usd(e.receivedUsd ?? e.usd) : (out ? '-' : '+') + usd(e.usd)}</td>
         <td class="num dim">${usd(e.unitPrice, 4)}</td>
         <td class="dim">${esc(e.note || '—')}</td>
       </tr>`;
@@ -2487,7 +2507,8 @@ async function loadFundBrief(id) {
       totalUsd: total,
       // Sama dengan kartu dana: laba yang diputar kembali ikut jadi modal.
       depositedUsd: ledger.deposited + (Number(ledger.reinvested) || 0),
-      pnlUsd: snap?.trading?.capitalKnown === false ? null : total + ledger.withdrawn - ledger.deposited - (Number(ledger.reinvested) || 0),
+      pnlUsd: snap?.trading?.capitalKnown === false ? null
+        : total + ledger.withdrawn - dividendTotals(cfg).gross + dividendTotals(cfg).net - ledger.deposited - (Number(ledger.reinvested) || 0),
       updatedAt: Number(snap?.updatedAt) || null,
       paper: Boolean(meta?.paper),
       risk: meta?.risk || null,
@@ -2501,7 +2522,7 @@ async function loadFundBrief(id) {
       closedCount: Number(snap?.stats?.closedCount) || Number(snap?.performance?.trades?.count) || 0,
       owners: ledger.owners.filter((o) => o.units > 0)
         .map((o) => ({ id: o.id, name: o.name, color: o.color, share: (o.units / ledger.totalUnits) * 100, value: o.units * unit,
-          deposited: o.deposited, withdrawn: o.withdrawn }))
+          deposited: o.deposited, withdrawn: o.withdrawn - (dividendByOwner(cfg)[o.id]?.gross || 0) + (dividendByOwner(cfg)[o.id]?.net || 0) }))
         .sort((a, b) => b.share - a.share),
     };
   })();
