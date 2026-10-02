@@ -1366,7 +1366,7 @@ function renderNavChart() {
   const tip = $('#navTip');
   const cross = svg.querySelector('#navCross');
   const hit = svg.querySelector('#navHit');
-  hit.onmousemove = (ev) => {
+  hit.onpointermove = hit.onpointerdown = (ev) => {
     const box = wrap.getBoundingClientRect();
     const ratio = W / (box.width || W);
     const sx = (ev.clientX - box.left) * ratio;
@@ -1386,7 +1386,7 @@ function renderNavChart() {
     tip.style.left = (x(near.t) / ratio) + 'px';
     tip.style.top = ((y(near.v) - 10) / ratio) + 'px';
   };
-  hit.onmouseleave = () => { tip.hidden = true; cross.style.display = 'none'; };
+  hit.onpointerleave = (ev) => { if (ev.pointerType === 'mouse') { tip.hidden = true; cross.style.display = 'none'; } };
 }
 
 
@@ -2206,11 +2206,11 @@ function renderSafebox() {
             <div class="k">Saldo simpanan</div>
             <div class="v">${usd(d.balanceUsd)}</div>
             <div class="n">pokok ${usd(d.principalUsd)} + bunga berjalan ${usd(d.interestUsd, 2)}</div>
-            <div class="sb-pill"><span class="led ${d.inRange ? 'live' : ''}"></span>${d.inRange ? 'sedang menghasilkan' : 'sedang tidak menghasilkan'}</div>
+            <div class="sb-pill"><span class="led ${(d.earning ?? d.inRange) ? 'live' : ''}"></span>${(d.earning ?? d.inRange) ? 'sedang menghasilkan' : 'sedang tidak menghasilkan'}</div>
           </div>
           <div class="stat"><div class="k">Bunga hari ini</div>
             <div class="v pos">${usd(d.interestTodayUsd ?? rate.perDayUsd ?? 0, 2)}</div>
-            <div class="n">${d.interestDay ? fmtDay(d.interestDay) : ''} · fee yang masuk hari ini</div></div>
+            <div class="n">${d.interestDay ? fmtDay(d.interestDay) : ''} · imbal hasil yang masuk hari ini</div></div>
           ${Number(d.paidUsd) > 0 ? `<div class="stat"><div class="k">Sudah ditarik</div>
             <div class="v pos">${usd(d.paidUsd, 2)}</div>
             <div class="n">bunga dibayar ke pemilik${d.lastPayout?.at ? ` · terakhir ${fmtDay(new Date(d.lastPayout.at + 7 * 3600e3).toISOString().slice(0, 10))}` : ''}</div></div>`
@@ -2223,8 +2223,8 @@ function renderSafebox() {
         </div>
         <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>, tapi selalu di antara
           <strong>${pctRate(rate.minMonthlyPct ?? 0)} dan ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>.
-          Bunga dihitung dari perubahan fee yang teramati, dengan batas bawah dan atas sesuai aturan simpanan.
-          ${(d.quality?.feesEstimated || d.quality?.allocationEstimated) ? 'Sebagian penghitungan memakai estimasi; jeda pengamatan dibagi menurut waktu yang berlalu.' : 'Angka hari ini masih dapat bertambah sampai tengah malam WIB.'}
+          Bunga dihitung dari hasil penempatan dana yang teramati, dengan batas bawah dan atas sesuai aturan simpanan.
+          ${(d.quality?.estimated || d.quality?.feesEstimated || d.quality?.allocationEstimated) ? 'Sebagian penghitungan memakai estimasi; jeda pengamatan dibagi menurut waktu yang berlalu.' : 'Angka hari ini masih dapat bertambah sampai tengah malam WIB.'}
           Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran atau jaminan hasil investasi.</p>
       </section>
 
@@ -2260,7 +2260,7 @@ function renderSafebox() {
       ${(d.days || []).length > 1 ? `<section class="card">
         <div class="card-head">
           <h2>Bunga harian</h2>
-          <span class="hint">fee yang masuk tiap hari · berjalan ${usd(d.interestUsd, 2)}${Number(d.paidUsd) > 0 ? ` · sudah ditarik ${usd(d.paidUsd, 2)}` : ''}</span>
+          <span class="hint">imbal hasil tiap hari · berjalan ${usd(d.interestUsd, 2)}${Number(d.paidUsd) > 0 ? ` · sudah ditarik ${usd(d.paidUsd, 2)}` : ''}</span>
         </div>
         <div class="table-scroll"><table class="daily"><thead><tr><th>Tanggal</th><th class="num">Bunga</th><th>Status</th></tr></thead><tbody>
           ${(() => {
@@ -2286,7 +2286,7 @@ function renderSafebox() {
           yang dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
         <div class="two">
           <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
-            <li>Besarnya mengikuti hasil perdagangan yang benar-benar terjadi hari itu, bukan janji persentase tetap.</li>
+            <li>Besarnya mengikuti hasil penempatan dana yang benar-benar terjadi hari itu, bukan janji persentase tetap.</li>
             <li>Karena itu bunganya naik-turun: hari yang ramai membayar lebih besar, hari yang sepi lebih kecil.</li>
             <li>Sekecil apa pun hasilnya, bunga tidak pernah di bawah ${pctRate(rate.minMonthlyPct ?? 0)} per bulan, dan sebesar apa pun
                 tidak melebihi ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan.</li>
@@ -2326,7 +2326,7 @@ function renderSafebox() {
           <tbody>${rows}</tbody>
         </table></div>
         <p class="hint disclaimer">Tabel ini mengalikan laju bunga hari ini ke depan — bukan ramalan. Laju itu naik
-          dan turun mengikuti perdagangan di pool. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
+          dan turun mengikuti hasil penempatan dana. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
           tetap uang pokok, dan bunga yang sudah masuk berhenti di tempatnya — pokok ${usd(modal, 0)} yang sudah
           berbunga ${usd(100, 0)} tetap bekerja dengan ${usd(modal, 0)}, bukan ${usd(modal + 100, 0)}.</p>
       </section>`);
@@ -2995,13 +2995,16 @@ async function renderGrowth(g, paper = []) {
   const from = homeView.hours ? Math.max(earliest, now - homeView.hours * 3600e3) : earliest;
   const step = homeView.hours === 24 ? 15 * 60e3 : homeView.hours === 168 ? 2 * 3600e3 : 6 * 3600e3;
   const pts = [];
+  const partsAt = (t, latest) => {
+    const parts = briefs.map((b, i) => ({ name: b.label, color: b.accent, usd: latest ? b.totalUsd : (valueAt(series[i], t)?.usd ?? 0) }));
+    if (box && t >= boxStart) parts.push({ name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: Number(box.balanceUsd) || 0 });
+    return parts.filter((p) => p.usd > 0);
+  };
   for (let t = from; t <= now; t += step) {
-    let v = 0;
-    series.forEach((p) => { const a = valueAt(p, t); if (a) v += a.usd; });
-    if (box && t >= boxStart) v += Number(box.balanceUsd) || 0;
-    pts.push({ t, v });
+    const parts = partsAt(t, false);
+    pts.push({ t, v: parts.reduce((a, p) => a + p.usd, 0), parts });
   }
-  pts.push({ t: now, v: g.total });
+  pts.push({ t: now, v: g.total, parts: partsAt(now, true) });
   const flowIn = briefs.flatMap((b) => b.flows).filter((f) => f.at > from && f.at <= now).reduce((t, f) => t + f.usd, 0);
   const first = pts[0]?.v || 0;
   // 24 jam memakai jumlah perubahan per dana (sama dengan tanda di kartu
@@ -3087,7 +3090,39 @@ function drawGrowth(svg, pts, up, marks = []) {
     ${marks.map((f) => `<line x1="${x(f.at).toFixed(1)}" x2="${x(f.at).toFixed(1)}" y1="${m.t}" y2="${H - m.b}" class="g-flow"/>
       <text x="${(x(f.at) + 4).toFixed(1)}" y="${m.t + 10}" class="g-flow-lbl">${f.usd < 0 ? 'profit dibagikan' : 'setoran'} ${signedCompact(f.usd)}</text>`).join('')}
     <circle cx="${x(last.t).toFixed(1)}" cy="${y(last.v).toFixed(1)}" r="4.5" fill="${color}"/>
-    ${ticks.map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`).join('')}`);
+    ${ticks.map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`).join('')}
+    <line id="hgCross" class="g-cross" y1="${m.t}" y2="${H - m.b}" style="display:none"/>
+    <circle id="hgDot" r="5" fill="${color}" stroke="#0b0e13" stroke-width="2" style="display:none"/>
+    <rect id="hgHit" x="${m.l}" y="0" width="${W - m.l - m.r}" height="${H}" fill="transparent"/>`);
+  // Ditekan (HP) atau diarahkan kursor: tanggal, total, dan rincian tiap dana.
+  const wrap = $('#hgWrap'), tip = $('#hgTip'), cross = svg.querySelector('#hgCross'), dot = svg.querySelector('#hgDot'), hit = svg.querySelector('#hgHit');
+  if (!wrap || !tip || !hit) return;
+  const when = (t) => { const d = new Date(t + 7 * 3600e3); return `${d.getUTCDate()} ${M_SHORT[d.getUTCMonth()]} · ${d.toISOString().slice(11, 16)} WIB`; };
+  const show = (ev) => {
+    const box = wrap.getBoundingClientRect(), ratio = W / (box.width || W);
+    const sx = (ev.clientX - box.left) * ratio;
+    let near = pts[0];
+    for (const p of pts) if (Math.abs(x(p.t) - sx) < Math.abs(x(near.t) - sx)) near = p;
+    cross.setAttribute('x1', x(near.t)); cross.setAttribute('x2', x(near.t)); cross.style.display = '';
+    dot.setAttribute('cx', x(near.t)); dot.setAttribute('cy', y(near.v)); dot.style.display = '';
+    const parts = [...(near.parts || [])].sort((a, b) => b.usd - a.usd);
+    setHTML(tip, `<div class="t-d">${when(near.t)}</div><div class="t-v">${usd(near.v)}</div>`
+      + `<div class="t-n">total seluruh dana · termasuk token, LP, dan kas</div>`
+      + (parts.length ? `<div class="t-parts">${parts.map((p) => `<div class="t-row"><span><i style="background:${p.color}"></i>${esc(p.name)}</span><b>${usd(p.usd, 0)}</b></div>`).join('')}</div>` : ''));
+    tip.hidden = false;
+    // Tetap di dalam kotak grafik, juga di layar sempit.
+    const px = x(near.t) / ratio, half = tip.offsetWidth / 2;
+    tip.style.left = Math.min(Math.max(px, half + 4), box.width - half - 4) + 'px';
+    tip.style.top = Math.max(tip.offsetHeight + 4, (y(near.v) - 12) / ratio) + 'px';
+  };
+  const hide = () => { tip.hidden = true; cross.style.display = 'none'; dot.style.display = 'none'; };
+  hit.onpointermove = show;
+  hit.onpointerdown = show;
+  hit.onpointerleave = (ev) => { if (ev.pointerType === 'mouse') hide(); };
+  if (!wrap.dataset.tapAway) {
+    wrap.dataset.tapAway = '1';
+    document.addEventListener('pointerdown', (ev) => { if (!wrap.contains(ev.target)) hide(); });
+  }
 }
 
 let homeEpoch = 0;

@@ -56,11 +56,11 @@ const todayRate=Math.min(Number(cfg.rate?.maxMonthlyPct??100),Math.max(Number(cf
 const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
  principalUsd:principal,interestUsd:interest,paidUsd:Core.money(rows.reduce((t,o)=>t+o.paidUsd,0)),
  lastPayout:(()=>{const p=(existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[]).filter(x=>x.type==='interest');if(!p.length)return null;const at=Math.max(...p.map(x=>Date.parse(x.at)));const same=p.filter(x=>Date.parse(x.at)===at);return {at,period:same[0].period||null,usd:Core.money(same.reduce((t,x)=>t+Number(x.usd),0))};})(),interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
- interestDay:Core.day(now),days:state.days.slice(-30).map(d=>({date:d.date,usd:d.usd,estimated:d.estimated})),inRange:pos.inRange===true,
- quality:{complete:true,feesEstimated:true,allocationEstimated:state.days.some(d=>d.estimated),migrationAt:state.migration?.at},
+ interestDay:Core.day(now),days:state.days.slice(-30).map(d=>({date:d.date,usd:d.usd,estimated:d.estimated})),earning:pos.inRange===true,
+ quality:{complete:true,estimated:true,allocationEstimated:state.days.some(d=>d.estimated),migrationAt:state.migration?.at},
  measure:{monthlyPct:Number(todayRate.toFixed(3)),apyPct:Number((todayRate*365/30).toFixed(3)),perDayUsd:(today?.usd||0)/elapsedToday,
- minMonthlyPct:cfg.rate.minMonthlyPct,maxMonthlyPct:cfg.rate.maxMonthlyPct,spanDays:elapsedToday,basis:'fee teramati; periode tanpa pengamatan dialokasikan menurut durasi',since:Core.day(state.migration?.at||now)},
- ethPrice:price,nativePrice:price,nativeSymbol:'ETH'};
+ minMonthlyPct:cfg.rate.minMonthlyPct,maxMonthlyPct:cfg.rate.maxMonthlyPct,spanDays:elapsedToday,basis:'hasil teramati; periode tanpa pengamatan dibagi menurut durasi',since:Core.day(state.migration?.at||now)},
+ };
 assertPublic(snapshot);
 const navFile=resolve(DIR,'nav.json'),old=readJSON(navFile,{points:[]});
 atomicJSON(stateFile,state);atomicJSON(resolve(DIR,'fees.json'),book);

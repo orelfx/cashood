@@ -176,7 +176,7 @@ const html = `<!doctype html>
     <div>
       <h3>Cara pembayaran</h3>
       <div class="steps">
-        <div class="step"><div class="n">1</div><div>Pokok ${usd(principal, 0)} ditempatkan pengelola dan menghasilkan imbal hasil setiap hari, mengikuti fee yang benar-benar masuk.</div></div>
+        <div class="step"><div class="n">1</div><div>Pokok ${usd(principal, 0)} ditempatkan pengelola dan menghasilkan imbal hasil setiap hari, mengikuti hasil penempatan yang benar-benar terjadi.</div></div>
         <div class="step"><div class="n">2</div><div>Imbal hasil dicatat harian dan dikunci di antara ${pct(Number(cfg.rate?.minMonthlyPct ?? 0), 1)} dan ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)} per bulan. Tidak pernah negatif.</div></div>
         <div class="step"><div class="n">3</div><div>Tiap tanggal 1, seluruh imbal hasil bulan sebelumnya <b>ditarik dan dibayarkan</b> menurut porsi pokok. Pokok tetap di dalam Safe Box dan terus bekerja.</div></div>
       </div>
