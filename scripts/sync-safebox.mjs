@@ -6,33 +6,19 @@ import Core from '../assets/core.js';
 import { atomicJSON, readJSON, lock, downsample, generation, assertPublic } from './lib/io.mjs';
 import { accrue } from './lib/accrual.mjs';
 import { parseTransfers } from './lib/treasury.mjs';
-import { useCashoodRobinhoodRpc } from './lib/rpc-env.mjs';
 const DIR=resolve(process.env.CASHOOD_DATA_DIR || resolve(dirname(fileURLToPath(import.meta.url)),'..','data'),'safebox');
 const release=lock(resolve(DIR,'sync.lock.local'));
-const cfg=readJSON(resolve(DIR,'config.json')),secret=readJSON(resolve(DIR,'position.local.json'));
+const cfg=readJSON(resolve(DIR,'config.json'));
 const prev=readJSON(resolve(DIR,'live.json'));
-// Dulu dibatasi sekali per 55 menit supaya hemat RPC bot; sejak situs punya RPC
-// sendiri, Safe Box ikut siklus 5 menit seperti dana lain.
-const home=process.env.RR_HOME||'/root/robinhood';process.chdir(home);useCashoodRobinhoodRpc();
-const load=rel=>import(pathToFileURL(resolve(home,rel)).href);
-await load('node_modules/dotenv/config.js');
-const {getPositionPnl}=await load('venue/univ4.js'),{ethUsd}=await load('venue/price.js');
-const price=Core.number(await ethUsd(),'Harga ETH',.01);
-const pos=await getPositionPnl({tokenId:BigInt(secret.position.tokenId)});
-if(pos.feesError)throw new Error('Fee Safe Box gagal dibaca');
-const eth=v=>Core.number(v,'ETH mentah',0)/1e18*price,usd=v=>Core.number(v,'USDG mentah',0)/1e6;
-const valueUsd=eth(pos.amount0)+usd(pos.amount1),unclaimed=eth(pos.fees0)+usd(pos.fees1);
-if(!Number.isFinite(valueUsd)||valueUsd<=0||!Number.isFinite(unclaimed)||unclaimed<0||unclaimed>Math.max(10,valueUsd*2))throw new Error('Nilai Safe Box tidak wajar; snapshot lama dipertahankan');
-const book=readJSON(resolve(DIR,'fees.json'),{collectedUsd:0,lastUnclaimedUsd:unclaimed,since:Date.now()});
-Core.number(book.collectedUsd,'Buku fee kumulatif',0);
-const last=Core.number(book.lastUnclaimedUsd,'Fee terakhir',0);
-// Claims remain an estimate until confirmed claim events are available for this external position.
-if(last-unclaimed>.02&&unclaimed<last*.3)book.collectedUsd+=last-unclaimed;
-book.lastUnclaimedUsd=unclaimed;
-const fee=book.collectedUsd+unclaimed,now=Date.now();
+// Penempatan dana Safe Box bersifat rahasia. Modul sumbernya berada di luar
+// repo publik dan hanya mengembalikan hasil kumulatif; yang terbit dari sini
+// hanya pokok, imbal hasil, dan saldo tiap pemilik.
+const SOURCE=process.env.CASHOOD_SAFEBOX_SOURCE||'/root/cashood-private/safebox-source.mjs';
+const obs=await (await import(pathToFileURL(SOURCE).href)).observe({dir:DIR});
+const total=Core.number(obs.total,'Hasil kumulatif',0),now=Date.now();
 const stateFile=resolve(DIR,'accrual-v2.local.json');
 const payoutFile=resolve(DIR,'payouts.jsonl');
-const state=accrue(cfg,readJSON(stateFile),{at:now,fee},prev,existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[]);
+const state=accrue(cfg,readJSON(stateFile),{at:now,total},prev,existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[]);
 const principal=state.owners.reduce((t,o)=>t+o.principalUsd,0);
 const today=state.days.find(d=>d.date===Core.day(now));
 const rows=Object.values(state.balances).map(b=>{
@@ -56,16 +42,16 @@ const todayRate=Math.min(Number(cfg.rate?.maxMonthlyPct??100),Math.max(Number(cf
 const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
  principalUsd:principal,interestUsd:interest,paidUsd:Core.money(rows.reduce((t,o)=>t+o.paidUsd,0)),
  lastPayout:(()=>{const p=(existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[]).filter(x=>x.type==='interest');if(!p.length)return null;const at=Math.max(...p.map(x=>Date.parse(x.at)));const same=p.filter(x=>Date.parse(x.at)===at);return {at,period:same[0].period||null,usd:Core.money(same.reduce((t,x)=>t+Number(x.usd),0))};})(),interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
- interestDay:Core.day(now),days:state.days.slice(-30).map(d=>({date:d.date,usd:d.usd,estimated:d.estimated})),earning:pos.inRange===true,
+ interestDay:Core.day(now),days:state.days.slice(-30).map(d=>({date:d.date,usd:d.usd,estimated:d.estimated})),earning:obs.earning===true,
  quality:{complete:true,estimated:true,allocationEstimated:state.days.some(d=>d.estimated),migrationAt:state.migration?.at},
  measure:{monthlyPct:Number(todayRate.toFixed(3)),apyPct:Number((todayRate*365/30).toFixed(3)),perDayUsd:(today?.usd||0)/elapsedToday,
  minMonthlyPct:cfg.rate.minMonthlyPct,maxMonthlyPct:cfg.rate.maxMonthlyPct,spanDays:elapsedToday,basis:'hasil teramati; periode tanpa pengamatan dibagi menurut durasi',since:Core.day(state.migration?.at||now)},
  };
 assertPublic(snapshot);
 const navFile=resolve(DIR,'nav.json'),old=readJSON(navFile,{points:[]});
-atomicJSON(stateFile,state);atomicJSON(resolve(DIR,'fees.json'),book);
-atomicJSON(navFile,{updatedAt:now,points:downsample([...old.points,{t:now,usd:valueUsd,fee}],now)});
-atomicJSON(resolve(DIR,'internal.json'),{updatedAt:now,lpValueUsd:valueUsd,feesUsd:fee,feesEstimated:true});
+atomicJSON(stateFile,state);obs.commit?.();
+atomicJSON(navFile,{updatedAt:now,points:downsample([...old.points,{t:now,usd:obs.valueUsd,total}],now)});
+atomicJSON(resolve(DIR,'internal.json'),{updatedAt:now,valueUsd:obs.valueUsd,totalUsd:total,estimated:true});
 atomicJSON(resolve(DIR,'live.json'),snapshot);
 console.log(`[safebox] saldo=$${snapshot.balanceUsd} bunga=$${interest} pemilik=${rows.length}`);
 release();process.exit(0);

@@ -73,7 +73,7 @@ sendiri; fee posisi masuk tepat satu kali.
 RR_HOME=/root/robinhood node scripts/sync.mjs
 MERIDIAN_HOME=/root/main/meridian node scripts/sync-meridian.mjs
 RR_HOME=/root/robinhood node scripts/sync-ferari.mjs
-RR_HOME=/root/robinhood node scripts/sync-safebox.mjs
+node scripts/sync-safebox.mjs   # perlu modul sumber privat (CASHOOD_SAFEBOX_SOURCE)
 ```
 
 Jangan menjalankan exporter produksi untuk menguji: gunakan `npm test`, yang memakai
@@ -134,20 +134,20 @@ sebagai draft di situs. Membuat invoice tidak menandai uang sudah dibayarkan.
 
 ## Safe Box
 
-Pokok dan pemilik awal ada di konfigurasi. Pada migrasi pertama, hak bunga yang sudah
-terlihat di snapshot terakhir dibekukan per pemilik; sistem tidak mengarang riwayat
-kepemilikan yang tidak tersedia. State baru ada di `accrual-v2.local.json`.
+Simpanan dengan pokok tetap dan imbal hasil 0,1%–3% per bulan. **Penempatan dananya
+rahasia**: modul yang membacanya berada di luar repo ini
+(`CASHOOD_SAFEBOX_SOURCE`) dan hanya memberi satu angka hasil kumulatif. Yang terbit
+hanya pokok, imbal hasil, dan saldo tiap pemilik.
 
+Pokok dan pemilik awal ada di konfigurasi; state akrual ada di `accrual-v2.local.json`.
 Perubahan pemilik/pokok berikutnya memakai `ownerEvents: [{ at, owners: [...] }]`
 dengan waktu efektif, bukan menimpa pokok awal. Hak lama tidak dibagi ulang.
-Kenaikan fee dialokasikan terhadap interval pengamatan. Jeda lebih dari dua jam
-ditandai estimasi; hari terlewat tidak dikenai batas bunga hanya satu hari.
-Nilai fee tidak wajar membatalkan pengamatan sebelum baseline berubah.
+Kenaikan hasil dialokasikan terhadap interval pengamatan; jeda lebih dari dua jam
+ditandai estimasi.
 
-Pembayaran bunga menggunakan `scripts/treasury.mjs interest --fund safebox
---owner <id> --id <unik> --usd <jumlah> --at <ISO>`. Hak tercatat dikurangi pembayaran,
-bukan mengurangi bunga historis yang pernah dihasilkan. Fee posisi eksternal masih
-merupakan estimasi bila log claim yang terkonfirmasi belum tersedia.
+Tiap tanggal 1, imbal hasil bulan sebelumnya ditarik dan dibayarkan dengan
+`node scripts/statement-safebox.mjs --period YYYY-MM --rate <kurs>`, yang membuat
+invoice dan mencatat pembayarannya sehingga saldo kembali ke pokok.
 
 ## Forecast
 
