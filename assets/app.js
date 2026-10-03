@@ -3038,6 +3038,7 @@ async function loadIndexSeries() {
 function showIndex() { showGlobal('index', 'Cashood Index — Cashood Headfund'); renderIndex().catch(() => {}); }
 
 const indexView = { hours: 168 };
+const idxCalc = { capital: 1000, rate: 3 };
 let indexEpoch = 0;
 async function renderIndex() {
   const epoch = ++indexEpoch;
@@ -3079,6 +3080,56 @@ async function renderIndex() {
       </table></div>
     </section>
 
+    ${(d.holders || []).length ? `<section class="card">
+      <div class="card-head"><h2>Pemegang index</h2><span class="hint">modal tetap bekerja · kelebihannya jadi dividen</span></div>
+      <div class="table-scroll"><table class="mcards">
+        <thead><tr><th>Pemegang</th><th class="num">Modal</th><th class="num">Nilai sekarang</th><th class="num">Dividen berjalan</th><th class="num">Dividen diterima</th><th class="num">Untung / rugi</th></tr></thead>
+        <tbody>${d.holders.map((h) => `<tr>
+          <td class="mc-head"><span class="who"><span class="chip" style="background:${h.color || '#f59e0b'}"></span>${esc(h.name)}${h.test ? ' <span class="pill sim">uji coba</span>' : ''}</span></td>
+          <td class="num" data-k="Modal">${usd(h.capitalUsd)}</td>
+          <td class="num" data-k="Nilai sekarang"><b>${usd(h.valueUsd)}</b></td>
+          <td class="num pos" data-k="Dividen berjalan">${usd(h.accruedDividendUsd)}</td>
+          <td class="num" data-k="Dividen diterima">${usd(h.receivedUsd)}</td>
+          <td class="num ${cls(h.pnlUsd)}" data-k="Untung / rugi">${signed(h.pnlUsd)}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <p class="hint">Nilai = unit index × level sekarang, jadi ikut naik dan turun. "Dividen berjalan" adalah kelebihan nilai di atas modal saat ini — itu yang dibagikan kalau bertahan sampai tanggal pembagian.</p>
+    </section>` : ''}
+
+    ${d.dividend ? `<section class="card">
+      <div class="card-head"><h2>Dividen</h2><span class="hint">dibagikan tiap tanggal ${d.dividend.payDayOfMonth} · berikutnya ${fmtDay(d.dividend.nextPayDate)}</span></div>
+      <div class="stats three">
+        ${tile('Dividen berjalan', usd(d.dividend.accruedUsd), 'kalau dibagikan hari ini', d.dividend.accruedUsd > 0 ? 'pos' : '')}
+        ${tile('Sudah dibagikan', usd(d.dividend.paidUsd), 'sejak index dimulai')}
+        ${tile('Laju nyata index', d.dividend.monthlyRatePct == null ? '—' : sign(d.dividend.monthlyRatePct) , d.dividend.monthlyRatePct == null ? 'data belum cukup' : `per bulan · dari ${d.dividend.rateSpanDays} hari data`, cls(d.dividend.monthlyRatePct || 0))}
+      </div>
+      <div class="two" style="margin-top:14px">
+        <div><h3 class="sub-h">Aturannya</h3><ul class="plain">
+          <li><strong>Modal tetap bekerja.</strong> Yang dibagikan hanya kelebihan nilai di atas modal.</li>
+          <li>Contoh: modal $1.000 naik jadi $1.030 → dividen $30, saldo kembali $1.000.</li>
+          <li><strong>Dividen tidak pernah memotong saldo di bawah modal.</strong></li>
+          <li>Kalau nilai di bawah modal (misalnya $950), tidak ada dividen sampai nilainya kembali di atas modal.</li>
+        </ul></div>
+        <div><h3 class="sub-h">Riwayat dividen</h3>
+          <div class="table-scroll"><table><thead><tr><th>Periode</th><th>Pemegang</th><th class="num">Dividen</th></tr></thead><tbody>
+            ${(d.dividend.history || []).length ? d.dividend.history.slice().reverse().map((p) => `<tr><td>${esc(p.period || tgl(p.at))}</td><td>${esc(p.name)}</td><td class="num pos">${usd(p.usd)}</td></tr>`).join('')
+              : `<tr><td>${fmtDay(d.dividend.nextPayDate)} <span class="dim">(berjalan)</span></td><td class="dim">semua pemegang</td><td class="num">${usd(d.dividend.accruedUsd)}</td></tr>
+                 <tr><td colspan="3" class="dim">Belum ada dividen yang dibagikan: $0.</td></tr>`}
+          </tbody></table></div></div>
+      </div>
+    </section>
+
+    <section class="card" id="idxCalcCard">
+      <div class="card-head"><h2>Simulasi dividen</h2><span class="hint">asumsi, bukan janji</span></div>
+      <div class="calc">
+        <label class="field"><span>Modal (USD)</span><input type="number" id="idxCap" min="0" step="any" value="${idxCalc.capital}"></label>
+        <label class="field"><span>Asumsi hasil per bulan (%)</span><input type="number" id="idxRate" step="any" value="${idxCalc.rate}"></label>
+        <div class="field quick"><span>Isi cepat</span><div class="seg" id="idxQuick">
+          ${d.dividend.monthlyRatePct == null ? '' : `<button data-v="${d.dividend.monthlyRatePct}">laju nyata</button>`}<button data-v="2">2%</button><button data-v="4">4%</button><button data-v="6">6%</button></div></div>
+      </div>
+      <div id="idxCalcOut"></div>
+      <p class="hint disclaimer">Simulasi ini mengalikan asumsi yang kamu pilih; hasil sebenarnya bisa lebih kecil, nol, atau minus. Laju nyata index dihitung dari data yang masih pendek (${d.dividend.rateSpanDays} hari), jadi belum bisa dijadikan patokan. Dividen dibayarkan, tidak diputar ulang, sehingga setahun = 12 × sebulan.</p>
+    </section>` : ''}
+
     <section class="card">
       <div class="card-head"><h2>Apa itu Cashood Index</h2><span class="hint">cara kerjanya, apa adanya</span></div>
       <p class="lead">Cashood Index adalah <strong>satu produk berisi seluruh dana Cashood</strong>. Daripada memilih satu bot,
@@ -3095,10 +3146,32 @@ async function renderIndex() {
           <li><strong>Index bisa turun.</strong> Isinya bot yang sama dengan produk lain; menggabungkannya menyebar risiko, bukan menghilangkannya.</li>
           <li>Tidak ada jaminan pokok dan tidak ada janji persentase hasil.</li>
           <li>Hasil masa lalu tidak menjamin hasil ke depan.</li>
-          <li>Produk ini <strong>belum dibuka</strong> untuk investor; yang tampil adalah angka index-nya saja.</li>
+          <li>Produk ini masih <strong>uji coba</strong>: pemegang yang tampil adalah setoran uji, bukan uang sungguhan.</li>
         </ul></div>
       </div>
     </section>`);
+  // ── simulasi dividen ──
+  const calc = () => {
+    const out = $('#idxCalcOut'); if (!out) return;
+    const cap = Math.max(0, Number(idxCalc.capital) || 0), rate = Number(idxCalc.rate) || 0;
+    const today = new Date(Date.now() + 7 * 3600e3), dim = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0)).getUTCDate();
+    const left = Math.max(0, dim - today.getUTCDate() + 1) / dim;        // sisa bulan ini
+    const perMonth = Math.max(0, cap * rate / 100), first = Math.max(0, cap * rate / 100 * left);
+    const row = (k, v, n) => `<tr><td>${k}<div class="n dim">${n}</div></td><td class="num ${v > 0 ? 'pos' : ''}"><b>${usd(v)}</b></td></tr>`;
+    setHTML(out, `<div class="table-scroll"><table><thead><tr><th>Perkiraan</th><th class="num">Dividen</th></tr></thead><tbody>
+      ${row(`Dividen ${fmtDay(d.dividend.nextPayDate)}`, first, 'sisa bulan ini saja')}
+      ${row('Dividen per bulan', perMonth, 'bulan penuh')}
+      ${row('Dividen per tahun', perMonth * 12, `${pct(Math.max(0, rate) * 12, 1)} dari modal, tanpa diputar ulang`)}
+    </tbody></table></div>`
+      + (rate < 0 ? `<p class="miss">Dengan asumsi ${pct(rate)} per bulan tidak ada dividen, dan saldo ikut turun: ${usd(cap)} menjadi sekitar ${usd(cap * (1 + rate / 100))} setelah sebulan.</p>` : ''));
+  };
+  if ($('#idxCap')) {
+    calc();
+    $('#idxCap').oninput = (e) => { idxCalc.capital = e.target.value; calc(); };
+    $('#idxRate').oninput = (e) => { idxCalc.rate = e.target.value; calc(); };
+    $('#idxQuick').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; idxCalc.rate = b.getAttribute('data-v'); $('#idxRate').value = idxCalc.rate; calc(); };
+  }
+
   const draw = () => {
     const now = Date.now(), from = indexView.hours ? now - indexView.hours * 3600e3 : 0;
     const list = pts.filter((p) => p.t >= from).map((p) => ({ t: p.t, v: p.usd }));
