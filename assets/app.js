@@ -425,6 +425,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     performance: snap.performance || null,
     trading: snap.trading || null,
     tradeDays: Array.isArray(snap.tradeDays) ? snap.tradeDays : [],
+    strategy: snap.strategy || null,
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -1034,12 +1035,14 @@ function renderTrades(nav) {
   }
   setHTML(body, [...rows].sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)).map((r) => `<tr>
       <td><span class="who"><span class="chip" style="background:${r.pnlUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span>
-        ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}</td>
-      <td>${esc(r.bookLabel || '—')}<div class="sub2">${r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : ''}${r.partialDone ? ' · sebagian sudah dijual' : ''}</div></td>
+        ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}${r.stale ? '<div class="sub2 neg">harga belum terverifikasi</div>' : ''}</td>
+      <td>${esc(r.bookLabel || '—')}<div class="sub2">${[r.strategy && r.strategy !== r.bookLabel ? esc(r.strategy) : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.confidence != null ? `yakin ${r.confidence}%` : '', r.partialDone ? 'sebagian sudah dijual' : ''].filter(Boolean).join(' · ')}</div>
+        ${r.thesis ? `<div class="thesis" title="${esc(r.thesis)}"><b>Alasan masuk:</b> ${esc(r.thesis)}</div>` : ''}</td>
       <td class="num dim">${dur(r.ageMinutes)}</td>
       <td class="num">${usd(r.costUsd)}</td>
       <td class="num"><strong>${usd(r.valueUsd)}</strong></td>
-      <td class="num"><span class="neg">−${r.stopPct == null ? '—' : pct(r.stopPct, 1)}</span> / <span class="pos">+${r.targetPct == null ? '—' : pct(r.targetPct, 1)}</span></td>
+      <td class="num">${r.stopPct == null && r.targetPct == null ? '<span class="dim">belum diisi bot</span>'
+        : `<span class="neg">${r.stopPct == null ? '—' : '−' + pct(r.stopPct, 1)}</span> / <span class="pos">${r.targetPct == null ? '—' : '+' + pct(r.targetPct, 1)}</span>`}</td>
       <td class="num ${cls(r.pnlUsd)}">${signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
     </tr>`).join(''));
   $('#lpHint').textContent = `nilai = hasil jual bersih menurut quote · dihitung ${ago(nav.updatedAt)}`
@@ -1403,7 +1406,7 @@ function renderNavChart() {
   const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1];
   const up = last.v >= modal;
-  const stroke = up ? 'var(--accent)' : 'var(--red)';
+  const stroke = up ? 'var(--green)' : 'var(--red)';
   const area = `${line} L${x(last.t).toFixed(1)},${y(lo)} L${x(pts[0].t).toFixed(1)},${y(lo)} Z`;
 
   const fmtT = (t) => {
@@ -1953,7 +1956,7 @@ function renderChart(buckets) {
     const up = b.usd >= 0;
     const h = Math.abs(yv - y0);
     const r = Math.min(4, bw / 2, h);
-    const color = up ? 'var(--accent)' : 'var(--red)';
+    const color = up ? 'var(--green)' : 'var(--red)';
     const path = up
       ? `M${x},${y0} L${x},${y0 - h + r} Q${x},${y0 - h} ${x + r},${y0 - h} L${x + bw - r},${y0 - h} Q${x + bw},${y0 - h} ${x + bw},${y0 - h + r} L${x + bw},${y0} Z`
       : `M${x},${y0} L${x},${y0 + h - r} Q${x},${y0 + h} ${x + r},${y0 + h} L${x + bw - r},${y0 + h} Q${x + bw},${y0 + h} ${x + bw},${y0 + h - r} L${x + bw},${y0} Z`;
@@ -2797,7 +2800,11 @@ function renderAnalys() {
     <table class="dna-tbl"><tbody>${axisRows.map(([k, n, how]) => `<tr><td>${n}<div class="n dim">${how}</div></td><td class="num">${sc.axes[k] == null ? '—' : sc.axes[k]}</td></tr>`).join('')}</tbody></table>` : '');
 
   // ── info sistem & tentang strategi ──
-  const st = cfg.strategy || {};
+  // Buku paper bisa membawa penjelasan strateginya sendiri di snapshot.
+  const fromBot = nav.strategy || null;
+  const st = fromBot ? { ...(cfg.strategy || {}), ...fromBot, about: fromBot.about?.length ? fromBot.about : (cfg.strategy?.about || []),
+    system: fromBot.system?.length > 1 ? fromBot.system : (cfg.strategy?.system || []), risks: cfg.strategy?.risks || [],
+    requirements: fromBot.requirements?.length ? fromBot.requirements : (cfg.strategy?.requirements || []) } : (cfg.strategy || {});
   const ledger = state.ledger || {};
   const sistem = isTrading() ? [...(st.system || []), ['Modal simulasi', usdText(ledger.deposited || 0, 0)]] : [...(st.system || []),
     ['Modal masuk', usdText((ledger.deposited || 0) + (ledger.reinvested || 0), 0)],
@@ -2857,6 +2864,7 @@ function renderAnalys() {
         </tbody></table></div>
       <p class="hint">Menang/kalah memakai ambang impas yang sama dengan laporan bot; ${t.flat} posisi impas tidak ikut membagi win rate.${t.usdComplete ? '' : ' Total kotor dalam dolar tidak ditampilkan karena bot tidak mencatat nilai dolar tiap posisi.'}</p>` : '<p class="miss">Belum ada posisi yang ditutup.</p>';
   }
+  if (perf?.equityNote && anSection !== 'activity') detail += `<p class="hint">${esc(perf.equityNote)}</p>`;
   setHTML($('#anDetailBody'), detail);
 
   // ── prediksi, pindahan dari halaman Portofolio ──

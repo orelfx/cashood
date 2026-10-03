@@ -39,7 +39,15 @@ const pick = (o, names) => { for (const n of names) if (o?.[n] !== undefined) re
 const must = (o, names, what) => { const v = pick(o, names); if (v === undefined || v === null || !Number.isFinite(Number(v))) throw new Error(`${what} tidak ada di berkas sumber (${names.join(' / ')})`); return Number(v); };
 const time = (v, what) => { const t = typeof v === 'number' ? (v < 1e12 ? v * 1000 : v) : Date.parse(v); if (!Number.isFinite(t)) throw new Error(`${what} tidak valid`); return t; };
 const optNum = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? null : Number(v));
-const tidy = (n) => Number(n.toFixed(8));   // hanya membuang galat biner penjumlahan, bukan membulatkan angka sumber
+const tidy = (n) => Number(n.toFixed(8));
+// Teks bebas dari bot (alasan masuk, alasan keputusan): apa pun yang berbentuk
+// alamat dipangkas dan panjangnya dibatasi, supaya tidak ada identitas on-chain
+// yang ikut terbit dan satu kalimat panjang tidak membatalkan impor.
+const text = (v, max = 280) => { if (v === undefined || v === null) return null; const t = String(v).replace(/0x[0-9a-fA-F]{16,}/g, '0x…').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').replace(/\s+/g, ' ').trim(); return t ? (t.length > max ? t.slice(0, max - 1) + '…' : t) : null; };
+const pctOf = (p, pctNames, priceNames, entry, sign) => {
+  const direct = optNum(pick(p, pctNames)); if (direct != null) return Math.abs(direct);
+  const px = optNum(pick(p, priceNames)); return px != null && entry > 0 ? Number((Math.abs(px / entry - 1) * 100).toFixed(2)) : null;
+};   // hanya membuang galat biner penjumlahan, bukan membulatkan angka sumber
 
 if (src.label !== undefined && src.label !== BOOKS[fund]) throw new Error(`Label berkas "${src.label}" bukan "${BOOKS[fund]}" — berkas tertukar?`);
 const equity = must(src, ['equity_usd', 'equity'], 'equity');
@@ -84,6 +92,14 @@ const positions = list.map((p, i) => {
     ...(entry != null ? { entryPriceUsd: entry } : {}),
     ...(mark != null ? { priceUsd: mark } : {}),          // harga null tidak diisi
     ...(opened !== undefined ? { ageMinutes: Math.max(0, Math.round((asOf - time(opened, 'opened_at')) / 60000)) } : {}),
+    // Data rencana — opsional; yang tidak dikirim bot dibiarkan kosong, tidak dikarang.
+    stopPct: pctOf(p, ['stop_pct', 'sl_pct'], ['stop_price', 'sl_price'], entry),
+    targetPct: pctOf(p, ['target_pct', 'tp_pct'], ['target_price', 'tp_price'], entry),
+    maxHoldHours: optNum(pick(p, ['max_hold_hours'])),
+    ...(optNum(pick(p, ['quantity', 'qty', 'amount'])) != null ? { amount: optNum(pick(p, ['quantity', 'qty', 'amount'])) } : {}),
+    ...(text(pick(p, ['strategy'])) ? { strategy: text(pick(p, ['strategy']), 60) } : {}),
+    ...(optNum(pick(p, ['confidence'])) != null ? { confidence: optNum(pick(p, ['confidence'])) } : {}),
+    ...(text(pick(p, ['thesis', 'entry_reason', 'reason'])) ? { thesis: text(pick(p, ['thesis', 'entry_reason', 'reason'])) } : {}),
     stale,
     ...(stale ? { staleReason: 'harga masuk/mark belum tersedia' } : {}),
   };
@@ -101,11 +117,23 @@ const closed = (Array.isArray(closedSrc) ? closedSrc : []).map((c, i) => {
   return { symbol, strategy: String(pick(c, ['sleeve', 'book']) ?? '—'), investedUsd: notional, netUsd: net,
     netPct: notional > 0 ? Number(((net / notional) * 100).toFixed(2)) : null,
     holdMinutes: openedRaw === undefined ? null : Math.max(0, Math.round((closedAt - time(openedRaw, 'opened_at')) / 60000)),
-    reason: String(pick(c, ['reason', 'exit_reason']) ?? '—'), closedAt };
+    reason: text(pick(c, ['reason', 'exit_reason']), 60) ?? '—',
+    ...(text(pick(c, ['reason_detail', 'note'])) ? { reasonDetail: text(pick(c, ['reason_detail', 'note']), 240) } : {}),
+    ...(optNum(pick(c, ['fees_usd'])) != null ? { feesUsd: optNum(pick(c, ['fees_usd'])) } : {}), closedAt };
 }).sort((a, b) => a.closedAt - b.closedAt);
 const trades = groupTradeDays(closed, 0.5);
 const wins = closed.filter((c) => c.netPct > 0.5).length, losses = closed.filter((c) => c.netPct < -0.5).length;
 const realizedClosed = tidy(closed.reduce((t, c) => t + c.netUsd, 0));
+
+// Keadaan bot (opsional): status, pindai terakhir, keputusan terakhir, aktivitas.
+const bot = pick(src, ['bot']) || {};
+const dec = bot.last_decision || {};
+const act = bot.activity_24h || {};
+const lastScanAt = bot.last_scan_at ? time(bot.last_scan_at, 'last_scan_at') : null;
+const rules = Array.isArray(src.rules) ? src.rules.map((x) => [text(x?.[0] ?? x?.k, 40), text(x?.[1] ?? x?.v, 120)]).filter(([k, v]) => k && v) : [];
+const about = (Array.isArray(src.about) ? src.about : src.about ? [src.about] : []).map((x) => text(x, 500)).filter(Boolean);
+const sleeveInfo = src.sleeves && typeof src.sleeves === 'object' ? Object.entries(src.sleeves).map(([k, v]) => [text(k, 30), text(v, 160)]).filter(([k, v]) => k && v) : [];
+const peak = optNum(pick(src, ['peak_equity_usd']));
 
 const unrealized = tidy(positions.reduce((t, p) => t + p.pnlUsd, 0));
 const inPositions = tidy(positions.reduce((t, p) => t + p.principalUsd, 0));
@@ -151,17 +179,24 @@ const snapshot = {
     paused: false,
     startedAt,
     heartbeatAt: asOf,
-    status: now - asOf < 20 * 60e3 ? 'berjalan (paper)' : 'data paper terlambat',
-    healthy: now - asOf < 20 * 60e3,
+    status: now - asOf >= 20 * 60e3 ? 'data paper terlambat' : text(bot.status, 30) || 'berjalan (paper)',
+    healthy: now - asOf < 20 * 60e3 && !/pause|jeda|halt|error|stop/i.test(String(bot.status || '')),
+    ...(peak != null && peak > 0 ? { peakUsd: peak, drawdownPct: Number((Math.max(0, (peak - equity) / peak) * 100).toFixed(2)) } : {}),
+    lastScanAt,
     lead: `${BOOKS[fund]} adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.`,
     tiles: [
       { k: 'Posisi terbuka', v: String(positions.length), n: `${sleeves.length} sleeve` },
       { k: 'Kas', usd: cash, n: 'belum dipakai' },
       { k: 'Belum terealisasi', v: `${unrealized >= 0 ? '+' : '−'}$${Math.abs(unrealized).toFixed(4)}`, n: 'dari posisi terbuka', tone: unrealized >= 0 ? 'pos' : 'neg' },
       ...(nStale ? [{ k: 'Harga belum tersedia', v: String(nStale), n: 'posisi ditandai belum terverifikasi', tone: 'neg' }] : []),
+      ...(optNum(act.scans) != null ? [{ k: 'Pindai pasar', v: String(act.scans), n: `24 jam${lastScanAt ? '' : ''}${optNum(act.rejected) != null ? ` · ${act.rejected} kandidat ditolak` : ''}` }] : []),
+      ...(optNum(act.entries) != null || optNum(act.exits) != null ? [{ k: 'Buka · tutup', v: `${act.entries ?? 0} · ${act.exits ?? 0}`, n: '24 jam terakhir' }] : []),
     ],
-    llm: null,
+    llm: text(dec.reason) ? { model: text(bot.model, 40), lastDecisionAt: dec.at ? time(dec.at, 'last_decision.at') : asOf, lastAction: text(dec.action, 24) || 'keputusan', lastReason: text(dec.reason, 400) } : null,
   },
+  // Penjelasan strategi dari bot sendiri (opsional), untuk tab Analys.
+  ...(about.length || rules.length || sleeveInfo.length ? { strategy: { title: `${BOOKS[fund]} — buku paper`, about,
+    system: [['Mode', 'paper'], ...rules], requirements: sleeveInfo, risks: [] } } : {}),
   quality: nStale ? { complete: false, reasons: [`${nStale} posisi tanpa harga masuk/mark; nilainya dari catatan paper`] } : { complete: true, reasons: [] },
   costsShareUsd: 0,
 };

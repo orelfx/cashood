@@ -10,7 +10,17 @@ export function nextPayday(now,payDay=1){
 }
 /** Closed WIB days only. Never use unverified legacy NAVs or unrecorded cash flows. */
 export function dailyReturns(cfg,live,series,now){
- if(cfg.forecast?.cashFlowsComplete===false)return [];
+ // Dompet yang hanya dibaca: hasil harian = hasil posisi yang ditutup hari itu
+ // dibagi modal. Hari tanpa posisi ditutup dihitung 0%. Tidak butuh arus kas.
+ if(cfg.forecast?.cashFlowsComplete===false){
+  const base=Core.buildLedger(cfg).capitalBasis,today=Core.day(now),start0=Core.day(Math.min(...cfg.events.map(Core.eventTime)));
+  const byDay=new Map((live.history||[]).map(h=>[h.date,Number(h.usd)||0]));
+  const days=[...byDay.keys()].filter(d=>d>=start0&&d<today).sort();
+  if(!(base>0)||!days.length)return [];
+  const out=[];
+  for(let t=Core.eventTime({date:days[0]});Core.day(t)<today;t+=DAY){const d=Core.day(t),pct=(byDay.get(d)||0)/base;if(Math.abs(pct)<=.3)out.push({date:d,pct});}
+  return out;
+ }
  const end=Core.day(now),start=Math.min(...cfg.events.map(Core.eventTime));
  const daily=new Map();
  for(const p of [...series].sort((a,b)=>a.t-b.t))if(p.quality==='complete'&&p.t>=start&&Core.day(p.t)<end&&Number.isFinite(p.usd)&&p.usd>0)daily.set(Core.day(p.t),p);
@@ -67,7 +77,7 @@ export function forecastFund(fund,cfg,live,series,{now=Date.now(),paths=10000}={
  const payday=nextPayday(now,cfg.dividend?.payDayOfMonth);
  const daily=dailyReturns(cfg,live,series,now);
  const meta={fund,updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',days:payday.days,paydayAt:payday.at,paydayDate:Core.day(payday.at),navNow:live.totalUsd,
-  samples:daily.length,basis:'perubahan NAV terverifikasi setelah koreksi arus kas',rules:{...cfg.fund,distributePct:cfg.dividend?.distributePct??100},enough:false};
+  samples:daily.length,basis:cfg.forecast?.cashFlowsComplete===false?'hasil posisi yang ditutup per hari, dibagi modal':'perubahan NAV terverifikasi setelah koreksi arus kas',rules:{...cfg.fund,distributePct:cfg.dividend?.distributePct??100},enough:false};
  if(live.quality?.complete!==true||now-live.updatedAt>45*60000||daily.length<7)return {...meta,reason:'Proyeksi memerlukan snapshot lengkap dan minimal tujuh hari selesai dengan arus kas serta NAV terverifikasi.'};
  const ledger=Core.buildLedger(cfg),units=ledger.totalUnits,base=ledger.capitalBasis+Number(cfg.dividend?.retainedUsd||0),costs=Core.monthlyCosts(cfg,live);
  const horizons=[['d1','1 hari',1],['w1','1 minggu',7],['m1','1 bulan',30],['m3','3 bulan',90],['m6','6 bulan',180],['y1','1 tahun',365]];

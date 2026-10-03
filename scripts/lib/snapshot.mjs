@@ -53,20 +53,38 @@ export function saveSnapshot(out, snapshot, cfg) {
       // bukan rugi. Semua angka yang dihitung dari nilai dana ditahan; statistik
       // posisi tertutup tetap terbit karena datanya lengkap.
       const flowsKnown = cfg.fund?.cashFlowsRecorded !== false;
+      // Dompet yang hanya dibaca: kurva nilainya disusun SENDIRI dari hasil tiap
+      // posisi yang ditutup (modal + hasil kumulatif). Hasil posisi tidak
+      // terpengaruh uang yang dipindah pemilik, jadi penurunan terdalam, rasio
+      // risiko, dan skor bisa dihitung tanpa menebak arus kas.
+      const capital0 = ledger.capitalBasis ?? ledger.deposited;
+      const usdCloses = (inp.closes || []).filter((c) => Number.isFinite(c.closedAt) && Number.isFinite(c.netUsd)).sort((a, b) => a.closedAt - b.closedAt);
+      let run = capital0;
+      const ownCurve = usdCloses.length ? [{ t: Math.min(usdCloses[0].closedAt - 1, ...((cfg.events || []).map(Core.eventTime))), usd: capital0 },
+        ...usdCloses.map((c) => ({ t: c.closedAt, usd: (run += c.netUsd) }))] : [];
+      const openPnl = (snapshot.positions || []).reduce((t, p) => t + (Number(p.pnlUsd) || 0), 0);
       snapshot.performance = buildPerformance({
-        closes: inp.closes || [], points: flowsKnown ? points : [], flows, flatBand: inp.flatBand ?? 0.5,
+        closes: inp.closes || [], points: flowsKnown ? points : ownCurve, flows: flowsKnown ? flows : [], flatBand: inp.flatBand ?? 0.5,
         // Basis untung/rugi: modal dikurangi profit yang DITERIMA investor
         // (bersih, sesuai invoice). Tanggungan biaya sistem tidak dihitung
         // sebagai uang yang diterima, jadi ditambahkan kembali ke basis.
-        capitalUsd: (ledger.capitalBasis ?? ledger.deposited) + (cfg.events || []).filter((e) => e.dividend).reduce((t, e) => t + Number(e.usd || 0) - Number(e.receivedUsd ?? e.usd ?? 0), 0), navUsd: snapshot.totalUsd,
+        capitalUsd: (ledger.capitalBasis ?? ledger.deposited) + (cfg.events || []).filter((e) => e.dividend).reduce((t, e) => t + Number(e.usd || 0) - Number(e.receivedUsd ?? e.usd ?? 0), 0),
+        navUsd: flowsKnown ? snapshot.totalUsd : run + openPnl,
         // Dividen yang dibayar mengurangi basis untuk menghitung untung/rugi
         // (uangnya sudah diterima investor), tapi persennya tetap dibandingkan
         // dengan modal yang disetor — bukan modal yang mengecil karena dividen.
         pctBaseUsd: (ledger.capitalBasis ?? ledger.deposited) + (cfg.events || []).filter((e) => e.dividend).reduce((t, e) => t + Number(e.usd || 0), 0),
       });
       if (!flowsKnown) {
-        snapshot.performance.equityWithheld = 'Dompet dana ini dibaca, bukan dijalankan: uang yang masuk atau keluar dompet tidak tercatat di sini, jadi penurunan nilai tidak bisa dibedakan dari penarikan. Penurunan terdalam, rasio risiko, dan pemulihan ditahan sampai arus kasnya dicatat.';
-        snapshot.performance.recoveryFactor = null;
+        // Untung/rugi dari sisi posisi (untuk skor) dan dari saldo dompet (yang
+        // tampil di kartu dana) dicatat terpisah — keduanya bisa berbeda kalau
+        // pemilik memindahkan uang dari atau ke dompet.
+        const p = snapshot.performance;
+        p.positionProfitUsd = p.profitUsd;
+        p.profitUsd = Number((snapshot.totalUsd - capital0).toFixed(2));
+        p.profitPct = capital0 > 0 ? Number(((p.profitUsd / capital0) * 100).toFixed(2)) : null;
+        p.equityBasis = 'closed-positions';
+        p.equityNote = 'Dompet dana ini hanya dibaca, jadi uang yang dipindah pemiliknya tidak tercatat. Penurunan terdalam, rasio risiko, dan skor di sini dihitung dari hasil tiap posisi yang ditutup (modal + hasil kumulatif), bukan dari saldo dompet.';
       }
     } catch (err) { snapshot.performance = null; }
   }

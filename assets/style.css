@@ -8,6 +8,8 @@
   --text: #e7ecf3;
   --muted: #8b97a8;
   --accent: #4ade80;
+  /* Untung selalu hijau, rugi selalu merah — tidak ikut warna aksen dana. */
+  --green: #4ade80;
   --accent-dim: #1d3d2b;
   --blue: #60a5fa;
   --red: #f87171;
@@ -148,12 +150,12 @@ tr:last-child td { border-bottom: 0; }
 th.num { text-align: right; }
 .who { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .chip { width: 9px; height: 9px; border-radius: 3px; flex: none; }
-.pos { color: var(--accent); }
+.pos { color: var(--green); }
 .neg { color: var(--red); }
 .dim { color: var(--muted); }
 .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line);
         color: var(--muted); font-family: var(--sans); }
-.pill.in { color: var(--accent); border-color: var(--accent-dim); background: #101c14; }
+.pill.in { color: var(--green); border-color: #1f4a30; background: #101c14; }
 .pill.out { color: var(--amber); border-color: #3a3320; background: #1c1810; }
 
 /* kalkulator */
@@ -181,7 +183,7 @@ code { font-family: var(--mono); font-size: .92em; color: var(--accent); }
 .strip-item { display: flex; align-items: center; gap: 7px; }
 .strip-item b { color: var(--text); font-weight: 600; }
 .led { width: 7px; height: 7px; border-radius: 50%; background: #3a4552; flex: none; }
-.led.live { background: var(--accent); box-shadow: 0 0 0 3px rgba(74,222,128,.14); }
+.led.live { background: var(--green); box-shadow: 0 0 0 3px rgba(74,222,128,.14); }
 .led.lp { background: var(--blue); box-shadow: 0 0 0 3px rgba(96,165,250,.14); }
 
 /* ── panel statistik ─────────────────────────────────────────────────── */
@@ -261,10 +263,10 @@ code { font-family: var(--mono); font-size: .92em; color: var(--accent); }
 .hb-row { padding: 9px 14px; font: 12.5px/1.6 var(--mono); overflow-wrap: anywhere;
           border-bottom: 1px solid #1a1f27; }
 .hb-row:last-child { border-bottom: 0; }
-.hb-in { color: var(--accent); }
+.hb-in { color: var(--green); }
 .hb-wait { color: var(--amber); }
 .hb-bad { color: var(--red); }
-.hb-good { color: var(--accent); }
+.hb-good { color: var(--green); }
 .hb-det { color: var(--muted); }
 .hb-foot { color: var(--muted); font-size: 12px; text-align: center; padding-top: 4px; }
 
@@ -581,7 +583,7 @@ ul.plain strong { color: var(--text); }
 .flow-row.total { background: #101c14; }
 .flow-row.total .fl { font-weight: 650; }
 .flow-row.total .fv { color: var(--accent); font-size: 16px; }
-.flow-row .free { color: var(--accent); }
+.flow-row .free { color: var(--green); }
 .field.quick .seg { align-self: flex-start; }
 @media (max-width: 640px) {
   .flow-row { padding: 10px 11px; gap: 10px; }
@@ -1204,3 +1206,7 @@ body.at-home #tabs { display: none; }
 .idx-link { color: var(--text); text-decoration: none; }
 .idx-link:hover { text-decoration: underline; }
 @media (max-width: 760px) { .idx-top { grid-template-columns: 1fr; } }
+
+/* alasan masuk posisi (dari bot) */
+.thesis { margin-top: 4px; font-size: 11.5px; line-height: 1.45; color: var(--muted); max-width: 46ch; white-space: normal; overflow-wrap: anywhere; }
+.thesis b { color: #c3cad6; font-weight: 600; }
