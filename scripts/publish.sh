@@ -34,11 +34,13 @@ run_paper() {
 }
 run_paper dgrh /root/cashood-inbox/devil-greed-robin-hood.json
 run_paper dgsol /root/cashood-inbox/devil-greed-solana.json
+# Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
+run_snapshot scripts/sync-index.mjs
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
 /usr/bin/node scripts/stage-data.mjs "$WORK" || failed=1
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
-  git add -- reborn meridian ferari robsol charon forex binance safebox
+  git add -- reborn meridian ferari robsol charon forex binance safebox index
   [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi

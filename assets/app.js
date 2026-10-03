@@ -87,6 +87,7 @@ function getJSON(url, { fresh = false } = {}) {
       }
       if (list.safebox?.configUrl) quiet(getJSON(list.safebox.configUrl));
       if (list.safebox) quiet(getJSON(RAW_BASE + 'safebox/live.json'));
+      if (list.index) quiet(getJSON(RAW_BASE + 'index/live.json'));
     }));
     const guess = first || 'reborn';
     const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance', 'dgrh', 'dgsol'].includes(guess) ? guess : 'reborn';
@@ -2172,6 +2173,7 @@ function parseHash() {
   if (parts[0] === 'kinerja') return { kinerja: true, tab: 'portfolio' };
   if (parts[0] === 'pemegang') return { pemegang: true, tab: 'portfolio' };
   if (parts[0] === 'safebox') return { safebox: true, tab: 'portfolio' };
+  if (parts[0] === 'index') return { index: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
@@ -2187,29 +2189,41 @@ function parseHash() {
   return { fund, tab };
 }
 
+/**
+ * Menu utama: Beranda · Portofolio · Analys · [High risk ▾] [Medium risk ▾]
+ * [Low risk ▾] [Dry run ▾] · Update. Tiap kelompok risiko adalah dropdown berisi
+ * produknya (dibaca dari `risk` di funds.json), jadi dana baru tinggal muncul
+ * di kelompoknya tanpa menambah tombol di baris menu.
+ */
+const NAV_GROUPS = [
+  { key: 'high', label: 'High risk', color: '#fb7185' },
+  { key: 'medium', label: 'Medium risk', color: '#fbbf24' },
+  { key: 'low', label: 'Low risk', color: '#2dd4bf' },
+  { key: 'paper', label: 'Dry run', color: '#c084fc' },
+];
+let navOpen = null;
+function navItems(key) {
+  const items = state.funds.filter((f) => (f.risk || 'paper') === key)
+    .map((f) => ({ attr: `data-fund="${esc(f.id)}"`, name: f.label, sub: f.chain, accent: f.accent, on: state.view === 'fund' && f.id === state.fund }));
+  if (state.safebox && (state.safebox.risk || 'low') === key) items.push({ attr: 'data-view="safebox"', name: state.safebox.label, sub: state.safebox.subtitle, accent: state.safebox.accent, on: state.view === 'safebox' });
+  if (state.index && (state.index.risk || 'low') === key) items.push({ attr: 'data-view="index"', name: state.index.label, sub: state.index.subtitle, accent: state.index.accent, on: state.view === 'index' });
+  return items;
+}
 function renderFundBar() {
-  const analisa = state.view === 'analisa';
-  // Dana hanya disorot saat tampilan dana yang sedang dibuka. Versi sebelumnya
-  // hanya mengecualikan tampilan analisa, jadi membuka Safe Box menyalakan dua
-  // tombol sekaligus: Safe Box dan dana yang terakhir dilihat.
-  const diDana = state.view === 'fund';
-  // Kotak ringkas: hanya yang sedang dibuka memakai nama lengkap; sisanya
-  // singkatan + jaringan singkat, supaya seluruh pilihan muat tanpa terpotong
-  // di layar HP. Nama lengkap tetap ada di tooltip dan label aksesibilitas.
-  const initials = (t) => String(t || '').split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 4);
-  const box = ({ on, accent, name, chain, short, chainShort, attr, extra = '' }) => `
-    <button ${attr} class="${extra} ${on ? 'on' : ''}" style="--fund-accent:${accent}" title="${esc(name)}${chain ? ' · ' + esc(chain) : ''}" aria-label="${esc(name)}">
-      <span class="fdot" style="background:${accent}"></span>
-      <span class="fmeta"><span class="fname">${esc(name)}</span>${chain ? `<span class="fchain">${esc(chain)}</span>` : ''}</span>
-      <span class="fshort"><b>${esc(short || initials(name))}</b>${chainShort ? `<span>${esc(chainShort)}</span>` : ''}</span>
-    </button>`;
-  setHTML($('#fundBar'), box({ on: state.view === 'home', accent: '#e5e7eb', name: 'Beranda', short: 'Home', attr: 'data-view="home"', extra: 'analysis home-btn' })
-    + state.funds.map((f) => box({ on: diDana && f.id === state.fund, accent: f.accent, name: f.label,
-      chain: f.chain, short: f.short, chainShort: f.chainShort, attr: `data-fund="${esc(f.id)}"` })).join('')
-    + (state.safebox ? box({ on: state.view === 'safebox', accent: state.safebox.accent, name: state.safebox.label,
-      chain: state.safebox.subtitle, short: state.safebox.short, attr: 'data-view="safebox"' }) : '')
-    + box({ on: analisa, accent: '#fbbf24', name: 'Portofolio', short: 'Porto', attr: 'data-view="analisa"', extra: 'analysis' })
-    + box({ on: state.view === 'update', accent: '#38bdf8', name: 'Update', short: 'Update', attr: 'data-view="update"', extra: 'analysis' }));
+  const top = (view, label, on) => `<button class="nav-top ${on ? 'on' : ''}" data-view="${view}">${label}</button>`;
+  const groups = NAV_GROUPS.map((g) => {
+    const items = navItems(g.key);
+    if (!items.length) return '';
+    const cur = items.find((i) => i.on);
+    return `<div class="nav-group ${cur ? 'on' : ''} ${navOpen === g.key ? 'open' : ''}" style="--g:${g.color}">
+      <button class="nav-top" data-menu="${g.key}" aria-haspopup="true" aria-expanded="${navOpen === g.key}">
+        <span class="nav-dot"></span><span class="nav-lbl">${g.label}${cur ? `<small>${esc(cur.name)}</small>` : ''}</span><span class="nav-caret">▾</span></button>
+      <div class="nav-menu" role="menu"${navOpen === g.key ? '' : ' hidden'}>${items.map((i) => `<button role="menuitem" ${i.attr} class="${i.on ? 'on' : ''}">
+        <span class="fdot" style="background:${i.accent}"></span><span class="nav-item"><b>${esc(i.name)}</b><small>${esc(i.sub || '')}</small></span>${i.on ? '<span class="nav-check">✓</span>' : ''}</button>`).join('')}</div>
+    </div>`;
+  }).join('');
+  setHTML($('#fundBar'), top('home', 'Beranda', state.view === 'home') + top('analisa', 'Portofolio', state.view === 'analisa')
+    + top('kinerja', 'Analys', state.view === 'kinerja') + groups + top('update', 'Update', state.view === 'update'));
 }
 
 async function loadFundConfig(id, epoch = fundEpoch) {
@@ -2980,17 +2994,18 @@ const RISK = [
 ];
 
 function leaveHome() {
-  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang']) if ($(id)) $(id).hidden = true;
+  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index']) if ($(id)) $(id).hidden = true;
   if ($('#strip')) $('#strip').hidden = false;
   if (document.body.classList.contains('at-home')) {
     document.body.classList.remove('at-home');
     const meta = fundMeta(state.fund);
+    if (meta && /^#[0-9a-f]{6}$/i.test(meta.accent)) document.documentElement.style.setProperty('--accent', meta.accent);
     $('#tagline').textContent = state.cfg?.app?.tagline || '';
     if (meta) document.title = `${meta.label} — Cashood Headfund`;
   }
 }
 
-const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang'];
+const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index'];
 function showGlobal(view, title) {
   state.view = view;
   $('#tabs').hidden = true;
@@ -2998,11 +3013,127 @@ function showGlobal(view, title) {
   $('#strip').hidden = true;
   document.body.classList.add('at-home');
   document.title = title;
+  document.documentElement.style.setProperty('--accent', '#4ade80');   // halaman ringkasan: warna netral, bukan warna dana terakhir
   $('#tagline').textContent = 'Dana kripto yang dikelola AI';
   renderFundBar();
   if (location.hash !== '#' + view && !(view === 'home' && !location.hash)) history.replaceState(null, '', '#' + view);
   window.scrollTo(0, 0);
 }
+/* ── Cashood Index ───────────────────────────────────────────────────────
+ * Satu angka untuk seluruh dana sungguhan. Dihitung exporter (sync-index.mjs)
+ * dari harga saham tiap dana; halaman ini hanya menggambarnya.
+ */
+async function loadIndex() {
+  for (const url of [(rawDataBase('index') || RAW_BASE + 'index/') + 'live.json', 'data/index/live.json']) {
+    try { const j = await getJSON(url); if (j?.fund === 'index' && Number.isFinite(j.level)) return j; } catch { /* sumber berikutnya */ }
+  }
+  return null;
+}
+async function loadIndexSeries() {
+  for (const url of [(rawDataBase('index') || RAW_BASE + 'index/') + 'nav.json', 'data/index/nav.json']) {
+    try { const j = await getJSON(url); if (Array.isArray(j?.points)) return j.points; } catch { /* sumber berikutnya */ }
+  }
+  return [];
+}
+function showIndex() { showGlobal('index', 'Cashood Index — Cashood Headfund'); renderIndex().catch(() => {}); }
+
+const indexView = { hours: 168 };
+let indexEpoch = 0;
+async function renderIndex() {
+  const epoch = ++indexEpoch;
+  const body = $('#indexBody');
+  const [d, pts] = await Promise.all([loadIndex(), loadIndexSeries()]);
+  if (epoch !== indexEpoch || state.view !== 'index') return;
+  if (!d) { setHTML(body, '<section class="card"><p class="miss">Data index belum tersedia.</p></section>'); return; }
+  const sign = (v, dp = 2) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${pct(v, dp)}`);
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const lvl = (v) => Number(v).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  setHTML(body, `
+    <section class="card idx-hero">
+      <div class="card-head"><h2>Cashood Index</h2><span class="pill sim">${esc(d.status || 'belum dibuka')}</span></div>
+      <div class="idx-top">
+        <div class="idx-level"><div class="k">Level index</div><div class="v">${lvl(d.level)}</div>
+          <div class="n">mulai ${lvl(d.baseLevel)} pada ${tgl(d.baseAt)} · diperbarui ${ago(d.updatedAt)}</div></div>
+        <div class="stats three">
+          ${tile('Sejak awal', sign(d.changePct), `dari level ${lvl(d.baseLevel)}`, cls(d.changePct))}
+          ${tile('24 jam', sign(d.change24hPct), 'perubahan level', cls(d.change24hPct || 0))}
+          ${tile('7 hari', sign(d.change7dPct), 'perubahan level', cls(d.change7dPct || 0))}
+        </div>
+      </div>
+      <div class="controls"><div class="seg" id="segIndex" role="group" aria-label="Rentang grafik index">
+        <button data-h="24" class="${indexView.hours === 24 ? 'on' : ''}">24 jam</button><button data-h="168" class="${indexView.hours === 168 ? 'on' : ''}">7 hari</button><button data-h="0" class="${indexView.hours === 0 ? 'on' : ''}">semua</button></div></div>
+      <div class="hg-chart chart-wrap"><svg id="idxChart" viewBox="0 0 720 220" role="img" aria-label="Level Cashood Index"></svg></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Isi index</h2><span class="hint">${d.components.length} dana · bobot mengikuti besar dana</span></div>
+      <div class="alloc idx-alloc">${d.components.map((c) => `<i style="width:${c.weightPct}%;background:${c.accent}" title="${esc(c.label)} ${c.weightPct}%"></i>`).join('')}</div>
+      <div class="table-scroll"><table class="mcards">
+        <thead><tr><th>Dana</th><th class="num">Bobot</th><th class="num">Harga saham</th><th class="num">Sejak masuk index</th><th class="num">Nilai dana</th></tr></thead>
+        <tbody>${d.components.map((c) => `<tr>
+          <td class="mc-head"><a class="who idx-link" href="#${esc(c.id)}/portfolio"><span class="chip" style="background:${c.accent}"></span>${esc(c.label)} <small class="dim">${esc(c.chain || '')}</small></a></td>
+          <td class="num" data-k="Bobot"><b>${pct(c.weightPct, 1)}</b></td>
+          <td class="num" data-k="Harga saham">${usd(c.unitPrice, 4)}</td>
+          <td class="num ${cls(c.changePct)}" data-k="Sejak masuk index">${sign(c.changePct)}</td>
+          <td class="num" data-k="Nilai dana">${usd(c.fundUsd, 0)}</td></tr>`).join('')}</tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Apa itu Cashood Index</h2><span class="hint">cara kerjanya, apa adanya</span></div>
+      <p class="lead">Cashood Index adalah <strong>satu produk berisi seluruh dana Cashood</strong>. Daripada memilih satu bot,
+        pemegang index ikut semuanya sekaligus: kalau satu bot sedang turun, bot lain bisa menahannya.</p>
+      <div class="two">
+        <div><h3 class="sub-h">Cara kerjanya</h3><ul class="plain">
+          <li>Level index mulai dari 100 dan bergerak mengikuti <strong>rata-rata tertimbang</strong> hasil semua dana di dalamnya.</li>
+          <li>Dana yang lebih besar bobotnya lebih besar.</li>
+          <li>Yang diukur adalah harga saham tiap dana, jadi setoran baru dan pembagian profit tidak dihitung sebagai naik-turun.</li>
+          <li>Bot baru yang lulus uji coba (dry run) otomatis masuk ke index.</li>
+          <li>Safe Box dan dana uji coba tidak termasuk.</li>
+        </ul></div>
+        <div><h3 class="sub-h">Yang perlu dipahami</h3><ul class="plain">
+          <li><strong>Index bisa turun.</strong> Isinya bot yang sama dengan produk lain; menggabungkannya menyebar risiko, bukan menghilangkannya.</li>
+          <li>Tidak ada jaminan pokok dan tidak ada janji persentase hasil.</li>
+          <li>Hasil masa lalu tidak menjamin hasil ke depan.</li>
+          <li>Produk ini <strong>belum dibuka</strong> untuk investor; yang tampil adalah angka index-nya saja.</li>
+        </ul></div>
+      </div>
+    </section>`);
+  const draw = () => {
+    const now = Date.now(), from = indexView.hours ? now - indexView.hours * 3600e3 : 0;
+    const list = pts.filter((p) => p.t >= from).map((p) => ({ t: p.t, v: p.usd }));
+    drawIndexChart($('#idxChart'), list.length > 1 ? list : pts.map((p) => ({ t: p.t, v: p.usd })), lvl);
+  };
+  draw();
+  $('#segIndex').onclick = (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    indexView.hours = Number(btn.getAttribute('data-h'));
+    $('#segIndex').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === btn));
+    draw();
+  };
+}
+
+function drawIndexChart(svg, pts, fmt) {
+  if (!svg || pts.length < 2) { if (svg) setHTML(svg, ''); return; }
+  const small = narrow();
+  const W = small ? 420 : 720, H = small ? 240 : 220, m = { t: 16, r: 58, b: 26, l: 6 };
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const vs = pts.map((p) => p.v), lo = Math.min(...vs), hi = Math.max(...vs), pad = (hi - lo) * 0.12 || 1;
+  const y0 = lo - pad, y1 = hi + pad, t0 = pts[0].t, t1 = pts.at(-1).t;
+  const x = (t) => m.l + ((t - t0) / Math.max(1, t1 - t0)) * (W - m.l - m.r);
+  const y = (v) => m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
+  const up = pts.at(-1).v >= pts[0].v, color = up ? '#4ade80' : '#f87171';
+  const span = t1 - t0, tick = (t) => { const d = new Date(t + 7 * 3600e3); return span <= 36 * 3600e3 ? d.toISOString().slice(11, 16) : `${d.getUTCDate()} ${M_SHORT[d.getUTCMonth()]}`; };
+  setHTML(svg, `<defs><linearGradient id="idxFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    ${[hi, (hi + lo) / 2, lo].map((v) => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" class="g-grid"/><text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${fmt(v)}</text>`).join('')}
+    <line x1="${m.l}" x2="${W - m.r}" y1="${y(pts[0].v).toFixed(1)}" y2="${y(pts[0].v).toFixed(1)}" class="g-base"/>
+    <path d="${line}L${x(t1).toFixed(1)},${H - m.b}L${x(t0).toFixed(1)},${H - m.b}Z" fill="url(#idxFill)"/>
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/>
+    <circle cx="${x(t1).toFixed(1)}" cy="${y(pts.at(-1).v).toFixed(1)}" r="4.5" fill="${color}"/>
+    ${[t0, t0 + span / 2, t1].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}" class="g-lbl">${tick(t)}</text>`).join('')}`);
+}
+
 function showKinerja() { showGlobal('kinerja', 'Analys seluruh bot — Cashood Headfund'); renderKinerja().catch(() => {}); }
 function showPemegang() { showGlobal('pemegang', 'Data investor — Cashood Headfund'); renderPemegang().catch(() => {}); }
 
@@ -3014,6 +3145,7 @@ function showHome() {
   $('#strip').hidden = true;
   document.body.classList.add('at-home');
   document.title = 'Cashood Headfund — dana kripto yang dikelola AI';
+  document.documentElement.style.setProperty('--accent', '#4ade80');
   $('#tagline').textContent = 'Dana kripto yang dikelola AI';
   renderFundBar();
   if (location.hash && location.hash !== '#home') history.replaceState(null, '', '#home');
@@ -3313,8 +3445,27 @@ async function renderHome() {
       ${quota(box ? Number(box.principalUsd) : null, sbCapacity || 0, false)}
       <span class="prod-go">Buka Safe Box <b>→</b></span></a>`;
   };
+  const idx = state.index ? await loadIndex().catch(() => null) : null;
+  if (epoch !== homeEpoch || state.view !== 'home') return;
+  const indexCard = () => {
+    const ix = state.index, s2 = (v) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${pct(v, 2)}`);
+    return `<a class="prod" href="#index" style="--c:${ix.accent}">
+      <div class="prod-top">${iconTile('pie', ix.accent)}
+        <div class="prod-id"><div class="prod-name">${esc(ix.label)}</div><div class="prod-sub">${esc(ix.subtitle || '')} · ${idx.components.length} dana</div></div>
+        ${idx.change24hPct == null ? '' : `<span class="chg ${idx.change24hPct >= 0 ? 'up' : 'down'}">${idx.change24hPct >= 0 ? '▲' : '▼'} ${pct(Math.abs(idx.change24hPct), 2)}<small>24 jam</small></span>`}</div>
+      <p class="prod-desc">${esc(ix.blurb || '')}</p>
+      <div class="prod-nums">
+        <div><span class="k">Level index</span><span class="v">${Number(idx.level).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
+        <div><span class="k">Sejak awal</span><span class="v ${cls(idx.changePct)}">${s2(idx.changePct)}</span></div>
+        <div><span class="k">7 hari</span><span class="v ${cls(idx.change7dPct || 0)}">${s2(idx.change7dPct)}</span></div>
+        <div><span class="k">Isi</span><span class="v txt">${idx.components.length} dana</span></div>
+        <div><span class="k">Jenis</span><span class="v txt">${esc(ix.type || 'Index')}</span></div>
+        <div><span class="k">Status</span><span class="v txt">${esc(idx.status || 'belum dibuka')}</span></div>
+      </div>
+      <span class="prod-go">Buka Cashood Index <b>→</b></span></a>`;
+  };
   setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
-    const items = r.key === 'low' ? (state.safebox ? [safeCard()] : []) : state.funds.filter((f) => f.risk === r.key).map(card);
+    const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : [])] : state.funds.filter((f) => f.risk === r.key).map(card);
     if (!items.length) return '';
     return `<div class="risk-group" style="--rc:${r.color}">
       <div class="rg-head"><span class="rg-badge">${r.title}</span><span class="rg-note">${r.note}</span></div>
@@ -3516,6 +3667,7 @@ function renderVisible() {
   if (state.view === 'home') renderHome().catch(() => {});
   else if (state.view === 'kinerja') renderKinerja().catch(() => {});
   else if (state.view === 'pemegang') renderPemegang().catch(() => {});
+  else if (state.view === 'index') renderIndex().catch(() => {});
   else if (state.view === 'safebox') renderSafebox();
   else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
   else if (state.view === 'update') renderUpdates();
@@ -3528,6 +3680,7 @@ async function init() {
     state.funds = list.funds || [];
     state.coins = list.coins || ['eth'];
     state.safebox = list.safebox || null;
+    state.index = list.index || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -3538,8 +3691,13 @@ async function init() {
   $('#fundBar').onclick = (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
+    const menu = btn.getAttribute('data-menu');
+    if (menu) { navOpen = navOpen === menu ? null : menu; renderFundBar(); return; }
+    navOpen = null;
     const view = btn.getAttribute('data-view');
     if (view === 'home') { showHome(); return; }
+    if (view === 'kinerja') { showKinerja(); return; }
+    if (view === 'index') { showIndex(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
     if (view === 'update') { showUpdate(); return; }
@@ -3547,6 +3705,10 @@ async function init() {
     if (state.view === 'analisa' && id === state.fund) { showTab(currentTab); return; }
     switchFund(id);
   };
+
+  // Dropdown menu tertutup saat menekan di luar atau menekan Escape.
+  document.addEventListener('pointerdown', (e) => { if (navOpen && !e.target.closest('#fundBar')) { navOpen = null; renderFundBar(); } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && navOpen) { navOpen = null; renderFundBar(); } });
 
   const calStep = (dir) => {
     const months = [...new Set(homeCal.rows.map((r) => r.date.slice(0, 7)))].sort();
@@ -3623,6 +3785,7 @@ async function init() {
     if (state.view === 'home') renderHome().catch(() => {});
     else if (state.view === 'kinerja') renderKinerja().catch(() => {});
     else if (state.view === 'pemegang') renderPemegang().catch(() => {});
+    else if (state.view === 'index') renderIndex().catch(() => {});
     else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
     else if (state.view === 'safebox') renderSafebox();
     else if (state.view === 'update') renderUpdates();
@@ -3640,6 +3803,7 @@ async function init() {
     if (route.kinerja) { showKinerja(); return; }
     if (route.pemegang) { showPemegang(); return; }
     if (route.safebox) { showSafebox(); return; }
+    if (route.index) { showIndex(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }

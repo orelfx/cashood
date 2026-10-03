@@ -9,18 +9,19 @@ if(!process.argv[2]||destination===ROOT)throw new Error('Direktori staging ekspl
 let failed=false;
 // Buku paper impor (dgrh, dgsol) baru ikut terbit setelah snapshot-nya diimpor.
 const OPTIONAL=new Set(['dgrh','dgsol']);
-for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','safebox']){
+for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','safebox','index']){
  if(OPTIONAL.has(fund)&&!existsSync(resolve(ROOT,'data',fund,'live.json')))continue;
  try{
   const dir=resolve(ROOT,'data',fund),live=readJSON(resolve(dir,'live.json'));if(!live)throw new Error('Snapshot belum ada');
   assertPublic(live);
   if(live.schemaVersion!==2)throw new Error('Snapshot versi lama belum disanitasi; jangan publikasi ulang');
-  if(fund!=='safebox')Core.validateSnapshot(live);
+  // Safe Box dan Cashood Index bukan dompet dana: bentuk snapshot-nya sendiri.
+  if(fund!=='safebox'&&fund!=='index')Core.validateSnapshot(live);
   const nav=fund==='safebox'?null:readJSON(resolve(dir,'nav.json'));
   if(nav&&nav.generation!==live.generation)throw new Error('Generasi snapshot dan deret belum cocok');
   // File writes here are private until a single Git commit publishes all of them.
   atomicJSON(resolve(destination,fund,'live.json'),live);
-  atomicJSON(resolve(destination,fund,'config.json'),readJSON(resolve(dir,'config.json')));
+  if(fund!=='index')atomicJSON(resolve(destination,fund,'config.json'),readJSON(resolve(dir,'config.json')));
   // Deret publik hanya membawa yang digambar situs (waktu, nilai, bagian LP);
   // kolom pembukuan per titik tetap di server dan tidak membebani pengunjung.
   if(nav)atomicJSON(resolve(destination,fund,'nav.json'),{updatedAt:nav.updatedAt,generation:nav.generation,

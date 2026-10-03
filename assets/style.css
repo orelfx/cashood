@@ -1160,3 +1160,47 @@ body.at-home #tabs { display: none; }
   #closedPager button { min-width: 38px; height: 38px; }
 }
 .nowrap { white-space: nowrap; }
+
+/* ══ menu utama dengan dropdown (2026-10-03) ══════════════════════════ */
+.nav2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0 0; position: relative; z-index: 20; }
+.nav2 .nav-top { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 11px; font: 600 13px var(--sans); white-space: nowrap; }
+.nav2 .nav-top:hover { color: var(--text); border-color: #33404f; }
+.nav2 > .nav-top.on { color: #06120b; background: linear-gradient(135deg, #4ade80, #2dd4bf); border-color: transparent; }
+.nav-group { position: relative; }
+.nav-group .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--g); flex: none; }
+.nav-group .nav-lbl { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.nav-group .nav-lbl small { font: 500 10.5px var(--sans); color: var(--muted); }
+.nav-group .nav-caret { font-size: 10px; opacity: .7; transition: transform .15s ease; }
+.nav-group.open .nav-caret { transform: rotate(180deg); }
+.nav-group.on > .nav-top, .nav-group.open > .nav-top { color: var(--text); border-color: var(--g); box-shadow: inset 0 0 0 1px var(--g); }
+.nav-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 230px; padding: 6px; z-index: 30;
+  background: #0d1117; border: 1px solid #2b3543; border-radius: 13px; box-shadow: 0 18px 40px rgba(0,0,0,.55); display: grid; gap: 2px; }
+.nav-menu button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 8px 10px; text-align: left; cursor: pointer;
+  background: transparent; border: 0; border-radius: 9px; color: var(--text); font: 500 13px var(--sans); }
+.nav-menu button:hover, .nav-menu button.on { background: rgba(255,255,255,.06); }
+.nav-menu .fdot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.nav-menu .nav-item { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.25; }
+.nav-menu .nav-item b { font-weight: 650; }
+.nav-menu .nav-item small { color: var(--muted); font-size: 11.5px; }
+.nav-menu .nav-check { color: #4ade80; font-weight: 700; }
+@media (max-width: 640px) {
+  .nav2 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+  .nav2 .nav-top { width: 100%; justify-content: center; padding: 0 6px; min-height: 44px; font-size: 12px; gap: 5px; }
+  .nav-group .nav-lbl { align-items: center; text-align: center; white-space: normal; }
+  .nav-group .nav-lbl small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-group .nav-caret { display: none; }
+  /* dropdown selebar baris menu, bukan selebar tombolnya */
+  .nav-group { position: static; }
+  .nav-menu { left: 0; right: 0; top: auto; margin-top: 6px; min-width: 0; }
+}
+
+/* ── halaman Cashood Index ── */
+.idx-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; align-items: center; margin-bottom: 12px; }
+.idx-level .k { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.idx-level .v { font: 700 clamp(34px, 5vw, 48px)/1.1 var(--mono); letter-spacing: -.03em; margin: 6px 0 4px; }
+.idx-level .n { font-size: 12px; color: var(--muted); }
+.idx-alloc { margin: 4px 0 14px; }
+.idx-link { color: var(--text); text-decoration: none; }
+.idx-link:hover { text-decoration: underline; }
+@media (max-width: 760px) { .idx-top { grid-template-columns: 1fr; } }
