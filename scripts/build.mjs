@@ -15,7 +15,7 @@ for(const file of ['assets/style.css','assets/vendor/purify.min.js','assets/secu
  const name=file.replace(/\.(js|css)$/,'-'+hash+'.$1');mkdirSync(dirname(resolve(out,name)),{recursive:true});writeFileSync(resolve(out,name),content);html=html.replace(`${file}?v=__BUILD__`,name);
 }
 writeFileSync(resolve(out,'index.html'),html);
-for(const file of ['data/funds.json','data/updates.json',...['reborn','meridian','ferari','robsol','charon','forex','binance','safebox'].map(f=>`data/${f}/config.json`)]){
+for(const file of ['data/funds.json','data/updates.json',...['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','safebox'].map(f=>`data/${f}/config.json`)]){
  const value=JSON.parse(readFileSync(resolve(root,file),'utf8'));assertPublic(value);if(file.endsWith('config.json')&&!file.includes('safebox'))Core.buildLedger(value);
  mkdirSync(dirname(resolve(out,file)),{recursive:true});writeFileSync(resolve(out,file),JSON.stringify(value));
 }

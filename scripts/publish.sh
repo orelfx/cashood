@@ -29,6 +29,7 @@ run_snapshot scripts/sync-binance.mjs
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
   git add -- reborn meridian ferari robsol charon forex binance safebox
+  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 # Retry an earlier unpushed commit even when there are no file changes this run.

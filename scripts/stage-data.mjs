@@ -7,7 +7,10 @@ import { readJSON,atomicJSON,assertPublic } from './lib/io.mjs';
 const ROOT=resolve(dirname(fileURLToPath(import.meta.url)),'..'),destination=resolve(process.argv[2]||'');
 if(!process.argv[2]||destination===ROOT)throw new Error('Direktori staging eksplisit wajib');
 let failed=false;
-for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','safebox']){
+// Buku paper impor (dgrh, dgsol) baru ikut terbit setelah snapshot-nya diimpor.
+const OPTIONAL=new Set(['dgrh','dgsol']);
+for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','safebox']){
+ if(OPTIONAL.has(fund)&&!existsSync(resolve(ROOT,'data',fund,'live.json')))continue;
  try{
   const dir=resolve(ROOT,'data',fund),live=readJSON(resolve(dir,'live.json'));if(!live)throw new Error('Snapshot belum ada');
   assertPublic(live);

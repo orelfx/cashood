@@ -89,7 +89,7 @@ function getJSON(url, { fresh = false } = {}) {
       if (list.safebox) quiet(getJSON(RAW_BASE + 'safebox/live.json'));
     }));
     const guess = first || 'reborn';
-    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance'].includes(guess) ? guess : 'reborn';
+    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance', 'dgrh', 'dgsol'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
   } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
