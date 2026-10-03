@@ -356,7 +356,10 @@ const closedAll = (tracking.entries || []).filter((e) => Number.isFinite(Date.pa
   const at = Date.parse(e.close_ts), pct = Number(e.close_pnl_pct);
   const st = state.positions?.[e.position];
   const priced = closes.find((c) => c.closedAt === at && c.symbol === (e.pool_name || '—'));
-  const est = !priced && Number(st?.amount_sol) > 0 && Number.isFinite(pct) ? Number(st.amount_sol) * pct / 100 * solPrice : null;
+  // Perkiraan dolar dibekukan saat posisi pertama kali diarsipkan; kalau dihitung
+  // ulang dengan harga SOL terbaru, riwayat hari-hari lama berubah tiap siklus.
+  if (e._estUsd == null && !priced && Number(st?.amount_sol) > 0 && Number.isFinite(pct)) e._estUsd = Number((Number(st.amount_sol) * pct / 100 * solPrice).toFixed(2));
+  const est = priced ? null : (e._estUsd ?? null);
   const opened = st?.deployed_at ? Date.parse(st.deployed_at) : null;
   return {
     symbol: e.pool_name || '—',
@@ -370,12 +373,12 @@ const closedAll = (tracking.entries || []).filter((e) => Number.isFinite(Date.pa
   };
 }).sort((a, b) => b.closedAt - a.closedAt);
 snapshot.closedRecent = closedAll.slice(0, 20);
-snapshot.tradesFile = true;
+snapshot.tradesAll = closedAll;
+snapshot.tradesFlatBand = 0.05;
 snapshot.stats.closedCount = closedAll.length;
 snapshot.stats.wins = closedAll.filter((c) => c.netPct > 0.05).length;
 snapshot.stats.losses = closedAll.filter((c) => c.netPct < -0.05).length;
 snapshot.stats.winRate = closedAll.length ? r2((snapshot.stats.wins / closedAll.length) * 100) : null;
-atomicJSON(resolve(OUT_DIR, 'trades.json'), { fund: 'meridian', updatedAt: Date.now(), rows: closedAll });
 atomicJSON(ARSIP, { updatedAt: Date.now(), rows: arsip.rows });
 saveSnapshot(resolve(OUT_DIR,'live.json'), snapshot, cfgFund);
 console.log(`[meridian] total=$${snapshot.totalUsd} positions=${positions.length} complete=${snapshot.quality.complete} unpricedCloses=${unpricedCloses}`);

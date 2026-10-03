@@ -2,6 +2,7 @@ import Core from '../../assets/core.js';
 import { atomicJSON, downsample, generation, publicSnapshot, readJSON } from './io.mjs';
 import { resolve, dirname } from 'node:path';
 import { buildPerformance } from './performance.mjs';
+import { groupTradeDays, writeTradeDays } from './trades.mjs';
 export function reconcile(snapshot, cfg, previous = null) {
   snapshot.schemaVersion = 2;
   snapshot.generation ||= generation();
@@ -69,8 +70,16 @@ export function saveSnapshot(out, snapshot, cfg) {
       }
     } catch (err) { snapshot.performance = null; }
   }
+  // Riwayat lengkap: indeks per hari ikut snapshot, barisnya ke berkas harian.
+  let tradeFiles=null;
+  if (Array.isArray(snapshot.tradesAll)) {
+    const g=groupTradeDays(snapshot.tradesAll, snapshot.tradesFlatBand ?? 0.5);
+    snapshot.tradeDays=g.index; tradeFiles=g.files;
+    delete snapshot.tradesAll; delete snapshot.tradesFlatBand; delete snapshot.tradesFile;
+  }
   const publicData=publicSnapshot(snapshot,dir);
   // Only after all validation/sanitization has passed may any new generation be written.
   atomicJSON(local,snapshot);atomicJSON(navPath,{updatedAt:snapshot.updatedAt,generation:snapshot.generation,points});atomicJSON(out,publicData);
+  if (tradeFiles) writeTradeDays(dir, snapshot.fund, tradeFiles);
   return snapshot;
 }

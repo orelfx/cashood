@@ -161,7 +161,8 @@ const snapshot = {
     timezone: 'Asia/Jakarta (UTC+7)',
   },
   closedRecent: semua.slice(0, 20).map(bersih),
-  tradesFile: true,
+  tradesAll: semua,
+  tradesFlatBand: 0.1,
   trading: {
     paper: true,
     mode: 'testnet',
@@ -196,7 +197,6 @@ if (!health.usable) snapshot.quality = { complete: false, reasons: [`${health.st
 
 snapshot.performanceInput = { closes: baru.map((r) => ({ netUsd: r.netUsd, netPct: r.netPct, closedAt: r.closedAt, holdMinutes: r.holdMinutes, symbol: r.symbol })), flatBand: 0.005 };
 saveSnapshot(OUT, snapshot, cfg);
-atomicJSON(resolve(DIR, 'trades.json'), { fund: 'binance', updatedAt: now, rows: semua.map(bersih) });
 console.log(`[binance] equity=$${equity} baru=${baru.length} arsip=${lama.length} aktif=${positions.length} status=${snapshot.trading.status}`);
 release();
 process.exit(0);

@@ -1145,3 +1145,18 @@ body.at-home #tabs { display: none; }
 .hg-tip .t-row span { display: inline-flex; align-items: center; gap: 6px; color: #c3cad6; }
 .hg-tip .t-row i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
 .hg-tip .t-row b { font: 600 11.5px var(--mono); }
+
+/* ── riwayat posisi: filter bulan + halaman ─────────────────────────── */
+.closed-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 10px; }
+.sel-wrap { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.sel-wrap select { appearance: none; -webkit-appearance: none; background: #0f1319 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238b97a8' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+  color: var(--text); border: 1px solid var(--line); border-radius: 9px; padding: 8px 30px 8px 12px; font: 500 13px var(--sans); min-height: 38px; cursor: pointer; }
+.closed-sum { font-size: 12.5px; color: var(--muted); }
+.closed-sum b { color: var(--text); font-family: var(--mono); }
+#closedPager { flex-wrap: wrap; justify-content: center; }
+#closedPager .gap { color: var(--muted); padding: 0 2px; }
+@media (max-width: 640px) {
+  .sel-wrap { width: 100%; } .sel-wrap select { flex: 1; min-height: 42px; }
+  #closedPager button { min-width: 38px; height: 38px; }
+}
+.nowrap { white-space: nowrap; }

@@ -248,7 +248,7 @@ const history = [...perHari.values()]
 const realisedUsd = tutup.reduce((t, r) => t + r.netUsd, 0);
 const terbaik = history.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
 const terburuk = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), null);
-const closedRecent = [...tutup].reverse().slice(0, 10);
+const closedRecent = [...tutup].reverse().slice(0, 20).map(({ tokenId, ...r }) => r);
 
 // ─── kurs rupiah, sama seperti dana lain ──────────────────────────────────
 let usdIdr = null;
@@ -298,6 +298,7 @@ const snapshot = {
     timezone: 'Asia/Jakarta (UTC+7)',
   },
   closedRecent,
+  tradesAll: tutup,
 };
 
 snapshot.performanceInput = { closes: tutup.map((r) => ({ netUsd: r.netUsd, netPct: r.netPct, closedAt: r.closedAt, holdMinutes: r.holdMinutes, symbol: r.symbol || null })), flatBand: 0.5 };

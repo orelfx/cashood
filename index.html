@@ -380,8 +380,12 @@
   <!-- ── posisi yang sudah ditutup ─────────────────────────── -->
   <section class="card" id="closedCard">
     <div class="card-head">
-      <h2>Posisi terakhir ditutup</h2>
+      <h2>Riwayat posisi ditutup</h2>
       <span class="hint" id="closedHint"></span>
+    </div>
+    <div class="controls closed-ctl" id="closedCtl" hidden>
+      <label class="sel-wrap"><span>Periode</span><select id="closedMonth" aria-label="Pilih bulan"></select></label>
+      <span class="closed-sum" id="closedSum"></span>
     </div>
     <div class="table-scroll">
       <table id="closedTable">
@@ -391,6 +395,7 @@
         <tbody></tbody>
       </table>
     </div>
+    <div class="pager" id="closedPager" hidden></div>
   </section>
 
   <!-- ── biaya bulanan ─────────────────────────────────────── -->

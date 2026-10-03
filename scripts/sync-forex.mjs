@@ -151,7 +151,8 @@ const snapshot = {
   // Dua puluh terakhir di snapshot; seluruh riwayat di trades.json, yang baru
   // diambil halaman saat pembaca meminta "tampilkan semua".
   closedRecent: [...tutup].reverse().slice(0, 20),
-  tradesFile: true,
+  tradesAll: tutup,
+  tradesFlatBand: 0.005,
   trading: {
     paper: true,
     mode: 'demo',
@@ -183,7 +184,6 @@ const snapshot = {
 };
 snapshot.performanceInput = { closes: tutup.map((r) => ({ netUsd: r.netUsd, netPct: r.netPct, closedAt: r.closedAt, holdMinutes: r.holdMinutes, symbol: r.symbol })), flatBand: 0.005 };
 saveSnapshot(OUT, snapshot, cfg);
-atomicJSON(resolve(DIR, 'trades.json'), { fund: snapshot.fund, updatedAt: now, rows: [...tutup].reverse() });
 console.log(`[forex] total=$${totalUsd} open=${positions.length} closed=${tutup.length} points=${points.length} complete=${snapshot.quality.complete}`);
 release();
 process.exit(0);

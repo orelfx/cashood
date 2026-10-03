@@ -233,7 +233,8 @@ const snapshot = {
     worstClosePct: tutup.length ? r2(Math.min(...tutup.map((r) => r.netPct ?? 0))) : null,
     timezone: 'Asia/Jakarta (UTC+7)',
   },
-  closedRecent: [...tutup].reverse().slice(0, 10),
+  closedRecent: [...tutup].reverse().slice(0, 20),
+  tradesAll: tutup,
 };
 // Alamat Solana tidak tertangkap pemeriksa rahasia umum (yang mencari 0x…),
 // jadi diperiksa di sini secara eksplisit.

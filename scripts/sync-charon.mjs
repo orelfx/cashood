@@ -228,7 +228,8 @@ const snapshot = {
     worstClosePct: tutup.length ? Number(Math.min(...tutup.map((r) => r.netPct ?? 0)).toFixed(2)) : null,
     timezone: 'Asia/Jakarta (UTC+7)',
   },
-  closedRecent: [...tutup].reverse().slice(0, 15),
+  closedRecent: [...tutup].reverse().slice(0, 20),
+  tradesAll: tutup,
   trading,
 };
 if (heartbeat && now - heartbeat > 10 * 60e3) {

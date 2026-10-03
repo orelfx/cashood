@@ -423,7 +423,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     historyNote: snap.historyNote || null,
     performance: snap.performance || null,
     trading: snap.trading || null,
-    tradesFile: Boolean(snap.tradesFile),
+    tradeDays: Array.isArray(snap.tradeDays) ? snap.tradeDays : [],
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -787,51 +787,129 @@ function renderLp(nav) {
     + (trackedSince ? ` · estimasi fee dipanen sejak ${ago(trackedSince)}` : '');
 }
 
-function renderClosed(nav) {
-  const rows = nav.closedRecent || [];
-  const body = $('#closedTable').querySelector('tbody');
-  $('#closedCard').hidden = false;
-  if (!rows.length) {
-    setHTML(body, '<tr><td colspan="7" class="dim">Belum ada posisi yang ditutup.</td></tr>');
-    $('#closedHint').textContent = '';
-    return;
+/* ── riwayat posisi ditutup: seluruh riwayat, per halaman ───────────────
+ *
+ * Snapshot membawa dua puluh posisi terakhir (halaman pertama, tanpa unduhan)
+ * dan indeks per hari (`tradeDays`: tanggal, jumlah, hasil, menang, kalah).
+ * Baris hari-hari lain ada di berkas harian yang baru diunduh saat halamannya
+ * dibuka — jadi riwayat boleh puluhan ribu posisi tanpa memberatkan halaman.
+ */
+const CLOSED_PER_PAGE = 20;
+const closedView = { fund: null, month: '', page: 0, token: 0 };
+const tradeDayCache = new Map();
+
+async function loadTradeDay(fund, day) {
+  const key = `${fund}/${day}`;
+  if (tradeDayCache.has(key)) return tradeDayCache.get(key);
+  const file = `trades/${day}.json`;
+  const urls = [(rawDataBase(fund) || RAW_BASE + fund + '/') + file, `data/${fund}/${file}`];
+  for (const url of urls) {
+    try {
+      const j = await getJSON(url);
+      if (j?.fund === fund && Array.isArray(j.rows)) { tradeDayCache.set(key, j.rows); return j.rows; }
+    } catch { /* sumber berikutnya */ }
   }
-  const all = closedAll && closedAll.fund === state.fund ? closedAll.rows : null;
-  const shown = all || rows;
+  throw new Error('riwayat hari ' + day + ' tidak terbaca');
+}
+
+function closedRowsHtml(rows, absolute) {
   // Hasil dalam dolar kalau bot mencatatnya; bot yang hanya mencatat persen
-  // ditulis "—" di kolom dolar, bukan $0.
+  // ditulis "—" (atau ≈ perkiraan) di kolom dolar, bukan $0.
   const tone = (r) => (r.netUsd != null ? r.netUsd : r.netPct);
-  setHTML(body, shown.map((r) => `
+  return rows.map((r) => `
     <tr>
       <td><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
       <td class="dim">${esc(r.strategy ?? '—')}</td>
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
-      <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga sekarang">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
+      <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
       <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}</td>
-      <td class="num dim">${all ? tglJam(r.closedAt) : ago(r.closedAt)}</td>
-    </tr>`).join('')
-    + (!all && nav.tradesFile && Number(nav.stats?.closedCount) > rows.length
-      ? `<tr><td colspan="7" class="more-row"><button class="btn ghost" id="closedAllBtn">Tampilkan semua ${nav.stats.closedCount} trade</button></td></tr>` : ''));
-  const withUsd = shown.filter((r) => r.netUsd != null);
-  const withEst = shown.filter((r) => r.netUsd == null && r.estUsd != null);
-  setHTML($('#closedHint'), `${all ? 'seluruh ' + shown.length : shown.length + ' terakhir'}`
-    + (withUsd.length ? ` · jumlahnya ${signed(withUsd.reduce((t, r) => t + r.netUsd, 0))}`
-      : withEst.length ? ` · ≈ jumlahnya ${signed(withEst.reduce((t, r) => t + r.estUsd, 0))} (dolar diperkirakan dari persen)`
-      : ' · hasil dalam persen dari nilai posisi'));
-  const btn = $('#closedAllBtn');
-  if (btn) btn.onclick = async () => {
-    btn.disabled = true; btn.textContent = 'memuat…';
-    const fund = state.fund;
-    for (const url of dataUrls(state.cfg, 'trades.json', null, fund)) {
-      try { const j = await getJSON(url); if (j?.fund === fund && Array.isArray(j.rows)) { closedAll = j; break; } } catch { /* sumber berikutnya */ }
-    }
-    if (fund !== state.fund) return;
-    if (closedAll?.fund === fund) renderClosed(state.nav);
-    else { btn.disabled = false; btn.textContent = 'gagal memuat — coba lagi'; }
-  };
+      <td class="num dim nowrap">${absolute ? tglRingkas(r.closedAt) : ago(r.closedAt)}</td>
+    </tr>`).join('');
 }
-let closedAll = null;
+// "1 Okt 13:14" (WIB); tahun hanya ditulis kalau bukan tahun ini.
+function tglRingkas(t) {
+  if (!Number.isFinite(t)) return '—';
+  const d = new Date(t + 7 * 3600e3), y = d.getUTCFullYear();
+  return `${d.getUTCDate()} ${M_SHORT[d.getUTCMonth()]}${y === new Date().getUTCFullYear() ? '' : ' ' + y} ${d.toISOString().slice(11, 16)}`;
+}
+
+function pagerHtml(page, pages) {
+  const btn = (label, p, extra = '') => `<button ${extra} data-p="${p}" class="${p === page && !extra.includes('data-nav') ? 'on' : ''}">${label}</button>`;
+  const nums = [];
+  for (let i = 0; i < pages; i += 1) {
+    if (i === 0 || i === pages - 1 || Math.abs(i - page) <= 1) nums.push(btn(String(i + 1), i));
+    else if (nums[nums.length - 1] !== '<span class="gap">…</span>') nums.push('<span class="gap">…</span>');
+  }
+  return btn('‹', Math.max(0, page - 1), `data-nav ${page === 0 ? 'disabled' : ''}`) + nums.join('')
+    + btn('›', Math.min(pages - 1, page + 1), `data-nav ${page === pages - 1 ? 'disabled' : ''}`);
+}
+
+function renderClosed(nav) {
+  const recent = nav.closedRecent || [];
+  const days = Array.isArray(nav.tradeDays) ? nav.tradeDays : [];
+  const body = $('#closedTable').querySelector('tbody');
+  const ctl = $('#closedCtl'), pager = $('#closedPager');
+  $('#closedCard').hidden = false;
+  if (closedView.fund !== state.fund) Object.assign(closedView, { fund: state.fund, month: '', page: 0 });
+  if (!recent.length && !days.length) {
+    setHTML(body, '<tr><td colspan="7" class="dim">Belum ada posisi yang ditutup.</td></tr>');
+    $('#closedHint').textContent = ''; ctl.hidden = true; pager.hidden = true;
+    return;
+  }
+  // Snapshot lama tanpa indeks harian: tampilkan yang ada saja.
+  if (!days.length) {
+    setHTML(body, closedRowsHtml(recent, false));
+    setHTML($('#closedHint'), `${recent.length} terakhir`); ctl.hidden = true; pager.hidden = true;
+    return;
+  }
+
+  const months = [...new Set(days.map((x) => x.d.slice(0, 7)))].sort().reverse();
+  if (closedView.month && !months.includes(closedView.month)) closedView.month = '';
+  const scope = days.filter((x) => !closedView.month || x.d.startsWith(closedView.month)).slice().reverse();   // terbaru dulu
+  const total = scope.reduce((t, x) => t + x.n, 0);
+  const pages = Math.max(1, Math.ceil(total / CLOSED_PER_PAGE));
+  closedView.page = Math.min(Math.max(0, closedView.page), pages - 1);
+  const sum = (list) => ({ n: list.reduce((t, x) => t + x.n, 0), w: list.reduce((t, x) => t + x.w, 0), l: list.reduce((t, x) => t + x.l, 0),
+    usd: list.some((x) => x.usd != null) ? list.reduce((t, x) => t + (x.usd || 0), 0) : null, est: list.some((x) => x.est) });
+  const label = (m) => `${M_SHORT[Number(m.slice(5)) - 1]} ${m.slice(0, 4)}`;
+
+  ctl.hidden = false;
+  const all = sum(days);
+  setHTML($('#closedMonth'), `<option value="">Semua · ${all.n} posisi</option>`
+    + months.map((m) => { const s = sum(days.filter((x) => x.d.startsWith(m))); return `<option value="${m}"${m === closedView.month ? ' selected' : ''}>${label(m)} · ${s.n} posisi</option>`; }).join(''));
+  const s = sum(scope);
+  setHTML($('#closedSum'), `<b>${s.n}</b> posisi`
+    + (s.usd == null ? '' : ` · hasil <b class="${cls(s.usd)}">${s.est ? '≈' : ''}${signed(s.usd)}</b>`)
+    + ` · <span class="pos">${s.w} untung</span> · <span class="neg">${s.l} rugi</span>`
+    + (s.w + s.l ? ` · win rate ${pct((s.w / (s.w + s.l)) * 100, 1)}` : ''));
+  setHTML($('#closedHint'), `halaman ${closedView.page + 1} dari ${pages} · ${closedView.month ? label(closedView.month) : 'seluruh riwayat'}`);
+  pager.hidden = pages < 2;
+  if (pages > 1) setHTML(pager, pagerHtml(closedView.page, pages));
+
+  // Halaman pertama tanpa filter sudah ada di snapshot — langsung tampil.
+  const start = closedView.page * CLOSED_PER_PAGE;
+  if (closedView.page === 0 && !closedView.month && recent.length >= Math.min(CLOSED_PER_PAGE, total)) {
+    setHTML(body, closedRowsHtml(recent.slice(0, CLOSED_PER_PAGE), false));
+    return;
+  }
+  // Hari-hari yang beririsan dengan halaman ini saja yang diunduh.
+  const need = []; let off = 0, first = null;
+  for (const x of scope) {
+    if (off + x.n > start && off < start + CLOSED_PER_PAGE) { if (first == null) first = off; need.push(x.d); }
+    off += x.n;
+  }
+  const token = ++closedView.token, fund = state.fund;
+  if (!need.every((d) => tradeDayCache.has(`${fund}/${d}`))) setHTML(body, '<tr><td colspan="7" class="dim">memuat riwayat…</td></tr>');
+  Promise.all(need.map((d) => loadTradeDay(fund, d))).then((lists) => {
+    if (token !== closedView.token || fund !== state.fund) return;
+    const rows = lists.flat().slice(start - first, start - first + CLOSED_PER_PAGE);
+    setHTML(body, closedRowsHtml(rows, true));
+  }).catch((err) => {
+    if (token !== closedView.token) return;
+    setHTML(body, `<tr><td colspan="7" class="miss">Riwayat tidak bisa dimuat: ${esc(err.message)}</td></tr>`);
+  });
+}
 const tglJam = (t) => (Number.isFinite(t) ? new Date(t + 7 * 3600e3).toISOString().slice(0, 16).replace('T', ' ') : '—');
 
 /* ── dana trading (Charon RH) ──────────────────────────────────────────
@@ -2153,7 +2231,7 @@ async function switchFund(id) {
   const epoch = ++fundEpoch; ++loadEpoch;
   tandaiSibuk(1);
   state.nav = null; navPoints = []; hbLoaded = false; hbLoading = null;
-  holdPage = 0; historyRetried = false; closedAll = null; view.month = null; $('#divNav').value = '';
+  holdPage = 0; historyRetried = false; view.month = null; $('#divNav').value = '';
   try {
     if (!await loadFundConfig(id, epoch)) return;
     showTab(currentTab); await load({ force: true });
@@ -3512,6 +3590,15 @@ async function init() {
     brand.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); } };
   }
   wireProfitControls();
+
+  $('#closedMonth').onchange = (e) => { closedView.month = e.target.value; closedView.page = 0; renderClosed(state.nav); };
+  $('#closedPager').onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.disabled) return;
+    closedView.page = Number(btn.getAttribute('data-p')) || 0;
+    renderClosed(state.nav);
+    $('#closedCard').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
 
   $('#holdPager').onclick = (e) => {
     const btn = e.target.closest('button');

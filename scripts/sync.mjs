@@ -327,19 +327,20 @@ for (const id of Object.keys(feeBook)) if (!openIds.has(id)) delete feeBook[id];
 
 // Sepuluh posisi terakhir yang ditutup — cukup untuk melihat apa yang baru
 // saja terjadi tanpa mengunduh dua ratus baris yang tidak dibaca siapa pun.
-const closedRecent = [...closed]
-  .sort((a, b) => (Number(b.closedAt) || 0) - (Number(a.closedAt) || 0))
-  .slice(0, 10)
-  .map((r) => ({
-    symbol: r.symbol ?? null,
-    strategy: r.strategy ?? null,
-    netUsd: Number(Number(r.netUsd).toFixed(2)),
-    netPct: Number.isFinite(Number(r.netPct)) ? Number((Number(r.netPct) * 100).toFixed(2)) : null,
-    openedAt: Number(r.openedAt) || null,
-    closedAt: Number(r.closedAt) || null,
-    holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null,
-    reason: String(r.closeReason || '').split(':')[0] || null,
-  }));
+const closedRow = (r) => ({
+  symbol: r.symbol ?? null,
+  strategy: r.strategy ?? null,
+  netUsd: Number(Number(r.netUsd).toFixed(2)),
+  netPct: Number.isFinite(Number(r.netPct)) ? Number((Number(r.netPct) * 100).toFixed(2)) : null,
+  openedAt: Number(r.openedAt) || null,
+  closedAt: Number(r.closedAt) || null,
+  holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null,
+  reason: String(r.closeReason || '').split(/[:—]/)[0].replace(/(?:0x)?[0-9a-fA-F]{24,}/g, '0x…').trim().slice(0, 90) || null,
+});
+// Seluruh riwayat diterbitkan per hari (lihat lib/trades.mjs); snapshot hanya
+// membawa dua puluh terakhir supaya halaman pertama tampil tanpa unduhan lagi.
+const closedAllRows = closed.map(closedRow).filter((r) => Number.isFinite(r.closedAt));
+const closedRecent = [...closedAllRows].sort((a, b) => b.closedAt - a.closedAt).slice(0, 20);
 
 // Sebaran kerugian terburuk per posisi. Dipakai analisa untuk menghitung batas
 // atas peluang sebuah posisi habis total — peristiwa yang belum pernah terjadi
@@ -440,6 +441,7 @@ const snapshot = {
   bookStats,
   stats,
   closedRecent,
+  tradesAll: closedAllRows,
 };
 
 snapshot.performanceInput = { closes: closed.map((r) => ({ netUsd: Number(r.netUsd), netPct: Number(r.netPct) * 100, closedAt: Number(r.closedAt), holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null, symbol: r.symbol || null })), flatBand: 0.5 };
