@@ -689,7 +689,7 @@ function renderHoldings(nav) {
     ? slice.map((r) => `
       <tr>
         <td><span class="who"><span class="chip" style="background:${r.symbol === 'ETH' ? '#627eea' : '#4ade80'}"></span>${esc(r.symbol)}</span></td>
-        <td class="num">${num(r.amount, 6)}</td>
+        <td class="num">${r.amount == null ? '<span class="dim">—</span>' : num(r.amount, 6)}</td>
         <td class="num">${r.price == null ? '<span class="dim">—</span>' : usd(r.price, r.price < 10 ? 4 : 2)}</td>
         <td class="num">${r.usd == null ? '<span class="dim">?</span>' : usd(r.usd)}</td>
       </tr>`).join('')
