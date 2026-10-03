@@ -18,6 +18,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { atomicJSON, lock, readJSON } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
+import { binanceHealth } from './lib/binance-health.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'binance');
@@ -38,6 +39,9 @@ const db = new Database(resolve(HOME, 'data', 'demo_v2.sqlite3'), { readonly: tr
 db.pragma('busy_timeout = 5000');
 const kv = (key) => parse(db.prepare('SELECT body FROM kv WHERE key=?').get(key)?.body);
 const status = kv('status');
+const api = kv('api_status');
+const heartbeat = kv('heartbeat');
+const health = binanceHealth(status, api, heartbeat, now);
 if (!status?.account) throw new Error('status akun testnet belum tercatat');
 
 // ─── mesin baru: trade tertutup, dalam dolar bersih ───────────────────────
@@ -63,7 +67,8 @@ const baru = db.prepare("SELECT body FROM trades WHERE status='CLOSED' ORDER BY 
   }));
 
 // ─── posisi aktif ─────────────────────────────────────────────────────────
-const positions = (status.active || []).map((a, i) => {
+const activeLedger = db.prepare("SELECT body FROM trades WHERE status IN ('PENDING','OPEN','UNKNOWN') ORDER BY opened_ms").all().map(r => parse(r.body)).filter(Boolean);
+const positions = activeLedger.map((a, i) => {
   const t = typeof a === 'string' ? parse(db.prepare('SELECT body FROM trades WHERE id=?').get(a)?.body) || { id: a } : a;
   return {
     tokenId: `bn-${t.id || i}`,
@@ -76,6 +81,7 @@ const positions = (status.active || []).map((a, i) => {
     bookLabel: `${t.direction === 'LONG' ? 'long' : 'short'} · ${label(t.strategy)}${t.leverage ? ` · ${t.leverage}×` : ''}`,
     ageMinutes: t.opened_ms ? Math.round((now - t.opened_ms) / 60000) : null,
     principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0, pnlUsd: null,
+    stale: !health.usable,
   };
 });
 
@@ -107,7 +113,7 @@ try {
 const equity = r2(status.account.equity);
 if (!(equity > 0)) throw new Error('equity testnet tidak masuk akal');
 const updatedAt = Number(status.updated_ms) || null;
-const hidup = updatedAt && now - updatedAt < 10 * 60e3;
+const hidup = health.alive;
 const modal = Number(cfg.events?.[0]?.usd) || null;
 
 // Deret nilai: saldo saat tiap trade dibuka (dicatat bot) sebagai titik
@@ -167,12 +173,17 @@ const snapshot = {
     peakUsd: null,
     paused: Boolean(status.paused || status.daily_halt),
     startedAt,
-    heartbeatAt: updatedAt,
-    status: !hidup ? 'tidak aktif' : status.paused ? 'dijeda' : status.daily_halt ? 'berhenti hari ini (batas rugi)' : 'berjalan',
-    healthy: Boolean(hidup && !status.paused && !status.daily_halt),
+    heartbeatAt: health.heartbeatAt,
+    accountUpdatedAt: updatedAt,
+    apiState: api?.state || null,
+    retryAt: health.until,
+    status: health.status,
+    healthy: health.healthy,
     lead: `Bot crypto futures di Binance TESTNET — dananya virtual. Sejak ${startedAt ? tgl(startedAt) : '29 Sep'} berjalan dengan mesin baru `
       + `yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.`,
     tiles: [
+      { k: 'Data akun terakhir', v: updatedAt ? new Date(updatedAt + WIB).toISOString().slice(11, 16) + ' WIB' : 'belum tersedia', n: health.usable ? 'akun berhasil diperiksa' : 'nilai terakhir; belum terverifikasi ulang', tone: health.usable ? 'pos' : 'neg' },
+      ...(health.until > now ? [{ k: 'Coba koneksi lagi', v: new Date(health.until + WIB).toISOString().slice(11, 19) + ' WIB', n: 'otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang' }] : []),
       { k: 'Pindai pasar', v: String(act.scans), n: `24 jam · ${act.skips} kandidat dilewati` },
       { k: 'Buka · tutup', v: `${act.opened} · ${act.closed}`, n: '24 jam terakhir' },
       { k: 'Error siklus', v: String(act.errors), n: lastErrAt ? `24 jam · terakhir ${tgl(lastErrAt)} ${new Date(lastErrAt + WIB).toISOString().slice(11, 16)} WIB` : '24 jam', tone: act.errors ? 'neg' : 'pos' },
@@ -181,7 +192,7 @@ const snapshot = {
     llm: null,
   },
 };
-if (!hidup) snapshot.quality = { complete: false, reasons: [`bot tidak memperbarui status sejak ${updatedAt ? tgl(updatedAt) : '—'}`] };
+if (!health.usable) snapshot.quality = { complete: false, reasons: [`${health.status}; saldo/posisi adalah data terakhir, bukan pembacaan akun baru`] };
 
 snapshot.performanceInput = { closes: baru.map((r) => ({ netUsd: r.netUsd, netPct: r.netPct, closedAt: r.closedAt, holdMinutes: r.holdMinutes, symbol: r.symbol })), flatBand: 0.005 };
 saveSnapshot(OUT, snapshot, cfg);

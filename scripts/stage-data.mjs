@@ -18,7 +18,10 @@ for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binan
   // File writes here are private until a single Git commit publishes all of them.
   atomicJSON(resolve(destination,fund,'live.json'),live);
   atomicJSON(resolve(destination,fund,'config.json'),readJSON(resolve(dir,'config.json')));
-  if(nav)atomicJSON(resolve(destination,fund,'nav.json'),nav);
+  // Deret publik hanya membawa yang digambar situs (waktu, nilai, bagian LP);
+  // kolom pembukuan per titik tetap di server dan tidak membebani pengunjung.
+  if(nav)atomicJSON(resolve(destination,fund,'nav.json'),{updatedAt:nav.updatedAt,generation:nav.generation,
+   points:(nav.points||[]).map(p=>({t:p.t,usd:p.usd,...(p.lp!=null?{lp:p.lp}:{})}))});
   for(const name of ['heartbeat.json','forecast.json','trades.json']){
    if(fund==='safebox')continue;
    const value=readJSON(resolve(dir,name));if(value){assertPublic(value);atomicJSON(resolve(destination,fund,name),value);}

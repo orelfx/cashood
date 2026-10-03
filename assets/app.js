@@ -45,14 +45,24 @@ function tandaiSibuk(delta) {
 }
 
 /** Satu permintaan per alamat. `fresh` melewati antrean, untuk tombol refresh. */
+// Hasil yang baru saja diunduh dipakai ulang selama 20 detik. Tanpa ini, berkas
+// yang sama diunduh dua kali dalam satu pemuatan halaman: sekali oleh prefetch,
+// sekali lagi oleh bagian yang menggambarnya begitu prefetch selesai.
+const recentJSON = new Map();
+const RECENT_MS = 20000;
 function getJSON(url, { fresh = false } = {}) {
-  if (!fresh && inflight.has(url)) return inflight.get(url);
+  if (!fresh) {
+    if (inflight.has(url)) return inflight.get(url);
+    const hit = recentJSON.get(url);
+    if (hit && Date.now() - hit.at < RECENT_MS) return Promise.resolve(hit.data);
+  }
   const full = url + (url.includes('?') ? '&' : '?') + 't=' + (fresh ? Date.now() : BOOT_T);
   tandaiSibuk(1);
   const job = fetch(full, { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) }).then((res) => {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return res.json();
-  }).finally(() => { tandaiSibuk(-1); if (inflight.get(url) === job) inflight.delete(url); });
+  }).then((data) => { recentJSON.set(url, { at: Date.now(), data }); return data; })
+    .finally(() => { tandaiSibuk(-1); if (inflight.get(url) === job) inflight.delete(url); });
   if (!fresh) inflight.set(url, job);
   return job;
 }
@@ -62,8 +72,23 @@ function getJSON(url, { fresh = false } = {}) {
 (() => {
   try {
     const quiet = (pr) => { pr.catch(() => {}); return pr; };
-    quiet(getJSON(FUNDS_URL));
-    const guess = (location.hash || '').replace(/^#/, '').split('/')[0] || 'reborn';
+    const first = (location.hash || '').replace(/^#/, '').split('/')[0];
+    const global = ['', 'home', 'kinerja', 'pemegang', 'analisa'].includes(first);
+    quiet(getJSON(FUNDS_URL).then((list) => {
+      // Halaman ringkasan (beranda dll.) butuh SEMUA dana. Begitu daftarnya
+      // tiba, config + snapshot + deret tiap dana diminta sekaligus — bukan
+      // menunggu giliran saat bagian masing-masing mulai digambar.
+      if (!global) return;
+      for (const f of list.funds || []) {
+        quiet(getJSON(f.configUrl).then((cfg) => {
+          quiet(getJSON(dataUrls(cfg, 'live.json', cfg?.app?.snapshotUrl, f.id)[0]));
+          if (!f.paper || first === '' || first === 'home') quiet(getJSON(dataUrls(cfg, 'nav.json', cfg?.app?.navUrl, f.id)[0]));
+        }));
+      }
+      if (list.safebox?.configUrl) quiet(getJSON(list.safebox.configUrl));
+      if (list.safebox) quiet(getJSON(RAW_BASE + 'safebox/live.json'));
+    }));
+    const guess = first || 'reborn';
     const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
@@ -2150,11 +2175,9 @@ async function loadSafebox() {
   const urls = [rawDataBase('safebox') ? rawDataBase('safebox') + 'live.json' : null,
     'https://raw.githubusercontent.com/orelfx/cashood/data/safebox/live.json',
     'data/safebox/live.json'].filter(Boolean);
-  for (const url of urls) {
+  for (const url of [...new Set(urls)]) {
     try {
-      const res = await fetch(url + '?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
-      if (!res.ok) continue;
-      const j = await res.json();
+      const j = await getJSON(url);
       if (j && j.valueUsd != null && Number.isFinite(Number(j.valueUsd))) { safeboxData = j; safeboxAt = Date.now(); return j; }
     } catch { /* sumber berikutnya */ }
   }
@@ -2541,9 +2564,10 @@ async function loadFundBrief(id) {
 /** Angka global yang sama untuk halaman Portofolio dan Beranda. */
 async function portoTotals() {
   const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
+  const boxJob = state.safebox ? loadSafebox().catch(() => null) : Promise.resolve(null);   // bersamaan dengan dana
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
   const briefs = loaded.filter(Boolean);
-  const box = state.safebox ? await loadSafebox().catch(() => null) : null;
+  const box = await boxJob;
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
   const simpanan = Number(box?.balanceUsd) || 0;
   const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + (Number(box?.principalUsd) || 0);
@@ -2558,10 +2582,11 @@ async function renderPortofolio() {
   // Dana simulasi tidak memegang uang sungguhan; menjumlahkannya ke total aset
   // akan membuat total itu bohong.
   const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
+  const boxJob = state.safebox ? loadSafebox().catch(() => null) : Promise.resolve(null);
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
   const missing = ids.filter((id, i) => !loaded[i]);
   const briefs = loaded.filter(Boolean);
-  const box = state.safebox ? await loadSafebox().catch(() => null) : null;
+  const box = await boxJob;
 
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
   const simpanan = Number(box?.balanceUsd) || 0;
@@ -3128,8 +3153,12 @@ function drawGrowth(svg, pts, up, marks = []) {
 let homeEpoch = 0;
 async function renderHome() {
   const epoch = ++homeEpoch;
-  const g = await portoTotals();
-  const paper = await Promise.all(state.funds.filter((f) => f.paper).map((f) => loadFundBrief(f.id).catch(() => null)));
+  // Dana sungguhan, dana uji coba, dan config Safe Box dimuat bersamaan.
+  const paperJob = Promise.all(state.funds.filter((f) => f.paper).map((f) => loadFundBrief(f.id).catch(() => null)));
+  const sbJob = sbCapacity == null && state.safebox?.configUrl
+    ? getJSON(state.safebox.configUrl).then((c) => { sbCapacity = Number(c?.display?.capacityUsd) || 0; state.safebox.startedAt = c?.startedAt; }).catch(() => { sbCapacity = 0; })
+    : Promise.resolve();
+  const [g, paper] = await Promise.all([portoTotals(), paperJob, sbJob]);
   if (epoch !== homeEpoch || state.view !== 'home') return;
   const byId = Object.fromEntries([...g.briefs, ...paper.filter(Boolean)].map((b) => [b.id, b]));
   const box = g.box;
@@ -3153,10 +3182,6 @@ async function renderHome() {
       <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span></li>`).join('')}</ul>
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
 
-  if (sbCapacity == null && state.safebox?.configUrl) {
-    try { const c = await getJSON(state.safebox.configUrl); sbCapacity = Number(c?.display?.capacityUsd) || 0; state.safebox.startedAt = c?.startedAt; } catch { sbCapacity = 0; }
-    if (epoch !== homeEpoch || state.view !== 'home') return;
-  }
   // ── angka singkat ──
   const tile = (k, v, n) => `<div class="hs"><div class="hs-v">${v}</div><div class="hs-k">${k}</div><div class="hs-n">${n}</div></div>`;
   const posisi = g.briefs.reduce((s, b) => s + b.openCount, 0);
@@ -3386,7 +3411,7 @@ async function load({ force = false } = {}) {
   const fund = state.fund, epoch = fundEpoch, request = ++loadEpoch;
   const valid = () => fund === state.fund && epoch === fundEpoch && request === loadEpoch;
   const btn = $('#refreshBtn'); btn.disabled = true; btn.textContent = 'memuat…';
-  if (force) { portoCache.clear(); safeboxData = null; for (const k of Object.keys(forecastCache)) delete forecastCache[k]; reportsCache = null; updatesCache = null; }
+  if (force) { recentJSON.clear(); portoCache.clear(); seriesCache.clear(); safeboxData = null; for (const k of Object.keys(forecastCache)) delete forecastCache[k]; reportsCache = null; updatesCache = null; }
   try {
     let cfg = state.cfg;
     if (force) {

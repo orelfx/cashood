@@ -209,6 +209,24 @@ const readJson = (name) => {
 };
 const state = readJson('state.json') || { positions: {} };
 const tracking = readJson('post-close-tracking.json') || { entries: [] };
+// Bot hanya menyimpan 200 posisi tertutup terakhir. Supaya riwayat dan jumlah
+// posisi di situs terus bertambah, tiap entri yang pernah terlihat diarsipkan
+// di server (berkas lokal, tidak terbit) dan digabung kembali di sini. Ukuran
+// posisi dan waktu buka ikut disimpan karena state bot juga dibersihkan.
+const ARSIP = resolve(OUT_DIR, 'closed.local.json');
+const arsip = readJSON(ARSIP, { rows: {} });
+for (const e of tracking.entries || []) {
+  if (!e.position || !e.close_ts) continue;
+  const st0 = state.positions?.[e.position];
+  const old = arsip.rows[e.position] || {};
+  arsip.rows[e.position] = { ...old, ...e, outcomes: undefined, lesson: undefined,
+    _amountSol: st0?.amount_sol ?? old._amountSol ?? null, _deployedAt: st0?.deployed_at ?? old._deployedAt ?? null, _book: st0?.book ?? old._book ?? null };
+}
+tracking.entries = Object.values(arsip.rows).sort((a, b) => Date.parse(a.close_ts) - Date.parse(b.close_ts));
+for (const e of tracking.entries) {
+  if (!state.positions) state.positions = {};
+  if (!state.positions[e.position] && (e._amountSol != null || e._deployedAt)) state.positions[e.position] = { amount_sol: e._amountSol, deployed_at: e._deployedAt, book: e._book };
+}
 
 const startAt = Math.min(...cfgFund.events.map(Core.eventTime));
 let unpricedCloses = 0;
@@ -358,6 +376,7 @@ snapshot.stats.wins = closedAll.filter((c) => c.netPct > 0.05).length;
 snapshot.stats.losses = closedAll.filter((c) => c.netPct < -0.05).length;
 snapshot.stats.winRate = closedAll.length ? r2((snapshot.stats.wins / closedAll.length) * 100) : null;
 atomicJSON(resolve(OUT_DIR, 'trades.json'), { fund: 'meridian', updatedAt: Date.now(), rows: closedAll });
+atomicJSON(ARSIP, { updatedAt: Date.now(), rows: arsip.rows });
 saveSnapshot(resolve(OUT_DIR,'live.json'), snapshot, cfgFund);
 console.log(`[meridian] total=$${snapshot.totalUsd} positions=${positions.length} complete=${snapshot.quality.complete} unpricedCloses=${unpricedCloses}`);
 release();
