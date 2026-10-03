@@ -1019,7 +1019,7 @@ function renderTrades(nav) {
     tile('Nilai jual sekarang', usd(value), `${rows.length} posisi`),
     tile('Modal masuk', usd(cost), 'saat dibeli'),
     tile('Untung / rugi', signed(pnl), cost ? pct((pnl / cost) * 100) + ' dari modal' : '—', cls(pnl)),
-    tile('Eksposur', total ? pct((value / total) * 100, 1) : '—', 'dari nilai dana · batas 60%'),
+    tile('Eksposur', total ? pct((value / total) * 100, 1) : '—', nav.trading?.tiles ? 'dari nilai dana' : 'dari nilai dana · batas 60%'),
   ].join(''));
   if (rows.every((r) => r.direction)) {
     setHTML($('#lpSummary'), '');
