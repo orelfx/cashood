@@ -3272,6 +3272,20 @@ function fundChange(pts, flows, nowUsd, ms, now = Date.now()) {
 }
 const chgBadge = (c, label = '24 jam') => (!c ? '' : `<span class="chg ${c.delta >= 0 ? 'up' : 'down'}">${c.delta >= 0 ? '▲' : '▼'} ${pct(Math.abs(c.pct), 2)}<small>${label}</small></span>`);
 
+// Naik-turun tiap dana di daftar total aset. Diklik: nominalnya ikut tampil,
+// dalam mata uang yang sedang dipilih.
+const homeChg = new Map();
+let legShowUsd = false;
+function paintLegendChg() {
+  document.querySelectorAll('.leg-chg').forEach((el) => {
+    const c = homeChg.get(el.getAttribute('data-leg'));
+    if (!c) { setHTML(el, ''); el.hidden = true; return; }
+    el.hidden = false;
+    el.className = `leg-chg ${c.delta >= 0 ? 'up' : 'down'}`;
+    el.title = `${c.label} · klik untuk ${legShowUsd ? 'menyembunyikan' : 'melihat'} nominal`;
+    setHTML(el, `${c.delta >= 0 ? '▲' : '▼'} ${c.delta >= 0 ? '+' : '−'}${pct(Math.abs(c.pct), 2)}${legShowUsd ? ` <span class="leg-usd">(${signed(c.delta)})</span>` : ''}`);
+  });
+}
 let growthEpoch = 0;
 async function renderGrowth(g, paper = []) {
   const epoch = ++growthEpoch;
@@ -3285,6 +3299,7 @@ async function renderGrowth(g, paper = []) {
   // Tanda naik-turun 24 jam per dana dan untuk total.
   let totalDelta = 0, totalBase = 0;
   const todayIso = new Date(now + 7 * 3600e3).toISOString().slice(0, 10);
+  homeChg.clear();
   const badge = (b, pts) => {
     // Dompet yang hanya dibaca (setoran/penarikan pemilik tidak tercatat):
     // perubahan nilainya bisa karena uang dipindah, bukan kinerja. Untuk dana
@@ -3298,11 +3313,16 @@ async function renderGrowth(g, paper = []) {
     } else c = fundChange(pts, b.flows, b.totalUsd, 86400e3, now);
     const el = document.querySelector(`[data-chg="${CSS.escape(b.id)}"]`);
     if (el) setHTML(el, chgBadge(c, label));
+    if (c && !b.paper) homeChg.set(b.id, { ...c, label });
     return c;
   };
   briefs.forEach((b, i) => { const c = badge(b, series[i]); if (c) { totalDelta += c.delta; totalBase += c.base; } });
   paper.forEach((b, i) => badge(b, paperSeries[i]));
-  if (box) { totalDelta += Number(box.interestTodayUsd) || 0; totalBase += Number(box.principalUsd) || 0; }
+  if (box) {
+    totalDelta += Number(box.interestTodayUsd) || 0; totalBase += Number(box.principalUsd) || 0;
+    if (box.principalUsd > 0) homeChg.set('safebox', { delta: Number(box.interestTodayUsd) || 0, pct: ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100, label: 'hari ini' });
+  }
+  paintLegendChg();
   const tc = totalBase > 0 ? { delta: totalDelta, pct: (totalDelta / totalBase) * 100 } : null;
   if ($('#aumChg')) setHTML($('#aumChg'), tc ? `${chgBadge(tc)} <span class="aum-chg-usd ${cls(tc.delta)}">${signed(tc.delta)}</span>` : '');
 
@@ -3426,10 +3446,15 @@ function drawGrowth(svg, pts, up, marks = []) {
       + `<div class="t-n">total seluruh dana · termasuk token, LP, dan kas</div>`
       + (parts.length ? `<div class="t-parts">${parts.map((p) => `<div class="t-row"><span><i style="background:${p.color}"></i>${esc(p.name)}</span><b>${usd(p.usd, 0)}</b></div>`).join('')}</div>` : ''));
     tip.hidden = false;
-    // Tetap di dalam kotak grafik, juga di layar sempit.
-    const px = x(near.t) / ratio, half = tip.offsetWidth / 2;
-    tip.style.left = Math.min(Math.max(px, half + 4), box.width - half - 4) + 'px';
-    tip.style.top = Math.max(tip.offsetHeight + 4, (y(near.v) - 12) / ratio) + 'px';
+    // Layar lebar: tooltip di SAMPING titik (kiri atau kanan, mana yang lapang),
+    // menempel di atas grafik. Layar sempit: jadi panel di bawah grafik. Di
+    // keduanya titik yang ditunjuk tidak pernah tertutup.
+    if (narrow()) { tip.classList.add('dock'); tip.style.cssText = ''; return; }
+    tip.classList.remove('dock');
+    const px = x(near.t) / ratio, wTip = tip.offsetWidth, gap = 14;
+    tip.style.transform = 'none';
+    tip.style.top = '0px';
+    tip.style.left = (px + gap + wTip <= box.width - 2 ? px + gap : Math.max(2, px - gap - wTip)) + 'px';
   };
   const hide = () => { tip.hidden = true; cross.style.display = 'none'; dot.style.display = 'none'; };
   hit.onpointermove = show;
@@ -3455,8 +3480,8 @@ async function renderHome() {
   const box = g.box;
 
   // ── total aset + alokasi ──
-  const parts = [...g.briefs.map((b) => ({ name: b.label, color: b.accent, usd: b.totalUsd })),
-    ...(box ? [{ name: state.safebox.label, color: state.safebox.accent, usd: g.simpanan }] : [])]
+  const parts = [...g.briefs.map((b) => ({ id: b.id, name: b.label, color: b.accent, usd: b.totalUsd })),
+    ...(box ? [{ id: 'safebox', name: state.safebox.label, color: state.safebox.accent, usd: g.simpanan }] : [])]
     .filter((p) => p.usd > 0).sort((a, b) => b.usd - a.usd);
   const pnlPct = g.setoran ? (g.untung / g.setoran) * 100 : 0;
   const tua = Math.min(...g.briefs.map((b) => b.updatedAt || Date.now()), box?.updatedAt || Date.now());
@@ -3470,7 +3495,8 @@ async function renderHome() {
     </div>
     <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
     <ul class="alloc-legend">${parts.map((p) => `<li><span class="chip" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
-      <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span></li>`).join('')}</ul>
+      <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span>
+      <button class="leg-chg" data-leg="${esc(p.id)}" aria-label="Perubahan ${esc(p.name)}"></button></li>`).join('')}</ul>
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
 
   // ── angka singkat ──
@@ -3798,6 +3824,8 @@ async function init() {
   };
   $('#hgCalPrev').onclick = () => calStep(-1);
   $('#hgCalNext').onclick = () => calStep(1);
+
+  $('#homeAum').onclick = (e) => { if (e.target.closest('.leg-chg')) { legShowUsd = !legShowUsd; paintLegendChg(); } };
 
   $('#segHome').onclick = (e) => {
     const btn = e.target.closest('button');
