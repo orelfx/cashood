@@ -32,6 +32,7 @@ run_paper() {
     failed=1
   fi
 }
+timeout --kill-after=5 40 scripts/fetch-paper-inbox.sh || true   # bot-nya di VPS lain
 run_paper dgrh /root/cashood-inbox/devil-greed-robin-hood.json
 run_paper dgsol /root/cashood-inbox/devil-greed-solana.json
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
