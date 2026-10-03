@@ -3272,18 +3272,16 @@ function fundChange(pts, flows, nowUsd, ms, now = Date.now()) {
 }
 const chgBadge = (c, label = '24 jam') => (!c ? '' : `<span class="chg ${c.delta >= 0 ? 'up' : 'down'}">${c.delta >= 0 ? '▲' : '▼'} ${pct(Math.abs(c.pct), 2)}<small>${label}</small></span>`);
 
-// Naik-turun tiap dana di daftar total aset. Diklik: nominalnya ikut tampil,
-// dalam mata uang yang sedang dipilih.
+// Naik-turun tiap dana di daftar total aset: persen dan nominalnya, dalam
+// mata uang yang sedang dipilih.
 const homeChg = new Map();
-let legShowUsd = false;
 function paintLegendChg() {
   document.querySelectorAll('.leg-chg').forEach((el) => {
     const c = homeChg.get(el.getAttribute('data-leg'));
-    if (!c) { setHTML(el, ''); el.hidden = true; return; }
-    el.hidden = false;
+    if (!c) { setHTML(el, '<span class="dim">—</span>'); el.className = 'leg-chg'; return; }
     el.className = `leg-chg ${c.delta >= 0 ? 'up' : 'down'}`;
-    el.title = `${c.label} · klik untuk ${legShowUsd ? 'menyembunyikan' : 'melihat'} nominal`;
-    setHTML(el, `${c.delta >= 0 ? '▲' : '▼'} ${c.delta >= 0 ? '+' : '−'}${pct(Math.abs(c.pct), 2)}${legShowUsd ? ` <span class="leg-usd">(${signed(c.delta)})</span>` : ''}`);
+    el.title = c.label;
+    setHTML(el, `${c.delta >= 0 ? '▲' : '▼'} ${c.delta >= 0 ? '+' : '−'}${pct(Math.abs(c.pct), 2)} <span class="leg-usd">${signed(c.delta)}</span>`);
   });
 }
 let growthEpoch = 0;
@@ -3494,9 +3492,10 @@ async function renderHome() {
         <span class="dim"> · ${pnlPct >= 0 ? '+' : ''}${pct(pnlPct)} dari modal ${usd(g.setoran, 0)}</span></span></div>
     </div>
     <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
-    <ul class="alloc-legend">${parts.map((p) => `<li><span class="chip" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span>
-      <span class="v">${usd(p.usd, 0)}</span><span class="dim">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'}</span>
-      <button class="leg-chg" data-leg="${esc(p.id)}" aria-label="Perubahan ${esc(p.name)}"></button></li>`).join('')}</ul>
+    <ul class="alloc-legend">${parts.map((p) => `<li>
+      <span class="chip" style="background:${p.color}"></span>
+      <span class="leg-l"><span class="nm">${esc(p.name)}</span><span class="leg-w">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'} dari total</span></span>
+      <span class="leg-r"><span class="v">${usd(p.usd, 0)}</span><span class="leg-chg" data-leg="${esc(p.id)}"></span></span></li>`).join('')}</ul>
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
 
   // ── angka singkat ──
@@ -3824,8 +3823,6 @@ async function init() {
   };
   $('#hgCalPrev').onclick = () => calStep(-1);
   $('#hgCalNext').onclick = () => calStep(1);
-
-  $('#homeAum').onclick = (e) => { if (e.target.closest('.leg-chg')) { legShowUsd = !legShowUsd; paintLegendChg(); } };
 
   $('#segHome').onclick = (e) => {
     const btn = e.target.closest('button');
