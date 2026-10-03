@@ -20,7 +20,8 @@ import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Core from '../assets/core.js';
-import { atomicJSON, assertPublic, generation, lock, privateId } from './lib/io.mjs';
+import { atomicJSON, assertPublic, downsample, generation, lock, privateId, readJSON } from './lib/io.mjs';
+import { groupTradeDays, writeTradeDays } from './lib/trades.mjs';
 import { buildPerformance } from './lib/performance.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -50,6 +51,11 @@ const startedAt = time(pick(src, ['started_at', 'startedAt', 'start']), 'started
 const asOfRaw = pick(src, ['as_of', 'asOf', 'updated_at', 'updatedAt', 'marked_at', 'timestamp']);
 const now = Date.now();
 const asOf = asOfRaw === undefined ? now : time(asOfRaw, 'waktu snapshot');
+if (asOf > now + 60000) throw new Error('as_of berada di masa depan');
+// Berkas yang belum berubah sejak impor terakhir tidak diterbitkan ulang.
+const before = readJSON(resolve(DIR, 'snapshot.local.json'));
+if (before && before.updatedAt === asOf && !process.argv.includes('--force')) { console.log(`[${fund}] belum ada pembaruan sejak ${new Date(asOf).toISOString()}`); release(); process.exit(0); }
+if (before && asOf < before.updatedAt) throw new Error('as_of lebih lama dari snapshot yang sudah terbit');
 const list = pick(src, ['positions', 'open_positions', 'open']);
 if (!Array.isArray(list)) throw new Error('daftar posisi tidak ada di berkas sumber');
 
@@ -83,13 +89,34 @@ const positions = list.map((p, i) => {
   };
 });
 
+// Trade yang sudah ditutup (opsional). Tanpa daftar ini riwayat tetap kosong.
+const closedSrc = pick(src, ['closed_trades', 'closed', 'history']);
+const closed = (Array.isArray(closedSrc) ? closedSrc : []).map((c, i) => {
+  const symbol = String(pick(c, ['symbol', 'ticker']) ?? '').trim();
+  if (!symbol) throw new Error(`trade tutup #${i + 1} tanpa simbol`);
+  const notional = must(c, ['notional_usd', 'notional'], `notional trade tutup ${symbol}`);
+  const net = must(c, ['realized_usd', 'realized', 'pnl_usd', 'pnl'], `hasil trade tutup ${symbol}`);
+  const closedAt = time(pick(c, ['closed_at', 'closedAt']), `closed_at ${symbol}`);
+  const openedRaw = pick(c, ['opened_at', 'openedAt']);
+  return { symbol, strategy: String(pick(c, ['sleeve', 'book']) ?? '—'), investedUsd: notional, netUsd: net,
+    netPct: notional > 0 ? Number(((net / notional) * 100).toFixed(2)) : null,
+    holdMinutes: openedRaw === undefined ? null : Math.max(0, Math.round((closedAt - time(openedRaw, 'opened_at')) / 60000)),
+    reason: String(pick(c, ['reason', 'exit_reason']) ?? '—'), closedAt };
+}).sort((a, b) => a.closedAt - b.closedAt);
+const trades = groupTradeDays(closed, 0.5);
+const wins = closed.filter((c) => c.netPct > 0.5).length, losses = closed.filter((c) => c.netPct < -0.5).length;
+const realizedClosed = tidy(closed.reduce((t, c) => t + c.netUsd, 0));
+
 const unrealized = tidy(positions.reduce((t, p) => t + p.pnlUsd, 0));
 const inPositions = tidy(positions.reduce((t, p) => t + p.principalUsd, 0));
 const gen = generation();
 const WIB = 7 * 3600e3;
 const sleeves = [...new Set(positions.map((p) => p.bookLabel))];
 const nStale = positions.filter((p) => p.stale).length;
-const points = [{ t: startedAt, usd: initial }, { t: asOf, usd: equity }];
+// Deret nilai: impor pertama = dua titik (modal awal, equity sekarang); tiap
+// pembaruan berikutnya menambah satu titik.
+const navOld = readJSON(resolve(DIR, 'nav.json'), { points: [] }).points || [];
+const points = downsample([...(navOld.length ? navOld : [{ t: startedAt, usd: initial }]), { t: asOf, usd: equity }].map(({ t, usd }) => ({ t, usd })), now);
 
 const snapshot = {
   fund,
@@ -105,11 +132,13 @@ const snapshot = {
   treasuryUsd: 0,
   holdings: [{ symbol: 'Kas (paper)', amount: cash, price: 1, usd: cash }],
   positions,
-  history: [],
-  historyNote: 'belum ada trade yang ditutup di buku paper ini',
-  stats: { closedCount: 0, openCount: positions.length, graded: 0, wins: 0, losses: 0, winRate: null, realisedUsd: 0, bestDay: null, worstDay: null, worstClosePct: null, timezone: 'Asia/Jakarta (UTC+7)' },
-  closedRecent: [],
-  tradeDays: [],
+  history: trades.index.map((x) => ({ date: x.d, usd: x.usd ?? 0, closes: x.n, wins: x.w, losses: x.l })),
+  historyNote: closed.length ? 'hasil trade paper yang sudah ditutup' : 'belum ada trade yang ditutup di buku paper ini',
+  stats: { closedCount: closed.length, openCount: positions.length, graded: wins + losses, wins, losses,
+    winRate: wins + losses ? Number(((wins / (wins + losses)) * 100).toFixed(2)) : null, realisedUsd: realizedClosed,
+    bestDay: null, worstDay: null, worstClosePct: closed.length ? Math.min(...closed.map((c) => c.netPct ?? 0)) : null, timezone: 'Asia/Jakarta (UTC+7)' },
+  closedRecent: [...closed].reverse().slice(0, 20),
+  tradeDays: trades.index,
   trading: {
     paper: true,
     mode: 'paper',
@@ -122,8 +151,8 @@ const snapshot = {
     paused: false,
     startedAt,
     heartbeatAt: asOf,
-    status: 'buku paper · snapshot impor',
-    healthy: false,
+    status: now - asOf < 20 * 60e3 ? 'berjalan (paper)' : 'data paper terlambat',
+    healthy: now - asOf < 20 * 60e3,
     lead: `${BOOKS[fund]} adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.`,
     tiles: [
       { k: 'Posisi terbuka', v: String(positions.length), n: `${sleeves.length} sleeve` },
@@ -136,7 +165,7 @@ const snapshot = {
   quality: nStale ? { complete: false, reasons: [`${nStale} posisi tanpa harga masuk/mark; nilainya dari catatan paper`] } : { complete: true, reasons: [] },
   costsShareUsd: 0,
 };
-snapshot.performance = buildPerformance({ closes: [], points, flows: [{ at: startedAt, usd: initial }], capitalUsd: initial, navUsd: equity, flatBand: 0.5 });
+snapshot.performance = buildPerformance({ closes: closed.map((c) => ({ netUsd: c.netUsd, netPct: c.netPct, closedAt: c.closedAt, holdMinutes: c.holdMinutes, symbol: c.symbol })), points, flows: [{ at: startedAt, usd: initial }], capitalUsd: initial, navUsd: equity, flatBand: 0.5 });
 
 // ─── validasi: tidak ada yang ditulis sebelum semuanya lulus ───────────────
 Core.validateSnapshot(snapshot);                                   // komponen vs total, dalam $0,011
@@ -149,6 +178,7 @@ Core.buildLedger(cfg);
 atomicJSON(resolve(DIR, 'snapshot.local.json'), snapshot);
 atomicJSON(resolve(DIR, 'nav.json'), { updatedAt: asOf, generation: gen, points: points.map((p) => ({ ...p, quality: 'complete' })) });
 atomicJSON(resolve(DIR, 'live.json'), publik);
+writeTradeDays(DIR, fund, trades.files);
 console.log(`[${fund}] ${BOOKS[fund]}`);
 console.log(`  mulai   ${new Date(startedAt).toISOString()}`);
 console.log(`  kas     ${cash}`);

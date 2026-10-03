@@ -24,6 +24,16 @@ run_snapshot scripts/sync-charon.mjs
 run_snapshot scripts/sync-robsol.mjs
 run_snapshot scripts/sync-forex.mjs
 run_snapshot scripts/sync-binance.mjs
+# Buku paper devil greed: bot-nya menaruh berkas di kotak masuk; diimpor kalau ada.
+run_paper() {
+  [ -f "$2" ] || return 0
+  if ! timeout --kill-after=10 60 /usr/bin/node scripts/import-paper-book.mjs "$1" "$2"; then
+    echo "PERINGATAN: impor $1 gagal; snapshot terakhir dipertahankan" >&2
+    failed=1
+  fi
+}
+run_paper dgrh /root/cashood-inbox/devil-greed-robin-hood.json
+run_paper dgsol /root/cashood-inbox/devil-greed-solana.json
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
 /usr/bin/node scripts/stage-data.mjs "$WORK" || failed=1
 cd "$WORK"
