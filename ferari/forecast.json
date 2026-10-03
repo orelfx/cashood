@@ -1,13 +1,13 @@
 {
   "fund": "ferari",
-  "updatedAt": 1790978401826,
-  "generatedAt": "2026-10-03T05:00 WIB",
-  "days": 29,
+  "updatedAt": 1791049688843,
+  "generatedAt": "2026-10-04T00:48 WIB",
+  "days": 28,
   "paydayAt": 1793466000000,
   "paydayDate": "2026-11-01",
-  "navNow": 888.98,
-  "samples": 0,
-  "basis": "perubahan NAV terverifikasi setelah koreksi arus kas",
+  "navNow": 822.84,
+  "samples": 9,
+  "basis": "hasil posisi yang ditutup per hari, dibagi modal",
   "rules": {
     "minDepositUsd": 100,
     "noticeHours": 24,
@@ -16,6 +16,427 @@
     "cashFlowsRecorded": false,
     "distributePct": 100
   },
-  "enough": false,
-  "reason": "Proyeksi memerlukan snapshot lengkap dan minimal tujuh hari selesai dengan arus kas serta NAV terverifikasi."
+  "enough": true,
+  "sharePriceNow": 0.6857,
+  "baseCapital": 1200,
+  "costs": 160,
+  "sample": {
+    "days": 9,
+    "from": "2026-09-25",
+    "to": "2026-10-03",
+    "meanDailyPct": 4.253148148148148,
+    "stdevDailyPct": 9.496022383464199,
+    "winDays": 7,
+    "lossDays": 2
+  },
+  "monthSample": {
+    "days": 9,
+    "scope": "seluruh hari tervalidasi"
+  },
+  "activity": {
+    "closesPerDay7d": 17.142857142857142,
+    "closesPerDay3d": 11,
+    "openPositions": 4,
+    "inRangePct": 75,
+    "openFeesUsd": 0,
+    "winRatePct": 76
+  },
+  "scenarios": {
+    "worst": {
+      "navUsd": 1158.97,
+      "changePct": 40.85,
+      "dividendsUsd": 0,
+      "sweptUsd": 0,
+      "totalUsd": 1158.97,
+      "sharePrice": 0.9658,
+      "label": "Persentil 10",
+      "changeUsd": 336.13,
+      "dividend": {
+        "distributed": 0,
+        "net": 0,
+        "reinvested": 0
+      }
+    },
+    "normal": {
+      "navUsd": 1200,
+      "changePct": 45.84,
+      "dividendsUsd": 830.98,
+      "sweptUsd": 0,
+      "totalUsd": 2030.98,
+      "sharePrice": 1,
+      "label": "Median",
+      "changeUsd": 377.16,
+      "dividend": {
+        "distributed": 830.98,
+        "net": 830.98,
+        "reinvested": 0
+      }
+    },
+    "best": {
+      "navUsd": 1200,
+      "changePct": 45.84,
+      "dividendsUsd": 2357.66,
+      "sweptUsd": 0,
+      "totalUsd": 3557.66,
+      "sharePrice": 1,
+      "label": "Persentil 90",
+      "changeUsd": 377.16,
+      "dividend": {
+        "distributed": 2357.66,
+        "net": 2357.66,
+        "reinvested": 0
+      }
+    }
+  },
+  "horizons": [
+    {
+      "key": "d1",
+      "label": "1 hari",
+      "days": 1,
+      "speculative": false,
+      "worst": {
+        "navUsd": 712.24,
+        "changePct": -13.44,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 712.24,
+        "sharePrice": 0.5935
+      },
+      "normal": {
+        "navUsd": 843.35,
+        "changePct": 2.49,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 843.35,
+        "sharePrice": 0.7028
+      },
+      "best": {
+        "navUsd": 960.91,
+        "changePct": 16.78,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 960.91,
+        "sharePrice": 0.8008
+      },
+      "risk": {
+        "p10": 11.07,
+        "p50": 0,
+        "p80": 0,
+        "p90": 0,
+        "p99": 0,
+        "floored": false
+      },
+      "belowBase": {
+        "endPct": 100,
+        "anyPct": 100
+      }
+    },
+    {
+      "key": "w1",
+      "label": "1 minggu",
+      "days": 7,
+      "speculative": false,
+      "worst": {
+        "navUsd": 793.77,
+        "changePct": -3.53,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 793.77,
+        "sharePrice": 0.6615
+      },
+      "normal": {
+        "navUsd": 1082.82,
+        "changePct": 31.6,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 1082.82,
+        "sharePrice": 0.9023
+      },
+      "best": {
+        "navUsd": 1446.17,
+        "changePct": 75.75,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 1446.17,
+        "sharePrice": 1.2051
+      },
+      "risk": {
+        "p10": 23.75,
+        "p50": 0.02,
+        "p80": 0,
+        "p90": 0,
+        "p99": 0,
+        "floored": false
+      },
+      "belowBase": {
+        "endPct": 67.28,
+        "anyPct": 100
+      }
+    },
+    {
+      "key": "m1",
+      "label": "1 bulan",
+      "days": 30,
+      "speculative": true,
+      "worst": {
+        "navUsd": 1217.82,
+        "changePct": 48,
+        "dividendsUsd": 0,
+        "sweptUsd": 0,
+        "totalUsd": 1217.82,
+        "sharePrice": 1.0149
+      },
+      "normal": {
+        "navUsd": 1419.79,
+        "changePct": 72.55,
+        "dividendsUsd": 729.97,
+        "sweptUsd": 0,
+        "totalUsd": 2149.76,
+        "sharePrice": 1.1832
+      },
+      "best": {
+        "navUsd": 1546.05,
+        "changePct": 87.89,
+        "dividendsUsd": 2120.59,
+        "sweptUsd": 0,
+        "totalUsd": 3666.64,
+        "sharePrice": 1.2884
+      },
+      "risk": {
+        "p10": 26.94,
+        "p50": 0.26,
+        "p80": 0,
+        "p90": 0,
+        "p99": 0,
+        "floored": false
+      },
+      "belowBase": {
+        "endPct": 9.62,
+        "anyPct": 100
+      }
+    },
+    {
+      "key": "m3",
+      "label": "3 bulan",
+      "days": 90,
+      "speculative": true,
+      "worst": {
+        "navUsd": 1169.29,
+        "changePct": 42.1,
+        "dividendsUsd": 2635.56,
+        "sweptUsd": 0,
+        "totalUsd": 3804.85,
+        "sharePrice": 0.9744
+      },
+      "normal": {
+        "navUsd": 1401.36,
+        "changePct": 70.31,
+        "dividendsUsd": 5100.68,
+        "sweptUsd": 0,
+        "totalUsd": 6502.04,
+        "sharePrice": 1.1678
+      },
+      "best": {
+        "navUsd": 1323.9,
+        "changePct": 60.89,
+        "dividendsUsd": 8562.46,
+        "sweptUsd": 0,
+        "totalUsd": 9886.36,
+        "sharePrice": 1.1033
+      },
+      "risk": {
+        "p10": 27.06,
+        "p50": 0.3,
+        "p80": 0.01,
+        "p90": 0,
+        "p99": 0,
+        "floored": false
+      },
+      "belowBase": {
+        "endPct": 0.16,
+        "anyPct": 100
+      }
+    },
+    {
+      "key": "m6",
+      "label": "6 bulan",
+      "days": 180,
+      "speculative": true,
+      "worst": {
+        "navUsd": 1169.29,
+        "changePct": 42.1,
+        "dividendsUsd": 7757.08,
+        "sweptUsd": 0,
+        "totalUsd": 8926.37,
+        "sharePrice": 0.9744
+      },
+      "normal": {
+        "navUsd": 1038.71,
+        "changePct": 26.23,
+        "dividendsUsd": 12062.45,
+        "sweptUsd": 0,
+        "totalUsd": 13101.16,
+        "sharePrice": 0.8656
+      },
+      "best": {
+        "navUsd": 1385.28,
+        "changePct": 68.35,
+        "dividendsUsd": 16443.66,
+        "sweptUsd": 0,
+        "totalUsd": 17828.94,
+        "sharePrice": 1.1544
+      },
+      "risk": {
+        "p10": 27.06,
+        "p50": 0.3,
+        "p80": 0.01,
+        "p90": 0,
+        "p99": 0,
+        "floored": false
+      },
+      "belowBase": {
+        "endPct": 0,
+        "anyPct": 100
+      }
+    },
+    {
+      "key": "y1",
+      "label": "1 tahun",
+      "days": 365,
+      "speculative": true,
+      "worst": {
+        "navUsd": 1229.53,
+        "changePct": 49.43,
+        "dividendsUsd": 19331.16,
+        "sweptUsd": 0,
+        "totalUsd": 20560.69,
+        "sharePrice": 1.0246
+      },
+      "normal": {
+        "navUsd": 1055.59,
+        "changePct": 28.29,
+        "dividendsUsd": 25619.73,
+        "sweptUsd": 0,
+        "totalUsd": 26675.32,
+        "sharePrice": 0.8797
+      },
+      "best": {
+        "navUsd": 1199.12,
+        "changePct": 45.73,
+        "dividendsUsd": 32291.58,
+        "sweptUsd": 0,
+        "totalUsd": 33490.7,
+        "sharePrice": 0.9993
+      },
+      "risk": {
+        "p10": 27.06,
+        "p50": 0.3,
+        "p80": 0.01,
+        "p90": 0,
+        "p99": 0,
+        "floored": false
+      },
+      "belowBase": {
+        "endPct": 0,
+        "anyPct": 100
+      }
+    }
+  ],
+  "lossScenarios": [
+    {
+      "dropPct": 10,
+      "navUsd": 740.56,
+      "changeUsd": -82.28,
+      "sharePrice": 0.6171300000000001,
+      "belowBase": true,
+      "dividend": {
+        "gross": 0,
+        "costs": 160,
+        "net": 0,
+        "distributed": 0,
+        "reinvest": 0,
+        "fee": 0,
+        "received": 0,
+        "costsFromFund": 160,
+        "distributePct": 100,
+        "reinvestPct": 0,
+        "feePct": 20,
+        "standardFeePct": 20,
+        "feeIfStandard": 0,
+        "feeNote": "fee protokol 20% dari laba, berlaku",
+        "nav": 740.556,
+        "navAfter": 580.56,
+        "payDay": 1
+      }
+    },
+    {
+      "dropPct": 50,
+      "navUsd": 411.42,
+      "changeUsd": -411.42,
+      "sharePrice": 0.34285,
+      "belowBase": true,
+      "dividend": {
+        "gross": 0,
+        "costs": 160,
+        "net": 0,
+        "distributed": 0,
+        "reinvest": 0,
+        "fee": 0,
+        "received": 0,
+        "costsFromFund": 160,
+        "distributePct": 100,
+        "reinvestPct": 0,
+        "feePct": 20,
+        "standardFeePct": 20,
+        "feeIfStandard": 0,
+        "feeNote": "fee protokol 20% dari laba, berlaku",
+        "nav": 411.42,
+        "navAfter": 251.42,
+        "payDay": 1
+      }
+    },
+    {
+      "dropPct": 90,
+      "navUsd": 82.28,
+      "changeUsd": -740.56,
+      "sharePrice": 0.06856999999999999,
+      "belowBase": true,
+      "dividend": {
+        "gross": 0,
+        "costs": 160,
+        "net": 0,
+        "distributed": 0,
+        "reinvest": 0,
+        "fee": 0,
+        "received": 0,
+        "costsFromFund": 160,
+        "distributePct": 100,
+        "reinvestPct": 0,
+        "feePct": 20,
+        "standardFeePct": 20,
+        "feeIfStandard": 0,
+        "feeNote": "fee protokol 20% dari laba, berlaku",
+        "nav": 82.28399999999999,
+        "navAfter": -77.72,
+        "payDay": 1
+      }
+    }
+  ],
+  "stress": {
+    "lpUsd": 354.37,
+    "lpSharePct": 43.066695833940976,
+    "cashUsd": 468.47,
+    "positions": 4,
+    "worstDayUsd": -161.29,
+    "worstDayPct": null,
+    "worstClosePct": -86.22
+  },
+  "lossProfile": null,
+  "market": null,
+  "method": "Bootstrap 9 hari tervalidasi, 10000 lintasan. Peluang yang ditulis <0,001% berarti kejadiannya tidak muncul dalam undian — bukan berarti mustahil.",
+  "caveats": [
+    "Ini frekuensi simulasi bersyarat pada sampel, bukan probabilitas kerugian dunia nyata.",
+    "Kas cadangan dan dividen yang sudah diterima termasuk total kekayaan investor; sapuan tidak dianggap kerugian.",
+    "Periode pendek dan perubahan strategi dapat membuat model tidak representatif. Tidak ada probabilitas minimum buatan atau kejutan sintetis tersembunyi."
+  ]
 }
