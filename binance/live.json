@@ -1,7 +1,7 @@
 {
   "fund": "binance",
-  "updatedAt": 1791142624080,
-  "generatedAt": "2026-10-05 02:37 WIB",
+  "updatedAt": 1791142923473,
+  "generatedAt": "2026-10-05 02:42 WIB",
   "usdIdr": null,
   "totalUsd": 8408.71,
   "botWalletUsd": 8408.71,
@@ -24,13 +24,13 @@
       "slPrice": 1.783,
       "tpPrice": 2.256,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 4286,
+      "ageMinutes": 4291,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-387aba3ce7815514d919"
@@ -43,13 +43,13 @@
       "slPrice": 115.12,
       "tpPrice": 132.2,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 3922,
+      "ageMinutes": 3927,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-c10dec93b0fb3c6c0b25"
@@ -62,13 +62,13 @@
       "slPrice": 758.75,
       "tpPrice": 826.38,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 3165,
+      "ageMinutes": 3170,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-ce7533858d10562e17cc"
@@ -413,19 +413,24 @@
     "peakUsd": null,
     "paused": false,
     "startedAt": 1790691121483,
-    "heartbeatAt": 1791142622910,
-    "accountUpdatedAt": 1791142616220,
-    "apiState": "CONNECTED",
-    "retryAt": null,
-    "status": "berjalan",
-    "healthy": true,
+    "heartbeatAt": 1791142923006,
+    "accountUpdatedAt": 1791142888512,
+    "apiState": "RATE_LIMIT_WAIT",
+    "retryAt": 1791142983939,
+    "status": "menunggu anggaran request",
+    "healthy": false,
     "lead": "Bot crypto futures di Binance TESTNET — dananya virtual. Sejak 2026-09-29 berjalan dengan mesin baru yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.",
     "tiles": [
       {
         "k": "Data akun terakhir",
-        "v": "02:36 WIB",
-        "n": "akun berhasil diperiksa",
-        "tone": "pos"
+        "v": "02:41 WIB",
+        "n": "nilai terakhir; belum terverifikasi ulang",
+        "tone": "neg"
+      },
+      {
+        "k": "Coba koneksi lagi",
+        "v": "02:43:03 WIB",
+        "n": "otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang"
       },
       {
         "k": "Pindai pasar",
@@ -451,16 +456,19 @@
     ],
     "llm": null
   },
-  "schemaVersion": 2,
-  "generation": "16287f5a-b20e-4686-8ce1-20747f7c4aae",
-  "treasuryUsd": 0,
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "menunggu anggaran request; saldo/posisi adalah data terakhir, bukan pembacaan akun baru",
+      "sebagian posisi memakai nilai terakhir"
+    ]
   },
+  "schemaVersion": 2,
+  "generation": "25d4ad90-01d1-47b6-b499-e831df3b77b1",
+  "treasuryUsd": 0,
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791142624137,
+    "generatedAt": 1791142923518,
     "trades": {
       "count": 33,
       "wins": 12,
