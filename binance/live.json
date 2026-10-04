@@ -1,18 +1,18 @@
 {
   "fund": "binance",
-  "updatedAt": 1791139627403,
-  "generatedAt": "2026-10-05 01:47 WIB",
+  "updatedAt": 1791139926238,
+  "generatedAt": "2026-10-05 01:52 WIB",
   "usdIdr": null,
-  "totalUsd": 8410.4,
-  "botWalletUsd": 8410.4,
-  "walletUsd": 8410.4,
+  "totalUsd": 8413.16,
+  "botWalletUsd": 8413.16,
+  "walletUsd": 8413.16,
   "lpUsd": 0,
   "holdings": [
     {
       "symbol": "USDT (testnet)",
-      "amount": 8410.4,
+      "amount": 8413.16,
       "price": 1,
-      "usd": 8410.4
+      "usd": 8413.16
     }
   ],
   "positions": [
@@ -24,13 +24,13 @@
       "slPrice": 1.783,
       "tpPrice": 2.256,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 4236,
+      "ageMinutes": 4241,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-387aba3ce7815514d919"
@@ -43,13 +43,13 @@
       "slPrice": 115.12,
       "tpPrice": 132.2,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 3872,
+      "ageMinutes": 3877,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-c10dec93b0fb3c6c0b25"
@@ -62,13 +62,13 @@
       "slPrice": 758.75,
       "tpPrice": 826.38,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 3115,
+      "ageMinutes": 3120,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-ce7533858d10562e17cc"
@@ -406,26 +406,31 @@
     "paper": true,
     "mode": "testnet",
     "initialUsd": 8446.31,
-    "cashUsd": 8410.4,
+    "cashUsd": 8413.16,
     "positionsUsd": 0,
     "realizedUsd": 19.38,
     "unrealizedUsd": 0,
     "peakUsd": null,
     "paused": false,
     "startedAt": 1790691121483,
-    "heartbeatAt": 1791139621389,
-    "accountUpdatedAt": 1791139620795,
-    "apiState": "CONNECTED",
-    "retryAt": null,
-    "status": "berjalan",
-    "healthy": true,
+    "heartbeatAt": 1791139921465,
+    "accountUpdatedAt": 1791139863038,
+    "apiState": "RATE_LIMIT_WAIT",
+    "retryAt": 1791139958712,
+    "status": "menunggu anggaran request",
+    "healthy": false,
     "lead": "Bot crypto futures di Binance TESTNET — dananya virtual. Sejak 2026-09-29 berjalan dengan mesin baru yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.",
     "tiles": [
       {
         "k": "Data akun terakhir",
-        "v": "01:47 WIB",
-        "n": "akun berhasil diperiksa",
-        "tone": "pos"
+        "v": "01:51 WIB",
+        "n": "nilai terakhir; belum terverifikasi ulang",
+        "tone": "neg"
+      },
+      {
+        "k": "Coba koneksi lagi",
+        "v": "01:52:38 WIB",
+        "n": "otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang"
       },
       {
         "k": "Pindai pasar",
@@ -451,16 +456,19 @@
     ],
     "llm": null
   },
-  "schemaVersion": 2,
-  "generation": "f684f439-2931-4d83-aa93-fa1e0fcb882c",
-  "treasuryUsd": 0,
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "menunggu anggaran request; saldo/posisi adalah data terakhir, bukan pembacaan akun baru",
+      "sebagian posisi memakai nilai terakhir"
+    ]
   },
+  "schemaVersion": 2,
+  "generation": "85ca6add-a72a-4d10-b409-65f9ac70eeca",
+  "treasuryUsd": 0,
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791139627447,
+    "generatedAt": 1791139926295,
     "trades": {
       "count": 33,
       "wins": 12,
@@ -517,9 +525,9 @@
       "calmar": null,
       "since": 1790691122573
     },
-    "profitUsd": -35.91,
-    "profitPct": -0.43,
-    "recoveryFactor": -0.31,
+    "profitUsd": -33.15,
+    "profitPct": -0.39,
+    "recoveryFactor": -0.29,
     "score": {
       "axes": {
         "winRate": 37.5,
