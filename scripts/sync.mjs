@@ -391,6 +391,8 @@ const closedRow = (r) => ({
   holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null,
   ...(r.closeNote ? { reasonDetail: String(r.closeNote).replace(/(?:0x)?[0-9a-fA-F]{24,}/g, '0x…').slice(0, 240) } : {}),
   ...(Number.isFinite(Number(r.investedUsd)) ? { investedUsd: Number(Number(r.investedUsd).toFixed(2)) } : {}),
+  ...(Number.isFinite(Number(r.feesUsd)) && r.feesUsd !== null ? { feesUsd: Number(Number(r.feesUsd).toFixed(2)) } : {}),
+  ...(r.entryNote ? { entry: String(r.entryNote).replace(/(?:0x)?[0-9a-fA-F]{24,}/g, '0x…').slice(0, 300) } : {}),
   reason: String(r.closeReason || '').split(/[:—]/)[0].replace(/(?:0x)?[0-9a-fA-F]{24,}/g, '0x…').trim().slice(0, 90) || null,
 });
 // Seluruh riwayat diterbitkan per hari (lihat lib/trades.mjs); snapshot hanya

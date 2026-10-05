@@ -321,7 +321,20 @@ const buildLedger = CashoodCore.buildLedger;
  * keduanya memberi kurs dolar-rupiah tanpa perlu sumber kedua. Kalau gagal,
  * baru mencari kurs rupiah ke tempat lain.
  */
+// Kurs disimpan 10 menit (memori + localStorage): CoinGecko gratis membatasi
+// panggilan per IP, dan tiap pindah halaman dulu memanggilnya lagi sampai
+// ditolak. Kurs lama yang masih segar dipakai tanpa jaringan.
+const FX_KEY = 'cashood.fx.v1', FX_TTL = 10 * 60e3;
+let fxAt = 0;
+function fxFromCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(FX_KEY) || 'null');
+    if (!c || Date.now() - c.at > FX_TTL) return false;
+    Object.assign(coinPrice, c.coins || {}); if (c.usdIdr > 0) lastUsdIdr = c.usdIdr; fxAt = c.at; return true;
+  } catch { return false; }
+}
 async function fxRates() {
+  if (Date.now() - fxAt < FX_TTL || fxFromCache()) return;
   const ids = [...new Set(Object.values(COINS).map((c) => c.cg))].join(',');
   try {
     const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd,idr`, { signal: AbortSignal.timeout(6000) });
@@ -333,6 +346,8 @@ async function fxRates() {
       const idrPrice = Number(j?.[coin.cg]?.idr);
       if (usdPrice > 0 && idrPrice > 0) lastUsdIdr = idrPrice / usdPrice;
     }
+    fxAt = Date.now();
+    try { localStorage.setItem(FX_KEY, JSON.stringify({ at: fxAt, coins: { ...coinPrice }, usdIdr: lastUsdIdr })); } catch { /* penyimpanan tidak wajib */ }
   } catch { /* lanjut ke cadangan */ }
 
   if (!lastUsdIdr) {
@@ -844,7 +859,7 @@ function closedRowsHtml(rows, absolute) {
       <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
       <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}${r.exitDetail ? `<div class="sub2 why">${esc(r.exitDetail)}</div>` : ''}${
-        r.entry ? `<div class="sub2 why"><b>Masuk:</b> ${esc(r.entry)}</div>` : ''}${r.peakPct != null ? `<div class="sub2">puncak +${pct(r.peakPct, 1)}${r.ddPct != null ? ` · terdalam ${pct(r.ddPct, 1)}` : ''}</div>` : ''}</td>
+        r.entry ? `<div class="sub2 why"><b>Alasan buka:</b> ${esc(r.entry)}</div>` : ''}${r.peakPct != null ? `<div class="sub2">puncak +${pct(r.peakPct, 1)}${r.ddPct != null ? ` · terdalam ${pct(r.ddPct, 1)}` : ''}</div>` : ''}</td>
       <td class="num dim nowrap">${absolute ? tglRingkas(r.closedAt) : ago(r.closedAt)}</td>
     </tr>`).join('');
 }
