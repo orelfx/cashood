@@ -2,7 +2,7 @@
 /**
  * Snapshot Charon RH — bot trading token (meme/spekulatif) di Robinhood Chain.
  *
- * Bot ini masih SIMULASI (paper / dry-run): modal $500 di atas kertas, harga
+ * Bot ini masih SIMULASI (paper / dry-run): modal kertas $1.500 ($500 + $1.000 tambahan 5 Okt), harga
  * dari quote pasar sungguhan, tanpa dompet dan tanpa transaksi. Situs hanya
  * MEMBACA database bot dalam mode read-only — tidak mengambil lock-nya, tidak
  * menulis apa pun ke foldernya.

@@ -13,7 +13,11 @@
     "_note": "Bot simulasi: tidak punya dompet dan tidak mengirim transaksi. Seluruh angka datang dari database paper bot, dibaca read-only."
   },
   "owners": [
-    { "id": "paper", "name": "Modal simulasi", "color": "#e879f9" }
+    {
+      "id": "paper",
+      "name": "Modal simulasi",
+      "color": "#e879f9"
+    }
   ],
   "events": [
     {
@@ -24,6 +28,16 @@
       "founding": true,
       "id": "charon-paper-modal",
       "note": "modal kertas bot Charon RH (dry-run) — bukan uang sungguhan"
+    },
+    {
+      "date": "2026-10-05",
+      "at": 1791182813128,
+      "type": "deposit",
+      "owner": "paper",
+      "usd": 1000,
+      "navBefore": 185.46,
+      "id": "charon-paper-topup-2026-10-05",
+      "note": "tambahan modal kertas $1.000 dari operator (capital_events #1 bot) — total modal kertas $1.500, bukan uang sungguhan"
     }
   ],
   "costs": {
@@ -34,21 +48,33 @@
   },
   "fund": {
     "note": "Simulasi (paper trading). Belum menerima investor.",
-    "capacityUsd": 500,
+    "capacityUsd": 1500,
     "paper": true
   },
   "strategy": {
     "title": "Charon RH — AI trader token di Robinhood Chain (simulasi)",
     "about": [
       "Charon RH adalah robot AI yang memperdagangkan token spekulatif — termasuk meme coin — di jaringan Robinhood. Berbeda dengan dana lain yang menyediakan likuiditas (LP), Charon membeli token lalu menjualnya kembali: untung kalau harga naik sebelum dijual, rugi kalau turun.",
-      "Saat ini Charon RH masih berjalan dalam mode SIMULASI (paper trading / dry-run). Harga dan biaya diambil dari quote pasar sungguhan, tetapi pembelian dan penjualannya hanya dicatat — tidak ada uang sungguhan, dompet, atau transaksi di blockchain. Modal $500 adalah modal di atas kertas untuk menguji apakah strateginya layak sebelum memakai uang asli.",
+      "Saat ini Charon RH masih berjalan dalam mode SIMULASI (paper trading / dry-run). Harga dan biaya diambil dari quote pasar sungguhan, tetapi pembelian dan penjualannya hanya dicatat — tidak ada uang sungguhan, dompet, atau transaksi di blockchain. Modal $1.500 ($500 awal + $1.000 tambahan 5 Okt) adalah modal di atas kertas untuk menguji apakah strateginya layak sebelum memakai uang asli.",
       "Setiap beberapa menit bot memindai pasar, menyaring token menurut likuiditas, aktivitas, dan keamanan, lalu meminta AI menilai apakah ada peluang yang layak. Bot boleh memutuskan menunggu — dan paling sering memang menunggu."
     ],
     "requirements": [
-      ["Modal simulasi", "$500 (kertas)"],
-      ["Aset kas", "USDG"],
-      ["Status", "uji coba, belum menerima investor"],
-      ["Profil risiko", "sangat tinggi"]
+      [
+        "Modal simulasi",
+        "$1.500 (kertas)"
+      ],
+      [
+        "Aset kas",
+        "USDG"
+      ],
+      [
+        "Status",
+        "uji coba, belum menerima investor"
+      ],
+      [
+        "Profil risiko",
+        "sangat tinggi"
+      ]
     ],
     "risks": [
       "Hasil simulasi bukan hasil nyata: pembelian sungguhan bisa mendapat harga lebih buruk, biaya gas nyata berbeda dari yang dimodelkan, dan token bisa saja tidak bisa dijual.",
@@ -57,15 +83,42 @@
       "Belum ada bukti strategi ini menguntungkan; jumlah trade masih sedikit."
     ],
     "system": [
-      ["Mode", "simulasi (dry-run) — tanpa dompet"],
-      ["Jaringan", "Robinhood Chain"],
-      ["Jenis", "trading token spot, bukan LP"],
-      ["Kelas token", "low cap · mid cap · large cap"],
-      ["Jangka posisi", "scalp ≤2 jam · intraday ≤24 jam · swing ≤72 jam"],
-      ["Risiko per trade", "1% nilai dana · maks 5 posisi · eksposur maks 60%"],
-      ["Rem darurat", "berhenti masuk saat turun 12% dari puncak atau rugi 5% sehari"],
-      ["Otak keputusan", "AI (MiniMax), maks 96 panggilan per hari"],
-      ["Sumber data situs", "database bot, dibaca tiap 5 menit"]
+      [
+        "Mode",
+        "simulasi (dry-run) — tanpa dompet"
+      ],
+      [
+        "Jaringan",
+        "Robinhood Chain"
+      ],
+      [
+        "Jenis",
+        "trading token spot, bukan LP"
+      ],
+      [
+        "Kelas token",
+        "low cap · mid cap · large cap"
+      ],
+      [
+        "Jangka posisi",
+        "scalp ≤2 jam · intraday ≤24 jam · swing ≤72 jam"
+      ],
+      [
+        "Risiko per trade",
+        "1% nilai dana · maks 5 posisi · eksposur maks 60%"
+      ],
+      [
+        "Rem darurat",
+        "berhenti masuk saat turun 12% dari puncak atau rugi 5% sehari"
+      ],
+      [
+        "Otak keputusan",
+        "AI (MiniMax), maks 96 panggilan per hari"
+      ],
+      [
+        "Sumber data situs",
+        "database bot, dibaca tiap 5 menit"
+      ]
     ]
   }
 }
