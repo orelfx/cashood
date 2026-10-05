@@ -48,10 +48,12 @@ const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedA
  interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
  interestDay:Core.day(now),days:[...state.days,...(today?[today]:[])].slice(-30).map(d=>({date:d.date,usd:d.usd,ratePct:d.ratePct??null,estimated:d.estimated})),earning:dailyPct>0,
  quality:{complete:true,estimated:false,allocationEstimated:false},
- measure:{monthlyPct:Number((dailyPct*30).toFixed(3)),dailyPct:Number(dailyPct.toFixed(4)),maxDailyPct:Number((maxM/30).toFixed(4)),
+ measure:{monthlyPct:Number((dailyPct*30).toFixed(3)),dailyPct:Number(dailyPct.toFixed(4)),windowDays:Number(cfg.rate?.windowDays??7),
+  windowMovePct:today?.windowMovePct??null,capped:Boolean(today?.capped),
+  monthUsedPct:principal?Number((([...state.days,...(today?[today]:[])].filter(d=>d.date.startsWith(Core.day(now).slice(0,7))).reduce((t,d)=>t+state.owners.reduce((u,o)=>u+(d.owners?.[o.id]||0),0),0))/principal*100).toFixed(3)):0,
   avgMonthlyPct:Number((avgDaily*30).toFixed(3)),apyPct:Number((avgDaily*365).toFixed(3)),perDayUsd:today?.usd||0,
   minMonthlyPct:Number(cfg.rate?.minMonthlyPct??0),maxMonthlyPct:maxM,spanDays:done.length,
-  basis:'mengikuti kinerja harian bot Cashood: hari rugi 0, hari untung maksimal '+(maxM/30).toFixed(2).replace('.',',')+'% per hari',since:Core.day(state.from)},
+  basis:'rata-rata kenaikan Cashood Index '+(cfg.rate?.windowDays??7)+' hari terakhir; seminggu rugi = 0; paling banyak '+String(maxM).replace('.',',')+'% per bulan',since:Core.day(state.from)},
  };
 assertPublic(snapshot);
 const navFile=resolve(DIR,'nav.json'),old=readJSON(navFile,{points:[]});

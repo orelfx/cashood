@@ -2335,7 +2335,7 @@ function renderSafebox() {
     // Laju harian mengikuti kinerja bot (Cashood Index), dikurung 0 sampai
     // batas harian. Tabel di bawah memakai rata-rata yang sudah terjadi dan
     // batas atasnya — laju satu hari saja bisa 0 dan tidak mewakili.
-    const maxDay = Number(rate.maxDailyPct ?? (rate.maxMonthlyPct ?? 3) / 30) / 100;
+    const maxDay = Number(rate.maxMonthlyPct ?? 3) / 30 / 100;   // laju yang tepat menghabiskan jatah bulanan
     const avgDay = Number(rate.avgMonthlyPct ?? 0) / 30 / 100;
 
     // Satu kolom saja. Bunga di sini TIDAK diputar lagi: yang menghasilkan
@@ -2377,12 +2377,13 @@ function renderSafebox() {
             <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>`}
           <div class="stat"><div class="k">Laju hari ini</div>
             <div class="v">${rate.dailyPct == null ? '—' : pct(rate.dailyPct, 2)} <span class="dim" style="font-size:.6em">/hari</span></div>
-            <div class="n">maks ${pct(rate.maxDailyPct ?? 0.1, 2)}/hari · rata-rata ${pct(rate.avgMonthlyPct ?? 0, 2)}/bulan</div></div>
+            <div class="n">rata-rata index ${rate.windowDays ?? 7} hari · bulan ini terpakai ${pct(rate.monthUsedPct ?? 0, 2)} dari ${pctRate(rate.maxMonthlyPct ?? 3)}</div></div>
         </div>
-        <p class="hint" style="margin-top:14px">Bunganya <strong>dihitung tiap hari mengikuti kinerja bot Cashood</strong>
-          (gerak <a href="#index">Cashood Index</a> hari itu, jam WIB). Hari bot rugi: bunga <strong>0</strong>. Hari bot untung:
-          bunga ikut naik, tapi <strong>paling tinggi ${pct(rate.maxDailyPct ?? 0.1, 2)} per hari</strong> — jadi sebulan paling banyak
-          <strong>${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong>, sebagus apa pun hasil botnya.
+        <p class="hint" style="margin-top:14px">Bunganya <strong>dihitung tiap hari mengikuti kinerja bot Cashood</strong>:
+          rata-rata kenaikan <a href="#index">Cashood Index</a> selama ${rate.windowDays ?? 7} hari terakhir. Satu hari turun tidak langsung
+          membuat bunga 0 — bunga baru 0 kalau seminggu itu bot memang rugi. Tidak ada batas harian, tapi
+          <strong>sebulan paling banyak ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok; kalau jatahnya habis lebih cepat,
+          bunga berhenti sampai tanggal 1 berikutnya.
           Angka hari ini masih bisa berubah sampai tengah malam WIB, lalu dikunci.
           Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran atau jaminan hasil investasi.</p>
       </section>
@@ -2445,10 +2446,10 @@ function renderSafebox() {
           dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
         <div class="two">
           <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
-            <li>Tiap hari dilihat gerak Cashood Index — gabungan kinerja bot-bot Cashood yang memakai uang asli.</li>
-            <li>Index turun atau datar hari itu: bunga hari itu <strong>0</strong>. Index naik: bunganya sebesar kenaikan itu.</li>
-            <li>Ada batas harian <strong>${pct(rate.maxDailyPct ?? 0.1, 2)}</strong>. Satu hari yang untung besar tetap dibayar paling tinggi
-                segitu, jadi sebulan tidak pernah lebih dari ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}.</li>
+            <li>Tiap hari dilihat Cashood Index — gabungan kinerja bot-bot Cashood yang memakai uang asli.</li>
+            <li>Bunga hari itu = rata-rata kenaikan index ${rate.windowDays ?? 7} hari terakhir. Seminggu turun atau datar: bunga <strong>0</strong>.</li>
+            <li>Tidak ada batas harian, tapi sebulan tidak pernah lebih dari <strong>${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok.
+                Minggu yang bagus bisa menghabiskan jatah itu lebih cepat; sesudahnya bunga 0 sampai tanggal 1.</li>
             <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
             <li><strong>Bunga tidak diputar ulang.</strong> Yang bekerja tetap uang pokok; bunga menumpuk di sampingnya
                 dan tidak ikut menghasilkan bunga baru.</li>
@@ -2484,7 +2485,7 @@ function renderSafebox() {
           <thead><tr><th>Jangka</th><th class="num">Bunga · laju rata-rata</th><th class="num">Bunga · maksimal</th><th class="num">Pokok + bunga maks</th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
-        <p class="hint disclaimer">Tabel ini mengalikan laju rata-rata sejauh ini dan batas maksimal ${pct(rate.maxDailyPct ?? 0.1, 2)}/hari
+        <p class="hint disclaimer">Tabel ini mengalikan laju rata-rata sejauh ini dan batas ${pctRate(rate.maxMonthlyPct ?? 3)} per bulan
           ke depan — bukan ramalan. Bunga nyatanya mengikuti kinerja bot tiap hari. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
           tetap uang pokok, dan bunga yang sudah masuk berhenti di tempatnya — pokok ${usd(modal, 0)} yang sudah
           berbunga ${usd(100, 0)} tetap bekerja dengan ${usd(modal, 0)}, bukan ${usd(modal + 100, 0)}.</p>
@@ -2773,7 +2774,7 @@ async function renderPortofolio() {
       <div class="table-scroll"><table class="porto-tbl"><tbody>
         ${(box.owners || []).map(o => `<tr><td>${esc(o.name)}</td><td class="num">${pct(o.sharePct)}</td><td class="num">${usd(o.balanceUsd)}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · laju ${box.measure?.dailyPct == null ? '—' : pct(box.measure.dailyPct, 2)}/hari (maks ${pct(box.measure?.maxDailyPct ?? 0.1, 2)}).</p>
+      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · laju ${box.measure?.dailyPct == null ? '—' : pct(box.measure.dailyPct, 2)}/hari (maks ${pct(box.measure?.maxMonthlyPct ?? 3, 0)}/bulan).</p>
     </div>` : ''));
 }
 
@@ -3577,7 +3578,7 @@ async function renderHome() {
     const today = box && box.principalUsd ? ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100 : null;
     return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
       <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
-        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga harian ikut kinerja bot, maks 3%/bulan</div></div>
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga harian ikut kinerja bot seminggu, maks 3%/bulan</div></div>
         ${today == null ? '' : `<span class="chg up">▲ ${pct(today, 3)}<small>hari ini</small></span>`}</div>
       <p class="prod-desc">${esc(sb.blurb || '')}</p>
       <div class="prod-nums">
