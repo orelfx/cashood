@@ -791,7 +791,7 @@ function renderLp(nav) {
         <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? r.tokenId)}</span>
             <div class="sub2">${esc(r.bookLabel ?? r.strategy ?? '')}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
             ${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}
-            ${r.thesis ? `<div class="thesis" title="${esc(r.thesis)}"><b>Alasan buka posisi LP:</b> ${esc(r.thesis)}</div>` : ''}
+            ${r.thesis ? `<details class="fx-det lp-why"><summary>Alasan buka</summary><p class="fx-why">${esc(r.thesis)}</p></details>` : ''}
             <div class="sub2 m-only ${r.inRange ? 'pos' : 'neg'}">${r.inRange ? 'di dalam range' : 'di luar range'}${
               r.throughBandPct == null ? '' : ' · ' + r.throughBandPct.toFixed(0) + '%'}</div></td>
         <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
@@ -847,6 +847,41 @@ function entryNote(r) {
   return '';
 }
 
+/*
+ * Alasan tutup: yang tampil hanya alasan singkatnya ("Trailing stop"); rincian
+ * — kalimat bot, alasan buka, puncak/terdalam — baru terbuka kalau diklik.
+ * Berlaku untuk riwayat semua dana.
+ */
+const capFirst = (t) => (t ? t[0].toUpperCase() + t.slice(1) : t);
+// Label singkat yang seragam untuk alasan tutup dari bot mana pun; kalimat
+// aslinya tetap ada di rincian.
+const REASON_SHORT = [
+  [/time ?limit|batas waktu|timeout|max.?hold/i, 'Batas waktu'], [/trailing/i, 'Trailing stop'],
+  [/banking early|dikunci|kunci untung|lock/i, 'Kunci untung'], [/take.?profit|target (untung )?tercapai|smart tp|ceiling/i, 'Take profit'],
+  [/cut loss|potong rugi/i, 'Potong rugi'], [/stop.?loss|kena stop|^stop\b|sl hit/i, 'Stop loss'],
+  [/below range|keluar rentang ke bawah|turun keluar rentang/i, 'Keluar rentang bawah'], [/above range|keluar rentang ke atas|naik keluar rentang/i, 'Keluar rentang atas'],
+  [/out of range|keluar rentang/i, 'Keluar rentang'], [/ikut wallet|follow exit/i, 'Ikut wallet keluar'], [/rug/i, 'Rug'],
+  [/perbaikan sistem/i, 'Perbaikan sistem'], [/pengaman gagal/i, 'Pengaman gagal'], [/SL\/TP|bursa/i, 'SL/TP bursa'],
+];
+function shortReason(t) {
+  const raw = String(t ?? '').trim();
+  if (!raw) return '—';
+  const hit = REASON_SHORT.find(([re]) => re.test(raw));
+  return hit ? hit[1] : capFirst(raw.length > 26 ? raw.slice(0, 24).trim() + '…' : raw);
+}
+function reasonCell(r) {
+  const short = shortReason(r.reason), head = esc(short);
+  const original = r.reason && capFirst(String(r.reason)) !== short ? capFirst(String(r.reason)) : null;
+  const detail = [original, r.exitDetail, r.reasonDetail && r.reasonDetail !== r.exitDetail ? r.reasonDetail : null].filter(Boolean);
+  const more = [
+    ...detail.map((t) => `<p class="fx-why">${esc(t)}</p>`),
+    r.entry ? `<p class="fx-why"><b>Alasan buka:</b> ${esc(r.entry)}</p>` : '',
+    r.peakPct != null ? `<div class="sub2">puncak +${pct(r.peakPct, 1)}${r.ddPct != null ? ` · terdalam ${pct(r.ddPct, 1)}` : ''}</div>` : '',
+    r.feesUsd ? `<div class="sub2">fee/biaya ${usd(r.feesUsd)}</div>` : '',
+  ].join('');
+  return more ? `<details class="fx-det"><summary>${head}</summary>${more}</details>` : head;
+}
+
 function closedRowsHtml(rows, absolute) {
   // Hasil dalam dolar kalau bot mencatatnya; bot yang hanya mencatat persen
   // ditulis "—" (atau ≈ perkiraan) di kolom dolar, bukan $0.
@@ -858,8 +893,7 @@ function closedRowsHtml(rows, absolute) {
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
       <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
-      <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}${r.exitDetail ? `<div class="sub2 why">${esc(r.exitDetail)}</div>` : ''}${
-        r.entry ? `<div class="sub2 why"><b>Alasan buka:</b> ${esc(r.entry)}</div>` : ''}${r.peakPct != null ? `<div class="sub2">puncak +${pct(r.peakPct, 1)}${r.ddPct != null ? ` · terdalam ${pct(r.ddPct, 1)}` : ''}</div>` : ''}</td>
+      <td class="dim">${reasonCell(r)}</td>
       <td class="num dim nowrap">${absolute ? tglRingkas(r.closedAt) : ago(r.closedAt)}</td>
     </tr>`).join('');
 }
@@ -981,7 +1015,7 @@ function applyFundKind() {
   $('#shareCard').hidden = t;
   if ($('#stripShare')) $('#stripShare').hidden = t;
   $('#paperCard').hidden = !t;
-  $('#copyCard').hidden = true; $('#decisionCard').hidden = true;   // dibuka renderCopyTrade kalau datanya ada
+  $('#copyCard').hidden = true; $('#decisionCard').hidden = true; $('#topWalletCard').hidden = true;   // dibuka renderCopyTrade kalau datanya ada
   $('#lpTable').classList.remove('fx', 'fxf');                       // dipasang lagi oleh renderTrades
   const shareBtn = document.querySelector('#segSeries [data-s="share"]');
   if (shareBtn) shareBtn.hidden = t;
@@ -1076,13 +1110,14 @@ function renderCopyTrade(nav) {
       ${w.definitions?.active || w.definitions?.passive ? `<details class="explain"><summary>Apa bedanya aktif dan pasif</summary>
         ${w.definitions.active ? `<p><b>Aktif:</b> ${esc(w.definitions.active)}</p>` : ''}${w.definitions.passive ? `<p><b>Pasif:</b> ${esc(w.definitions.passive)}</p>` : ''}
         ${w.definitions.label ? `<p><b>Label:</b> ${esc(w.definitions.label)}</p>` : ''}</details>` : ''}
-      ${w.top?.length ? `<h3 class="sub-h">10 wallet terbaik</h3><div class="table-scroll"><table class="mcards">
+      `);
+  }
+  $('#topWalletCard').hidden = !w?.top?.length;
+  if (w?.top?.length) setHTML($('#topWallets'), `<div class="table-scroll"><table class="mcards">
         <thead><tr><th>Wallet</th><th class="num">Skor</th><th class="num">Di-copy</th><th class="num">Menang</th><th class="num">Hasil copy</th></tr></thead>
         <tbody>${w.top.map((t) => `<tr><td class="mc-head">${kindOf(t.label)[0]} ${esc(t.alias)}</td><td class="num" data-k="Skor">${t.score ?? '—'}</td>
           <td class="num" data-k="Di-copy">${t.copied ?? 0}×</td><td class="num" data-k="Menang">${t.won ?? 0}</td>
-          <td class="num ${cls(t.pnlUsd ?? 0)}" data-k="Hasil copy">${t.pnlUsd ? signed(t.pnlUsd) : '<span class="dim">—</span>'}</td></tr>`).join('')}</tbody></table></div>
-        <p class="hint">Alamat wallet tidak pernah diterbitkan; nomornya alias tetap dari daftar bot.</p>` : ''}`);
-  }
+          <td class="num ${cls(t.pnlUsd ?? 0)}" data-k="Hasil copy">${t.pnlUsd ? signed(t.pnlUsd) : '<span class="dim">—</span>'}</td></tr>`).join('')}</tbody></table></div>`);
   const dec = ct?.decisions || [];
   $('#decisionCard').hidden = !dec.length && !ct?.reasonStats;
   if ($('#decisionCard').hidden) return;
@@ -1093,13 +1128,13 @@ function renderCopyTrade(nav) {
   const rs = ct?.reasonStats || {};
   const chips = Object.entries(rs).flatMap(([g, o]) => Object.entries(o).filter(([, n]) => n > 0).map(([k, n]) => `<span class="rs-chip"><b>${n}</b> ${esc(RS[g] || g)} · ${esc(SK[k] || k)}</span>`));
   setHTML($('#decStats'), `<div class="rs"><span class="k">24 jam terakhir</span>${chips.length ? chips.join('') : '<span class="dim">belum ada sinyal yang diproses</span>'}</div>`);
-  const shown = decView.all ? dec : dec.slice(0, 12);
+  const shown = decView.all ? dec : dec.slice(0, 3);   // 3 terbaru; sisanya dibuka lewat tombol
   setHTML($('#decList'), `<ol class="dec-list">${shown.map((d) => { const [a, tone] = ACTION[d.action] || [d.action, ''];
     return `<li><div class="dec-top"><span class="pill ${tone}">${esc(a)}</span><b>${esc(d.symbol || '—')}</b>${d.basket ? `<span class="dim">${esc(d.basket)}</span>` : ''}
       <span class="dim dec-t">${tglJam(d.at)}</span></div>
       ${walletChips(d.wallets)}${flagChips(d.flags)}
       ${d.reason ? `<p class="dec-r">${esc(d.reason)}</p>` : ''}</li>`; }).join('')}</ol>
-    ${dec.length > 12 ? `<button class="btn ghost" id="decMore">${decView.all ? 'tampilkan lebih sedikit' : `lihat semua ${dec.length} keputusan`}</button>` : ''}`);
+    ${dec.length > 3 ? `<button class="btn ghost dec-more" id="decMore">${decView.all ? 'sembunyikan' : `tampilkan ${dec.length - 3} keputusan lainnya`}</button>` : ''}`);
   if ($('#decMore')) $('#decMore').onclick = () => { decView.all = !decView.all; renderCopyTrade(nav); };
 }
 
