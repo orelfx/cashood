@@ -107,7 +107,9 @@ const positions = db.prepare("SELECT * FROM positions WHERE status='open' ORDER 
   ...(Number.isFinite(Number(p.confidence)) && p.confidence !== null ? { confidence: Number(p.confidence) } : {}),
   ...(Number(p.current_price) ? { priceUsd: Number(p.current_price) } : {}),
   principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0,
-  pnlUsd: p.floating_usd != null && Number.isFinite(Number(p.floating_usd)) ? r2(p.floating_usd) : null,
+  pnlUsd: null,
+  // Disimpan terpisah: rekonsiliasi snapshot menghitung ulang pnlUsd dari nilai/modal.
+  ...(p.floating_usd != null && Number.isFinite(Number(p.floating_usd)) ? { floatingUsd: r2(p.floating_usd) } : {}),
 }));
 
 // ─── status bot ───────────────────────────────────────────────────────────

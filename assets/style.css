@@ -1263,3 +1263,32 @@ body.at-home #tabs { display: none; }
 .sub2.why { white-space: normal; max-width: 360px; line-height: 1.4; }
 @media (max-width: 640px) { .wl-big { font-size: 32px; } .wl-grid { grid-template-columns: repeat(2, 1fr); } .dec-t { margin-left: 0; width: 100%; } }
 .wl-big, .wl-n { text-align: left; }
+
+/* ── tabel trading: ringkasan skenario & strategi yang bisa dibuka ── */
+.fx-sum { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.fx-sum .stat { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0; }
+.fx-note { margin: 8px 0 4px; }
+.fx-strat { min-width: 150px; max-width: 280px; }
+.fx-det summary { cursor: pointer; font-weight: 600; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+.fx-det summary::-webkit-details-marker { display: none; }
+.fx-det summary::after { content: '▸'; font-size: 11px; color: var(--mute, #8b95a7); transition: transform .15s; }
+.fx-det[open] summary::after { transform: rotate(90deg); }
+.fx-det[open] { padding-bottom: 4px; }
+.fx-why { margin: 6px 0 2px; font-size: 12.5px; line-height: 1.45; color: var(--mute, #a3adbb); white-space: normal; }
+#lpSummary.stats { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+@media (max-width: 640px) {
+  /* futures: pair, SL/TP (+ potensi), untung/rugi; forex: pair, SL/TP, floating */
+  #lpTable.fx th:nth-child(6), #lpTable.fx td:nth-child(6),
+  #lpTable.fxf th:nth-child(6), #lpTable.fxf td:nth-child(6) { display: table-cell; }
+  #lpTable.fxf th:nth-child(5), #lpTable.fxf td:nth-child(5) { display: none; }
+}
+@media (max-width: 640px) {
+  #lpTable.fx .fx-px { display: none; }
+  #lpTable.fx td, #lpTable.fx th { padding-left: 4px; padding-right: 4px; }
+}
+.fx-pot i { font-style: normal; }
+@media (max-width: 640px) {
+  #lpTable.fx .fx-pot span { display: block; }
+  #lpTable.fx .fx-pot i { display: none; }
+  #lpTable.fx .fx-pot { font-size: 11.5px; }
+}
