@@ -2,6 +2,76 @@
   "note": "Catatan pembaruan. Ditulis manual, terbaru di atas. jenis: fitur | perbaikan | sistem | data | keamanan.",
   "updates": [
     {
+      "date": "2026-10-05",
+      "type": "fitur",
+      "system": "Situs",
+      "title": "Menu utama selalu di atas",
+      "detail": "Beranda, Portofolio, Analys, kelompok risiko, Dry run, dan Update sekarang menempel di bagian atas bersama kurs, jadi tidak perlu menggulung balik ke atas untuk pindah halaman. Kurs ETH/SOL/rupiah juga disimpan 10 menit supaya halaman lebih ringan."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "fitur",
+      "system": "Binance Bot",
+      "title": "Posisi Binance tampil seperti layar futures",
+      "detail": "Tiap posisi menampilkan LONG/SHORT, leverage, ukuran, margin, entry → harga mark, SL/TP beserta hasil dolarnya, untung/rugi berjalan dan ROE. Di atasnya: rugi kalau semua kena SL, untung kalau semua kena TP, dan floating real-time — berdampingan supaya angka merah tidak mengagetkan. Nama strategi dipendekkan; penjelasannya terbuka kalau diklik. Saat bot sedang menahan request ke Binance, statusnya kuning dengan keterangan, bukan merah."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "fitur",
+      "system": "SnipeHunt",
+      "title": "Bot dry run baru: SnipeHunt",
+      "detail": "Bot copy-trade di Solana yang ikut membeli ketika beberapa wallet trader terbaik membeli coin yang sama. Halamannya menampilkan wallet yang dipantau per label (smart money, paus, KOL, blacklist, dll.) dengan jumlah aktif/pasif, 10 wallet terbaik, jejak 50 keputusan bot termasuk yang dilewati, serta komposisi wallet dan tanda bahaya di tiap posisi. Modal kertas $1.000; alamat wallet tidak pernah diterbitkan."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "fitur",
+      "system": "Reborn Rich",
+      "title": "Buku ke-4 hot potato dan alasan posisi LP",
+      "detail": "Buku hot potato (uang asli sejak 4 Okt) punya baris sendiri di Performa per buku, lengkap dengan jumlah kursi dari laporan bot. Hasil uji kertasnya tampil terpisah dan tidak dijumlahkan dengan hasil asli. Setiap posisi LP kini menulis alasan dibuka, dan riwayatnya menulis alasan ditutup, modal masuk, dan fee seumur posisi."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "data",
+      "system": "Meridian",
+      "title": "Hasil dolar asli untuk posisi LP yang ditutup",
+      "detail": "251 dari 252 posisi LP yang sudah ditutup kini memakai hasil dolar dari catatan bot (nilai ditarik + fee − nilai disetor), bukan perkiraan ≈ lagi, lengkap dengan alasan tutup dalam bahasa Indonesia. Satu posisi lama tanpa catatan jumlah SOL tetap ditandai ≈."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "data",
+      "system": "Meridian",
+      "title": "Investor baru bergabung di Meridian",
+      "detail": "Stefani menyetor $2.000 dan membeli saham senilai $500 dari porsi laba Orel. Modal dana kini $7.500: Orel $5.000 dan Stefani $2.500. Setoran dicatat dengan harga saham saat itu, jadi pemilik lama tidak terencerkan."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "sistem",
+      "system": "Safe Box",
+      "title": "Bunga harian mengikuti kinerja bot, dengan jatah mingguan",
+      "detail": "Bunga harian = rata-rata kenaikan Cashood Index 7 hari terakhir; minggu yang rugi atau datar tidak menambah bunga dari bot. Jatahnya 0,75% per minggu: minggu yang bagus berhenti di jatah itu dan kelebihannya disimpan sebagai cadangan untuk mengisi minggu yang rugi. Sebulan paling banyak 3% dari pokok — batas atas, bukan janji. Pokok tidak pernah berkurang."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "perbaikan",
+      "system": "Semua dana",
+      "title": "Grafik tidak lagi melonjak karena setoran",
+      "detail": "Setoran dan penarikan bukan hasil bot. Grafik total dana di beranda dan grafik nilai tiap dana sekarang menggeser titik lama sebesar arus kas sesudahnya, jadi garis hanya naik-turun karena hasil, dan titik terakhir tetap nilai sebenarnya."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "fitur",
+      "system": "Forex Bot",
+      "title": "Floating Forex real-time",
+      "detail": "Posisi Forex menampilkan harga sekarang dan untung/rugi berjalan langsung dari MT5, beserta alasan bot masuk. Judul kolom diperbaiki: entry, harga sekarang, SL/TP, floating."
+    },
+    {
+      "date": "2026-10-05",
+      "type": "data",
+      "system": "Charon RH",
+      "title": "Tambahan modal kertas Charon",
+      "detail": "Operator menambah modal kertas Charon RH $1.000 (total $1.500). Tambahan itu dicatat sebagai setoran, bukan sebagai untung."
+    },
+    {
       "date": "2026-10-03",
       "type": "fitur",
       "system": "devil greed",

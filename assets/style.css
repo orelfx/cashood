@@ -1293,3 +1293,54 @@ body.at-home #tabs { display: none; }
   #lpTable.fx .fx-pot { font-size: 11.5px; }
 }
 .stat .v.warn { color: var(--amber); }
+
+/* ══ menu utama di dalam header yang menempel (2026-10-05) ══ */
+.top .nav-wrap { padding-top: 0; padding-bottom: 10px; }
+.top .nav2 { margin: 0; }
+.top .nav2 .nav-top { min-height: 36px; }
+.nav-menu { max-height: calc(100vh - 140px); overflow-y: auto; }
+@media (max-width: 640px) {
+  .top .nav-wrap { padding-bottom: 8px; }
+  .top .nav2 { gap: 5px; }
+  .top .nav2 .nav-top { min-height: 38px; font-size: 11.5px; border-radius: 9px; }
+  .top .nav-group .nav-lbl small { font-size: 9.5px; }
+  .top .tag { display: none; }
+}
+
+/* ══ header ringkas (2026-10-05): menu ikut menempel, jadi tingginya dijaga ══ */
+/* Halaman ringkasan (beranda, index, dll.) tidak punya jaringan atau kurs dana
+   sendiri: chip "Robinhood" dan kurs kosong di sana hanya membingungkan. */
+body.at-home header.top .addr, body.at-home header.top .rate { display: none; }
+@media (max-width: 1100px) {
+  .top .tag { display: none; }
+  .top .nav2 { flex-wrap: nowrap; gap: 6px; }
+  .top .nav2 .nav-top { padding: 0 9px; font-size: 12.5px; }
+  .top .nav-group .nav-lbl small { display: none; }
+}
+@media (max-width: 860px) {
+  .top .nav2 .nav-top { padding: 0 7px; font-size: 12px; gap: 5px; }
+  .top .nav-group .nav-caret { display: none; }
+}
+@media (max-width: 640px) {
+  header.top .top-in { flex-wrap: nowrap; padding-top: 7px; padding-bottom: 6px; min-height: 0; gap: 8px; }
+  header.top .brand h1 { font-size: 16px; white-space: nowrap; }
+  header.top .brand .mark { display: none; }
+  header.top .top-right { flex: 1; justify-content: flex-end; }
+  header.top #segCur { flex: 0 1 auto; max-width: 190px; }
+  header.top #segCur button { padding: 4px 8px; min-width: 30px; min-height: 30px; }
+  header.top #refreshBtn { min-height: 32px; padding: 0 10px; font-size: 12px; }
+  .top .nav2 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; flex-wrap: wrap; }
+  .top .nav2 .nav-top { min-height: 34px; padding: 0 4px; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top .nav-group .nav-lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top .nav-group .nav-dot { width: 7px; height: 7px; }
+}
+/* Halaman dana: brand, jaringan, kurs, mata uang, dan refresh dalam satu baris. */
+@media (min-width: 641px) {
+  header.top .top-in { flex-wrap: nowrap; }
+  header.top .brand { min-width: 0; flex: 1 1 auto; overflow: hidden; }
+  header.top .brand h1 { white-space: nowrap; }
+  header.top .tag { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  header.top .top-right { flex: none; flex-wrap: nowrap; }
+}
+@media (min-width: 641px) and (max-width: 1100px) { header.top .addr { display: none; } }
+@media (min-width: 641px) and (max-width: 900px) { header.top #idrRate { display: none; } header.top .brand .mark { display: none; } }
