@@ -241,7 +241,7 @@ const closes = (tracking.entries || []).filter(e => {
     netPct: e.close_pnl_pct == null ? null : num(e.close_pnl_pct), sizeUsd: num(e.entry_value_usd),
     openedAt: opened ? Date.parse(opened) : null, closedAt: Date.parse(e.close_ts),
     holdMinutes: opened ? Math.round((Date.parse(e.close_ts)-Date.parse(opened))/60000) : null,
-    reason: String(e.close_reason || '').split(':')[0] || null };
+    reason: (e.exit_detail ? String(e.exit_detail).split(/[,(]/)[0].trim().slice(0, 60) : '') || String(e.close_reason || '').split(':')[0] || null };
 }).filter(Boolean).sort((a,b)=>a.closedAt-b.closedAt);
 
 const byDay = new Map();
@@ -368,7 +368,9 @@ const closedAll = (tracking.entries || []).filter((e) => Number.isFinite(Date.pa
     estUsd: est == null ? null : r2(est),
     netPct: Number.isFinite(pct) ? r2(pct) : null,
     holdMinutes: opened ? Math.round((at - opened) / 60000) : null,
-    reason: String(e.close_reason || '').split(':')[0].replace(/_/g, ' ') || null,
+    // Alasan singkat: kalimat bot sendiri (exit_detail) sampai koma/kurung
+    // pertama — "Target untung tercapai" — kalau ada; kalau tidak, kode lama.
+    reason: (e.exit_detail ? String(e.exit_detail).split(/[,(]/)[0].trim().slice(0, 60) : '') || String(e.close_reason || '').split(':')[0].replace(/_/g, ' ') || null,
     // Rincian sesudah titik dua (kalau bot menulisnya); alamat dipangkas oleh lib/trades.mjs.
     ...(String(e.close_reason || '').includes(':') ? { reasonDetail: String(e.close_reason).split(':').slice(1).join(':').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').trim().slice(0, 240) || undefined } : {}),
     ...(e.exit_detail ? { reasonDetail: String(e.exit_detail).replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').slice(0, 240) } : {}),
