@@ -1259,7 +1259,10 @@ function renderFutures(nav, rows, body, tile) {
   setHTML($('#lpSummary'), `${[
     fx && !marginKnown.length && acc.marginUsd == null
       ? tile('Total saldo', usd(Number(nav.totalUsd) || 0), 'equity akun demo · termasuk floating')
-      : tile('Margin terpakai', usd(acc.marginUsd ?? margin), acc.availableUsd != null ? `tersedia ${usd(acc.availableUsd, 0)}` : `${marginKnown.length}/${rows.length} posisi`),
+      // Jumlah kolom margin per posisi, bukan angka akun dari bot: angka bot
+      // berasal dari dua sumber berbeda (dengan/tanpa tambahan kursi v2.7)
+      // dan bisa naik-turun sendiri. Dengan ini kotak selalu sama dengan tabel.
+      : tile('Margin terpakai', usd(marginKnown.length ? margin : (acc.marginUsd ?? 0)), `jumlah ${marginKnown.length} posisi${acc.availableUsd != null ? ` · tersedia ${usd(acc.availableUsd, 0)}` : ''}`),
     fx ? tile('Total lot', lots.toLocaleString('en-US', { maximumFractionDigits: 2 }), `${rows.length} posisi · nilai kontrak ${usd(notional, 0)}`)
       : tile('Ukuran total', usd(notional, 0), `nilai kontrak · ${margin ? (notional / margin).toFixed(1) + '× margin' : '—'}`),
     tile('Kalau semua kena SL', signed(atSl), `rugi maksimal · ${ofEq(atSl)}`, 'neg'),
