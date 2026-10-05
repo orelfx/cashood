@@ -776,7 +776,7 @@ function renderLp(nav) {
         <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? r.tokenId)}</span>
             <div class="sub2">${esc(r.bookLabel ?? r.strategy ?? '')}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
             ${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}
-            ${r.thesis ? `<div class="thesis" title="${esc(r.thesis)}"><b>Alasan masuk:</b> ${esc(r.thesis)}</div>` : ''}
+            ${r.thesis ? `<div class="thesis" title="${esc(r.thesis)}"><b>Alasan buka posisi LP:</b> ${esc(r.thesis)}</div>` : ''}
             <div class="sub2 m-only ${r.inRange ? 'pos' : 'neg'}">${r.inRange ? 'di dalam range' : 'di luar range'}${
               r.throughBandPct == null ? '' : ' · ' + r.throughBandPct.toFixed(0) + '%'}</div></td>
         <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
