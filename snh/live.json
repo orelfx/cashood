@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7c1a3706-b9de-4a77-a914-e6442e1f7930",
-  "updatedAt": 1791191299656,
-  "generatedAt": "2026-10-05 16:08 WIB",
+  "generation": "3bd8527b-e7dc-4750-b3c6-b990c3369a60",
+  "updatedAt": 1791191599657,
+  "generatedAt": "2026-10-05 16:13 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791191299656,
+    "heartbeatAt": 1791191599657,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791191297065,
+    "lastScanAt": 1791191597133,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,13 +109,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "28",
+        "v": "31",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1383",
-        "n": "223 aktif"
+        "v": "1385",
+        "n": "224 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791191299656,
+      "lastDecisionAt": 1791191599657,
       "lastAction": "keputusan",
-      "lastReason": "SHINU [degen]: Dilewati karena red flag: insider/entrapment pegang 14%."
+      "lastReason": "Sakabam [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -146,7 +146,7 @@
       ],
       [
         "Wallet dipantau",
-        "1383 · 223 aktif"
+        "1385 · 224 aktif"
       ],
       [
         "Cadangan kas",
@@ -158,7 +158,7 @@
       ],
       [
         "Label wallet",
-        "smart 487 · dolphin 60 · bot 703 · lp 1 · fresh 18 · kol 86 · whale 3 · blacklist 25"
+        "smart 488 · dolphin 62 · bot 702 · lp 1 · fresh 18 · kol 86 · whale 3 · blacklist 25"
       ]
     ],
     "requirements": [
@@ -204,23 +204,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1383,
-      "active": 223,
-      "passive": 1160,
+      "tracked": 1385,
+      "active": 224,
+      "passive": 1161,
       "trusted": 0,
       "promising": 8,
       "byLabel": [
         {
           "key": "bot",
-          "total": 703,
+          "total": 702,
           "active": 0,
-          "passive": 703
+          "passive": 702
         },
         {
           "key": "smart",
-          "total": 487,
+          "total": 488,
           "active": 175,
-          "passive": 312
+          "passive": 313
         },
         {
           "key": "kol",
@@ -230,9 +230,9 @@
         },
         {
           "key": "dolphin",
-          "total": 60,
-          "active": 29,
-          "passive": 31
+          "total": 62,
+          "active": 30,
+          "passive": 32
         },
         {
           "key": "blacklist",
@@ -360,6 +360,60 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791191568469,
+        "symbol": "Sakabam",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791191515319,
+        "symbol": "Cadence",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah naik 116% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
+      {
+        "at": 1791191509793,
+        "symbol": "BACKERS",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 328,
+            "note": "bundler pegang 14.3%"
+          },
+          {
+            "type": "rat",
+            "count": 2,
+            "note": "insider/entrapment pegang 2.8%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "21.6% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 10x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: biaya beli lalu jual 6,8% terlalu mahal (likuiditas tipis, batas 6%)."
+      },
       {
         "at": 1791191233431,
         "symbol": "SHINU",
@@ -661,9 +715,9 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 12,
-        "red_flag": 11,
-        "round_trip_cost": 0,
+        "chase": 13,
+        "red_flag": 12,
+        "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
         "no_price": 0,
@@ -705,7 +759,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791191510647,
+    "generatedAt": 1791191810408,
     "trades": {
       "count": 1,
       "wins": 1,
