@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { atomicJSON, lock, readJSON } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
 import { binanceHealth } from './lib/binance-health.mjs';
+import { positionMarginUsd } from './lib/binance-margin.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'binance');
@@ -86,7 +87,8 @@ const positions = activeLedger.map((a, i) => {
     // tidak dihitung dari harga lain supaya tidak ada angka karangan.
     futures: {
       leverage: Number(t.leverage) || null,
-      marginUsd: Number.isFinite(Number(t.planned_initial_margin)) ? r2(t.planned_initial_margin) : null,
+      // v2.7: margin isolated yang benar-benar terpasang (termasuk tambahan kursi), lihat lib/binance-margin.mjs.
+      marginUsd: positionMarginUsd(t),
       notionalUsd: Number(t.qty) && Number(t.entry) ? r2(Number(t.qty) * Number(t.entry)) : null,
       riskUsd: Number.isFinite(Number(t.initial_risk_usd)) ? r2(t.initial_risk_usd) : null,
       markPrice: Number(t.mark_price) || null,
