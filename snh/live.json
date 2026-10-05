@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "efbe1460-86db-467a-872f-1a683516b56b",
-  "updatedAt": 1791187396892,
-  "generatedAt": "2026-10-05 15:03 WIB",
+  "generation": "7728d0ae-9646-44a4-8a08-0f44ca56a160",
+  "updatedAt": 1791187650638,
+  "generatedAt": "2026-10-05 15:07 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -54,7 +54,7 @@
       "reasonDetail": "Take profit bertahap tercapai, sisanya ditutup trailing stop. · ikut 3 wallet",
       "feesUsd": 0.44999999999999996,
       "entry": "3 wallet terverifikasi (2 smart · 1 bot) membeli coin yang sama; semua cek red flag lolos.",
-      "exitDetail": "Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +60%.",
+      "exitDetail": "Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%.",
       "wallets": {
         "smart": 2,
         "bot": 1
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791187396892,
+    "heartbeatAt": 1791187650638,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791187394228,
+    "lastScanAt": 1791187635321,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,13 +109,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "2",
+        "v": "3",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1376",
-        "n": "116 aktif"
+        "n": "136 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791187396892,
+      "lastDecisionAt": 1791187650638,
       "lastAction": "keputusan",
-      "lastReason": "knightcat [low]: Dilewati karena red flag: insider/entrapment pegang 35%."
+      "lastReason": "Agency [mid]: Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
     }
   },
   "strategy": {
@@ -146,7 +146,7 @@
       ],
       [
         "Wallet dipantau",
-        "1376 · 116 aktif"
+        "1376 · 136 aktif"
       ],
       [
         "Label wallet",
@@ -156,15 +156,15 @@
     "requirements": [
       [
         "degen (launch)",
-        "alokasi 50% · $502.87976560544615 · kursi maks 2.5% equity · 0 terbuka"
+        "alokasi 40% · $402.30381248435697 · kursi maks 4% equity · 0 terbuka"
       ],
       [
         "low (core)",
-        "alokasi 15% · $150.86392968163383 · kursi maks 4% equity · 0 terbuka"
+        "alokasi 20% · $201.15190624217848 · kursi maks 4% equity · 0 terbuka"
       ],
       [
         "mid (core)",
-        "alokasi 15% · $150.86392968163383 · kursi maks 5% equity · 0 terbuka"
+        "alokasi 15% · $150.86392968163383 · kursi maks 3.75% equity · 0 terbuka"
       ],
       [
         "big (core)",
@@ -173,15 +173,20 @@
     ],
     "requirementsTitle": "Basket modal",
     "ruleList": [
-      "Masuk hanya saat beberapa wallet terverifikasi membeli coin yang sama dalam jendela waktu basket (degen 2 wallet/20 menit, low–big 3 wallet).",
-      "Setiap wallet dicek on-chain dulu: hanya yang benar-benar trading coin yang dihitung; wallet LP, arbitrase, bot, dan tidak aktif dibuang.",
-      "Skor wallet minimal 60/100, mengutamakan edge bersih (expectancy, PnL realized per token), penalti churn dan wallet terlalu populer.",
+      "Modal dibagi per basket: degen 40%, low 20%, mid 15%, big 20%; 5% selalu disimpan sebagai kas untuk gas, tip, dan slippage.",
+      "Kursi tiap posisi diambil dari modal basketnya: sinyal lemah tapi valid dapat kursi kecil, sinyal sangat kuat dapat kursi besar (degen 3–10%, low 5–20%, mid 7–25%, big 7–25% dari modal basket).",
+      "Masuk saat beberapa wallet terverifikasi membeli coin yang sama dalam jendela waktu basket (degen 2 wallet/20 menit, low 3 wallet/60 menit, mid 3 wallet/3 jam, big 3 wallet/6 jam).",
+      "Wallet tepercaya boleh memicu masuk sendirian setelah teruji: diikuti ≥ 3 kali, ≥ 2 kali untung, rata-rata ≥ +5%, tanpa rug. Kursinya dibatasi kecil. Wallet yang baru sekali-dua kali membawa untung diuji dulu lewat posisi bayangan.",
+      "Setiap wallet dicek on-chain dulu: hanya yang benar-benar trading coin yang dihitung; wallet LP, arbitrase, bot, flipper (< 2 menit), dan tidak aktif dibuang.",
+      "Skor wallet minimal 50/100; yang penting wallet aktif trading dan untung bersih (expectancy, PnL realized per token). Wallet yang 48 jam tidak trading jadi pasif dan aktif lagi begitu trading.",
       "Filter red flag: honeypot, tax, mint/freeze authority, scam warning, likuiditas & rasio likuiditas/MC, top-10, holder, dev, bundler, insider, sniper, fresh wallet, wash volume.",
-      "Tidak mengejar harga: batal kalau harga sudah naik melewati batas (degen 35%, low 30%, mid 20%, big 12%) dari harga beli wallet pertama.",
-      "Slippage dipakai sebagai toleransi (transaksi gagal kalau lebih buruk), dan kursi dikecilkan kalau biaya beli-jual terlalu mahal.",
-      "Degen (launch): kursi 1–2,5% equity, TP +40% jual 50% dan +120% jual sisa, SL 25%.",
-      "Low/mid/big (core): kursi 2–5% equity, TP bertahap 25% + 25%, sisanya runner dengan trailing; SL 25/18/12%.",
-      "Keluar juga saat mayoritas wallet yang diikuti menjual, saat rug, atau saat batas waktu tahan tercapai.",
+      "Tidak mengejar harga: batal kalau harga sudah naik melewati batas dari harga beli wallet pertama (degen 35%, low 30%, mid 20%, big 12%).",
+      "Cek bisa keluar: biaya beli lalu jual (fee, price impact, tx) dihitung sebelum masuk; kursi dikecilkan atau sinyal dilewati kalau terlalu mahal. Toleransi slippage: degen 22%, low 15%, mid 10%, big 10%.",
+      "Ambil profit bertahap, mulai dari profit kecil supaya tidak jadi exit liquidity: degen +20% jual 30%, +50% jual 35%, +120% jual 35%; low +20% jual 25%, +60% jual 25%, +200% jual 25%, sisanya runner dengan trailing 35%; mid +20% jual 25%, +45% jual 25%, +120% jual 25%, sisanya runner dengan trailing…",
+      "Setelah profit pertama diambil, sisa posisi dijaga stop di titik impas: posisi yang sudah untung tidak dibiarkan berubah jadi rugi.",
+      "Ikut keluar bersama smart money: kalau satu wallet yang diikuti keluar saat kita untung, 50% sisa posisi ikut dijual; kalau separuh wallet keluar, semua dijual. Bot juga mengambil profit lebih awal kalau posisi mendekati waktu/level jual kebiasaan wallet yang diikuti.",
+      "Stop loss: degen 25%, low 25%, mid 18%, big 12%. Batas waktu tahan: degen 4 jam, low 24 jam, mid 72 jam, big tanpa batas.",
+      "Rotasi: posisi mid/big yang datar (±8–10%) lebih dari 48 jam dijual untuk memberi tempat sinyal yang lebih bagus, hanya kalau kas tidak cukup.",
       "LLM (MiniMax-M2.7) menilai kelompok wallet di balik sinyal, bukan coin-nya, dan bisa memveto.",
       "Dry run: semua transaksi simulasi, tanpa eksekusi live."
     ],
@@ -190,26 +195,26 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1376,
-      "active": 116,
-      "passive": 1260,
+      "active": 136,
+      "passive": 1240,
       "byLabel": [
         {
           "key": "bot",
-          "total": 692,
+          "total": 694,
           "active": 0,
-          "passive": 692
+          "passive": 694
         },
         {
           "key": "smart",
-          "total": 493,
-          "active": 82,
-          "passive": 411
+          "total": 491,
+          "active": 101,
+          "passive": 390
         },
         {
           "key": "kol",
           "total": 84,
-          "active": 8,
-          "passive": 76
+          "active": 9,
+          "passive": 75
         },
         {
           "key": "dolphin",
@@ -237,13 +242,21 @@
         }
       ],
       "definitions": {
-        "active": "Dihitung untuk konsensus: status aktif (trading dalam 72 jam terakhir), skor ≥ 60/100, bukan bot/LP/fresh, tidak ditolak LLM, dan lolos cek on-chain sebagai trader coin.",
-        "passive": "Semua wallet lain yang tetap dipantau tetapi tidak dihitung: belum lolos atau belum dicek on-chain, skor di bawah batas, tidak trading 72 jam, bot/LP/arbitrase, atau blacklist.",
+        "active": "Dihitung untuk konsensus: status aktif (trading dalam 48 jam terakhir), skor ≥ 50/100, bukan bot/LP/fresh, tidak ditolak LLM, dan lolos cek on-chain sebagai trader coin.",
+        "passive": "Semua wallet lain yang tetap dipantau tetapi tidak dihitung: belum lolos atau belum dicek on-chain, skor di bawah batas, tidak trading 48 jam (aktif lagi begitu trading), bot/LP/arbitrase, atau blacklist.",
         "label": "Satu label per wallet: 'blacklist' bila diblacklist, selain itu kelas bot (smart, whale, dolphin, kol, fresh, lp, bot, unknown)."
       },
       "top": [
         {
           "alias": "smart #814",
+          "label": "smart",
+          "score": 100,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #1015",
           "label": "smart",
           "score": 100,
           "copied": 0,
@@ -259,9 +272,9 @@
           "pnlUsd": 0
         },
         {
-          "alias": "smart #1015",
-          "label": "smart",
-          "score": 98,
+          "alias": "dolphin #371",
+          "label": "dolphin",
+          "score": 96.5,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0
@@ -275,17 +288,33 @@
           "pnlUsd": 0
         },
         {
-          "alias": "dolphin #371",
-          "label": "dolphin",
-          "score": 93.5,
+          "alias": "smart #652",
+          "label": "smart",
+          "score": 95.2,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0
         },
         {
-          "alias": "smart #652",
+          "alias": "dolphin #934",
+          "label": "dolphin",
+          "score": 92.8,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #1273",
           "label": "smart",
-          "score": 92.2,
+          "score": 91.9,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #913",
+          "label": "smart",
+          "score": 91.6,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0
@@ -297,34 +326,20 @@
           "copied": 0,
           "won": 0,
           "pnlUsd": 0
-        },
-        {
-          "alias": "dolphin #934",
-          "label": "dolphin",
-          "score": 89.8,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0
-        },
-        {
-          "alias": "dolphin #915",
-          "label": "dolphin",
-          "score": 89.7,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0
-        },
-        {
-          "alias": "smart #1291",
-          "label": "smart",
-          "score": 89.7,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1791187644853,
+        "symbol": "Agency",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+      },
       {
         "at": 1791184356425,
         "symbol": "knightcat",
@@ -344,7 +359,7 @@
           "smart": 2,
           "bot": 1
         },
-        "reason": "Keluar (trailing): Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +60%. Hasil +26,3%."
+        "reason": "Keluar (trailing): Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +26,3%."
       },
       {
         "at": 1791181430581,
@@ -355,7 +370,7 @@
           "smart": 2,
           "bot": 1
         },
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $9,64, sisanya tetap jalan."
+        "reason": "Take profit bertahap (TP1): jual sebagian senilai $9,64; sisanya jalan terus dengan stop di titik impas."
       },
       {
         "at": 1791181354743,
@@ -371,7 +386,7 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 0,
+        "chase": 1,
         "red_flag": 1,
         "round_trip_cost": 0,
         "basket_full": 0,
@@ -379,10 +394,20 @@
         "no_price": 0,
         "max_open": 0,
         "day_loss": 0,
-        "paused": 0
+        "paused": 0,
+        "reserve": 0
       },
       "veto": {
         "llm": 0
+      },
+      "test": {
+        "solo": 0
+      },
+      "solo_entries": {},
+      "partial": {
+        "take profit": 1,
+        "anticipate": 0,
+        "early follow": 0
       },
       "exit": {
         "follow exit": 0,
@@ -391,7 +416,8 @@
         "trailing": 1,
         "time limit": 0,
         "rug": 0,
-        "stale price": 0
+        "stale price": 0,
+        "rotation": 0
       }
     }
   },
@@ -401,7 +427,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791187612057,
+    "generatedAt": 1791187913240,
     "trades": {
       "count": 1,
       "wins": 1,
