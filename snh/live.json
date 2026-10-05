@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3c4a03f7-7646-42e5-b5c8-8009b0d5bf34",
-  "updatedAt": 1791241007661,
-  "generatedAt": "2026-10-06 05:56 WIB",
+  "generation": "ebf1b217-d9c7-4d1c-b46e-69a62672de8c",
+  "updatedAt": 1791241307662,
+  "generatedAt": "2026-10-06 06:01 WIB",
   "usdIdr": null,
   "totalUsd": 987.0121353030377,
   "nativeSymbol": "SOL",
@@ -771,12 +771,12 @@
     "pnlUsd": -12.987864696962333,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791241007661,
+    "heartbeatAt": 1791241307662,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 2.22,
-    "lastScanAt": 1791241005642,
+    "lastScanAt": 1791241307321,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -797,12 +797,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "232",
+        "v": "233",
         "n": "24 jam · 21 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1551",
+        "v": "1554",
         "n": "171 aktif"
       },
       {
@@ -813,9 +813,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791241007661,
+      "lastDecisionAt": 1791241307662,
       "lastAction": "keputusan",
-      "lastReason": "4bit [degen]: Dilewati karena red flag: bundler pegang 70.5% supply."
+      "lastReason": "ASS [low]: Dilewati: harga sudah naik 38% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -834,7 +834,7 @@
       ],
       [
         "Wallet dipantau",
-        "1551 · 171 aktif"
+        "1554 · 171 aktif"
       ],
       [
         "Cadangan kas",
@@ -846,7 +846,7 @@
       ],
       [
         "Label wallet",
-        "smart 503 · dolphin 61 · bot 809 · blacklist 60 · lp 1 · fresh 22 · kol 91 · whale 4"
+        "smart 503 · dolphin 61 · bot 809 · blacklist 60 · lp 1 · fresh 22 · kol 92 · whale 4 · unknown 2"
       ]
     ],
     "requirements": [
@@ -892,9 +892,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1551,
+      "tracked": 1554,
       "active": 171,
-      "passive": 1380,
+      "passive": 1383,
       "trusted": 2,
       "promising": 11,
       "byLabel": [
@@ -912,9 +912,9 @@
         },
         {
           "key": "kol",
-          "total": 91,
+          "total": 92,
           "active": 14,
-          "passive": 77
+          "passive": 78
         },
         {
           "key": "dolphin",
@@ -938,6 +938,12 @@
           "key": "whale",
           "total": 4,
           "active": 2,
+          "passive": 2
+        },
+        {
+          "key": "unknown",
+          "total": 2,
+          "active": 0,
           "passive": 2
         },
         {
@@ -1048,6 +1054,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791241073085,
+        "symbol": "ASS",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah naik 38% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
       {
         "at": 1791239942236,
         "symbol": "4bit",
@@ -2000,44 +2023,11 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah naik 61% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791229094167,
-        "symbol": "HI",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 2,
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 6.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "19.2% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: smart #418 has our only copy history with -30% loss despite being a high-winrate trader, suggesting these wallets may be front-running or aren't sustainable for c. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 72,
+        "chase": 73,
         "red_flag": 109,
         "round_trip_cost": 5,
         "basket_full": 0,
@@ -2082,7 +2072,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791241012454,
+    "generatedAt": 1791241313807,
     "trades": {
       "count": 15,
       "wins": 5,
