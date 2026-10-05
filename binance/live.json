@@ -1,7 +1,7 @@
 {
   "fund": "binance",
-  "updatedAt": 1791159731939,
-  "generatedAt": "2026-10-05 07:22 WIB",
+  "updatedAt": 1791160026656,
+  "generatedAt": "2026-10-05 07:27 WIB",
   "usdIdr": null,
   "totalUsd": 8416.92,
   "botWalletUsd": 8416.92,
@@ -24,13 +24,13 @@
       "slPrice": 115.12,
       "tpPrice": 132.2,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 4207,
+      "ageMinutes": 4212,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-c10dec93b0fb3c6c0b25"
@@ -43,13 +43,13 @@
       "slPrice": 758.75,
       "tpPrice": 826.38,
       "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 3450,
+      "ageMinutes": 3455,
       "principalUsd": 0,
       "feesUsd": 0,
       "investedUsd": null,
       "collectedFeesUsd": 0,
       "pnlUsd": null,
-      "stale": false,
+      "stale": true,
       "valueUsd": 0,
       "totalFeesUsd": 0,
       "tokenId": "pos-ce7533858d10562e17cc"
@@ -403,19 +403,24 @@
     "peakUsd": null,
     "paused": false,
     "startedAt": 1790691121483,
-    "heartbeatAt": 1791159729421,
-    "accountUpdatedAt": 1791159730796,
-    "apiState": "CONNECTED",
-    "retryAt": null,
-    "status": "berjalan",
-    "healthy": true,
+    "heartbeatAt": 1791160019531,
+    "accountUpdatedAt": 1791159972879,
+    "apiState": "RATE_LIMIT_WAIT",
+    "retryAt": 1791160068334,
+    "status": "menunggu anggaran request",
+    "healthy": false,
     "lead": "Bot crypto futures di Binance TESTNET — dananya virtual. Sejak 2026-09-29 berjalan dengan mesin baru yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.",
     "tiles": [
       {
         "k": "Data akun terakhir",
-        "v": "07:22 WIB",
-        "n": "akun berhasil diperiksa",
-        "tone": "pos"
+        "v": "07:26 WIB",
+        "n": "nilai terakhir; belum terverifikasi ulang",
+        "tone": "neg"
+      },
+      {
+        "k": "Coba koneksi lagi",
+        "v": "07:27:48 WIB",
+        "n": "otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang"
       },
       {
         "k": "Pindai pasar",
@@ -441,16 +446,19 @@
     ],
     "llm": null
   },
-  "schemaVersion": 2,
-  "generation": "bdc6eda0-e00b-42c3-a3ae-aaed05cd693d",
-  "treasuryUsd": 0,
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "menunggu anggaran request; saldo/posisi adalah data terakhir, bukan pembacaan akun baru",
+      "sebagian posisi memakai nilai terakhir"
+    ]
   },
+  "schemaVersion": 2,
+  "generation": "7ad1fec2-57df-4b08-95bc-591f6a30691d",
+  "treasuryUsd": 0,
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791159731992,
+    "generatedAt": 1791160026700,
     "trades": {
       "count": 34,
       "wins": 13,
