@@ -12,7 +12,7 @@ function book(now, extra = {}) {
     positions: [
       { symbol: 'BONK', sleeve: 'degen', opened_at: iso(now - 3600e3), notional_usd: 25, unrealized_usd: -1.5, entry_price_usd: 0.00002, mark_price_usd: 0.0000188,
         quantity: 1250000, stop_pct: 25, targets: [{ pct: 40, size_pct: 50, hit: true }, { pct: 120, size_pct: 50, hit: false }], trailing: false,
-        wallets_joined: 3, wallet_labels: ['smart', 'kol', 'smart'], thesis: '3 wallet smart membeli dalam 12 menit', llm_verdict: 'kelompok wallet sehat', stale: false },
+        wallets_joined: 3, wallet_labels: ['smart', 'kol', 'smart'], entry_mode: 'solo_test', entry_mode_label: 'uji solo', is_test: true, thesis: '3 wallet smart membeli dalam 12 menit', llm_verdict: 'kelompok wallet sehat', stale: false },
       { symbol: 'WIF', sleeve: 'mid', opened_at: iso(now - 1800e3), notional_usd: 39, unrealized_usd: 0, entry_price_usd: 2.1, mark_price_usd: null, stale: true, wallets_joined: 2 },
     ],
     closed_trades: [
@@ -48,6 +48,7 @@ test('SnipeHunt: berkas copy-trade diimpor apa adanya, alasan keluar diterjemahk
     assert.equal(bonk.targetPct, 120, 'target berikutnya = target pertama yang belum kena');
     assert.match(bonk.strategy, /ikut 3 wallet \(smart, kol\)/); assert.match(bonk.thesis, /LLM: kelompok wallet sehat/);
     assert.equal(live.positions.find((p) => p.symbol === 'WIF').stale, true);
+    assert.equal(bonk.modeLabel, 'uji solo'); assert.equal(bonk.test, true); assert.equal(bonk.mode, 'solo_test');
     assert.equal(live.stats.closedCount, 2);
     const days = readdirSync(join(f.data, 'snh/trades')); const rows = days.flatMap((d) => JSON.parse(readFileSync(join(f.data, 'snh/trades', d), 'utf8')).rows);
     assert.equal(rows.find((x) => x.symbol === 'POPCAT').reason, 'ikut wallet keluar'); assert.equal(rows.find((x) => x.symbol === 'POPCAT').netPct, 15);

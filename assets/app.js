@@ -889,7 +889,7 @@ function closedRowsHtml(rows, absolute) {
   return rows.map((r) => `
     <tr>
       <td><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
-      <td class="dim">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
+      <td class="dim">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}${modeBadge(r) ? `<div>${modeBadge(r)}</div>` : ''}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
       <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
@@ -1076,6 +1076,8 @@ const FLAG_KIND = {
 // Bukan tanda bahaya: datanya saja yang tidak tersedia — chip netral, bukan merah.
 const FLAG_NEUTRAL = new Set(['no_data']);
 const kindOf = (k) => WALLET_KIND[k] || ['👛', k, '#8b95a7'];
+// Jenis posisi copy-trade; uji coba diberi warna lain supaya mudah dibedakan.
+const modeBadge = (r) => (r.modeLabel ? `<span class="pill ${r.test ? 'test' : 'in'} mode-pill" title="${r.test ? 'uji coba: kursi terkecil untuk menguji wallet atau filter' : 'posisi strategi utama'}">${r.test ? '🧪 ' : ''}${esc(r.modeLabel)}</span>` : '');
 function walletChips(o) {
   const e = Object.entries(o || {}).filter(([, n]) => n > 0);
   return e.length ? `<span class="wchips">${e.map(([k, n]) => `<span class="wchip" title="${esc(kindOf(k)[1])}">${kindOf(k)[0]} ${n} <small>${esc(kindOf(k)[1])}</small></span>`).join('')}</span>` : '';
@@ -1134,7 +1136,10 @@ function renderCopyTrade(nav) {
     anticipate: 'antisipasi', 'early follow': 'wallet pertama keluar', rotation: 'rotasi', 'take profit': 'take profit', 'follow exit': 'ikut wallet keluar',
     'time limit': 'batas waktu', 'stale price': 'harga basi', stop: 'stop' };
   const rs = ct?.reasonStats || {};
-  const chips = Object.entries(rs).flatMap(([g, o]) => Object.entries(o).filter(([, n]) => n > 0).map(([k, n]) => `<span class="rs-chip"><b>${n}</b> ${esc(RS[g] || g)} · ${esc(SK[k] || k)}</span>`));
+  const TEST_SK = { solo: 'uji solo', explore: 'uji wallet "avoid"', chase: 'uji batas chase' };
+  const chips = Object.entries(rs).flatMap(([g, o]) => Object.entries(o).filter(([, n]) => n > 0).map(([k, n]) => g === 'test'
+    ? `<span class="rs-chip test">🧪 <b>${n}</b> ${esc(TEST_SK[k] || k)}</span>`
+    : `<span class="rs-chip"><b>${n}</b> ${esc(RS[g] || g)} · ${esc(SK[k] || k)}</span>`));
   setHTML($('#decStats'), `<div class="rs"><span class="k">24 jam terakhir</span>${chips.length ? chips.join('') : '<span class="dim">belum ada sinyal yang diproses</span>'}</div>`);
   const shown = decView.all ? dec : dec.slice(0, 3);   // 3 terbaru; sisanya dibuka lewat tombol
   setHTML($('#decList'), `<ol class="dec-list">${shown.map((d) => { const [a, tone] = ACTION[d.action] || [d.action, ''];
@@ -1167,7 +1172,7 @@ function renderTrades(nav) {
   $('#lpCount').textContent = rows.length ? `(${rows.length})` : '';
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   if (!rows.length) {
-    setHTML(body, `<tr><td colspan="7" class="dim">${nav.trading?.paused ? 'Tidak ada posisi terbuka — bot sedang dijeda.' : 'Tidak ada posisi terbuka — bot sedang menunggu peluang yang layak.'}</td></tr>`);
+    setHTML(body, `<tr><td colspan="7" class="dim">${nav.trading?.paused ? 'Tidak ada posisi terbuka — bot sedang dijeda.' : 'Belum ada posisi terbuka — bot sedang menunggu peluang yang layak.'}</td></tr>`);
     setHTML($('#lpSummary'), '');
     $('#lpHint').textContent = `diperiksa ${ago(nav.updatedAt)}`;
     return;
@@ -1215,7 +1220,7 @@ function renderTrades(nav) {
         ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}${r.stale ? '<div class="sub2 neg">harga belum terverifikasi</div>' : ''}</td>
       <td class="fx-strat">${stratDetails({ ...r, bookLabel: r.bookLabel || '—' }, [r.strategy && r.strategy !== r.bookLabel ? r.strategy : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.partialDone ? 'sebagian sudah dijual' : '',
           r.firstWallet ? `pertama beli: ${r.firstWallet}` : '', r.llmScore != null ? `skor LLM ${r.llmScore}` : ''])}
-        ${walletChips(r.wallets)}${flagChips(r.flags)}</td>
+        ${modeBadge(r)}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
       <td class="num dim">${dur(r.ageMinutes)}</td>
       <td class="num">${usd(r.costUsd)}</td>
       <td class="num"><strong>${usd(r.valueUsd)}</strong></td>

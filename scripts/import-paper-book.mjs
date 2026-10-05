@@ -59,6 +59,10 @@ const counts = (o) => (o && typeof o === 'object' && !Array.isArray(o) ? Object.
 const flagsOf = (a) => (Array.isArray(a) ? a.map((f) => ({ type: keyOf(f?.type ?? ''), count: optNum(f?.count), ...(text(f?.note, 160) ? { note: text(f.note, 160) } : {}) })).filter((f) => f.type) : []);
 const aliasOf = (w) => (w && typeof w === 'object' && text(w.alias, 30) ? `${text(w.alias, 30)}` : null);
 const copyFields = (p) => ({
+  // Jenis posisi (konsensus, solo, uji solo, uji "avoid", uji chase) dan tanda uji coba.
+  ...(text(p.entry_mode_label, 40) ? { modeLabel: text(p.entry_mode_label, 40) } : {}),
+  ...(p.entry_mode ? { mode: keyOf(p.entry_mode) } : {}),
+  ...(p.is_test === true ? { test: true } : {}),
   ...(counts(p.wallet_breakdown) ? { wallets: counts(p.wallet_breakdown) } : {}),
   ...(flagsOf(p.risk_flags).length ? { flags: flagsOf(p.risk_flags) } : {}),
   ...(aliasOf(p.first_wallet) ? { firstWallet: aliasOf(p.first_wallet) } : {}),
