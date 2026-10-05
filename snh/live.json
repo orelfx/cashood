@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e1b0a886-e20b-4f18-895e-ad7aa717f099",
-  "updatedAt": 1791190227184,
-  "generatedAt": "2026-10-05 15:50 WIB",
+  "generation": "d11785bb-3391-43c5-be0b-560db7726e98",
+  "updatedAt": 1791190419507,
+  "generatedAt": "2026-10-05 15:53 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791190227184,
+    "heartbeatAt": 1791190419507,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791190224194,
+    "lastScanAt": 1791190404056,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,13 +109,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "20",
+        "v": "22",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1380",
-        "n": "222 aktif"
+        "n": "228 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791190227184,
+      "lastDecisionAt": 1791190419507,
       "lastAction": "keputusan",
-      "lastReason": "glam [degen]: Uji coba: konsensus baru terpenuhi kalau wallet yang dinilai 'avoid' oleh LLM ikut dihitung. Dicatat sebagai posisi bayangan untuk menguji apakah penilaian LLM itu benar."
+      "lastReason": "Agency [mid]: Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
     }
   },
   "strategy": {
@@ -146,7 +146,7 @@
       ],
       [
         "Wallet dipantau",
-        "1380 · 222 aktif"
+        "1380 · 228 aktif"
       ],
       [
         "Label wallet",
@@ -188,7 +188,8 @@
       "Ikut keluar bersama smart money: kalau satu wallet yang diikuti keluar saat kita untung, 50% sisa posisi ikut dijual; kalau separuh wallet keluar, semua dijual. Bot juga mengambil profit lebih awal kalau posisi mendekati waktu/level jual kebiasaan wallet yang diikuti.",
       "Stop loss: degen 25%, low 25%, mid 18%, big 12%. Batas waktu tahan: degen 4 jam, low 24 jam, mid 72 jam, big tanpa batas.",
       "Rotasi: posisi mid/big yang datar (±8–10%) lebih dari 48 jam dijual untuk memberi tempat sinyal yang lebih bagus, hanya kalau kas tidak cukup.",
-      "LLM (MiniMax-M2.7) menilai kelompok wallet di balik sinyal, bukan coin-nya, dan bisa memveto.",
+      "LLM (MiniMax-M2.7) menilai kelompok wallet di balik sinyal, bukan coin-nya, dan bisa memveto. Data yang kosong diperlakukan netral, bukan alasan veto.",
+      "Hemat biaya: pemakaian dibatasi kuota harian yang dibagi rata sepanjang hari (cek on-chain 150 wallet/hari, LLM 400 panggilan/hari). Kalau data token dari GMGN kosong, harga diambil gratis dari DexScreener.",
       "Dry run: semua transaksi simulasi, tanpa eksekusi live."
     ],
     "risks": []
@@ -196,8 +197,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1380,
-      "active": 222,
-      "passive": 1158,
+      "active": 228,
+      "passive": 1152,
       "byLabel": [
         {
           "key": "bot",
@@ -208,14 +209,14 @@
         {
           "key": "smart",
           "total": 486,
-          "active": 176,
-          "passive": 310
+          "active": 180,
+          "passive": 306
         },
         {
           "key": "kol",
           "total": 85,
-          "active": 17,
-          "passive": 68
+          "active": 18,
+          "passive": 67
         },
         {
           "key": "dolphin",
@@ -238,8 +239,8 @@
         {
           "key": "whale",
           "total": 3,
-          "active": 0,
-          "passive": 3
+          "active": 1,
+          "passive": 2
         },
         {
           "key": "lp",
@@ -249,7 +250,7 @@
         }
       ],
       "definitions": {
-        "active": "Dihitung untuk konsensus: status aktif (trading dalam 48 jam terakhir), skor ≥ 50/100, bukan bot/LP/fresh, tidak ditolak LLM, dan lolos cek on-chain sebagai trader coin.",
+        "active": "Dihitung untuk konsensus: status aktif (trading dalam 48 jam terakhir), skor ≥ 50/100, bukan bot/LP/fresh, tidak ditolak LLM, dan lolos cek on-chain sebagai trader coin. Hasil cek yang tidak meyakinkan karena data kita kurang dihitung netral, bukan negatif.",
         "passive": "Semua wallet lain yang tetap dipantau tetapi tidak dihitung: belum lolos atau belum dicek on-chain, skor di bawah batas, tidak trading 48 jam (aktif lagi begitu trading), bot/LP/arbitrase, atau blacklist.",
         "label": "Satu label per wallet: 'blacklist' bila diblacklist, selain itu kelas bot (smart, whale, dolphin, kol, fresh, lp, bot, unknown)."
       },
@@ -273,6 +274,14 @@
         {
           "alias": "dolphin #1103",
           "label": "dolphin",
+          "score": 100,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "whale #1333",
+          "label": "whale",
           "score": 100,
           "copied": 0,
           "won": 0,
@@ -325,18 +334,47 @@
           "copied": 0,
           "won": 0,
           "pnlUsd": 0
-        },
-        {
-          "alias": "smart #955",
-          "label": "smart",
-          "score": 91.3,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1791190406689,
+        "symbol": "Agency",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+      },
+      {
+        "at": 1791190377066,
+        "symbol": "DOMAIN",
+        "action": "test",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 11.6%"
+          },
+          {
+            "type": "rat",
+            "count": 2,
+            "note": "insider/entrapment pegang 7.5%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "20.7% holder wallet baru"
+          }
+        ],
+        "reason": "Uji coba: konsensus baru terpenuhi kalau wallet yang dinilai 'avoid' oleh LLM ikut dihitung. Dicatat sebagai posisi bayangan untuk menguji apakah penilaian LLM itu benar."
+      },
       {
         "at": 1791190188931,
         "symbol": "glam",
@@ -400,16 +438,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 13%."
-      },
-      {
-        "at": 1791189935100,
-        "symbol": "Agency",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
       },
       {
         "at": 1791189747302,
@@ -551,7 +579,7 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 8,
+        "chase": 9,
         "red_flag": 8,
         "round_trip_cost": 0,
         "basket_full": 0,
@@ -567,7 +595,7 @@
       },
       "test": {
         "solo": 2,
-        "explore": 1
+        "explore": 2
       },
       "solo_entries": {},
       "partial": {
@@ -593,7 +621,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791190314756,
+    "generatedAt": 1791190612770,
     "trades": {
       "count": 1,
       "wins": 1,
