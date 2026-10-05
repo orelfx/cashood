@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /*
- * Impor buku paper (devil greed) menjadi snapshot situs.
+ * Impor buku paper (devil greed, SnipeHunt) menjadi snapshot situs.
  *
  *   node scripts/import-paper-book.mjs dgrh  /path/devil-greed-robin-hood.json
  *   node scripts/import-paper-book.mjs dgsol /path/devil-greed-solana.json
+ *   node scripts/import-paper-book.mjs snh   /root/cashood-inbox/snipehunt.json
  *
  * Aturan pemilik (2026-10-03):
  *   - angka disalin APA ADANYA dari berkas sumber: kas, equity, pnl, notional,
@@ -25,9 +26,9 @@ import { groupTradeDays, writeTradeDays } from './lib/trades.mjs';
 import { buildPerformance } from './lib/performance.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BOOKS = { dgrh: 'devil greed Robin Hood', dgsol: 'devil greed Solana' };
+const BOOKS = { dgrh: 'devil greed Robin Hood', dgsol: 'devil greed Solana', snh: 'SnipeHunt' };
 const [fund, file] = process.argv.slice(2);
-if (!BOOKS[fund] || !file) { console.error('pakai: import-paper-book.mjs <dgrh|dgsol> <berkas.json>'); process.exit(1); }
+if (!BOOKS[fund] || !file) { console.error('pakai: import-paper-book.mjs <dgrh|dgsol|snh> <berkas.json>'); process.exit(1); }
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(ROOT, 'data'), fund);
 const release = lock(resolve(DIR, 'sync.lock.local'));
 const src = JSON.parse(readFileSync(resolve(file), 'utf8'));
@@ -44,6 +45,13 @@ const tidy = (n) => Number(n.toFixed(8));
 // alamat dipangkas dan panjangnya dibatasi, supaya tidak ada identitas on-chain
 // yang ikut terbit dan satu kalimat panjang tidak membatalkan impor.
 const text = (v, max = 280) => { if (v === undefined || v === null) return null; const t = String(v).replace(/0x[0-9a-fA-F]{16,}/g, '0x…').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').replace(/\s+/g, ' ').trim(); return t ? (t.length > max ? t.slice(0, max - 1) + '…' : t) : null; };
+// Alasan keluar yang dikenal ditulis dalam bahasa situs; lainnya apa adanya.
+const REASON = { 'follow exit': 'ikut wallet keluar', 'stale price': 'harga basi', 'take profit': 'take profit', 'stop': 'stop loss',
+  'trailing': 'trailing stop', 'time limit': 'batas waktu', 'rug': 'rug', 'manual': 'manual' };
+const reasonText = (v) => { const t = text(v, 60); return t ? REASON[t.toLowerCase()] ?? t : null; };
+// Wallet yang ikut membeli (copy-trade): jumlah dan labelnya, tanpa alamat.
+const walletsNote = (p) => { const n = optNum(pick(p, ['wallets_joined'])); const labels = Array.isArray(p.wallet_labels) ? [...new Set(p.wallet_labels.map((x) => text(x, 16)).filter(Boolean))] : [];
+  return n == null ? null : `${n} wallet${labels.length ? ' (' + labels.join(', ') + ')' : ''}`; };
 const pctOf = (p, pctNames, priceNames, entry, sign) => {
   const direct = optNum(pick(p, pctNames)); if (direct != null) return Math.abs(direct);
   const px = optNum(pick(p, priceNames)); return px != null && entry > 0 ? Number((Math.abs(px / entry - 1) * 100).toFixed(2)) : null;
@@ -94,12 +102,13 @@ const positions = list.map((p, i) => {
     ...(opened !== undefined ? { ageMinutes: Math.max(0, Math.round((asOf - time(opened, 'opened_at')) / 60000)) } : {}),
     // Data rencana — opsional; yang tidak dikirim bot dibiarkan kosong, tidak dikarang.
     stopPct: pctOf(p, ['stop_pct', 'sl_pct'], ['stop_price', 'sl_price'], entry),
-    targetPct: pctOf(p, ['target_pct', 'tp_pct'], ['target_price', 'tp_price'], entry),
+    targetPct: pctOf(p, ['target_pct', 'tp_pct'], ['target_price', 'tp_price'], entry)
+      ?? (Array.isArray(p.targets) ? optNum(p.targets.find((x) => !x?.hit)?.pct) : null),
     maxHoldHours: optNum(pick(p, ['max_hold_hours'])),
     ...(optNum(pick(p, ['quantity', 'qty', 'amount'])) != null ? { amount: optNum(pick(p, ['quantity', 'qty', 'amount'])) } : {}),
-    ...(text(pick(p, ['strategy'])) ? { strategy: text(pick(p, ['strategy']), 60) } : {}),
+    ...(text(pick(p, ['strategy'])) || walletsNote(p) ? { strategy: [text(pick(p, ['strategy']), 60), walletsNote(p) && `ikut ${walletsNote(p)}`, p.trailing === true ? 'trailing' : null].filter(Boolean).join(' · ') } : {}),
     ...(optNum(pick(p, ['confidence'])) != null ? { confidence: optNum(pick(p, ['confidence'])) } : {}),
-    ...(text(pick(p, ['thesis', 'entry_reason', 'reason'])) ? { thesis: text(pick(p, ['thesis', 'entry_reason', 'reason'])) } : {}),
+    ...(text(pick(p, ['thesis', 'entry_reason', 'reason'])) || text(p.llm_verdict) ? { thesis: [text(pick(p, ['thesis', 'entry_reason', 'reason'])), text(p.llm_verdict) && `LLM: ${text(p.llm_verdict)}`].filter(Boolean).join(' · ').slice(0, 400) } : {}),
     stale,
     ...(stale ? { staleReason: 'harga masuk/mark belum tersedia' } : {}),
   };
@@ -115,10 +124,10 @@ const closed = (Array.isArray(closedSrc) ? closedSrc : []).map((c, i) => {
   const closedAt = time(pick(c, ['closed_at', 'closedAt']), `closed_at ${symbol}`);
   const openedRaw = pick(c, ['opened_at', 'openedAt']);
   return { symbol, strategy: String(pick(c, ['sleeve', 'book']) ?? '—'), investedUsd: notional, netUsd: net,
-    netPct: notional > 0 ? Number(((net / notional) * 100).toFixed(2)) : null,
+    netPct: optNum(pick(c, ['realized_pct'])) ?? (notional > 0 ? Number(((net / notional) * 100).toFixed(2)) : null),
     holdMinutes: openedRaw === undefined ? null : Math.max(0, Math.round((closedAt - time(openedRaw, 'opened_at')) / 60000)),
-    reason: text(pick(c, ['reason', 'exit_reason']), 60) ?? '—',
-    ...(text(pick(c, ['reason_detail', 'note'])) ? { reasonDetail: text(pick(c, ['reason_detail', 'note']), 240) } : {}),
+    reason: reasonText(pick(c, ['reason', 'exit_reason'])) ?? '—',
+    ...(text(pick(c, ['reason_detail', 'note'])) || walletsNote(c) ? { reasonDetail: [text(pick(c, ['reason_detail', 'note']), 200), walletsNote(c) && `ikut ${walletsNote(c)}`].filter(Boolean).join(' · ') } : {}),
     ...(optNum(pick(c, ['fees_usd'])) != null ? { feesUsd: optNum(pick(c, ['fees_usd'])) } : {}), closedAt };
 }).sort((a, b) => a.closedAt - b.closedAt);
 const trades = groupTradeDays(closed, 0.5);
@@ -127,12 +136,22 @@ const realizedClosed = tidy(closed.reduce((t, c) => t + c.netUsd, 0));
 
 // Keadaan bot (opsional): status, pindai terakhir, keputusan terakhir, aktivitas.
 const bot = pick(src, ['bot']) || {};
-const dec = bot.last_decision || {};
-const act = bot.activity_24h || {};
+const dec = typeof bot.last_decision === 'string' ? { reason: bot.last_decision } : (bot.last_decision || {});
+// Nama kolom aktivitas berbeda antar bot; dipetakan ke satu set.
+const actSrc = bot.activity_24h || {};
+const act = { scans: pick(actSrc, ['scans', 'signals']), rejected: pick(actSrc, ['rejected', 'vetoed']), entries: pick(actSrc, ['entries', 'entered']), exits: pick(actSrc, ['exits', 'closed']) };
 const lastScanAt = bot.last_scan_at ? time(bot.last_scan_at, 'last_scan_at') : null;
-const rules = Array.isArray(src.rules) ? src.rules.map((x) => [text(x?.[0] ?? x?.k, 40), text(x?.[1] ?? x?.v, 120)]).filter(([k, v]) => k && v) : [];
+const rules = Array.isArray(src.rules) ? src.rules.filter((x) => typeof x !== 'string').map((x) => [text(x?.[0] ?? x?.k, 40), text(x?.[1] ?? x?.v, 120)]).filter(([k, v]) => k && v) : [];
+// Aturan berupa kalimat (bukan pasangan kunci–nilai) tampil sebagai daftar.
+const ruleList = Array.isArray(src.rules) ? src.rules.filter((x) => typeof x === 'string').map((x) => text(x, 300)).filter(Boolean) : [];
+// Basket modal (copy-trade): alokasi, kursi maksimum, dan posisi terbuka.
+const baskets = Array.isArray(src.baskets) ? src.baskets.map((b) => [text(b.label ?? b.id, 30),
+  [optNum(b.alloc_pct) != null && `alokasi ${b.alloc_pct}%`, optNum(b.cap) != null && `$${b.cap}`, optNum(b.seat_pct) != null && `kursi maks ${b.seat_pct}% equity`, optNum(b.open) != null && `${b.open} terbuka`].filter(Boolean).join(' · ')]).filter(([k, v]) => k && v) : [];
+const wallets = src.wallets && typeof src.wallets === 'object' ? src.wallets : null;
+const walletRows = wallets ? [['Wallet dipantau', `${optNum(wallets.tracked) ?? '—'} · ${optNum(wallets.active) ?? '—'} aktif`],
+  ...(wallets.by_label && typeof wallets.by_label === 'object' ? [['Label wallet', Object.entries(wallets.by_label).filter(([, n]) => optNum(n)).map(([k, n]) => `${text(k, 16)} ${n}`).join(' · ')]] : [])] : [];
 const about = (Array.isArray(src.about) ? src.about : src.about ? [src.about] : []).map((x) => text(x, 500)).filter(Boolean);
-const sleeveInfo = src.sleeves && typeof src.sleeves === 'object' ? Object.entries(src.sleeves).map(([k, v]) => [text(k, 30), text(v, 160)]).filter(([k, v]) => k && v) : [];
+const sleeveInfo = [...(src.sleeves && typeof src.sleeves === 'object' ? Object.entries(src.sleeves).map(([k, v]) => [text(k, 30), text(v, 160)]).filter(([k, v]) => k && v) : []), ...baskets];
 const peak = optNum(pick(src, ['peak_equity_usd']));
 
 const unrealized = tidy(positions.reduce((t, p) => t + p.pnlUsd, 0));
@@ -144,7 +163,11 @@ const nStale = positions.filter((p) => p.stale).length;
 // Deret nilai: impor pertama = dua titik (modal awal, equity sekarang); tiap
 // pembaruan berikutnya menambah satu titik.
 const navOld = readJSON(resolve(DIR, 'nav.json'), { points: [] }).points || [];
-const points = downsample([...(navOld.length ? navOld : [{ t: startedAt, usd: initial }]), { t: asOf, usd: equity }].map(({ t, usd }) => ({ t, usd })), now);
+// Bot yang mengirim riwayat equity: titik yang lebih baru dari deret kita ikut masuk.
+const lastOld = navOld.length ? navOld.at(-1).t : -Infinity;
+const hist = (Array.isArray(src.equity_history) ? src.equity_history : []).map((h) => ({ t: time(h.t, 'equity_history.t'), usd: optNum(h.equity_usd) }))
+  .filter((h) => h.usd != null && h.usd > 0 && h.t > lastOld && h.t < asOf && h.t >= startedAt);
+const points = downsample([...(navOld.length ? navOld : [{ t: startedAt, usd: initial }]), ...hist, { t: asOf, usd: equity }].map(({ t, usd }) => ({ t, usd })).sort((a, b) => a.t - b.t), now);
 
 const snapshot = {
   fund,
@@ -185,18 +208,20 @@ const snapshot = {
     lastScanAt,
     lead: `${BOOKS[fund]} adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.`,
     tiles: [
-      { k: 'Posisi terbuka', v: String(positions.length), n: `${sleeves.length} sleeve` },
+      { k: 'Posisi terbuka', v: String(positions.length), n: baskets.length ? `${baskets.length} basket` : `${sleeves.length} sleeve` },
       { k: 'Kas', usd: cash, n: 'belum dipakai' },
       { k: 'Belum terealisasi', v: `${unrealized >= 0 ? '+' : '−'}$${Math.abs(unrealized).toFixed(4)}`, n: 'dari posisi terbuka', tone: unrealized >= 0 ? 'pos' : 'neg' },
       ...(nStale ? [{ k: 'Harga belum tersedia', v: String(nStale), n: 'posisi ditandai belum terverifikasi', tone: 'neg' }] : []),
-      ...(optNum(act.scans) != null ? [{ k: 'Pindai pasar', v: String(act.scans), n: `24 jam${lastScanAt ? '' : ''}${optNum(act.rejected) != null ? ` · ${act.rejected} kandidat ditolak` : ''}` }] : []),
+      ...(optNum(act.scans) != null ? [{ k: fund === 'snh' ? 'Sinyal wallet' : 'Pindai pasar', v: String(act.scans), n: `24 jam${optNum(act.rejected) != null ? ` · ${act.rejected} ${fund === 'snh' ? 'diveto LLM' : 'kandidat ditolak'}` : ''}` }] : []),
+      ...(wallets && optNum(wallets.tracked) != null ? [{ k: 'Wallet dipantau', v: String(wallets.tracked), n: `${optNum(wallets.active) ?? 0} aktif` }] : []),
       ...(optNum(act.entries) != null || optNum(act.exits) != null ? [{ k: 'Buka · tutup', v: `${act.entries ?? 0} · ${act.exits ?? 0}`, n: '24 jam terakhir' }] : []),
     ],
     llm: text(dec.reason) ? { model: text(bot.model, 40), lastDecisionAt: dec.at ? time(dec.at, 'last_decision.at') : asOf, lastAction: text(dec.action, 24) || 'keputusan', lastReason: text(dec.reason, 400) } : null,
   },
   // Penjelasan strategi dari bot sendiri (opsional), untuk tab Analys.
-  ...(about.length || rules.length || sleeveInfo.length ? { strategy: { title: `${BOOKS[fund]} — buku paper`, about,
-    system: [['Mode', 'paper'], ...rules], requirements: sleeveInfo, risks: [] } } : {}),
+  ...(about.length || rules.length || ruleList.length || sleeveInfo.length ? { strategy: { title: `${BOOKS[fund]} — buku paper`, about,
+    system: [['Mode', 'paper'], ...(text(bot.model, 40) ? [['Model LLM', text(bot.model, 40)]] : []), ...rules, ...walletRows], requirements: sleeveInfo,
+    ...(baskets.length ? { requirementsTitle: 'Basket modal' } : {}), ...(ruleList.length ? { ruleList } : {}), risks: [] } } : {}),
   quality: nStale ? { complete: false, reasons: [`${nStale} posisi tanpa harga masuk/mark; nilainya dari catatan paper`] } : { complete: true, reasons: [] },
   costsShareUsd: 0,
 };

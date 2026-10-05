@@ -34,6 +34,8 @@ run_paper() {
 timeout --kill-after=5 40 scripts/fetch-paper-inbox.sh || true   # bot-nya di VPS lain
 run_paper dgrh /root/cashood-inbox/devil-greed-robin-hood.json
 run_paper dgsol /root/cashood-inbox/devil-greed-solana.json
+# SnipeHunt menulis berkasnya langsung ke kotak masuk (VPS yang sama).
+run_paper snh /root/cashood-inbox/snipehunt.json
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
 run_snapshot scripts/sync-index.mjs
 # Bunga Safe Box mengikuti gerak harian index, jadi dihitung sesudahnya.
@@ -43,7 +45,7 @@ run_snapshot scripts/sync-safebox.mjs
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
   git add -- reborn meridian ferari robsol charon forex binance safebox index
-  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol
+  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 # Retry an earlier unpushed commit even when there are no file changes this run.

@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "Cashood",
+    "tagline": "SnipeHunt · copy-trade wallet Solana · paper",
+    "currency": "USD",
+    "refreshMinutes": 5,
+    "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/snh/live.json",
+    "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/snh/nav.json"
+  },
+  "wallet": {
+    "chainName": "Solana",
+    "_note": "Buku paper: tidak punya dompet dan tidak mengirim transaksi. Angkanya diimpor dari catatan paper, bukan dari saldo chain."
+  },
+  "owners": [
+    {
+      "id": "paper",
+      "name": "Modal simulasi",
+      "color": "#a3e635"
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-10-05",
+      "type": "deposit",
+      "owner": "paper",
+      "usd": 1000,
+      "founding": true,
+      "id": "snh-paper-modal",
+      "note": "modal kertas $1.000 — bukan uang sungguhan (buku paper v3 mulai 5 Okt 12:07 WIB)"
+    }
+  ],
+  "costs": {
+    "note": "Buku paper: biaya belum dibebankan.",
+    "items": [],
+    "shared": false,
+    "primary": false
+  },
+  "fund": {
+    "note": "Paper trading. Bukan dana investor dan bukan LP.",
+    "capacityUsd": 1000,
+    "paper": true
+  },
+  "strategy": {
+    "title": "SnipeHunt — buku paper",
+    "about": [
+      "SnipeHunt adalah bot copy-trade di Solana yang masih dry run: semua transaksinya simulasi dengan modal kertas $1.000, tanpa uang sungguhan dan tanpa dompet.",
+      "Angka di halaman ini diimpor apa adanya dari catatan paper bot dan tidak dihitung ulang dari saldo chain."
+    ],
+    "requirements": [
+      [
+        "Modal",
+        "kertas $1.000"
+      ],
+      [
+        "Status",
+        "dry run, belum menerima investor"
+      ],
+      [
+        "Jenis",
+        "copy-trade wallet, bukan LP"
+      ]
+    ],
+    "risks": [
+      "Hasil paper bukan hasil nyata: eksekusi sungguhan bisa mendapat harga, slippage, dan biaya yang berbeda.",
+      "Wallet yang diikuti bisa keluar lebih cepat dari bot; harga bisa sudah bergerak saat bot ikut masuk.",
+      "Memecoin Solana bisa rug atau kehilangan likuiditas dalam hitungan menit.",
+      "Posisi yang harganya belum tersedia ditandai belum terverifikasi."
+    ],
+    "system": [
+      [
+        "Mode",
+        "paper (dry run)"
+      ],
+      [
+        "Jaringan",
+        "Solana"
+      ],
+      [
+        "Cara masuk",
+        "ikut ketika beberapa wallet terverifikasi membeli coin yang sama"
+      ],
+      [
+        "Modal",
+        "kertas $1.000"
+      ]
+    ]
+  }
+}

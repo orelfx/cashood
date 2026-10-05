@@ -90,7 +90,7 @@ function getJSON(url, { fresh = false } = {}) {
       if (list.index) quiet(getJSON(RAW_BASE + 'index/live.json'));
     }));
     const guess = first || 'reborn';
-    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance', 'dgrh', 'dgsol'].includes(guess) ? guess : 'reborn';
+    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance', 'dgrh', 'dgsol', 'snh'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
   } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
@@ -2871,8 +2871,9 @@ function renderAnalys() {
   $('#anAboutTitle').textContent = st.title || 'Tentang strategi';
   setHTML($('#anAboutBody'), `
     ${(st.about || []).map((x) => `<p>${esc(x)}</p>`).join('')}
+    ${st.ruleList?.length ? `<h3 class="sub-h">Aturan bot</h3><ul class="plain">${st.ruleList.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
     <div class="two">
-      <div><h3 class="sub-h">Yang dibutuhkan</h3><table class="kv"><tbody>${(st.requirements || []).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>
+      <div><h3 class="sub-h">${esc(st.requirementsTitle || 'Yang dibutuhkan')}</h3><table class="kv"><tbody>${(st.requirements || []).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>
       <div><h3 class="sub-h">Risiko yang harus dipahami</h3><ul class="plain">${(st.risks || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
     </div>
     <p class="hint disclaimer">Kinerja masa lalu tidak menjamin hasil ke depan. Semua angka di halaman ini dihitung dari data dana yang sebenarnya dan diperbarui otomatis; tidak ada yang ditulis tangan.</p>`);
