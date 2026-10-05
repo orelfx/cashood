@@ -1,21 +1,21 @@
 {
   "fund": "charon",
-  "updatedAt": 1791232592453,
-  "generatedAt": "2026-10-06 03:36 WIB",
+  "updatedAt": 1791232887533,
+  "generatedAt": "2026-10-06 03:41 WIB",
   "usdIdr": null,
   "nativeSymbol": "ETH",
-  "nativePrice": 2711.48,
-  "ethPrice": 2711.48,
-  "totalUsd": 1170.8,
-  "botWalletUsd": 1170.8,
-  "walletUsd": 1170.8,
+  "nativePrice": 2712.12,
+  "ethPrice": 2712.12,
+  "totalUsd": 1169.32,
+  "botWalletUsd": 1169.32,
+  "walletUsd": 1169.32,
   "lpUsd": 0,
   "holdings": [
     {
       "symbol": "USDG",
-      "amount": 1170.8,
+      "amount": 1169.32,
       "price": 1,
-      "usd": 1170.8
+      "usd": 1169.32
     }
   ],
   "positions": [],
@@ -100,20 +100,29 @@
       "losses": 16,
       "winUsd": 2.81,
       "lossUsd": -26.96
+    },
+    {
+      "date": "2026-10-06",
+      "usd": -1.48,
+      "closes": 1,
+      "wins": 0,
+      "losses": 1,
+      "winUsd": 0,
+      "lossUsd": -1.48
     }
   ],
   "historyNote": "hasil trade simulasi yang sudah ditutup, bersih setelah biaya swap dan jaringan yang dimodelkan",
   "stats": {
-    "closedCount": 248,
+    "closedCount": 249,
     "openCount": 0,
-    "graded": 241,
+    "graded": 242,
     "wins": 46,
-    "losses": 195,
-    "winRate": 19.09,
-    "realisedUsd": -329.19,
+    "losses": 196,
+    "winRate": 19.01,
+    "realisedUsd": -330.67,
     "bestDay": {
-      "date": "2026-09-27",
-      "usd": -1.97
+      "date": "2026-10-06",
+      "usd": -1.48
     },
     "worstDay": {
       "date": "2026-10-01",
@@ -123,6 +132,17 @@
     "timezone": "Asia/Jakarta (UTC+7)"
   },
   "closedRecent": [
+    {
+      "symbol": "0x…",
+      "closedAt": 1791232634381,
+      "investedUsd": 6.15,
+      "netUsd": -1.48,
+      "netPct": -24.06,
+      "holdMinutes": 1,
+      "strategy": "scalp · degen",
+      "reason": "lainnya",
+      "reasonDetail": "RUG_EXIT: exit impact 19.7% vs 0.0% at entry"
+    },
     {
       "symbol": "0x…",
       "closedAt": 1791217182900,
@@ -331,57 +351,46 @@
       "strategy": "swing · large cap",
       "reason": "stop loss",
       "reasonDetail": "STOP_LOSS"
-    },
-    {
-      "symbol": "PONS",
-      "closedAt": 1791125615724,
-      "investedUsd": 16.57,
-      "netUsd": -2.35,
-      "netPct": -14.17,
-      "holdMinutes": 2062,
-      "strategy": "swing · large cap",
-      "reason": "stop loss",
-      "reasonDetail": "STOP_LOSS"
     }
   ],
   "trading": {
     "paper": true,
     "mode": "dry_run",
     "initialUsd": 1500,
-    "cashUsd": 1170.8,
+    "cashUsd": 1169.32,
     "positionsUsd": 0,
-    "realizedUsd": -329.2,
+    "realizedUsd": -330.68,
     "unrealizedUsd": 0,
-    "modeledFeesUsd": 144.04,
+    "modeledFeesUsd": 144.13,
     "peakUsd": 1183.97,
-    "drawdownPct": 1.11,
+    "drawdownPct": 1.24,
     "dayStartUsd": 1183.97,
     "paused": false,
     "startedAt": 1790405776427,
-    "status": "attention",
+    "status": "healthy",
     "processStatus": "online",
-    "heartbeatAt": 1791232591005,
-    "lastScanAt": 1791232146021,
-    "cashPeg": 0.9998503365,
+    "heartbeatAt": 1791232862544,
+    "lastScanAt": 1791232758915,
+    "cashPeg": 0.9994185934,
     "llm": {
       "model": "MiniMax-M3",
-      "calls24h": 143,
+      "calls24h": 144,
       "dailyBudget": 96,
-      "lastDecisionAt": 1791232168223,
+      "lastDecisionAt": 1791232804404,
       "lastAction": "WAIT",
-      "lastReason": "All three candidates have disqualifying evidence: AI shows whale_selling + dangerous_wallets_active with falling-knife price action (-10.5% h1). ORBIO has whale_selling + dangerous_active + 57.3% top10 concentration + -21% 24h. BONER has declining volume (h1 growth -4.2%) and buyers (accel 0.48) with no edge. No setup meets BUY criteria."
+      "lastReason": "All three candidates fail entry gates. AI: dangerous_wallets_active (hard veto) + whale selling -$63.5K + downtrend, no hypothesis. BONER: score 0, volume decelerating, h1/h6 negative, scalp ineligible, no setup. ORBIO: dangerous_wallets_active + whale_selling -$136K + falling knife (-23.9% h24), no recovery. No testable edge meets confidence >=65."
     },
     "activity24h": {
       "scans": 212,
-      "decisions": 127,
+      "decisions": 128,
       "quotesRejected": 97,
-      "entriesRejected": 588,
-      "buys": 14,
-      "sells": 19
+      "entriesRejected": 583,
+      "buys": 15,
+      "sells": 20
     }
   },
   "schemaVersion": 2,
-  "generation": "dd489468-03dd-46bc-b997-fc06d833fb24",
+  "generation": "e4f0901b-a1c6-477c-b499-b2b608bf2145",
   "treasuryUsd": 0,
   "quality": {
     "complete": true,
@@ -389,25 +398,25 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791232592686,
+    "generatedAt": 1791232887735,
     "trades": {
-      "count": 248,
+      "count": 249,
       "wins": 46,
-      "losses": 195,
+      "losses": 196,
       "flat": 7,
-      "winRate": 19.09,
+      "winRate": 19.01,
       "usdComplete": true,
-      "netUsd": -329.19,
+      "netUsd": -330.67,
       "grossProfitUsd": 136.45,
-      "grossLossUsd": -465.64,
+      "grossLossUsd": -467.12,
       "profitFactor": 0.29,
       "profitFactorBasis": "usd",
       "expectancyUsd": -1.33,
-      "expectancyPct": -6.63,
+      "expectancyPct": -6.7,
       "avgWinUsd": 2.96,
-      "avgLossUsd": -2.39,
+      "avgLossUsd": -2.38,
       "avgWinPct": 14.87,
-      "avgLossPct": -11.95,
+      "avgLossPct": -12.01,
       "best": {
         "usd": 13.88,
         "pct": 52.47,
@@ -422,42 +431,42 @@
       },
       "longestWinStreak": 3,
       "longestLossStreak": 18,
-      "avgHoldMinutes": 150,
-      "tradesPerDay": 30.3,
+      "avgHoldMinutes": 149,
+      "tradesPerDay": 29.8,
       "firstAt": 1790510820968,
-      "lastAt": 1791217182900
+      "lastAt": 1791232634381
     },
     "equity": {
       "days": 9,
       "spanDays": 8.9,
-      "returnPct": -63.53,
-      "maxDrawdownPct": 63.53,
-      "maxDrawdownAt": 1791217776048,
-      "maxDrawdownUsd": 317.67,
+      "returnPct": -63.58,
+      "maxDrawdownPct": 63.58,
+      "maxDrawdownAt": 1791232772210,
+      "maxDrawdownUsd": 317.9,
       "maxDrawdownPeakUsd": 500,
-      "maxDrawdownTroughUsd": 1170.8,
-      "currentDrawdownPct": 63.53,
-      "currentDrawdownUsd": 2039.81,
+      "maxDrawdownTroughUsd": 1169.32,
+      "currentDrawdownPct": 63.58,
+      "currentDrawdownUsd": 2041.29,
       "positiveDaysPct": 0,
-      "bestDayPct": 0,
+      "bestDayPct": -0.13,
       "worstDayPct": -29.31,
       "sharpe": null,
       "sortino": null,
       "calmar": null,
       "since": 1790467193741
     },
-    "profitUsd": -329.2,
-    "profitPct": -21.95,
+    "profitUsd": -330.68,
+    "profitPct": -22.05,
     "recoveryFactor": -1.04,
     "score": {
       "axes": {
-        "winRate": 19.09,
+        "winRate": 19.01,
         "profitFactor": 0,
         "risk": 0,
         "recovery": 0,
         "consistency": 0
       },
-      "overall": 3.82,
+      "overall": 3.8,
       "complete": true
     }
   },
@@ -524,6 +533,13 @@
       "usd": -24.15,
       "w": 2,
       "l": 16
+    },
+    {
+      "d": "2026-10-06",
+      "n": 1,
+      "usd": -1.48,
+      "w": 0,
+      "l": 1
     }
   ]
 }
