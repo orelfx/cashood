@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ba135663-ebef-4690-a347-fb66192c7e55",
-  "updatedAt": 1791205606261,
-  "generatedAt": "2026-10-05 20:06 WIB",
+  "generation": "89b0e368-203a-4c5d-b923-0642b5d57f50",
+  "updatedAt": 1791205906345,
+  "generatedAt": "2026-10-05 20:11 WIB",
   "usdIdr": null,
   "totalUsd": 996.790136152152,
   "botWalletUsd": 996.790136152152,
@@ -174,12 +174,12 @@
     "pnlUsd": -3.2098638478480552,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791205606261,
+    "heartbeatAt": 1791205906345,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 1.25,
-    "lastScanAt": 1791205602973,
+    "lastScanAt": 1791205905686,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -200,13 +200,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "98",
-        "n": "24 jam · 6 diveto LLM"
+        "v": "100",
+        "n": "24 jam · 7 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1424",
-        "n": "154 aktif"
+        "v": "1426",
+        "n": "155 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -216,9 +216,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791205606261,
+      "lastDecisionAt": 1791205906345,
       "lastAction": "keputusan",
-      "lastReason": "OFF [degen]: Dilewati: harga sudah naik 123% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      "lastReason": "Village [degen]: Diveto LLM: Padre (91.9) is a solid trader with 56% winrate and $8K realized, but both wallets lack asymmetric upside (only 3 over-5x wins total across 95+ tokens) and Padr. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -237,7 +237,7 @@
       ],
       [
         "Wallet dipantau",
-        "1424 · 154 aktif"
+        "1426 · 155 aktif"
       ],
       [
         "Cadangan kas",
@@ -249,7 +249,7 @@
       ],
       [
         "Label wallet",
-        "smart 489 · dolphin 63 · bot 726 · lp 1 · fresh 19 · kol 89 · whale 3 · blacklist 34"
+        "smart 491 · dolphin 62 · bot 727 · lp 1 · fresh 19 · kol 89 · whale 3 · blacklist 34"
       ]
     ],
     "requirements": [
@@ -295,22 +295,22 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1424,
-      "active": 154,
-      "passive": 1270,
+      "tracked": 1426,
+      "active": 155,
+      "passive": 1271,
       "trusted": 0,
       "promising": 9,
       "byLabel": [
         {
           "key": "bot",
-          "total": 726,
+          "total": 727,
           "active": 0,
-          "passive": 726
+          "passive": 727
         },
         {
           "key": "smart",
-          "total": 489,
-          "active": 116,
+          "total": 491,
+          "active": 118,
           "passive": 373
         },
         {
@@ -321,8 +321,8 @@
         },
         {
           "key": "dolphin",
-          "total": 63,
-          "active": 27,
+          "total": 62,
+          "active": 26,
           "passive": 36
         },
         {
@@ -451,6 +451,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791205831214,
+        "symbol": "Village",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 154,
+            "note": "bundler pegang 22.4%"
+          },
+          {
+            "type": "rat",
+            "count": 2,
+            "note": "insider/entrapment pegang 5.7%"
+          },
+          {
+            "type": "sniper",
+            "count": 7,
+            "note": "sniper awal masih pegang 4.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 128,
+            "note": "13.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Padre (91.9) is a solid trader with 56% winrate and $8K realized, but both wallets lack asymmetric upside (only 3 over-5x wins total across 95+ tokens) and Padr. Tidak dimasuki."
+      },
+      {
+        "at": 1791205732457,
+        "symbol": "MATTHEW",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
       {
         "at": 1791205332090,
         "symbol": "OFF",
@@ -1224,50 +1266,12 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah naik 130% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791192713098,
-        "symbol": "Cadence",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 799,
-            "note": "bundler pegang 16.4%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 7.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "15.7% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: smart #158 has proven copy history (+26.8%) but group is dragged by negative smart #420, all wallets show zero over_x5 winners despite high churn, and 29.8 wallets . Tidak dimasuki."
-      },
-      {
-        "at": 1791192358750,
-        "symbol": "Camel",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 34% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 32,
-        "red_flag": 42,
+        "red_flag": 43,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -1278,7 +1282,7 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 6
+        "llm": 7
       },
       "test": {
         "solo": 8,
@@ -1311,7 +1315,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791205612232,
+    "generatedAt": 1791205926978,
     "trades": {
       "count": 3,
       "wins": 1,
