@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "79ab81bd-6512-41d5-b73e-824fff96d285",
-  "updatedAt": 1791181816160,
-  "generatedAt": "2026-10-05 13:30 WIB",
+  "generation": "e3849267-6d17-4839-ac75-08bfe16c325c",
+  "updatedAt": 1791182096175,
+  "generatedAt": "2026-10-05 13:34 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -53,6 +53,12 @@
       "reason": "trailing stop",
       "reasonDetail": "Take profit bertahap tercapai, sisanya ditutup trailing stop. · ikut 3 wallet",
       "feesUsd": 0.44999999999999996,
+      "entry": "3 wallet terverifikasi (3 smart) membeli coin yang sama; semua cek red flag lolos.",
+      "exitDetail": "Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +60%.",
+      "wallets": {
+        "smart": 3
+      },
+      "peakPct": 83.5,
       "closedAt": 1791181695631
     }
   ],
@@ -76,12 +82,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791181816160,
+    "heartbeatAt": 1791182096175,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791181813694,
+    "lastScanAt": 1791182093386,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -107,7 +113,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "1352",
+        "v": "1354",
         "n": "108 aktif"
       },
       {
@@ -118,7 +124,7 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791181816160,
+      "lastDecisionAt": 1791182096175,
       "lastAction": "keputusan",
       "lastReason": "SM [low]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
     }
@@ -139,7 +145,7 @@
       ],
       [
         "Wallet dipantau",
-        "1352 · 108 aktif"
+        "1354 · 108 aktif"
       ],
       [
         "Label wallet",
@@ -180,13 +186,208 @@
     ],
     "risks": []
   },
+  "copyTrade": {
+    "wallets": {
+      "tracked": 1354,
+      "active": 108,
+      "passive": 1246,
+      "byLabel": [
+        {
+          "key": "bot",
+          "total": 704,
+          "active": 0,
+          "passive": 704
+        },
+        {
+          "key": "smart",
+          "total": 477,
+          "active": 81,
+          "passive": 396
+        },
+        {
+          "key": "kol",
+          "total": 83,
+          "active": 9,
+          "passive": 74
+        },
+        {
+          "key": "dolphin",
+          "total": 48,
+          "active": 18,
+          "passive": 30
+        },
+        {
+          "key": "blacklist",
+          "total": 24,
+          "active": 0,
+          "passive": 24
+        },
+        {
+          "key": "fresh",
+          "total": 15,
+          "active": 0,
+          "passive": 15
+        },
+        {
+          "key": "whale",
+          "total": 3,
+          "active": 0,
+          "passive": 3
+        }
+      ],
+      "definitions": {
+        "active": "Dihitung untuk konsensus: status aktif (trading dalam 72 jam terakhir), skor ≥ 60/100, bukan bot/LP/fresh, tidak ditolak LLM, dan lolos cek on-chain sebagai trader coin.",
+        "passive": "Semua wallet lain yang tetap dipantau tetapi tidak dihitung: belum lolos atau belum dicek on-chain, skor di bawah batas, tidak trading 72 jam, bot/LP/arbitrase, atau blacklist.",
+        "label": "Satu label per wallet: 'blacklist' bila diblacklist, selain itu kelas bot (smart, whale, dolphin, kol, fresh, lp, bot, unknown)."
+      },
+      "top": [
+        {
+          "alias": "smart #814",
+          "label": "smart",
+          "score": 100,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #1015",
+          "label": "smart",
+          "score": 98,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #668",
+          "label": "smart",
+          "score": 96.4,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #652",
+          "label": "smart",
+          "score": 92.2,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #402",
+          "label": "smart",
+          "score": 92.1,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #955",
+          "label": "smart",
+          "score": 91.3,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "dolphin #915",
+          "label": "dolphin",
+          "score": 89.7,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #1291",
+          "label": "smart",
+          "score": 89.7,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #1273",
+          "label": "smart",
+          "score": 88.9,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        },
+        {
+          "alias": "smart #913",
+          "label": "smart",
+          "score": 88.6,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0
+        }
+      ]
+    },
+    "decisions": [
+      {
+        "at": 1791181695631,
+        "symbol": "SM",
+        "action": "exit",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Keluar (trailing): Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +60%. Hasil +26,3%."
+      },
+      {
+        "at": 1791181430581,
+        "symbol": "SM",
+        "action": "partial",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Take profit bertahap (TP1): jual sebagian senilai $9,64, sisanya tetap jalan."
+      },
+      {
+        "at": 1791181354743,
+        "symbol": "SM",
+        "action": "enter",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      }
+    ],
+    "reasonStats": {
+      "skip": {
+        "chase": 0,
+        "red_flag": 0,
+        "round_trip_cost": 0,
+        "basket_full": 0,
+        "slippage": 0,
+        "no_price": 0,
+        "max_open": 0,
+        "day_loss": 0,
+        "paused": 0
+      },
+      "veto": {
+        "llm": 0
+      },
+      "exit": {
+        "follow exit": 0,
+        "take profit": 0,
+        "stop": 0,
+        "trailing": 1,
+        "time limit": 0,
+        "rug": 0,
+        "stale price": 0
+      }
+    }
+  },
   "quality": {
     "complete": true,
     "reasons": []
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791181909205,
+    "generatedAt": 1791182180809,
     "trades": {
       "count": 1,
       "wins": 1,
