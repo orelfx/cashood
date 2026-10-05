@@ -43,7 +43,7 @@ const dailyPct=today?today.ratePct:0, maxM=Number(cfg.rate?.maxMonthlyPct??3);
 const done=state.days.filter(d=>d.date>=Core.day(state.from));
 const avgDaily=done.length?done.reduce((t,d)=>t+d.ratePct,0)/done.length:dailyPct;
 const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
- principalUsd:principal,interestUsd:interest,paidUsd:Core.money(rows.reduce((t,o)=>t+o.paidUsd,0)),
+ principalUsd:principal,interestUsd:interest,paidUsd:Core.money(Object.values(state.balances).reduce((t,b)=>t+(Number(b.paid)||0),0)),   // termasuk pemilik yang sudah keluar
  lastPayout:(()=>{const p=payouts.filter(x=>x.type==='interest');if(!p.length)return null;const at=Math.max(...p.map(x=>Date.parse(x.at)));const same=p.filter(x=>Date.parse(x.at)===at);return {at,period:same[0].period||null,usd:Core.money(same.reduce((t,x)=>t+Number(x.usd),0))};})(),
  interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
  interestDay:Core.day(now),days:[...state.days,...(today?[today]:[])].slice(-30).map(d=>({date:d.date,usd:d.usd,ratePct:d.ratePct??null,fromReserve:d.fromReserve?Core.money(Object.values(d.fromReserve).reduce((t,v)=>t+v,0)):0,capped:Boolean(d.capped),estimated:d.estimated})),earning:dailyPct>0,
