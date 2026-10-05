@@ -1,57 +1,24 @@
 {
   "fund": "charon",
-  "updatedAt": 1791241286244,
-  "generatedAt": "2026-10-06 06:01 WIB",
+  "updatedAt": 1791241584395,
+  "generatedAt": "2026-10-06 06:06 WIB",
   "usdIdr": null,
   "nativeSymbol": "ETH",
-  "nativePrice": 2715.96,
-  "ethPrice": 2715.96,
+  "nativePrice": 2715.72,
+  "ethPrice": 2715.72,
   "totalUsd": 1158.75,
   "botWalletUsd": 1158.75,
-  "walletUsd": 996.74,
-  "lpUsd": 162.01,
+  "walletUsd": 1158.75,
+  "lpUsd": 0,
   "holdings": [
     {
       "symbol": "USDG",
-      "amount": 996.74,
+      "amount": 1158.75,
       "price": 1,
-      "usd": 996.74
+      "usd": 1158.75
     }
   ],
-  "positions": [
-    {
-      "symbol": "PONS",
-      "band": "large",
-      "horizon": "intraday",
-      "bookLabel": "intraday · large cap",
-      "strategy": "llm",
-      "experimental": false,
-      "principalUsd": 162.01,
-      "feesUsd": 0,
-      "investedUsd": 167.04,
-      "collectedFeesUsd": 0,
-      "costUsd": 167.04,
-      "realizedUsd": 0,
-      "pnlPct": -3.01,
-      "stopPct": 7,
-      "targetPct": 14,
-      "maxHoldHours": 24,
-      "ageMinutes": 79,
-      "amount": 422.6550687215664,
-      "priceUsd": 0.3833189528517454,
-      "entryPriceUsd": 0.39522026002258265,
-      "partialDone": false,
-      "bestPct": 0,
-      "worstPct": -3.42,
-      "markedAt": 1791241269828,
-      "stale": false,
-      "thesis": "Trend continuation on volume acceleration: price recovered 0.366→0.384 (+4.9%) with volAccel15m 7.8x, h1 buyers 108 vs 22 sellers, and whale_buying verdict (whaleNet +$24K). Target $0.438 if momentum extends within 24h.",
-      "valueUsd": 162.01,
-      "pnlUsd": -5.03,
-      "totalFeesUsd": 0,
-      "tokenId": "pos-a6ecf3df283e748b10c2"
-    }
-  ],
+  "positions": [],
   "history": [
     {
       "date": "2026-09-27",
@@ -136,23 +103,23 @@
     },
     {
       "date": "2026-10-06",
-      "usd": -7.02,
-      "closes": 4,
+      "usd": -12.05,
+      "closes": 5,
       "wins": 0,
-      "losses": 4,
+      "losses": 5,
       "winUsd": 0,
-      "lossUsd": -7.02
+      "lossUsd": -12.05
     }
   ],
   "historyNote": "hasil trade simulasi yang sudah ditutup, bersih setelah biaya swap dan jaringan yang dimodelkan",
   "stats": {
-    "closedCount": 252,
-    "openCount": 1,
-    "graded": 245,
+    "closedCount": 253,
+    "openCount": 0,
+    "graded": 246,
     "wins": 46,
-    "losses": 199,
-    "winRate": 18.78,
-    "realisedUsd": -336.21,
+    "losses": 200,
+    "winRate": 18.7,
+    "realisedUsd": -341.24,
     "bestDay": {
       "date": "2026-09-27",
       "usd": -1.97
@@ -165,6 +132,17 @@
     "timezone": "Asia/Jakarta (UTC+7)"
   },
   "closedRecent": [
+    {
+      "symbol": "PONS",
+      "closedAt": 1791241419125,
+      "investedUsd": 167.04,
+      "netUsd": -5.03,
+      "netPct": -3.01,
+      "holdMinutes": 82,
+      "strategy": "intraday · large cap",
+      "reason": "alasan masuk batal",
+      "reasonDetail": "THESIS_INVALIDATED: Thesis invalidated: volumeAccel15m collapsed 7.81x→0.036x (200x drop), h1 unique buyers 108→0, followScore 0 (turned negative). Two of three confirmation legs failed; price near entry but momentum dea"
+    },
     {
       "symbol": "0x…",
       "closedAt": 1791240105324,
@@ -373,57 +351,46 @@
       "strategy": "swing · mid cap",
       "reason": "stop loss",
       "reasonDetail": "STOP_LOSS"
-    },
-    {
-      "symbol": "HARMONIC",
-      "closedAt": 1791165672745,
-      "investedUsd": 14.58,
-      "netUsd": -1.9,
-      "netPct": -13.05,
-      "holdMinutes": 589,
-      "strategy": "intraday · low cap",
-      "reason": "stop loss",
-      "reasonDetail": "STOP_LOSS"
     }
   ],
   "trading": {
     "paper": true,
     "mode": "dry_run",
     "initialUsd": 1500,
-    "cashUsd": 996.74,
-    "positionsUsd": 162.01,
-    "realizedUsd": -336.22,
-    "unrealizedUsd": -5.03,
-    "modeledFeesUsd": 144.42,
+    "cashUsd": 1158.75,
+    "positionsUsd": 0,
+    "realizedUsd": -341.25,
+    "unrealizedUsd": 0,
+    "modeledFeesUsd": 144.46,
     "peakUsd": 1183.97,
     "drawdownPct": 2.13,
     "dayStartUsd": 1183.97,
     "paused": false,
     "startedAt": 1790405776427,
-    "status": "healthy",
+    "status": "attention",
     "processStatus": "online",
-    "heartbeatAt": 1791241269829,
-    "lastScanAt": 1791240713572,
-    "cashPeg": 1.0003703308,
+    "heartbeatAt": 1791241583488,
+    "lastScanAt": 1791241369823,
+    "cashPeg": 0.9998387523,
     "llm": {
       "model": "MiniMax-M3",
-      "calls24h": 142,
+      "calls24h": 143,
       "dailyBudget": 96,
-      "lastDecisionAt": 1791240756255,
+      "lastDecisionAt": 1791241418089,
       "lastAction": "WAIT",
-      "lastReason": "All four candidates fail confidence>=65: BONER has dangerous wallets active (auto-veto); ORBIO is in free-fall with whale distribution; HARMONIC volume drying post-pump; SHROOM shows only an m5 bounce against heavy h1 net sell (-$21K) and unbroken downtrend. No testable setup."
+      "lastReason": "PONS thesis broken; exiting. ORBIO sustained downtrend with whale_selling verdict; SHROOM h1 -9.6% with $23K sells vs $5K buys — no clean recovery structure."
     },
     "activity24h": {
       "scans": 197,
-      "decisions": 126,
+      "decisions": 127,
       "quotesRejected": 98,
-      "entriesRejected": 462,
+      "entriesRejected": 456,
       "buys": 19,
-      "sells": 23
+      "sells": 24
     }
   },
   "schemaVersion": 2,
-  "generation": "f72e029f-76f1-43e7-b3b0-17f386453575",
+  "generation": "e9550ca0-1d1f-4a42-97a1-11ee24baa1a3",
   "treasuryUsd": 0,
   "quality": {
     "complete": true,
@@ -431,25 +398,25 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791241286559,
+    "generatedAt": 1791241584631,
     "trades": {
-      "count": 252,
+      "count": 253,
       "wins": 46,
-      "losses": 199,
+      "losses": 200,
       "flat": 7,
-      "winRate": 18.78,
+      "winRate": 18.7,
       "usdComplete": true,
-      "netUsd": -336.21,
+      "netUsd": -341.24,
       "grossProfitUsd": 136.45,
-      "grossLossUsd": -472.66,
+      "grossLossUsd": -477.69,
       "profitFactor": 0.29,
       "profitFactorBasis": "usd",
-      "expectancyUsd": -1.33,
-      "expectancyPct": -6.93,
+      "expectancyUsd": -1.35,
+      "expectancyPct": -6.91,
       "avgWinUsd": 2.96,
-      "avgLossUsd": -2.37,
+      "avgLossUsd": -2.39,
       "avgWinPct": 14.87,
-      "avgLossPct": -12.21,
+      "avgLossPct": -12.16,
       "best": {
         "usd": 13.88,
         "pct": 52.47,
@@ -467,7 +434,7 @@
       "avgHoldMinutes": 147,
       "tradesPerDay": 29.9,
       "firstAt": 1790510820968,
-      "lastAt": 1791240105324
+      "lastAt": 1791241419125
     },
     "equity": {
       "days": 9,
@@ -493,13 +460,13 @@
     "recoveryFactor": -1.07,
     "score": {
       "axes": {
-        "winRate": 18.78,
+        "winRate": 18.7,
         "profitFactor": 0,
         "risk": 0,
         "recovery": 0,
         "consistency": 0
       },
-      "overall": 3.76,
+      "overall": 3.74,
       "complete": true
     }
   },
@@ -569,10 +536,10 @@
     },
     {
       "d": "2026-10-06",
-      "n": 4,
-      "usd": -7.02,
+      "n": 5,
+      "usd": -12.05,
       "w": 0,
-      "l": 4
+      "l": 5
     }
   ]
 }
