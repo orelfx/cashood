@@ -1,41 +1,21 @@
 {
   "fund": "binance",
-  "updatedAt": 1791167226604,
-  "generatedAt": "2026-10-05 09:27 WIB",
+  "updatedAt": 1791167525621,
+  "generatedAt": "2026-10-05 09:32 WIB",
   "usdIdr": null,
-  "totalUsd": 8423.17,
-  "botWalletUsd": 8423.17,
-  "walletUsd": 8423.17,
+  "totalUsd": 8422.52,
+  "botWalletUsd": 8422.52,
+  "walletUsd": 8422.52,
   "lpUsd": 0,
   "holdings": [
     {
       "symbol": "USDT (testnet)",
-      "amount": 8423.17,
+      "amount": 8422.52,
       "price": 1,
-      "usd": 8423.17
+      "usd": 8422.52
     }
   ],
-  "positions": [
-    {
-      "symbol": "SOL",
-      "direction": "LONG",
-      "lot": 8.31,
-      "entryPrice": 120,
-      "slPrice": 115.12,
-      "tpPrice": 132.2,
-      "bookLabel": "long · experiment swing ema · 3×",
-      "ageMinutes": 4332,
-      "principalUsd": 0,
-      "feesUsd": 0,
-      "investedUsd": null,
-      "collectedFeesUsd": 0,
-      "pnlUsd": null,
-      "stale": true,
-      "valueUsd": 0,
-      "totalFeesUsd": 0,
-      "tokenId": "pos-c10dec93b0fb3c6c0b25"
-    }
-  ],
+  "positions": [],
   "history": [
     {
       "date": "2026-09-29",
@@ -93,23 +73,23 @@
     },
     {
       "date": "2026-10-05",
-      "usd": 57.18,
-      "closes": 2,
-      "wins": 2,
+      "usd": 67.66,
+      "closes": 3,
+      "wins": 3,
       "losses": 0,
-      "winUsd": 57.18,
+      "winUsd": 67.66,
       "lossUsd": 0
     }
   ],
   "historyNote": "hasil bersih mesin baru (sejak 29 Sep) setelah komisi dan funding",
   "stats": {
-    "closedCount": 131,
-    "openCount": 1,
-    "graded": 34,
-    "wins": 14,
+    "closedCount": 132,
+    "openCount": 0,
+    "graded": 35,
+    "wins": 15,
     "losses": 20,
-    "winRate": 41.18,
-    "realisedUsd": 76.56,
+    "winRate": 42.86,
+    "realisedUsd": 87.04,
     "bestDay": {
       "date": "2026-10-04",
       "usd": 117.89,
@@ -132,6 +112,18 @@
     "timezone": "Asia/Jakarta (UTC+7)"
   },
   "closedRecent": [
+    {
+      "symbol": "SOL",
+      "closedAt": 1791166526923,
+      "investedUsd": null,
+      "netUsd": 10.48,
+      "netPct": 0.125,
+      "rMultiple": 0.24,
+      "holdMinutes": 4320,
+      "strategy": "long · experiment swing ema",
+      "reason": "batas waktu habis",
+      "feesUsd": -0.04
+    },
     {
       "symbol": "BNB",
       "closedAt": 1791163629642,
@@ -359,44 +351,37 @@
       "strategy": "short · experiment day donchian",
       "reason": "ditutup bursa (SL/TP)",
       "feesUsd": 0.9
-    },
-    {
-      "symbol": "UNI",
-      "closedAt": 1790830348059,
-      "investedUsd": null,
-      "netUsd": -13.36,
-      "netPct": -0.16,
-      "rMultiple": -0.89,
-      "holdMinutes": 369,
-      "strategy": "short · experiment day donchian",
-      "reason": "ditutup bursa (SL/TP)",
-      "feesUsd": 0.9
     }
   ],
   "trading": {
     "paper": true,
     "mode": "testnet",
     "initialUsd": 8446.31,
-    "cashUsd": 8423.17,
+    "cashUsd": 8422.52,
     "positionsUsd": 0,
-    "realizedUsd": 76.56,
+    "realizedUsd": 87.04,
     "unrealizedUsd": 0,
     "peakUsd": null,
     "paused": false,
     "startedAt": 1790691121483,
-    "heartbeatAt": 1791167223594,
-    "accountUpdatedAt": 1791167128667,
+    "heartbeatAt": 1791167523728,
+    "accountUpdatedAt": 1791167489897,
     "apiState": "RATE_LIMIT_WAIT",
-    "retryAt": 1791167223949,
-    "status": "memulihkan koneksi Binance",
+    "retryAt": 1791167584770,
+    "status": "menunggu anggaran request",
     "healthy": false,
     "lead": "Bot crypto futures di Binance TESTNET — dananya virtual. Sejak 2026-09-29 berjalan dengan mesin baru yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.",
     "tiles": [
       {
         "k": "Data akun terakhir",
-        "v": "09:25 WIB",
+        "v": "09:31 WIB",
         "n": "nilai terakhir; belum terverifikasi ulang",
         "tone": "neg"
+      },
+      {
+        "k": "Coba koneksi lagi",
+        "v": "09:33:04 WIB",
+        "n": "otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang"
       },
       {
         "k": "Pindai pasar",
@@ -405,7 +390,7 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "0 · 3",
+        "v": "0 · 4",
         "n": "24 jam terakhir"
       },
       {
@@ -425,33 +410,32 @@
   "quality": {
     "complete": false,
     "reasons": [
-      "memulihkan koneksi Binance; saldo/posisi adalah data terakhir, bukan pembacaan akun baru",
-      "sebagian posisi memakai nilai terakhir"
+      "menunggu anggaran request; saldo/posisi adalah data terakhir, bukan pembacaan akun baru"
     ]
   },
   "schemaVersion": 2,
-  "generation": "bf23e789-6df8-4e46-bfc2-1ffc62e18ac5",
+  "generation": "70810c0e-a526-4703-a554-83c913cca982",
   "treasuryUsd": 0,
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791167226656,
+    "generatedAt": 1791167525671,
     "trades": {
-      "count": 35,
-      "wins": 14,
+      "count": 36,
+      "wins": 15,
       "losses": 20,
       "flat": 1,
-      "winRate": 41.18,
+      "winRate": 42.86,
       "usdComplete": true,
-      "netUsd": 76.56,
-      "grossProfitUsd": 342.26,
+      "netUsd": 87.04,
+      "grossProfitUsd": 352.74,
       "grossLossUsd": -265.7,
-      "profitFactor": 1.29,
+      "profitFactor": 1.33,
       "profitFactorBasis": "usd",
-      "expectancyUsd": 2.19,
+      "expectancyUsd": 2.42,
       "expectancyPct": 0.03,
-      "avgWinUsd": 24.45,
+      "avgWinUsd": 23.52,
       "avgLossUsd": -13.27,
-      "avgWinPct": 0.29,
+      "avgWinPct": 0.28,
       "avgLossPct": -0.16,
       "best": {
         "usd": 70.14,
@@ -465,12 +449,12 @@
         "symbol": "XRP",
         "at": 1790966843045
       },
-      "longestWinStreak": 6,
+      "longestWinStreak": 7,
       "longestLossStreak": 5,
-      "avgHoldMinutes": 914,
-      "tradesPerDay": 6.4,
+      "avgHoldMinutes": 1008,
+      "tradesPerDay": 6.5,
       "firstAt": 1790691123483,
-      "lastAt": 1791163629642
+      "lastAt": 1791166526923
     },
     "equity": {
       "days": 5,
@@ -491,18 +475,18 @@
       "calmar": null,
       "since": 1790691122573
     },
-    "profitUsd": -23.14,
-    "profitPct": -0.27,
+    "profitUsd": -23.79,
+    "profitPct": -0.28,
     "recoveryFactor": -0.2,
     "score": {
       "axes": {
-        "winRate": 41.18,
-        "profitFactor": 14.5,
+        "winRate": 42.86,
+        "profitFactor": 16.5,
         "risk": 96.55,
         "recovery": 0,
         "consistency": 60
       },
-      "overall": 42.45,
+      "overall": 43.18,
       "complete": true
     }
   },
@@ -740,9 +724,9 @@
     },
     {
       "d": "2026-10-05",
-      "n": 2,
-      "usd": 57.18,
-      "w": 2,
+      "n": 3,
+      "usd": 67.66,
+      "w": 3,
       "l": 0
     }
   ]
