@@ -80,7 +80,24 @@ const positions = activeLedger.map((a, i) => {
     tpPrice: Number(t.tp) || null,
     bookLabel: `${t.direction === 'LONG' ? 'long' : 'short'} · ${label(t.strategy)}${t.leverage ? ` · ${t.leverage}×` : ''}`,
     ageMinutes: t.opened_ms ? Math.round((now - t.opened_ms) / 60000) : null,
-    principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0, pnlUsd: null,
+    // Data futures dari catatan bot sendiri. Harga mark dan untung/rugi per
+    // posisi baru terisi kalau bot mencatatnya (mark_price / unrealized_usd);
+    // tidak dihitung dari harga lain supaya tidak ada angka karangan.
+    futures: {
+      leverage: Number(t.leverage) || null,
+      marginUsd: Number.isFinite(Number(t.planned_initial_margin)) ? r2(t.planned_initial_margin) : null,
+      notionalUsd: Number(t.qty) && Number(t.entry) ? r2(Number(t.qty) * Number(t.entry)) : null,
+      riskUsd: Number.isFinite(Number(t.initial_risk_usd)) ? r2(t.initial_risk_usd) : null,
+      markPrice: Number(t.mark_price) || null,
+      unrealizedUsd: Number.isFinite(Number(t.unrealized_usd)) ? r2(t.unrealized_usd) : null,
+      liqPrice: Number(t.liquidation_price) || null,
+      bestR: Number.isFinite(Number(t.max_favorable_r)) ? r2(t.max_favorable_r) : null,
+      worstR: Number.isFinite(Number(t.max_adverse_r)) ? r2(t.max_adverse_r) : null,
+      timeframe: t.signal?.context?.timeframe || null,
+      exploration: t.signal?.context?.entry_mode === 'exploration',
+    },
+    thesis: t.signal?.context?.hypothesis ? String(t.signal.context.hypothesis).slice(0, 200) : null,
+    principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0, pnlUsd: Number.isFinite(Number(t.unrealized_usd)) ? r2(t.unrealized_usd) : null,
     stale: !health.usable,
   };
 });
@@ -170,7 +187,13 @@ const snapshot = {
     cashUsd: equity,
     positionsUsd: 0,
     realizedUsd: r2(baru.reduce((s, r) => s + r.netUsd, 0)),
-    unrealizedUsd: 0,
+    // Floating seluruh akun = equity − saldo wallet (angka bursa sendiri).
+    unrealizedUsd: r2(Number(status.account.equity) - Number(status.account.wallet)),
+    account: {
+      walletUsd: r2(status.account.wallet), equityUsd: r2(status.account.equity),
+      availableUsd: r2(status.account.available), marginUsd: r2(status.account.initial_margin),
+      reserveFraction: Number(status.margin_reserve_fraction) || null,
+    },
     peakUsd: null,
     paused: Boolean(status.paused || status.daily_halt),
     startedAt,
@@ -183,6 +206,10 @@ const snapshot = {
     lead: `Bot crypto futures di Binance TESTNET — dananya virtual. Sejak ${startedAt ? tgl(startedAt) : '29 Sep'} berjalan dengan mesin baru `
       + `yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.`,
     tiles: [
+      { k: 'Floating (belum terealisasi)', v: `${status.account.equity - status.account.wallet >= 0 ? '+' : '−'}$${Math.abs(status.account.equity - status.account.wallet).toFixed(2)}`,
+        n: `${positions.length} posisi terbuka · equity − saldo wallet`, tone: status.account.equity - status.account.wallet >= 0 ? 'pos' : 'neg' },
+      { k: 'Margin terpakai', usd: r2(status.account.initial_margin), n: `tersedia $${r2(status.account.available).toLocaleString('en-US')}` },
+      { k: 'Leverage', v: [...new Set(positions.map((p) => p.futures.leverage).filter(Boolean))].map((x) => x + '×').join(' / ') || '—', n: 'per posisi, isolated/cross mengikuti bot' },
       { k: 'Data akun terakhir', v: updatedAt ? new Date(updatedAt + WIB).toISOString().slice(11, 16) + ' WIB' : 'belum tersedia', n: health.usable ? 'akun berhasil diperiksa' : 'nilai terakhir; belum terverifikasi ulang', tone: health.usable ? 'pos' : 'neg' },
       ...(health.until > now ? [{ k: 'Coba koneksi lagi', v: new Date(health.until + WIB).toISOString().slice(11, 19) + ' WIB', n: 'otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang' }] : []),
       { k: 'Pindai pasar', v: String(act.scans), n: `24 jam · ${act.skips} kandidat dilewati` },

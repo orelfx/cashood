@@ -681,7 +681,8 @@ const HOLD_PER_PAGE = 5;
 
 function renderHoldings(nav) {
   const tokens = isTrading()
-    ? (nav.positions || []).map((p) => ({ symbol: p.symbol, amount: p.amount, price: p.priceUsd, usd: p.principalUsd }))
+    // Posisi futures/forex bukan token yang dipegang: tidak masuk daftar saldo.
+    ? (nav.positions || []).filter((p) => !p.direction).map((p) => ({ symbol: p.symbol, amount: p.amount, price: p.priceUsd, usd: p.principalUsd }))
     : [];
   const rows = [...(nav.holdings || []), ...tokens].sort((a, b) => (b.usd || 0) - (a.usd || 0));
   const body = $('#holdTable').querySelector('tbody');
@@ -1121,6 +1122,7 @@ function renderTrades(nav) {
     tile('Untung / rugi', signed(pnl), cost ? pct((pnl / cost) * 100) + ' dari modal' : '—', cls(pnl)),
     tile('Eksposur', total ? pct((value / total) * 100, 1) : '—', nav.trading?.tiles ? 'dari nilai dana' : 'dari nilai dana · batas 60%'),
   ].join(''));
+  if (rows.some((r) => r.futures)) { renderFutures(nav, rows, body, tile); return; }
   if (rows.every((r) => r.direction)) {
     setHTML($('#lpSummary'), '');
     setHTML(body, rows.map((r) => `<tr>
@@ -1148,6 +1150,43 @@ function renderTrades(nav) {
     </tr>`).join(''));
   $('#lpHint').textContent = `nilai = hasil jual bersih menurut quote · dihitung ${ago(nav.updatedAt)}`
     + (rows.some((p) => p.stale) ? ' · ada harga yang belum diperbarui' : '');
+}
+
+/**
+ * Posisi futures (Binance testnet): dibaca seperti layar trading — arah dan
+ * leverage, ukuran, margin, entry, SL/TP, risiko, dan untung/rugi berjalan.
+ * Harga mark dan floating per posisi hanya tampil kalau bot mengirimnya;
+ * floating seluruh akun selalu ada (equity − saldo wallet).
+ */
+function renderFutures(nav, rows, body, tile) {
+  const acc = nav.trading?.account || {};
+  const fl = Number(nav.trading?.unrealizedUsd) || 0;
+  const margin = rows.reduce((t, r) => t + (Number(r.futures?.marginUsd) || 0), 0);
+  const notional = rows.reduce((t, r) => t + (Number(r.futures?.notionalUsd) || 0), 0);
+  const risk = rows.reduce((t, r) => t + (Number(r.futures?.riskUsd) || 0), 0);
+  setHTML($('#lpSummary'), [
+    tile('Floating akun', signed(fl), `${rows.length} posisi · equity − saldo wallet`, cls(fl)),
+    tile('Margin terpakai', usd(acc.marginUsd ?? margin), acc.availableUsd != null ? `tersedia ${usd(acc.availableUsd, 0)}` : ''),
+    tile('Ukuran total', usd(notional, 0), `nilai kontrak · ${margin ? (notional / margin).toFixed(1) + '× margin' : '—'}`),
+    tile('Risiko kalau semua kena SL', usd(risk), acc.equityUsd ? pct((risk / acc.equityUsd) * 100, 2) + ' dari equity' : '', 'neg'),
+  ].join(''));
+  setHTML($('#lpHead'), '<tr><th>Pair</th><th>Strategi</th><th class="num">Ukuran</th><th class="num">Margin</th><th class="num">Entry → mark</th><th class="num">SL / TP</th><th class="num">Untung / rugi</th></tr>');
+  const px = (v) => (v == null ? '—' : Number(v) < 1 ? Number(v).toPrecision(4) : Number(v).toLocaleString('en-US', { maximumFractionDigits: 4 }));
+  setHTML(body, [...rows].sort((a, b) => (a.ageMinutes ?? 0) - (b.ageMinutes ?? 0)).map((r) => { const f = r.futures || {}; const long = r.direction === 'LONG';
+    return `<tr>
+      <td><b>${esc(r.symbol)}</b><span class="dim">USDT</span>
+        <div class="sub2"><span class="pill ${long ? 'in' : 'out2'}">${long ? 'LONG' : 'SHORT'}</span>${f.leverage ? ` <span class="pill">${f.leverage}×</span>` : ''}</div></td>
+      <td>${esc((r.bookLabel || '').replace(/^(long|short) · /, '').replace(/ · \d+×$/, ''))}<div class="sub2">${[f.timeframe, f.exploration ? 'mode eksplorasi' : '', `umur ${dur(r.ageMinutes)}`].filter(Boolean).join(' · ')}</div>
+        ${r.thesis ? `<div class="thesis" title="${esc(r.thesis)}"><b>Ide:</b> ${esc(r.thesis)}</div>` : ''}</td>
+      <td class="num">${f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">${r.lot ?? '—'} ${esc(r.symbol)}</div></td>
+      <td class="num">${f.marginUsd != null ? usd(f.marginUsd) : '—'}<div class="sub2">risiko ${f.riskUsd != null ? usd(f.riskUsd) : '—'}</div></td>
+      <td class="num">${px(r.entryPrice)}<div class="sub2">${f.markPrice ? '→ ' + px(f.markPrice) : '→ —'}</div></td>
+      <td class="num"><span class="neg">${px(r.slPrice)}</span> / <span class="pos">${px(r.tpPrice)}</span>${f.liqPrice ? `<div class="sub2">likuidasi ${px(f.liqPrice)}</div>` : ''}</td>
+      <td class="num ${f.unrealizedUsd == null ? '' : cls(f.unrealizedUsd)}">${f.unrealizedUsd == null ? '<span class="dim">—</span><div class="sub2">menunggu bot</div>'
+        : `${signed(f.unrealizedUsd)}<div class="sub2 ${cls(f.unrealizedUsd)}">${f.marginUsd ? 'ROE ' + (f.unrealizedUsd >= 0 ? '+' : '') + pct((f.unrealizedUsd / f.marginUsd) * 100, 1) : ''}</div>`}
+        ${f.bestR != null ? `<div class="sub2" title="gerak terbaik / terburuk sejak dibuka, dalam kelipatan risiko (R)">${f.bestR}R / ${f.worstR ?? '—'}R</div>` : ''}</td>
+    </tr>`; }).join(''));
+  $('#lpHint').textContent = `futures testnet · floating per posisi ${rows.some((r) => r.futures?.unrealizedUsd != null) ? 'dari bot' : 'belum dikirim bot (total akun tetap benar)'} · ${ago(nav.updatedAt)}`;
 }
 
 /** Biaya langganan bulanan. Dibayar dari luar wallet, jadi tidak masuk NAV. */
