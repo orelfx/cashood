@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "51642e78-64c0-47e7-bb69-3b868b0fe546",
-  "updatedAt": 1791199879193,
-  "generatedAt": "2026-10-05 18:31 WIB",
+  "generation": "95fa5424-7f23-4c76-8bdc-d235b41f498a",
+  "updatedAt": 1791200179193,
+  "generatedAt": "2026-10-05 18:36 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -82,12 +82,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791199879193,
+    "heartbeatAt": 1791200179193,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791199874549,
+    "lastScanAt": 1791200179084,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -108,13 +108,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "64",
+        "v": "66",
         "n": "24 jam · 2 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1411",
-        "n": "173 aktif"
+        "n": "172 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -124,9 +124,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791199879193,
+      "lastDecisionAt": 1791200179193,
       "lastAction": "keputusan",
-      "lastReason": "MENTOR [degen]: Dilewati karena red flag: likuiditas cuma $1941."
+      "lastReason": "EVERY [degen]: Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
     }
   },
   "strategy": {
@@ -145,7 +145,7 @@
       ],
       [
         "Wallet dipantau",
-        "1411 · 173 aktif"
+        "1411 · 172 aktif"
       ],
       [
         "Cadangan kas",
@@ -153,11 +153,11 @@
       ],
       [
         "Wallet tepercaya",
-        "0 · menjanjikan 9"
+        "0 · menjanjikan 8"
       ],
       [
         "Label wallet",
-        "smart 491 · dolphin 64 · bot 715 · lp 1 · fresh 19 · kol 90 · whale 3 · blacklist 28"
+        "smart 490 · dolphin 64 · bot 716 · lp 1 · fresh 19 · kol 90 · whale 3 · blacklist 28"
       ]
     ],
     "requirements": [
@@ -204,21 +204,21 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1411,
-      "active": 173,
-      "passive": 1238,
+      "active": 172,
+      "passive": 1239,
       "trusted": 0,
-      "promising": 9,
+      "promising": 8,
       "byLabel": [
         {
           "key": "bot",
-          "total": 715,
+          "total": 716,
           "active": 0,
-          "passive": 715
+          "passive": 716
         },
         {
           "key": "smart",
-          "total": 491,
-          "active": 132,
+          "total": 490,
+          "active": 131,
           "passive": 359
         },
         {
@@ -359,6 +359,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791200127752,
+        "symbol": "EVERY",
+        "action": "test",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 5.32% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 46,
+            "note": "bundler pegang 12.6%"
+          }
+        ],
+        "reason": "Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
+      },
+      {
+        "at": 1791200090933,
+        "symbol": "Harness-1",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 56% supply."
+      },
       {
         "at": 1791199670852,
         "symbol": "MENTOR",
@@ -1053,22 +1090,12 @@
           "smart": 3
         },
         "reason": "Take profit bertahap (TP1): jual sebagian senilai $9,64; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791181354743,
-        "symbol": "SM",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 29,
-        "red_flag": 22,
+        "red_flag": 23,
         "round_trip_cost": 3,
         "basket_full": 0,
         "slippage": 0,
@@ -1082,7 +1109,7 @@
         "llm": 2
       },
       "test": {
-        "solo": 5,
+        "solo": 6,
         "explore": 2
       },
       "solo_entries": {
@@ -1111,7 +1138,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791199915294,
+    "generatedAt": 1791200212850,
     "trades": {
       "count": 1,
       "wins": 1,
