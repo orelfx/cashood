@@ -1,7 +1,7 @@
 {
   "fund": "binance",
-  "updatedAt": 1791175905332,
-  "generatedAt": "2026-10-05 11:51 WIB",
+  "updatedAt": 1791176080295,
+  "generatedAt": "2026-10-05 11:54 WIB",
   "usdIdr": null,
   "totalUsd": 8422.52,
   "botWalletUsd": 8422.52,
@@ -364,19 +364,24 @@
     "peakUsd": null,
     "paused": false,
     "startedAt": 1790691121483,
-    "heartbeatAt": 1791175898310,
-    "accountUpdatedAt": 1791175881544,
-    "apiState": "CONNECTED",
-    "retryAt": null,
-    "status": "berjalan",
-    "healthy": true,
+    "heartbeatAt": 1791176078390,
+    "accountUpdatedAt": 1791176002139,
+    "apiState": "RATE_LIMIT_WAIT",
+    "retryAt": 1791176097571,
+    "status": "menunggu anggaran request",
+    "healthy": false,
     "lead": "Bot crypto futures di Binance TESTNET — dananya virtual. Sejak 2026-09-29 berjalan dengan mesin baru yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.",
     "tiles": [
       {
         "k": "Data akun terakhir",
-        "v": "11:51 WIB",
-        "n": "akun berhasil diperiksa",
-        "tone": "pos"
+        "v": "11:53 WIB",
+        "n": "nilai terakhir; belum terverifikasi ulang",
+        "tone": "neg"
+      },
+      {
+        "k": "Coba koneksi lagi",
+        "v": "11:54:57 WIB",
+        "n": "otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang"
       },
       {
         "k": "Pindai pasar",
@@ -402,16 +407,18 @@
     ],
     "llm": null
   },
-  "schemaVersion": 2,
-  "generation": "2041ee4b-1d19-4847-a398-3eb66dbefd5d",
-  "treasuryUsd": 0,
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "menunggu anggaran request; saldo/posisi adalah data terakhir, bukan pembacaan akun baru"
+    ]
   },
+  "schemaVersion": 2,
+  "generation": "c3785b98-c113-496b-86aa-551911ec6b5b",
+  "treasuryUsd": 0,
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791175905382,
+    "generatedAt": 1791176080350,
     "trades": {
       "count": 36,
       "wins": 15,
