@@ -11,10 +11,10 @@ import { atomicJSON, assertPublic } from './io.mjs';
 
 const WIB = 7 * 3600e3;
 // Hanya kolom ini yang boleh terbit; ID posisi, alamat, dan tiket tidak pernah ikut.
-const KEYS = ['symbol', 'strategy', 'bookLabel', 'entryVia', 'door', 'orderedBy', 'netUsd', 'estUsd', 'netPct', 'rMultiple', 'holdMinutes', 'reason', 'reasonDetail', 'closedAt', 'investedUsd', 'feesUsd', 'lot', 'legacy'];
+const KEYS = ['symbol', 'strategy', 'bookLabel', 'entryVia', 'door', 'orderedBy', 'netUsd', 'estUsd', 'netPct', 'rMultiple', 'holdMinutes', 'reason', 'reasonDetail', 'closedAt', 'investedUsd', 'feesUsd', 'lot', 'legacy', 'wallets', 'flags', 'firstWallet', 'llmScore', 'peakPct', 'ddPct', 'entry', 'exitDetail', 'walletsSold'];
 // Teks bebas dari bot (alasan tutup, nama strategi) bisa memuat alamat kontrak
 // atau kalimat panjang: alamat dipangkas, panjangnya dibatasi.
-const LIMIT = { symbol: 40, strategy: 60, reason: 90, reasonDetail: 240 };
+const LIMIT = { symbol: 40, strategy: 60, reason: 90, reasonDetail: 240, entry: 300, exitDetail: 300, firstWallet: 30 };
 const text = (v, max) => { const t = String(v).replace(/(?:0x)?[0-9a-fA-F]{24,}/g, '0x…').replace(/\s+/g, ' ').trim(); return t.length > max ? t.slice(0, max - 1) + '…' : t; };
 const clean = (r) => Object.fromEntries(KEYS.filter((k) => r[k] !== undefined && r[k] !== null).map((k) => [k, LIMIT[k] ? text(r[k], LIMIT[k]) : r[k]]));
 const dayOf = (t) => new Date(t + WIB).toISOString().slice(0, 10);

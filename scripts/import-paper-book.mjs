@@ -52,6 +52,20 @@ const reasonText = (v) => { const t = text(v, 60); return t ? REASON[t.toLowerCa
 // Wallet yang ikut membeli (copy-trade): jumlah dan labelnya, tanpa alamat.
 const walletsNote = (p) => { const n = optNum(pick(p, ['wallets_joined'])); const labels = Array.isArray(p.wallet_labels) ? [...new Set(p.wallet_labels.map((x) => text(x, 16)).filter(Boolean))] : [];
   return n == null ? null : `${n} wallet${labels.length ? ' (' + labels.join(', ') + ')' : ''}`; };
+// Komposisi wallet per label dan tanda bahaya (copy-trade). Kunci label huruf
+// kecil pendek; jumlah harus angka. Catatan bebas dipangkas seperti teks lain.
+const keyOf = (k) => String(k).toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+const counts = (o) => (o && typeof o === 'object' && !Array.isArray(o) ? Object.fromEntries(Object.entries(o).map(([k, n]) => [keyOf(k), optNum(n)]).filter(([k, n]) => k && n != null && n > 0)) : null);
+const flagsOf = (a) => (Array.isArray(a) ? a.map((f) => ({ type: keyOf(f?.type ?? ''), count: optNum(f?.count), ...(text(f?.note, 160) ? { note: text(f.note, 160) } : {}) })).filter((f) => f.type) : []);
+const aliasOf = (w) => (w && typeof w === 'object' && text(w.alias, 30) ? `${text(w.alias, 30)}` : null);
+const copyFields = (p) => ({
+  ...(counts(p.wallet_breakdown) ? { wallets: counts(p.wallet_breakdown) } : {}),
+  ...(flagsOf(p.risk_flags).length ? { flags: flagsOf(p.risk_flags) } : {}),
+  ...(aliasOf(p.first_wallet) ? { firstWallet: aliasOf(p.first_wallet) } : {}),
+  ...(optNum(p.llm_score) != null ? { llmScore: optNum(p.llm_score) } : {}),
+  ...(optNum(p.peak_pct) != null ? { peakPct: Number(optNum(p.peak_pct).toFixed(2)) } : {}),
+  ...(optNum(p.max_drawdown_pct) != null ? { ddPct: Number(optNum(p.max_drawdown_pct).toFixed(2)) } : {}),
+});
 const pctOf = (p, pctNames, priceNames, entry, sign) => {
   const direct = optNum(pick(p, pctNames)); if (direct != null) return Math.abs(direct);
   const px = optNum(pick(p, priceNames)); return px != null && entry > 0 ? Number((Math.abs(px / entry - 1) * 100).toFixed(2)) : null;
@@ -108,7 +122,8 @@ const positions = list.map((p, i) => {
     ...(optNum(pick(p, ['quantity', 'qty', 'amount'])) != null ? { amount: optNum(pick(p, ['quantity', 'qty', 'amount'])) } : {}),
     ...(text(pick(p, ['strategy'])) || walletsNote(p) ? { strategy: [text(pick(p, ['strategy']), 60), walletsNote(p) && `ikut ${walletsNote(p)}`, p.trailing === true ? 'trailing' : null].filter(Boolean).join(' · ') } : {}),
     ...(optNum(pick(p, ['confidence'])) != null ? { confidence: optNum(pick(p, ['confidence'])) } : {}),
-    ...(text(pick(p, ['thesis', 'entry_reason', 'reason'])) || text(p.llm_verdict) ? { thesis: [text(pick(p, ['thesis', 'entry_reason', 'reason'])), text(p.llm_verdict) && `LLM: ${text(p.llm_verdict)}`].filter(Boolean).join(' · ').slice(0, 400) } : {}),
+    ...(text(pick(p, ['entry_reason', 'thesis', 'reason'])) || text(p.llm_verdict) ? { thesis: [text(pick(p, ['entry_reason', 'thesis', 'reason'])), text(p.llm_verdict) && !/no answer/i.test(p.llm_verdict) && `LLM: ${text(p.llm_verdict)}`].filter(Boolean).join(' · ').slice(0, 450) } : {}),
+    ...copyFields(p),
     stale,
     ...(stale ? { staleReason: 'harga masuk/mark belum tersedia' } : {}),
   };
@@ -128,7 +143,11 @@ const closed = (Array.isArray(closedSrc) ? closedSrc : []).map((c, i) => {
     holdMinutes: openedRaw === undefined ? null : Math.max(0, Math.round((closedAt - time(openedRaw, 'opened_at')) / 60000)),
     reason: reasonText(pick(c, ['reason', 'exit_reason'])) ?? '—',
     ...(text(pick(c, ['reason_detail', 'note'])) || walletsNote(c) ? { reasonDetail: [text(pick(c, ['reason_detail', 'note']), 200), walletsNote(c) && `ikut ${walletsNote(c)}`].filter(Boolean).join(' · ') } : {}),
-    ...(optNum(pick(c, ['fees_usd'])) != null ? { feesUsd: optNum(pick(c, ['fees_usd'])) } : {}), closedAt };
+    ...(optNum(pick(c, ['fees_usd'])) != null ? { feesUsd: optNum(pick(c, ['fees_usd'])) } : {}),
+    ...(text(c.entry_reason) ? { entry: text(c.entry_reason, 300) } : {}),
+    ...(text(c.exit_detail) ? { exitDetail: text(c.exit_detail, 300) } : {}),
+    ...(counts(c.wallets_sold) ? { walletsSold: counts(c.wallets_sold) } : {}),
+    ...copyFields(c), closedAt };
 }).sort((a, b) => a.closedAt - b.closedAt);
 const trades = groupTradeDays(closed, 0.5);
 const wins = closed.filter((c) => c.netPct > 0.5).length, losses = closed.filter((c) => c.netPct < -0.5).length;
@@ -148,6 +167,25 @@ const ruleList = Array.isArray(src.rules) ? src.rules.filter((x) => typeof x ===
 const baskets = Array.isArray(src.baskets) ? src.baskets.map((b) => [text(b.label ?? b.id, 30),
   [optNum(b.alloc_pct) != null && `alokasi ${b.alloc_pct}%`, optNum(b.cap) != null && `$${b.cap}`, optNum(b.seat_pct) != null && `kursi maks ${b.seat_pct}% equity`, optNum(b.open) != null && `${b.open} terbuka`].filter(Boolean).join(' · ')]).filter(([k, v]) => k && v) : [];
 const wallets = src.wallets && typeof src.wallets === 'object' ? src.wallets : null;
+// Blok copy-trade (SnipeHunt): segmen wallet, wallet teratas, jejak keputusan.
+const byLabel = wallets?.by_label && typeof wallets.by_label === 'object' ? Object.entries(wallets.by_label).map(([k, v]) => (typeof v === 'object' && v
+  ? { key: keyOf(k), total: optNum(v.total) ?? 0, active: optNum(v.active) ?? 0, passive: optNum(v.passive) ?? 0 }
+  : { key: keyOf(k), total: optNum(v) ?? 0, active: null, passive: null })).filter((x) => x.key) : [];
+const copyTrade = wallets || Array.isArray(src.decisions) ? {
+  wallets: wallets ? {
+    tracked: optNum(wallets.tracked), active: optNum(wallets.active), passive: optNum(wallets.passive),
+    byLabel: byLabel.sort((a, b) => b.total - a.total),
+    definitions: Object.fromEntries(['active', 'passive', 'label'].map((k) => [k, text(wallets.definitions?.[k], 300)]).filter(([, v]) => v)),
+    top: (Array.isArray(wallets.top) ? wallets.top : []).slice(0, 10).map((w) => ({ alias: text(w.alias, 30), label: keyOf(w.label ?? ''), score: optNum(w.score),
+      copied: optNum(w.copied), won: optNum(w.won), pnlUsd: optNum(w.pnl_usd) })).filter((w) => w.alias),
+  } : null,
+  decisions: (Array.isArray(src.decisions) ? src.decisions : []).slice(0, 50).map((d) => ({
+    at: d.at ? time(d.at, 'decisions.at') : null, symbol: text(d.symbol, 40), action: keyOf(d.action ?? ''), basket: text(d.basket, 20),
+    ...(counts(d.wallet_breakdown) ? { wallets: counts(d.wallet_breakdown) } : {}), ...(flagsOf(d.risk_flags).length ? { flags: flagsOf(d.risk_flags) } : {}),
+    reason: text(d.reason, 400) })).filter((d) => d.at && d.action),
+  reasonStats: src.reason_stats_24h && typeof src.reason_stats_24h === 'object'
+    ? Object.fromEntries(Object.entries(src.reason_stats_24h).map(([g, o]) => [keyOf(g), Object.fromEntries(Object.entries(o || {}).map(([k, n]) => [text(k, 30), optNum(n)]).filter(([k, n]) => k && n != null))])) : null,
+} : null;
 const walletRows = wallets ? [['Wallet dipantau', `${optNum(wallets.tracked) ?? '—'} · ${optNum(wallets.active) ?? '—'} aktif`],
   ...(wallets.by_label && typeof wallets.by_label === 'object' ? [['Label wallet', Object.entries(wallets.by_label).filter(([, n]) => optNum(n)).map(([k, n]) => `${text(k, 16)} ${n}`).join(' · ')]] : [])] : [];
 const about = (Array.isArray(src.about) ? src.about : src.about ? [src.about] : []).map((x) => text(x, 500)).filter(Boolean);
@@ -222,6 +260,7 @@ const snapshot = {
   ...(about.length || rules.length || ruleList.length || sleeveInfo.length ? { strategy: { title: `${BOOKS[fund]} — buku paper`, about,
     system: [['Mode', 'paper'], ...(text(bot.model, 40) ? [['Model LLM', text(bot.model, 40)]] : []), ...rules, ...walletRows], requirements: sleeveInfo,
     ...(baskets.length ? { requirementsTitle: 'Basket modal' } : {}), ...(ruleList.length ? { ruleList } : {}), risks: [] } } : {}),
+  ...(copyTrade ? { copyTrade } : {}),
   quality: nStale ? { complete: false, reasons: [`${nStale} posisi tanpa harga masuk/mark; nilainya dari catatan paper`] } : { complete: true, reasons: [] },
   costsShareUsd: 0,
 };

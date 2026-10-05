@@ -426,6 +426,9 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     trading: snap.trading || null,
     tradeDays: Array.isArray(snap.tradeDays) ? snap.tradeDays : [],
     strategy: snap.strategy || null,
+    seats: snap.seats || null,                   // kursi per buku (Reborn)
+    paperBooks: snap.paperBooks || null,         // buku kertas pembanding (Reborn hot potato)
+    copyTrade: snap.copyTrade || null,           // segmen wallet & jejak keputusan (SnipeHunt)
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -834,11 +837,12 @@ function closedRowsHtml(rows, absolute) {
   return rows.map((r) => `
     <tr>
       <td><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
-      <td class="dim">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}</td>
+      <td class="dim">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
       <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
-      <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}</td>
+      <td class="dim"${r.reasonDetail ? ` title="${esc(r.reasonDetail)}"` : ''}>${esc(r.reason ?? '—')}${r.exitDetail ? `<div class="sub2 why">${esc(r.exitDetail)}</div>` : ''}${
+        r.entry ? `<div class="sub2 why"><b>Masuk:</b> ${esc(r.entry)}</div>` : ''}${r.peakPct != null ? `<div class="sub2">puncak +${pct(r.peakPct, 1)}${r.ddPct != null ? ` · terdalam ${pct(r.ddPct, 1)}` : ''}</div>` : ''}</td>
       <td class="num dim nowrap">${absolute ? tglRingkas(r.closedAt) : ago(r.closedAt)}</td>
     </tr>`).join('');
 }
@@ -960,6 +964,7 @@ function applyFundKind() {
   $('#shareCard').hidden = t;
   if ($('#stripShare')) $('#stripShare').hidden = t;
   $('#paperCard').hidden = !t;
+  $('#copyCard').hidden = true; $('#decisionCard').hidden = true;   // dibuka renderCopyTrade kalau datanya ada
   const shareBtn = document.querySelector('#segSeries [data-s="share"]');
   if (shareBtn) shareBtn.hidden = t;
   if (t && navView.series === 'share') {
@@ -974,6 +979,7 @@ function renderPaper(nav) {
   const tr = isTrading() ? nav?.trading : null;
   if (!tr) return;
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  renderCopyTrade(nav);
   if (Array.isArray(tr.tiles)) { renderPaperGeneric(nav, tr, tile); return; }
   const hidup = tr.heartbeatAt && nav.updatedAt - tr.heartbeatAt < 10 * 60e3;
   const sehat = hidup && tr.status === 'healthy' && !tr.paused;
@@ -998,6 +1004,87 @@ function renderPaper(nav) {
     </div>` : '');
 }
 
+/*
+ * Copy-trade (SnipeHunt): label wallet dan tanda bahaya diberi ikon supaya
+ * sekali lihat terbaca siapa yang ikut membeli. Kunci yang belum dikenal
+ * tetap tampil dengan namanya apa adanya.
+ */
+const WALLET_KIND = {
+  smart: ['🧠', 'Smart money', '#4ade80'], whale: ['🐋', 'Paus (whale)', '#60a5fa'], dolphin: ['🐬', 'Lumba-lumba', '#22d3ee'],
+  kol: ['📣', 'KOL', '#c084fc'], bot: ['🤖', 'Bot', '#94a3b8'], lp: ['💧', 'LP', '#38bdf8'], fresh: ['🌱', 'Wallet baru', '#a3e635'],
+  blacklist: ['💀', 'Blacklist', '#f87171'], unknown: ['❔', 'Belum dinilai', '#64748b'],
+};
+const FLAG_KIND = {
+  blacklist: ['💀', 'wallet blacklist ikut beli'], phishing: ['🎣', 'phishing'], bundler: ['📦', 'bundler'], rat: ['🐀', 'rat / insider'],
+  insider: ['🐀', 'insider'], sniper: ['🎯', 'sniper'], dev: ['👨‍💻', 'dev ikut main'], wash: ['🧼', 'volume cuci'], fresh: ['🌱', 'banyak wallet baru'],
+  top10: ['🔟', '10 holder teratas >30%'], honeypot: ['🍯', 'honeypot'], tax: ['💸', 'pajak token'], mint_authority: ['🖨️', 'mint authority'],
+  freeze_authority: ['🧊', 'freeze authority'], scam_warning: ['⚠️', 'peringatan scam'],
+};
+const kindOf = (k) => WALLET_KIND[k] || ['👛', k, '#8b95a7'];
+function walletChips(o) {
+  const e = Object.entries(o || {}).filter(([, n]) => n > 0);
+  return e.length ? `<span class="wchips">${e.map(([k, n]) => `<span class="wchip" title="${esc(kindOf(k)[1])}">${kindOf(k)[0]} ${n} <small>${esc(kindOf(k)[1])}</small></span>`).join('')}</span>` : '';
+}
+function flagChips(a) {
+  return (a || []).length ? `<span class="wchips">${a.map((f) => { const [ic, name] = FLAG_KIND[f.type] || ['🚩', f.type];
+    return `<span class="fchip" title="${esc(f.note || name)}">${ic} ${f.count ?? ''} <small>${esc(name)}</small></span>`; }).join('')}</span>` : '';
+}
+const ACTION = { enter: ['masuk', 'in'], skip: ['dilewati', ''], veto: ['diveto', 'warn'], exit: ['keluar', 'out'], partial: ['jual sebagian', 'in'] };
+const decView = { all: false };
+function renderCopyTrade(nav) {
+  const ct = nav?.copyTrade;
+  const w = ct?.wallets;
+  $('#copyCard').hidden = !w;
+  if (w) {
+    const total = w.tracked || w.byLabel.reduce((t, x) => t + x.total, 0) || 0;
+    const act = w.active ?? 0, pas = w.passive ?? Math.max(0, total - act);
+    setHTML($('#copyHint'), `diperbarui ${ago(nav.updatedAt)}`);
+    setHTML($('#copyWallets'), `
+      <div class="wl-head">
+        <div><div class="k">Total wallet dipantau</div><div class="wl-big num">${total.toLocaleString('id-ID')}</div></div>
+        <div class="wl-split">
+          <div class="wl-bar"><i style="width:${total ? (act / total * 100).toFixed(1) : 0}%"></i></div>
+          <div class="wl-leg"><span><b class="pos">${act.toLocaleString('id-ID')}</b> aktif dipantau</span><span><b>${pas.toLocaleString('id-ID')}</b> pasif dipantau</span></div>
+        </div>
+      </div>
+      <div class="wl-grid">${w.byLabel.map((x) => { const [ic, name, c] = kindOf(x.key);
+        return `<div class="wl-tile" style="--wc:${c}">
+          <div class="wl-ic">${ic}</div>
+          <div class="wl-name">${esc(name)}</div>
+          <div class="wl-n num">${x.total.toLocaleString('id-ID')}</div>
+          ${x.active != null ? `<div class="wl-sub"><span class="pos">${x.active} aktif</span> · ${x.passive} pasif</div>
+          <div class="wl-mini"><i style="width:${x.total ? (x.active / x.total * 100).toFixed(1) : 0}%"></i></div>` : ''}
+        </div>`; }).join('')}</div>
+      ${w.definitions?.active || w.definitions?.passive ? `<details class="explain"><summary>Apa bedanya aktif dan pasif</summary>
+        ${w.definitions.active ? `<p><b>Aktif:</b> ${esc(w.definitions.active)}</p>` : ''}${w.definitions.passive ? `<p><b>Pasif:</b> ${esc(w.definitions.passive)}</p>` : ''}
+        ${w.definitions.label ? `<p><b>Label:</b> ${esc(w.definitions.label)}</p>` : ''}</details>` : ''}
+      ${w.top?.length ? `<h3 class="sub-h">10 wallet terbaik</h3><div class="table-scroll"><table class="mcards">
+        <thead><tr><th>Wallet</th><th class="num">Skor</th><th class="num">Di-copy</th><th class="num">Menang</th><th class="num">Hasil copy</th></tr></thead>
+        <tbody>${w.top.map((t) => `<tr><td class="mc-head">${kindOf(t.label)[0]} ${esc(t.alias)}</td><td class="num" data-k="Skor">${t.score ?? '—'}</td>
+          <td class="num" data-k="Di-copy">${t.copied ?? 0}×</td><td class="num" data-k="Menang">${t.won ?? 0}</td>
+          <td class="num ${cls(t.pnlUsd ?? 0)}" data-k="Hasil copy">${t.pnlUsd ? signed(t.pnlUsd) : '<span class="dim">—</span>'}</td></tr>`).join('')}</tbody></table></div>
+        <p class="hint">Alamat wallet tidak pernah diterbitkan; nomornya alias tetap dari daftar bot.</p>` : ''}`);
+  }
+  const dec = ct?.decisions || [];
+  $('#decisionCard').hidden = !dec.length && !ct?.reasonStats;
+  if ($('#decisionCard').hidden) return;
+  setHTML($('#decHint'), `${dec.length} keputusan terakhir · termasuk yang dilewati`);
+  const RS = { skip: 'dilewati', veto: 'diveto', exit: 'keluar' };
+  const SK = { chase: 'harga sudah lari', red_flag: 'red flag', round_trip_cost: 'biaya keluar-masuk mahal', basket_full: 'basket penuh', slippage: 'slippage',
+    no_price: 'tanpa harga', max_open: 'posisi maksimum', day_loss: 'batas rugi harian', paused: 'bot dijeda', llm: 'LLM' };
+  const rs = ct?.reasonStats || {};
+  const chips = Object.entries(rs).flatMap(([g, o]) => Object.entries(o).filter(([, n]) => n > 0).map(([k, n]) => `<span class="rs-chip"><b>${n}</b> ${esc(RS[g] || g)} · ${esc(SK[k] || k)}</span>`));
+  setHTML($('#decStats'), `<div class="rs"><span class="k">24 jam terakhir</span>${chips.length ? chips.join('') : '<span class="dim">belum ada sinyal yang diproses</span>'}</div>`);
+  const shown = decView.all ? dec : dec.slice(0, 12);
+  setHTML($('#decList'), `<ol class="dec-list">${shown.map((d) => { const [a, tone] = ACTION[d.action] || [d.action, ''];
+    return `<li><div class="dec-top"><span class="pill ${tone}">${esc(a)}</span><b>${esc(d.symbol || '—')}</b>${d.basket ? `<span class="dim">${esc(d.basket)}</span>` : ''}
+      <span class="dim dec-t">${tglJam(d.at)}</span></div>
+      ${walletChips(d.wallets)}${flagChips(d.flags)}
+      ${d.reason ? `<p class="dec-r">${esc(d.reason)}</p>` : ''}</li>`; }).join('')}</ol>
+    ${dec.length > 12 ? `<button class="btn ghost" id="decMore">${decView.all ? 'tampilkan lebih sedikit' : `lihat semua ${dec.length} keputusan`}</button>` : ''}`);
+  if ($('#decMore')) $('#decMore').onclick = () => { decView.all = !decView.all; renderCopyTrade(nav); };
+}
+
 /** Status bot uji coba yang kartunya disusun exporter (Forex, Binance). */
 function renderPaperGeneric(nav, tr, tile) {
   const label = fundMeta(state.fund)?.label || 'Bot ini';
@@ -1010,7 +1097,7 @@ function renderPaperGeneric(nav, tr, tile) {
   setHTML($('#paperDecision'), llm?.lastReason ? `<div class="decision">
       <div class="decision-head"><span class="k">Pandangan AI terakhir</span><span class="pill">${esc(llm.lastAction || '—')}</span>
         <span class="dim">${ago(llm.lastDecisionAt)}${llm.model ? ' · ' + esc(llm.model) : ''}</span></div>
-      <blockquote>${esc(llm.lastReason)}</blockquote><div class="n dim">catatan asli dari AI, bahasa Inggris</div></div>` : '');
+      <blockquote>${esc(llm.lastReason)}</blockquote>${nav.copyTrade ? '' : '<div class="n dim">catatan asli dari AI, bahasa Inggris</div>'}</div>` : '');
 }
 
 function renderTrades(nav) {
@@ -1050,6 +1137,7 @@ function renderTrades(nav) {
       <td><span class="who"><span class="chip" style="background:${r.pnlUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span>
         ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}${r.stale ? '<div class="sub2 neg">harga belum terverifikasi</div>' : ''}</td>
       <td>${esc(r.bookLabel || '—')}<div class="sub2">${[r.strategy && r.strategy !== r.bookLabel ? esc(r.strategy) : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.confidence != null ? `yakin ${r.confidence}%` : '', r.partialDone ? 'sebagian sudah dijual' : ''].filter(Boolean).join(' · ')}</div>
+        ${walletChips(r.wallets)}${flagChips(r.flags)}${r.firstWallet ? `<div class="sub2">pertama beli: ${esc(r.firstWallet)}${r.llmScore != null ? ` · skor LLM ${r.llmScore}` : ''}</div>` : ''}
         ${r.thesis ? `<div class="thesis" title="${esc(r.thesis)}"><b>Alasan masuk:</b> ${esc(r.thesis)}</div>` : ''}</td>
       <td class="num dim">${dur(r.ageMinutes)}</td>
       <td class="num">${usd(r.costUsd)}</td>

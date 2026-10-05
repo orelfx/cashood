@@ -1230,3 +1230,36 @@ body.at-home #tabs { display: none; }
 /* Buku kertas di bawah performa per buku — dibedakan jelas dari hasil asli. */
 .paper-books { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line, rgba(255,255,255,.12)); }
 .paper-books h3 { font-size: 14px; margin: 0 0 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* ── copy-trade (SnipeHunt): segmen wallet, chip label, jejak keputusan ── */
+.pill.warn { color: #fb923c; border-color: #4a2f1a; background: #1f150c; }
+.wl-head { display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 16px; }
+.wl-head .k { font-size: 12px; color: var(--mute, #8b95a7); text-transform: uppercase; letter-spacing: .06em; }
+.wl-big { font-size: 40px; font-weight: 700; line-height: 1.1; }
+.wl-split { flex: 1; min-width: 220px; }
+.wl-bar, .wl-mini { height: 10px; border-radius: 999px; background: #2a323d; overflow: hidden; }
+.wl-bar i, .wl-mini i { display: block; height: 100%; background: var(--green); border-radius: inherit; }
+.wl-mini { height: 5px; margin-top: 8px; }
+.wl-mini i { background: var(--wc); }
+.wl-leg { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; margin-top: 6px; color: var(--mute, #8b95a7); flex-wrap: wrap; }
+.wl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.wl-tile { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: linear-gradient(160deg, color-mix(in srgb, var(--wc) 14%, transparent), transparent 70%); }
+.wl-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 22px;
+  background: color-mix(in srgb, var(--wc) 22%, transparent); border: 1px solid color-mix(in srgb, var(--wc) 45%, transparent); }
+.wl-name { font-size: 13px; color: var(--mute, #8b95a7); margin-top: 8px; }
+.wl-n { font-size: 24px; font-weight: 700; }
+.wl-sub { font-size: 12px; color: var(--mute, #8b95a7); }
+.wchips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.wchip, .fchip, .rs-chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: #151b23; white-space: nowrap; }
+.wchip small, .fchip small { color: var(--mute, #8b95a7); font-size: 11px; }
+.fchip { border-color: #4a2424; background: #1f1214; color: #fca5a5; }
+.rs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 12px; }
+.rs .k { font-size: 12px; color: var(--mute, #8b95a7); margin-right: 4px; }
+.dec-list { list-style: none; padding: 0; margin: 0; }
+.dec-list li { border-top: 1px solid var(--line); padding: 10px 0; }
+.dec-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.dec-t { margin-left: auto; font-size: 12px; }
+.dec-r { margin: 6px 0 0; font-size: 13px; line-height: 1.5; }
+.sub2.why { white-space: normal; max-width: 360px; line-height: 1.4; }
+@media (max-width: 640px) { .wl-big { font-size: 32px; } .wl-grid { grid-template-columns: repeat(2, 1fr); } .dec-t { margin-left: 0; width: 100%; } }
+.wl-big, .wl-n { text-align: left; }
