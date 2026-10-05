@@ -225,6 +225,8 @@ const snapshot = {
   generatedAt: new Date(asOf + WIB).toISOString().replace('T', ' ').slice(0, 16) + ' WIB',
   usdIdr: null,
   totalUsd: equity,
+  // Koin asli jaringannya, untuk kurs di header (Solana → SOL, Robin Hood → ETH).
+  nativeSymbol: fund === 'dgrh' ? 'ETH' : 'SOL',
   botWalletUsd: equity,
   walletUsd: cash,
   lpUsd: inPositions,

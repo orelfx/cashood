@@ -28,7 +28,11 @@ export function reconcile(snapshot, cfg, previous = null) {
       .reduce((s,e)=>s+(e.type==='deposit'?e.usd:e.type==='withdraw'?-e.usd:0),0);
     const outflow=Math.max(0,Number(snapshot.outflowTotalUsd||0)-Number(previous.outflowTotalUsd||0));
     const expected=previous.totalUsd+flow-outflow;
-    if (expected>0 && Math.abs(snapshot.totalUsd-expected)/expected>0.30) throw new Error('Perubahan NAV >30% tanpa arus kas setara: perlu rekonsiliasi sumber');
+    // Batas bawaan 30%. Dana LP memecoin bisa sungguh-sungguh jatuh lebih dari
+    // itu dalam satu siklus (token di pool anjlok), jadi batasnya boleh diatur
+    // per dana lewat fund.navGuardPct — tetap ada pagar untuk salah baca total.
+    const guard=Number(cfg.fund?.navGuardPct)>0?Number(cfg.fund.navGuardPct)/100:0.30;
+    if (expected>0 && Math.abs(snapshot.totalUsd-expected)/expected>guard) throw new Error(`Perubahan NAV >${Math.round(guard*100)}% tanpa arus kas setara: perlu rekonsiliasi sumber`);
   }
   Core.validateSnapshot(snapshot);
   return snapshot;
