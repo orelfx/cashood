@@ -1253,7 +1253,7 @@ function renderFutures(nav, rows, body, tile) {
   const ofEq = (v) => (eq ? pct((Math.abs(v) / eq) * 100, 2) + ' dari equity' : '');
   setHTML($('#lpSummary'), `${[
     fx && !marginKnown.length && acc.marginUsd == null
-      ? tile('Modal (margin)', '—', 'menunggu bot mencatat margin per posisi')
+      ? tile('Total saldo', usd(Number(nav.totalUsd) || 0), 'equity akun demo · termasuk floating')
       : tile('Margin terpakai', usd(acc.marginUsd ?? margin), acc.availableUsd != null ? `tersedia ${usd(acc.availableUsd, 0)}` : `${marginKnown.length}/${rows.length} posisi`),
     fx ? tile('Total lot', lots.toLocaleString('en-US', { maximumFractionDigits: 2 }), `${rows.length} posisi · nilai kontrak ${usd(notional, 0)}`)
       : tile('Ukuran total', usd(notional, 0), `nilai kontrak · ${margin ? (notional / margin).toFixed(1) + '× margin' : '—'}`),
@@ -1261,7 +1261,7 @@ function renderFutures(nav, rows, body, tile) {
     tile('Kalau semua kena TP', signed(atTp), `untung maksimal · ${ofEq(atTp)}`, 'pos'),
     tile('Floating sekarang', signed(fl), `real-time${fx ? ' dari MT5' : ''} · ${rows.length} posisi`, cls(fl)),
   ].join('')}`);
-  setHTML($('#lpHead'), `<tr><th>Pair</th><th>Strategi</th><th class="num">${fx ? 'Lot · margin' : 'Ukuran · margin'}</th><th class="num">${fx ? 'Entry → sekarang' : 'Entry → mark'}</th><th class="num">SL / TP</th><th class="num">${fx ? 'Floating' : 'Untung / rugi'}</th></tr>`);
+  setHTML($('#lpHead'), `<tr><th>Pair</th><th>Strategi</th><th class="num">${fx ? (marginKnown.length ? 'Lot · margin' : 'Lot · kontrak') : 'Ukuran · margin'}</th><th class="num">${fx ? 'Entry → sekarang' : 'Entry → mark'}</th><th class="num">SL / TP</th><th class="num">${fx ? 'Floating' : 'Untung / rugi'}</th></tr>`);
   const px = (v) => (v == null ? '—' : Number(v) < 1 ? Number(v).toPrecision(4) : Number(v).toLocaleString('en-US', { maximumFractionDigits: 4 }));
   setHTML(body, [...rows].sort((a, b) => (a.ageMinutes ?? 0) - (b.ageMinutes ?? 0)).map((r) => { const f = r.futures || {}; const long = r.direction === 'LONG';
     const sl = move(r, r.slPrice), tp = move(r, r.tpPrice);
@@ -1270,7 +1270,7 @@ function renderFutures(nav, rows, body, tile) {
         <div class="sub2"><span class="pill ${long ? 'in' : 'out2'}">${fx ? (long ? 'BELI' : 'JUAL') : long ? 'LONG' : 'SHORT'}</span>${f.leverage ? ` <span class="pill">${f.leverage}×</span>` : ''}</div>
         <div class="sub2 m-only">${esc(shortStrategy(r))} · ${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}</div></td>
       <td class="fx-strat">${stratDetails(r, [f.timeframe, f.exploration ? 'mode eksplorasi' : ''])}</td>
-      <td class="num">${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">margin ${f.marginUsd != null ? usd(f.marginUsd) : '—'}</div></td>
+      <td class="num">${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">${f.marginUsd != null ? 'margin ' + usd(f.marginUsd) : fx && f.notionalUsd != null ? 'kontrak ' + usd(f.notionalUsd, 0) : 'margin —'}</div></td>
       <td class="num">${px(r.entryPrice)}<div class="sub2">${f.markPrice ? '→ ' + px(f.markPrice) : '→ —'}</div></td>
       <td class="num"><div class="fx-px"><span class="neg">${px(r.slPrice)}</span> / <span class="pos">${px(r.tpPrice)}</span></div>
         <div class="sub2 fx-pot"><span class="neg">${signed(sl)}</span><i> / </i><span class="pos">${signed(tp)}</span></div></td>
