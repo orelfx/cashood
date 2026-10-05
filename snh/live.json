@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "95fa5424-7f23-4c76-8bdc-d235b41f498a",
-  "updatedAt": 1791200179193,
-  "generatedAt": "2026-10-05 18:36 WIB",
+  "generation": "8ccd8dfd-8f41-44f9-9376-583ca781e618",
+  "updatedAt": 1791200479195,
+  "generatedAt": "2026-10-05 18:41 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -82,12 +82,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791200179193,
+    "heartbeatAt": 1791200479195,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791200179084,
+    "lastScanAt": 1791200479084,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -108,12 +108,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "66",
-        "n": "24 jam · 2 diveto LLM"
+        "v": "68",
+        "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1411",
+        "v": "1412",
         "n": "172 aktif"
       },
       {
@@ -124,9 +124,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791200179193,
+      "lastDecisionAt": 1791200479195,
       "lastAction": "keputusan",
-      "lastReason": "EVERY [degen]: Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
+      "lastReason": "GENTA [degen]: Diveto LLM: Both wallets show near-identical patterns (62 tokens, same outcomes, same 5.5min hold) suggesting coordinated activity, with poor win rates and zero x5+ winners. Tetap dicatat sebagai posisi bayangan untuk menilai wallet-nya."
     }
   },
   "strategy": {
@@ -145,7 +145,7 @@
       ],
       [
         "Wallet dipantau",
-        "1411 · 172 aktif"
+        "1412 · 172 aktif"
       ],
       [
         "Cadangan kas",
@@ -157,7 +157,7 @@
       ],
       [
         "Label wallet",
-        "smart 490 · dolphin 64 · bot 716 · lp 1 · fresh 19 · kol 90 · whale 3 · blacklist 28"
+        "smart 491 · dolphin 64 · bot 716 · lp 1 · fresh 19 · kol 90 · whale 3 · blacklist 28"
       ]
     ],
     "requirements": [
@@ -203,9 +203,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1411,
+      "tracked": 1412,
       "active": 172,
-      "passive": 1239,
+      "passive": 1240,
       "trusted": 0,
       "promising": 8,
       "byLabel": [
@@ -217,9 +217,9 @@
         },
         {
           "key": "smart",
-          "total": 490,
+          "total": 491,
           "active": 131,
-          "passive": 359
+          "passive": 360
         },
         {
           "key": "kol",
@@ -359,6 +359,38 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791200353292,
+        "symbol": "GENTA",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 129,
+            "note": "bundler pegang 17.6%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.4%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show near-identical patterns (62 tokens, same outcomes, same 5.5min hold) suggesting coordinated activity, with poor win rates and zero x5+ winners. Tetap dicatat sebagai posisi bayangan untuk menilai wallet-nya."
+      },
+      {
+        "at": 1791200182151,
+        "symbol": "Stompy",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 23%."
+      },
       {
         "at": 1791200127752,
         "symbol": "EVERY",
@@ -1070,32 +1102,12 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 35%."
-      },
-      {
-        "at": 1791181695631,
-        "symbol": "SM",
-        "action": "exit",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Keluar (trailing): Harga turun 35% dari puncak +84% setelah 6 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +26,3%."
-      },
-      {
-        "at": 1791181430581,
-        "symbol": "SM",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $9,64; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 29,
-        "red_flag": 23,
+        "red_flag": 24,
         "round_trip_cost": 3,
         "basket_full": 0,
         "slippage": 0,
@@ -1106,7 +1118,7 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 2
+        "llm": 3
       },
       "test": {
         "solo": 6,
@@ -1138,7 +1150,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791200212850,
+    "generatedAt": 1791200512222,
     "trades": {
       "count": 1,
       "wins": 1,
