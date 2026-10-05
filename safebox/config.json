@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Safe Box",
-    "tagline": "Simpanan · bunga harian mengikuti kinerja bot Cashood, maksimal 3% per bulan",
+    "tagline": "Simpanan · bunga harian ikut rata-rata kinerja bot Cashood seminggu, maksimal 3% per bulan",
     "refreshMinutes": 5,
     "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/live.json",
     "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/nav.json"
@@ -11,8 +11,9 @@
   "rate": {
     "minMonthlyPct": 0,
     "maxMonthlyPct": 3,
+    "windowDays": 7,
     "dailyFrom": "2026-10-05",
-    "note": "Aturan pemilik 2026-10-05: bunga dihitung per hari mengikuti Cashood Index. Hari rugi 0; hari untung mengikuti kenaikannya tapi paling tinggi 0,1% per hari (3% per bulan)."
+    "note": "Aturan pemilik 2026-10-05 (revisi): bunga harian = rata-rata kenaikan Cashood Index 7 hari terakhir. Seminggu rugi atau datar: 0. Tidak ada batas harian; batasnya 3% per bulan dari pokok."
   },
   "display": {
     "principalUsd": 1000,
