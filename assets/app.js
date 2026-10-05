@@ -1348,6 +1348,17 @@ const navView = { hours: 24, series: 'wallet' };
 const narrow = () => (typeof window !== 'undefined' ? (window.innerWidth || 900) : 900) < 640;
 let navPoints = [];
 
+/**
+ * SETORAN DAN PENARIKAN BUKAN HASIL BOT. Titik lama digeser sebesar arus kas
+ * yang terjadi sesudahnya, jadi garis hanya naik-turun karena hasil, dan
+ * ujungnya tetap nilai sebenarnya sekarang. Dana yang dompetnya hanya dibaca
+ * (arus kas pemilik tidak tercatat) tidak punya daftar arus kas: tidak digeser.
+ */
+const cashFlows = (cfg) => (cfg?.events || []).filter((e) => e.type === 'deposit' || e.type === 'withdraw')
+  .map((e) => ({ at: CashoodCore.eventTime(e), usd: e.type === 'deposit' ? Number(e.usd) : -Number(e.usd) }))
+  .filter((f) => Number.isFinite(f.at) && Number.isFinite(f.usd));
+const flowsAfter = (flows, t) => flows.reduce((sum, f) => (f.at > t ? sum + f.usd : sum), 0);
+
 async function readNavSeries(cfg, { force = false, fund = state.fund } = {}) {
   const urls = dataUrls(cfg, 'nav.json', cfg?.app?.navUrl, fund);
   for (const url of urls) {
@@ -1370,7 +1381,8 @@ function renderNavChart() {
   const cut = navView.hours ? Date.now() - navView.hours * 3600e3 : 0;
   const raw = navPoints.filter((p) => p.t >= cut).sort((a, b) => a.t - b.t);
   const share = navView.series === 'share';
-  const pts = share ? sharePriceSeries(raw) : raw.map((p) => ({ ...p, v: p.usd }));
+  const flows = share ? [] : cashFlows(state.cfg);
+  const pts = share ? sharePriceSeries(raw) : raw.map((p) => ({ ...p, v: p.usd + flowsAfter(flows, p.t) }));
 
   // Harga saham bergerak dalam sen. Dibulatkan ke dolar penuh, grafiknya jadi
   // garis datar yang tidak mengatakan apa pun.
@@ -1454,30 +1466,29 @@ function renderNavChart() {
   const first = pts[0];
   const delta = last.v - first.v;
   const movePct = first.v ? (delta / first.v) * 100 : 0;
-  // SETORAN BUKAN HASIL BOT. Uang masuk menaikkan garis ini seketika, dan
+  // SETORAN BUKAN HASIL BOT. Uang masuk dulu menaikkan garis ini seketika, dan
   // tanpa keterangan lompatannya terbaca seperti keuntungan sehari. Garis
   // "Nilai saham" tidak punya masalah itu — setoran membeli unit baru, harganya
   // tidak ikut melompat — jadi pembaca diarahkan ke sana.
-  const masuk = (state.cfg?.events || [])
-    .filter((e) => e.type === 'deposit')
-    .map((e) => ({ at: Number(e.at) || Date.parse(`${e.date}T00:00:00+07:00`), usd: Number(e.usd) || 0 }))
-    .filter((e) => e.at >= first.t && e.at <= last.t && e.usd > 0);
+  // Sekarang titik lamanya sudah digeser (cashFlows di atas); yang tersisa di
+  // sini hanya keterangan berapa arus kas yang disesuaikan di rentang ini.
+  const masuk = flows.filter((e) => e.at > first.t && e.at <= Date.now());
   const totalMasuk = masuk.reduce((t, e) => t + e.usd, 0);
 
   setHTML($('#navHint'), share
     ? `1 saham = ${usd(last.v, 4)} · ${(movePct >= 0 ? '+' : '') + pct(movePct)} di rentang ini`
     : `${pts.length} titik · ${signed(delta)} (${pct(movePct)}) di rentang ini`
-      + (totalMasuk > 0 && !share
-        ? ` · termasuk ${usd(totalMasuk, 0)} setoran masuk`
+      + (Math.abs(totalMasuk) >= 1 && !share
+        ? ` · arus kas ${signed(totalMasuk)} tidak dihitung`
         : ''));
 
   const catatan = $('#navNote');
   if (catatan) {
-    catatan.hidden = !(totalMasuk > 0 && !share);
+    catatan.hidden = !(Math.abs(totalMasuk) >= 1 && !share);
     if (!catatan.hidden) {
-      setHTML(catatan, `Lompatan tegak pada garis ini <strong>${usd(totalMasuk, 0)} setoran modal yang masuk</strong>, bukan hasil bot.
-        Untuk melihat kinerja bot tanpa pengaruh setoran, pakai <strong>Nilai saham</strong> — setoran membeli unit baru,
-        jadi harga per saham tidak ikut melompat.`);
+      setHTML(catatan, `Ada arus kas <strong>${signed(totalMasuk)}</strong> (setoran/penarikan) di rentang ini. Supaya tidak terbaca
+        sebagai untung atau rugi, titik sebelum arus kas itu digeser sebesar jumlahnya — garis hanya naik-turun karena hasil bot,
+        dan titik terakhir tetap nilai wallet sebenarnya.`);
     }
   }
 
@@ -2676,8 +2687,7 @@ async function loadFundBrief(id) {
       history: Array.isArray(snap?.history) ? snap.history : [],
       // Arus uang masuk/keluar dana (setoran +, penarikan & dividen −), untuk
       // memisahkan perubahan nilai karena kinerja dari perubahan karena setoran.
-      flows: (cfg.events || []).filter((e) => e.type === 'deposit' || e.type === 'withdraw')
-        .map((e) => ({ at: CashoodCore.eventTime(e), usd: e.type === 'deposit' ? Number(e.usd) : -Number(e.usd) })),
+      flows: cashFlows(cfg),
       cfg,
       type: meta?.type || null,
       perf: snap?.performance || null,
@@ -3372,7 +3382,12 @@ async function renderGrowth(g, paper = []) {
   const step = homeView.hours === 24 ? 15 * 60e3 : homeView.hours === 168 ? 2 * 3600e3 : 6 * 3600e3;
   const pts = [];
   const partsAt = (t, latest) => {
-    const parts = briefs.map((b, i) => ({ name: b.label, color: b.accent, usd: latest ? b.totalUsd : (valueAt(series[i], t)?.usd ?? 0) }));
+    // Titik lama digeser sebesar setoran/penarikan sesudahnya (lihat cashFlows):
+    // setoran tidak tergambar sebagai lonjakan untung.
+    const parts = briefs.map((b, i) => {
+      const at = latest ? null : valueAt(series[i], t);
+      return { name: b.label, color: b.accent, usd: latest ? b.totalUsd : (at ? at.usd + flowsAfter(b.flows, at.t) : 0) };   // arus kas sesudah titik itu diamati
+    });
     if (box && t >= boxStart) parts.push({ name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: Number(box.balanceUsd) || 0 });
     return parts.filter((p) => p.usd > 0);
   };
@@ -3385,7 +3400,7 @@ async function renderGrowth(g, paper = []) {
   const first = pts[0]?.v || 0;
   // 24 jam memakai jumlah perubahan per dana (sama dengan tanda di kartu
   // produk dan kartu total aset); rentang panjang memakai deret gabungan.
-  const rangeDelta = homeView.hours === 24 && tc ? tc.delta : g.total - first - flowIn;
+  const rangeDelta = homeView.hours === 24 && tc ? tc.delta : g.total - first;   // titik awal sudah memuat arus kas sesudahnya
   const rangeBase = homeView.hours === 24 && tc ? totalBase : first;
   setHTML($('#hgSum'), pts.length > 1 ? `<b class="num">${usd(g.total, 0)}</b>
     <span class="chg ${rangeDelta >= 0 ? 'up' : 'down'}">${rangeDelta >= 0 ? '▲' : '▼'} ${pct(Math.abs(rangeBase ? rangeDelta / rangeBase * 100 : 0), 2)}</span>
@@ -3399,7 +3414,7 @@ async function renderGrowth(g, paper = []) {
   drawGrowth($('#hgChart'), pts, rangeDelta >= 0);
   const shown = grouped.filter((f) => Math.abs(f.usd) >= 50);
   $('#hgFlows').hidden = !shown.length;
-  setHTML($('#hgFlows'), shown.length ? `<span class="hg-fl">Arus kas di rentang ini (tidak dihitung sebagai naik-turun):</span>`
+  setHTML($('#hgFlows'), shown.length ? `<span class="hg-fl">Arus kas di rentang ini — grafik sudah disesuaikan, tidak dihitung sebagai naik-turun:</span>`
     + shown.map((f) => `<span class="hg-fi"><b>${tglJam(f.at)}</b> ${f.usd < 0 ? 'profit dibagikan / penarikan' : 'setoran masuk'} <b class="num">${signed(f.usd)}</b></span>`).join('') : '');
 
   // Hasil harian: profit posisi tertutup semua dana + imbal hasil Safe Box.
