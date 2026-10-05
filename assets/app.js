@@ -1235,42 +1235,49 @@ function renderTrades(nav) {
  */
 function renderFutures(nav, rows, body, tile) {
   const acc = nav.trading?.account || {};
-  const fl = Number(nav.trading?.unrealizedUsd) || 0;
+  const fx = rows.some((r) => r.futures?.kind === 'fx');          // Forex (MT5): lot & BELI/JUAL
+  const rowsFl = rows.filter((r) => r.futures?.unrealizedUsd != null);
+  const fl = fx || !Number.isFinite(Number(nav.trading?.unrealizedUsd)) ? rowsFl.reduce((t, r) => t + r.futures.unrealizedUsd, 0) : Number(nav.trading.unrealizedUsd) || 0;
   const margin = rows.reduce((t, r) => t + (Number(r.futures?.marginUsd) || 0), 0);
   const notional = rows.reduce((t, r) => t + (Number(r.futures?.notionalUsd) || 0), 0);
   // Skenario dari harga entry, SL, TP, dan ukuran posisi (sebelum biaya):
   // supaya angka merah yang besar tidak mengagetkan, untung maksimal kalau
   // semua kena TP ditulis tepat di sebelahnya.
-  const move = (r, to) => { const q = Number(r.lot), e = Number(r.entryPrice), x = Number(to);
+  const move = (r, to) => { const q = Number(r.futures?.unitUsd ?? r.lot), e = Number(r.entryPrice), x = Number(to);
     return q && e && x ? (r.direction === 'SHORT' ? e - x : x - e) * q : 0; };
   const atSl = rows.reduce((t, r) => t + move(r, r.slPrice), 0);
   const atTp = rows.reduce((t, r) => t + move(r, r.tpPrice), 0);
-  const eq = Number(acc.equityUsd) || 0;
+  const eq = Number(acc.equityUsd) || Number(nav.totalUsd) || 0;
+  const lots = rows.reduce((t, r) => t + (Number(r.lot) || 0), 0);
+  const marginKnown = rows.filter((r) => r.futures?.marginUsd != null);
   const ofEq = (v) => (eq ? pct((Math.abs(v) / eq) * 100, 2) + ' dari equity' : '');
   setHTML($('#lpSummary'), `${[
-    tile('Margin terpakai', usd(acc.marginUsd ?? margin), acc.availableUsd != null ? `tersedia ${usd(acc.availableUsd, 0)}` : ''),
-    tile('Ukuran total', usd(notional, 0), `nilai kontrak · ${margin ? (notional / margin).toFixed(1) + '× margin' : '—'}`),
+    fx && !marginKnown.length && acc.marginUsd == null
+      ? tile('Modal (margin)', '—', 'menunggu bot mencatat margin per posisi')
+      : tile('Margin terpakai', usd(acc.marginUsd ?? margin), acc.availableUsd != null ? `tersedia ${usd(acc.availableUsd, 0)}` : `${marginKnown.length}/${rows.length} posisi`),
+    fx ? tile('Total lot', lots.toLocaleString('en-US', { maximumFractionDigits: 2 }), `${rows.length} posisi · nilai kontrak ${usd(notional, 0)}`)
+      : tile('Ukuran total', usd(notional, 0), `nilai kontrak · ${margin ? (notional / margin).toFixed(1) + '× margin' : '—'}`),
     tile('Kalau semua kena SL', signed(atSl), `rugi maksimal · ${ofEq(atSl)}`, 'neg'),
     tile('Kalau semua kena TP', signed(atTp), `untung maksimal · ${ofEq(atTp)}`, 'pos'),
-    tile('Floating sekarang', signed(fl), `real-time · ${rows.length} posisi`, cls(fl)),
+    tile('Floating sekarang', signed(fl), `real-time${fx ? ' dari MT5' : ''} · ${rows.length} posisi`, cls(fl)),
   ].join('')}`);
-  setHTML($('#lpHead'), '<tr><th>Pair</th><th>Strategi</th><th class="num">Ukuran · margin</th><th class="num">Entry → mark</th><th class="num">SL / TP</th><th class="num">Untung / rugi</th></tr>');
+  setHTML($('#lpHead'), `<tr><th>Pair</th><th>Strategi</th><th class="num">${fx ? 'Lot · margin' : 'Ukuran · margin'}</th><th class="num">${fx ? 'Entry → sekarang' : 'Entry → mark'}</th><th class="num">SL / TP</th><th class="num">${fx ? 'Floating' : 'Untung / rugi'}</th></tr>`);
   const px = (v) => (v == null ? '—' : Number(v) < 1 ? Number(v).toPrecision(4) : Number(v).toLocaleString('en-US', { maximumFractionDigits: 4 }));
   setHTML(body, [...rows].sort((a, b) => (a.ageMinutes ?? 0) - (b.ageMinutes ?? 0)).map((r) => { const f = r.futures || {}; const long = r.direction === 'LONG';
     const sl = move(r, r.slPrice), tp = move(r, r.tpPrice);
     return `<tr>
-      <td><b>${esc(r.symbol)}</b><span class="dim">USDT</span>
-        <div class="sub2"><span class="pill ${long ? 'in' : 'out2'}">${long ? 'LONG' : 'SHORT'}</span>${f.leverage ? ` <span class="pill">${f.leverage}×</span>` : ''}</div>
-        <div class="sub2 m-only">${esc(shortStrategy(r))} · ${f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}</div></td>
+      <td><b>${esc(r.symbol)}</b>${fx ? '' : '<span class="dim">USDT</span>'}
+        <div class="sub2"><span class="pill ${long ? 'in' : 'out2'}">${fx ? (long ? 'BELI' : 'JUAL') : long ? 'LONG' : 'SHORT'}</span>${f.leverage ? ` <span class="pill">${f.leverage}×</span>` : ''}</div>
+        <div class="sub2 m-only">${esc(shortStrategy(r))} · ${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}</div></td>
       <td class="fx-strat">${stratDetails(r, [f.timeframe, f.exploration ? 'mode eksplorasi' : ''])}</td>
-      <td class="num">${f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">margin ${f.marginUsd != null ? usd(f.marginUsd) : '—'}</div></td>
+      <td class="num">${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">margin ${f.marginUsd != null ? usd(f.marginUsd) : '—'}</div></td>
       <td class="num">${px(r.entryPrice)}<div class="sub2">${f.markPrice ? '→ ' + px(f.markPrice) : '→ —'}</div></td>
       <td class="num"><div class="fx-px"><span class="neg">${px(r.slPrice)}</span> / <span class="pos">${px(r.tpPrice)}</span></div>
         <div class="sub2 fx-pot"><span class="neg">${signed(sl)}</span><i> / </i><span class="pos">${signed(tp)}</span></div></td>
       <td class="num ${f.unrealizedUsd == null ? '' : cls(f.unrealizedUsd)}">${f.unrealizedUsd == null ? '<span class="dim">—</span><div class="sub2">menunggu bot</div>'
         : `<b>${signed(f.unrealizedUsd)}</b><div class="sub2 ${cls(f.unrealizedUsd)}">${f.marginUsd ? 'ROE ' + (f.unrealizedUsd >= 0 ? '+' : '') + pct((f.unrealizedUsd / f.marginUsd) * 100, 1) : ''}</div>`}</td>
     </tr>`; }).join(''));
-  $('#lpHint').textContent = `SL/TP dari harga entry × ukuran, sebelum biaya · floating per posisi ${rows.some((r) => r.futures?.unrealizedUsd != null) ? 'dari bot' : 'belum dikirim bot (total akun tetap benar)'} · ${ago(nav.updatedAt)}`;
+  $('#lpHint').textContent = fx ? `akun demo MT5 · SL/TP dihitung dari risiko awal bot · floating dari MT5 · ${ago(nav.updatedAt)}` : `SL/TP dari harga entry × ukuran, sebelum biaya · floating per posisi ${rows.some((r) => r.futures?.unrealizedUsd != null) ? 'dari bot' : 'belum dikirim bot (total akun tetap benar)'} · ${ago(nav.updatedAt)}`;
 }
 
 /**

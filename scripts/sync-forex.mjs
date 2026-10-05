@@ -91,6 +91,27 @@ const terburuk = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), 
 // ─── posisi terbuka ───────────────────────────────────────────────────────
 // Database tidak menyimpan nilai berjalan per posisi; nilainya sudah masuk
 // equity akun. Yang terbit: simbol, arah, lot, harga masuk, SL/TP.
+// Dolar per 1 satuan harga untuk posisi ini, dari risiko awal yang dicatat bot
+// saat fill (risiko $ ÷ jarak entry–SL awal), disesuaikan kalau lot sudah
+// dijual sebagian. Dengan itu hasil kalau kena SL/TP dan nilai kontrak bisa
+// dihitung tanpa menebak ukuran kontrak tiap pair.
+function fxFutures(p) {
+  const entry = Number(p.entry_price), sl0 = Number(p.initial_sl ?? p.sl), risk = Number(p.initial_risk_amount);
+  const lot = Number(p.lot), lot0 = Number(p.initial_lot) || lot;
+  let unit = risk > 0 && entry && sl0 && Math.abs(entry - sl0) > 0 ? (risk / Math.abs(entry - sl0)) * (lot0 ? lot / lot0 : 1) : null;
+  if (!unit && Number(p.current_price) && Number(p.floating_usd) && Math.abs(p.current_price - entry) > 0) unit = Math.abs(p.floating_usd / (p.current_price - entry));
+  return {
+    kind: 'fx',
+    leverage: Number(p.leverage) || null,
+    marginUsd: Number.isFinite(Number(p.margin_usd)) && p.margin_usd !== null ? r2(p.margin_usd) : null,
+    unitUsd: unit,
+    notionalUsd: unit && Number(p.current_price || entry) ? r2(unit * Number(p.current_price || entry)) : null,
+    riskUsd: risk > 0 ? r2(risk) : null,
+    markPrice: Number(p.current_price) || null,
+    unrealizedUsd: p.floating_usd != null && Number.isFinite(Number(p.floating_usd)) ? r2(p.floating_usd) : null,
+    timeframe: /h1/i.test(String(p.setup_type)) ? 'H1' : /h4/i.test(String(p.setup_type)) ? 'H4' : null,
+  };
+}
 const positions = db.prepare("SELECT * FROM positions WHERE status='open' ORDER BY entry_time").all().map((p) => ({
   tokenId: `fx-${p.id}`,
   symbol: sym(p.symbol),
@@ -110,6 +131,7 @@ const positions = db.prepare("SELECT * FROM positions WHERE status='open' ORDER 
   pnlUsd: null,
   // Disimpan terpisah: rekonsiliasi snapshot menghitung ulang pnlUsd dari nilai/modal.
   ...(p.floating_usd != null && Number.isFinite(Number(p.floating_usd)) ? { floatingUsd: r2(p.floating_usd) } : {}),
+  futures: fxFutures(p),
 }));
 
 // ─── status bot ───────────────────────────────────────────────────────────
@@ -123,6 +145,10 @@ const buka24 = count('SELECT COUNT(*) n FROM positions WHERE entry_time >= ?');
 const tutup24 = count('SELECT COUNT(*) n FROM trades WHERE exit_time >= ?');
 const bias = db.prepare('SELECT timestamp, session, confidence, reasoning FROM macro_bias WHERE llm_success=1 ORDER BY id DESC LIMIT 1').get();
 const model = db.prepare('SELECT model FROM llm_calls ORDER BY id DESC LIMIT 1').get()?.model;
+const fxAccount = (() => { const cols = db.prepare('PRAGMA table_info(risk_snapshots)').all().map((c) => c.name);
+  if (!cols.includes('margin_used_usd')) return {};
+  const a = db.prepare('SELECT equity, margin_used_usd, free_margin_usd FROM risk_snapshots ORDER BY id DESC LIMIT 1').get();
+  return a?.margin_used_usd != null ? { account: { equityUsd: r2(a.equity), marginUsd: r2(a.margin_used_usd), availableUsd: a.free_margin_usd != null ? r2(a.free_margin_usd) : null } } : {}; })();
 db.close();
 
 const hbAt = ms(hb?.timestamp);
@@ -164,6 +190,9 @@ const snapshot = {
   tradesFlatBand: 0.005,
   trading: {
     paper: true,
+    // Margin akun dari snapshot risiko terakhir, kalau bot mencatatnya
+    // (margin_used_usd / free_margin_usd / account_leverage).
+    ...fxAccount,
     mode: 'demo',
     initialUsd: INITIAL,
     cashUsd: totalUsd,
