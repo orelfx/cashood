@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d5180e4a-e1d0-4654-8b96-33da93c8fcf7",
-  "updatedAt": 1791209806605,
-  "generatedAt": "2026-10-05 21:16 WIB",
+  "generation": "78ec3d30-f22e-49b1-b7cd-953e416fccbf",
+  "updatedAt": 1791210107107,
+  "generatedAt": "2026-10-05 21:21 WIB",
   "usdIdr": null,
   "totalUsd": 987.1483278657385,
   "botWalletUsd": 987.1483278657385,
@@ -267,12 +267,12 @@
     "pnlUsd": -12.851672134261548,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791209806605,
+    "heartbeatAt": 1791210107107,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 2.21,
-    "lastScanAt": 1791209802726,
+    "lastScanAt": 1791210103834,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -293,13 +293,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "118",
+        "v": "119",
         "n": "24 jam · 10 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1443",
-        "n": "156 aktif"
+        "v": "1445",
+        "n": "155 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -309,9 +309,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791209806605,
+      "lastDecisionAt": 1791210107107,
       "lastAction": "keputusan",
-      "lastReason": "Attention [low]: Dilewati: harga sudah naik 35% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      "lastReason": "Agency [mid]: Dilewati karena red flag: likuiditas cuma 3.5% dari market cap."
     }
   },
   "strategy": {
@@ -330,7 +330,7 @@
       ],
       [
         "Wallet dipantau",
-        "1443 · 156 aktif"
+        "1445 · 155 aktif"
       ],
       [
         "Cadangan kas",
@@ -342,7 +342,7 @@
       ],
       [
         "Label wallet",
-        "smart 497 · dolphin 63 · bot 732 · lp 1 · blacklist 35 · fresh 19 · kol 92 · whale 4"
+        "smart 497 · dolphin 64 · bot 734 · lp 1 · blacklist 35 · fresh 18 · kol 92 · whale 4"
       ]
     ],
     "requirements": [
@@ -388,23 +388,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1443,
-      "active": 156,
-      "passive": 1287,
+      "tracked": 1445,
+      "active": 155,
+      "passive": 1290,
       "trusted": 0,
       "promising": 9,
       "byLabel": [
         {
           "key": "bot",
-          "total": 732,
+          "total": 734,
           "active": 0,
-          "passive": 732
+          "passive": 734
         },
         {
           "key": "smart",
           "total": 497,
-          "active": 120,
-          "passive": 377
+          "active": 119,
+          "passive": 378
         },
         {
           "key": "kol",
@@ -414,9 +414,9 @@
         },
         {
           "key": "dolphin",
-          "total": 63,
+          "total": 64,
           "active": 25,
-          "passive": 38
+          "passive": 39
         },
         {
           "key": "blacklist",
@@ -426,9 +426,9 @@
         },
         {
           "key": "fresh",
-          "total": 19,
+          "total": 18,
           "active": 0,
-          "passive": 19
+          "passive": 18
         },
         {
           "key": "whale",
@@ -544,6 +544,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791210013248,
+        "symbol": "Agency",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 3.5% dari market cap."
+      },
       {
         "at": 1791209763207,
         "symbol": "Attention",
@@ -1455,22 +1465,12 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show near-identical patterns (62 tokens, same outcomes, same 5.5min hold) suggesting coordinated activity, with poor win rates and zero x5+ winners. Tidak dimasuki."
-      },
-      {
-        "at": 1791200182151,
-        "symbol": "Stompy",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 23%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 37,
-        "red_flag": 51,
+        "red_flag": 52,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -1514,7 +1514,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791209820399,
+    "generatedAt": 1791210129194,
     "trades": {
       "count": 5,
       "wins": 1,
