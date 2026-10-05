@@ -182,7 +182,7 @@ const html = `<!doctype html>
       <h3>Cara pembayaran</h3>
       <div class="steps">
         <div class="step"><div class="n">1</div><div>Pokok ${usd(principal, 0)} disimpan pengelola. Bunganya dihitung setiap hari mengikuti kinerja bot Cashood (Cashood Index).</div></div>
-        <div class="step"><div class="n">2</div><div>Bunga harian = rata-rata kenaikan index ${Number(cfg.rate?.windowDays ?? 7)} hari terakhir; seminggu rugi bunganya 0. Sebulan paling banyak ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)} dari pokok. Tidak pernah negatif.</div></div>
+        <div class="step"><div class="n">2</div><div>Bunga harian = rata-rata kenaikan index ${Number(cfg.rate?.windowDays ?? 7)} hari terakhir, dengan jatah ${pct(Number(cfg.rate?.weeklyQuotaPct ?? 0.75), 2)} per minggu; kelebihan minggu bagus disimpan untuk mengisi minggu rugi. Sebulan paling banyak ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)} dari pokok. Tidak pernah negatif.</div></div>
         <div class="step"><div class="n">3</div><div>Tiap tanggal 1, seluruh imbal hasil bulan sebelumnya <b>ditarik dan dibayarkan</b> menurut porsi pokok. Pokok tetap di dalam Safe Box dan terus bekerja.</div></div>
       </div>
       <div class="box"><b>Pokok tetap ${usd(principal, 0)}.</b> Imbal hasil tidak diputar ulang — setelah pembayaran ini saldo tiap pemilik kembali ke pokoknya, dan imbal hasil ${esc(BULAN[pm % 12])} mulai dihitung dari nol.</div>

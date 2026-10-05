@@ -18,9 +18,17 @@ test('Safe Box: bunga harian = rata-rata kenaikan index 7 hari, tanpa batas hari
  // 5 Okt ditutup 23:59: jendela mulai 28 Sep 23:59 (index 101) sampai 107 → 5,94% ÷ 7 hari ≈ 0,85%/hari.
  assert.ok(s.days[0].ratePct>0.84&&s.days[0].ratePct<0.86,String(s.days[0].ratePct));assert.ok(s.days[0].windowDays>6.9);});
 test('Safe Box: seminggu datar atau turun = 0',()=>{const flat=[{t:sbStart-8*DAY,usd:100},{t:sbStart+DAY-1,usd:99}];const s=accrue(sbd,null,{at:sbStart+DAY,points:flat});assert.equal(s.days[0].ratePct,0);assert.equal(s.balances.a.accrued,0);});
-test('Safe Box: sebulan paling banyak 3% dari pokok, lalu 0 sampai tanggal 1',()=>{const m0=Core.eventTime({date:'2026-11-01'}),pts=[];for(let i=-8;i<=40;i++)pts.push({t:m0+i*DAY,usd:100*1.01**i});
+test('Safe Box: jatah 0,75% per minggu, kelebihan jadi cadangan, sebulan tetap paling banyak 3%',()=>{const m0=Core.eventTime({date:'2026-11-01'}),pts=[];for(let i=-8;i<=40;i++)pts.push({t:m0+i*DAY,usd:100*1.01**i});
  const s=accrue({...sbd,rate:{...sbd.rate,dailyFrom:'2026-11-01'}},null,{at:m0+35*DAY,points:pts});const nov=s.days.filter(d=>d.date.startsWith('2026-11'));
- assert.equal(Number(nov.reduce((t,d)=>t+d.usd,0).toFixed(2)),90);assert.ok(nov.at(-1).usd===0&&nov.at(-1).capped);assert.ok(s.days.find(d=>d.date==='2026-12-01').usd>0);});
+ // Senin 2 Nov s.d. Minggu 8 Nov: tepat 0,75% dari $3.000 = $22,50.
+ assert.equal(Number(s.days.filter(d=>d.date>='2026-11-02'&&d.date<='2026-11-08').reduce((t,d)=>t+d.usd,0).toFixed(2)),22.5);
+ assert.ok(Number(nov.reduce((t,d)=>t+d.usd,0).toFixed(2))<=90);assert.ok(s.balances.a.reserve>0&&s.balances.a.reserve<=90);});
+test('Safe Box: minggu rugi diisi dari cadangan, paling banyak jatah harian normal',()=>{const m0=Core.eventTime({date:'2026-11-02'}),pts=[];
+ // Seminggu naik tajam (cadangan terisi), lalu index jatuh dan datar.
+ for(let i=-8;i<=6;i++)pts.push({t:m0+i*DAY,usd:100*1.03**Math.min(i,0)+(i>0?0:0)});for(let i=7;i<=20;i++)pts.push({t:m0+i*DAY,usd:90});
+ const cfg2={...sbd,rate:{...sbd.rate,dailyFrom:'2026-11-02'}};const s=accrue(cfg2,null,{at:m0+16*DAY,points:pts});
+ const lossDays=s.days.filter(d=>d.ratePct===0&&d.fromReserve);assert.ok(lossDays.length>0);
+ for(const d of lossDays)assert.ok(d.usd<=3000*0.0075/7+1e-3,String(d.usd));});
 test('Safe Box: hari yang sudah lewat dibekukan; titik index yang berubah kemudian tidak mengubahnya',()=>{let s=accrue(sbd,null,{at:sbStart+DAY+1000,points:sbPts});const before=s.balances.a.accrued;s=accrue(sbd,s,{at:sbStart+DAY+2000,points:sbPts.map(p=>({...p,usd:100}))});assert.equal(s.balances.a.accrued,before);assert.throws(()=>accrue(sbd,s,{at:sbStart,points:sbPts}),/mundur/);});
 test('Safe Box: pemilik keluar berhenti dapat bunga, sisa haknya tetap; pembayaran mengurangi saldo',()=>{const two={...sbd,owners:[...sbd.owners,{id:'b',name:'B',principalUsd:1000}],ownerEvents:[{at:sbStart+DAY+1,owners:sbd.owners}]};let s=accrue(two,null,{at:sbStart+3*DAY,points:sbPts});const b=s.balances.b.accrued;assert.ok(b>0);assert.equal(b,s.days[0].owners.b);assert.equal(s.owners.length,1);s=accrue(two,s,{at:sbStart+3*DAY,points:sbPts},[{id:'p1',owner:'b',type:'interest',at:sbStart+3*DAY,usd:1}]);assert.equal(s.balances.b.paid,1);assert.throws(()=>accrue(two,s,{at:sbStart+3*DAY,points:sbPts},[{id:'p2',owner:'b',type:'interest',at:sbStart+3*DAY,usd:b}]),/melebihi/);});
 test('zero-market-change sweeps do not create simulated investor loss',()=>{const r=simulate({cfg,live:{totalUsd:10000,treasuryUsd:0},daily:[{pct:0}],now,days:[1,7],paths:1})[0];assert.equal(r[1].working,8000);assert.equal(r[1].cash,2000);assert.equal(r[1].low,10000);assert.equal(r[7].total,10000);assert.equal(r[7].paid,2000);});

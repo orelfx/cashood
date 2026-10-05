@@ -2388,13 +2388,14 @@ function renderSafebox() {
             <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>`}
           <div class="stat"><div class="k">Laju hari ini</div>
             <div class="v">${rate.dailyPct == null ? '—' : pct(rate.dailyPct, 2)} <span class="dim" style="font-size:.6em">/hari</span></div>
-            <div class="n">rata-rata index ${rate.windowDays ?? 7} hari · bulan ini terpakai ${pct(rate.monthUsedPct ?? 0, 2)} dari ${pctRate(rate.maxMonthlyPct ?? 3)}</div></div>
+            <div class="n">jatah minggu ini ${pct(rate.weekUsedPct ?? 0, 2)} / ${pct(rate.weekQuotaPct ?? 0.75, 2)} · bulan ini ${pct(rate.monthUsedPct ?? 0, 2)} / ${pctRate(rate.maxMonthlyPct ?? 3)}${
+              Number(rate.reserveUsd) > 0 ? ` · cadangan ${usd(rate.reserveUsd, 2)}` : ''}</div></div>
         </div>
         <p class="hint" style="margin-top:14px">Bunganya <strong>dihitung tiap hari mengikuti kinerja bot Cashood</strong>:
           rata-rata kenaikan <a href="#index">Cashood Index</a> selama ${rate.windowDays ?? 7} hari terakhir. Satu hari turun tidak langsung
-          membuat bunga 0 — bunga baru 0 kalau seminggu itu bot memang rugi. Tidak ada batas harian, tapi
-          <strong>sebulan paling banyak ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok; kalau jatahnya habis lebih cepat,
-          bunga berhenti sampai tanggal 1 berikutnya.
+          membuat bunga 0. Jatahnya <strong>${pct(rate.weekQuotaPct ?? 0.75, 2)} per minggu</strong>: minggu yang bagus berhenti di jatah itu dan
+          kelebihannya disimpan sebagai cadangan; minggu yang rugi diisi sebagian dari cadangan itu. Sebulan
+          <strong>paling banyak ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok — itu batas atas, bukan janji.
           Angka hari ini masih bisa berubah sampai tengah malam WIB, lalu dikunci.
           Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran atau jaminan hasil investasi.</p>
       </section>
@@ -2441,7 +2442,7 @@ function renderSafebox() {
             return [...d.days].reverse().slice(0, 14).map((x) => {
               const paid = cut && x.date < cut;
               return `<tr><td>${fmtDay(x.date)}</td><td class="num dim">${x.ratePct == null ? '—' : pct(x.ratePct, 3)}</td><td class="num pos">${usd(x.usd, 2)}</td>
-                <td class="${paid ? 'dim' : 'pos'}">${paid ? `ditarik ${fmtDay(cut)}` : 'berjalan'}</td></tr>`;
+                <td class="${paid ? 'dim' : 'pos'}">${paid ? `ditarik ${fmtDay(cut)}` : 'berjalan'}${x.fromReserve > 0 ? ' · dari cadangan' : x.capped ? ' · jatah penuh' : ''}</td></tr>`;
             }).join('');
           })()}
         </tbody></table></div>
@@ -2458,9 +2459,12 @@ function renderSafebox() {
         <div class="two">
           <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
             <li>Tiap hari dilihat Cashood Index — gabungan kinerja bot-bot Cashood yang memakai uang asli.</li>
-            <li>Bunga hari itu = rata-rata kenaikan index ${rate.windowDays ?? 7} hari terakhir. Seminggu turun atau datar: bunga <strong>0</strong>.</li>
-            <li>Tidak ada batas harian, tapi sebulan tidak pernah lebih dari <strong>${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok.
-                Minggu yang bagus bisa menghabiskan jatah itu lebih cepat; sesudahnya bunga 0 sampai tanggal 1.</li>
+            <li>Bunga hari itu = rata-rata kenaikan index ${rate.windowDays ?? 7} hari terakhir. Seminggu turun atau datar: tidak ada bunga baru dari bot.</li>
+            <li>Jatah <strong>${pct(rate.weekQuotaPct ?? 0.75, 2)} per minggu</strong> (Senin–Minggu). Kalau penuh, bunga minggu itu berhenti dan
+                kelebihannya <strong>disimpan sebagai cadangan</strong>.</li>
+            <li>Minggu yang rugi diisi dari cadangan itu, paling banyak jatah harian normal — jadi bunga tidak langsung kosong.</li>
+            <li>Sebulan paling banyak <strong>${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok. Itu batas atas, bukan janji:
+                bulan yang buruk bisa jauh di bawahnya, karena pokoknya yang dijaga.</li>
             <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
             <li><strong>Bunga tidak diputar ulang.</strong> Yang bekerja tetap uang pokok; bunga menumpuk di sampingnya
                 dan tidak ikut menghasilkan bunga baru.</li>
@@ -3593,7 +3597,7 @@ async function renderHome() {
     const today = box && box.principalUsd ? ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100 : null;
     return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
       <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
-        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga harian ikut kinerja bot seminggu, maks 3%/bulan</div></div>
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga ikut kinerja bot, jatah per minggu, maks 3%/bulan</div></div>
         ${today == null ? '' : `<span class="chg up">▲ ${pct(today, 3)}<small>hari ini</small></span>`}</div>
       <p class="prod-desc">${esc(sb.blurb || '')}</p>
       <div class="prod-nums">
