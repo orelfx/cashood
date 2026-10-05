@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d11785bb-3391-43c5-be0b-560db7726e98",
-  "updatedAt": 1791190419507,
-  "generatedAt": "2026-10-05 15:53 WIB",
+  "generation": "eae7cd5b-700f-40dd-8786-23dda5ac44bc",
+  "updatedAt": 1791190699532,
+  "generatedAt": "2026-10-05 15:58 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791190419507,
+    "heartbeatAt": 1791190699532,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791190404056,
+    "lastScanAt": 1791190696343,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,13 +109,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "22",
+        "v": "24",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1380",
-        "n": "228 aktif"
+        "v": "1381",
+        "n": "222 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791190419507,
+      "lastDecisionAt": 1791190699532,
       "lastAction": "keputusan",
-      "lastReason": "Agency [mid]: Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+      "lastReason": "Apophenoth [low]: Dilewati: harga sudah naik 185% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -146,29 +146,37 @@
       ],
       [
         "Wallet dipantau",
-        "1380 · 228 aktif"
+        "1381 · 222 aktif"
+      ],
+      [
+        "Cadangan kas",
+        "5% untuk gas, tip, dan slippage — tidak dipakai membuka posisi"
+      ],
+      [
+        "Wallet tepercaya",
+        "0 · menjanjikan 8"
       ],
       [
         "Label wallet",
-        ""
+        "smart 486 · dolphin 60 · bot 703 · lp 1 · fresh 18 · kol 85 · whale 3 · blacklist 25"
       ]
     ],
     "requirements": [
       [
         "degen (launch)",
-        "alokasi 40% · $402.30381248435697 · kursi maks 4% equity · 0 terbuka"
+        "alokasi 40% · $402 · kursi 3–10% basket · maks 4% equity · 0 terbuka"
       ],
       [
         "low (core)",
-        "alokasi 20% · $201.15190624217848 · kursi maks 4% equity · 0 terbuka"
+        "alokasi 20% · $201 · kursi 5–20% basket · maks 4% equity · 0 terbuka"
       ],
       [
         "mid (core)",
-        "alokasi 15% · $150.86392968163383 · kursi maks 3.75% equity · 0 terbuka"
+        "alokasi 15% · $151 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
       ],
       [
         "big (core)",
-        "alokasi 20% · $201.15190624217848 · kursi maks 5% equity · 0 terbuka"
+        "alokasi 20% · $201 · kursi 7–25% basket · maks 5% equity · 0 terbuka"
       ]
     ],
     "requirementsTitle": "Basket modal",
@@ -196,21 +204,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1380,
-      "active": 228,
-      "passive": 1152,
+      "tracked": 1381,
+      "active": 222,
+      "passive": 1159,
+      "trusted": 0,
+      "promising": 8,
       "byLabel": [
         {
           "key": "bot",
-          "total": 702,
+          "total": 703,
           "active": 0,
-          "passive": 702
+          "passive": 703
         },
         {
           "key": "smart",
           "total": 486,
-          "active": 180,
-          "passive": 306
+          "active": 174,
+          "passive": 312
         },
         {
           "key": "kol",
@@ -252,7 +262,9 @@
       "definitions": {
         "active": "Dihitung untuk konsensus: status aktif (trading dalam 48 jam terakhir), skor ≥ 50/100, bukan bot/LP/fresh, tidak ditolak LLM, dan lolos cek on-chain sebagai trader coin. Hasil cek yang tidak meyakinkan karena data kita kurang dihitung netral, bukan negatif.",
         "passive": "Semua wallet lain yang tetap dipantau tetapi tidak dihitung: belum lolos atau belum dicek on-chain, skor di bawah batas, tidak trading 48 jam (aktif lagi begitu trading), bot/LP/arbitrase, atau blacklist.",
-        "label": "Satu label per wallet: 'blacklist' bila diblacklist, selain itu kelas bot (smart, whale, dolphin, kol, fresh, lp, bot, unknown)."
+        "label": "Satu label per wallet: 'blacklist' bila diblacklist, selain itu kelas bot (smart, whale, dolphin, kol, fresh, lp, bot, unknown).",
+        "trusted": "Boleh memicu masuk sendirian: sudah diikuti ≥ 3 kali, ≥ 2 kali untung, rata-rata ≥ +5%, tanpa rug.",
+        "promising": "Pernah membawa untung tapi belum cukup teruji: pembelian solonya diuji sebagai posisi bayangan."
       },
       "top": [
         {
@@ -261,7 +273,8 @@
           "score": 100,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "smart #1015",
@@ -269,7 +282,8 @@
           "score": 100,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "dolphin #1103",
@@ -277,7 +291,8 @@
           "score": 100,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "whale #1333",
@@ -285,7 +300,8 @@
           "score": 100,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "dolphin #371",
@@ -293,7 +309,8 @@
           "score": 96.5,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "smart #668",
@@ -301,7 +318,8 @@
           "score": 96.4,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "smart #652",
@@ -309,15 +327,8 @@
           "score": 95.2,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
-        },
-        {
-          "alias": "dolphin #934",
-          "label": "dolphin",
-          "score": 92.8,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "smart #1273",
@@ -325,7 +336,8 @@
           "score": 91.9,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
         },
         {
           "alias": "smart #913",
@@ -333,11 +345,41 @@
           "score": 91.6,
           "copied": 0,
           "won": 0,
-          "pnlUsd": 0
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
+          "alias": "smart #955",
+          "label": "smart",
+          "score": 91.3,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1791190521969,
+        "symbol": "Apophenoth",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati: harga sudah naik 185% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
+      {
+        "at": 1791190462624,
+        "symbol": "JENSEN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 11."
+      },
       {
         "at": 1791190406689,
         "symbol": "Agency",
@@ -579,8 +621,8 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 9,
-        "red_flag": 8,
+        "chase": 10,
+        "red_flag": 9,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -597,7 +639,9 @@
         "solo": 2,
         "explore": 2
       },
-      "solo_entries": {},
+      "solo_entries": {
+        "jumlah": 0
+      },
       "partial": {
         "take profit": 1,
         "anticipate": 0,
@@ -621,7 +665,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791190612770,
+    "generatedAt": 1791190799156,
     "trades": {
       "count": 1,
       "wins": 1,
