@@ -25,6 +25,8 @@ function book(now, extra = {}) {
     wallets: { tracked: 1344, active: 103, by_label: { smart: 484, kol: 86, lp: 0 } },
     rules: ['Masuk hanya saat beberapa wallet terverifikasi membeli coin yang sama.', 'Dry run: semua transaksi simulasi.'],
     about: 'SnipeHunt tidak menebak coin.',
+    reserve_pct: 5,
+    reason_stats_24h: { test: { solo: 2, explore: 1 }, solo_entries: 3, exit: { rotation: 1 } },
     ...extra,
   };
 }
@@ -54,6 +56,10 @@ test('SnipeHunt: berkas copy-trade diimpor apa adanya, alasan keluar diterjemahk
     assert.deepEqual(live.strategy.ruleList.length, 2); assert.equal(live.strategy.requirementsTitle, 'Basket modal');
     assert.ok(live.strategy.system.some(([k, v]) => k === 'Label wallet' && /smart 484/.test(v) && !/lp/.test(v)));
     assert.equal(live.trading.llm.lastReason, 'masuk BONK: 3 wallet smart');
+    // Tahap 3: angka tunggal (solo_entries) tidak hilang; cadangan kas ikut terbit.
+    assert.deepEqual(live.copyTrade.reasonStats.solo_entries, { jumlah: 3 });
+    assert.equal(live.copyTrade.reasonStats.test.explore, 1);
+    assert.ok(live.strategy.system.some(([k, v]) => k === 'Cadangan kas' && /5%/.test(v)));
     const nav = JSON.parse(readFileSync(join(f.data, 'snh/nav.json'), 'utf8')).points;
     assert.ok(nav.some((p) => p.usd === 1004), 'riwayat equity dari bot masuk ke deret nilai');
   } finally { rmSync(f.root, { recursive: true, force: true }); }

@@ -46,7 +46,7 @@ const tidy = (n) => Number(n.toFixed(8));
 // yang ikut terbit dan satu kalimat panjang tidak membatalkan impor.
 const text = (v, max = 280) => { if (v === undefined || v === null) return null; const t = String(v).replace(/0x[0-9a-fA-F]{16,}/g, '0x…').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').replace(/\s+/g, ' ').trim(); return t ? (t.length > max ? t.slice(0, max - 1) + '…' : t) : null; };
 // Alasan keluar yang dikenal ditulis dalam bahasa situs; lainnya apa adanya.
-const REASON = { 'follow exit': 'ikut wallet keluar', 'stale price': 'harga basi', 'take profit': 'take profit', 'stop': 'stop loss',
+const REASON = { 'rotation': 'rotasi (datar >48 jam)', 'follow exit': 'ikut wallet keluar', 'stale price': 'harga basi', 'take profit': 'take profit', 'stop': 'stop loss',
   'trailing': 'trailing stop', 'time limit': 'batas waktu', 'rug': 'rug', 'manual': 'manual' };
 const reasonText = (v) => { const t = text(v, 60); return t ? REASON[t.toLowerCase()] ?? t : null; };
 // Wallet yang ikut membeli (copy-trade): jumlah dan labelnya, tanpa alamat.
@@ -165,7 +165,9 @@ const rules = Array.isArray(src.rules) ? src.rules.filter((x) => typeof x !== 's
 const ruleList = Array.isArray(src.rules) ? src.rules.filter((x) => typeof x === 'string').map((x) => text(x, 300)).filter(Boolean) : [];
 // Basket modal (copy-trade): alokasi, kursi maksimum, dan posisi terbuka.
 const baskets = Array.isArray(src.baskets) ? src.baskets.map((b) => [text(b.label ?? b.id, 30),
-  [optNum(b.alloc_pct) != null && `alokasi ${b.alloc_pct}%`, optNum(b.cap) != null && `$${b.cap}`, optNum(b.seat_pct) != null && `kursi maks ${b.seat_pct}% equity`, optNum(b.open) != null && `${b.open} terbuka`].filter(Boolean).join(' · ')]).filter(([k, v]) => k && v) : [];
+  [optNum(b.alloc_pct) != null && `alokasi ${b.alloc_pct}%`, optNum(b.cap) != null && `$${Math.round(b.cap).toLocaleString('en-US')}`,
+   Array.isArray(b.seat_basket_pct) && b.seat_basket_pct.length === 2 ? `kursi ${b.seat_basket_pct[0]}–${b.seat_basket_pct[1]}% basket` : null,
+   optNum(b.seat_pct) != null && `maks ${b.seat_pct}% equity`, optNum(b.open) != null && `${b.open} terbuka`].filter(Boolean).join(' · ')]).filter(([k, v]) => k && v) : [];
 const wallets = src.wallets && typeof src.wallets === 'object' ? src.wallets : null;
 // Blok copy-trade (SnipeHunt): segmen wallet, wallet teratas, jejak keputusan.
 const byLabel = wallets?.by_label && typeof wallets.by_label === 'object' ? Object.entries(wallets.by_label).map(([k, v]) => (typeof v === 'object' && v
@@ -174,20 +176,24 @@ const byLabel = wallets?.by_label && typeof wallets.by_label === 'object' ? Obje
 const copyTrade = wallets || Array.isArray(src.decisions) ? {
   wallets: wallets ? {
     tracked: optNum(wallets.tracked), active: optNum(wallets.active), passive: optNum(wallets.passive),
+    trusted: optNum(wallets.trusted), promising: optNum(wallets.promising),
     byLabel: byLabel.sort((a, b) => b.total - a.total),
-    definitions: Object.fromEntries(['active', 'passive', 'label'].map((k) => [k, text(wallets.definitions?.[k], 300)]).filter(([, v]) => v)),
+    definitions: Object.fromEntries(['active', 'passive', 'label', 'trusted', 'promising'].map((k) => [k, text(wallets.definitions?.[k], 300)]).filter(([, v]) => v)),
     top: (Array.isArray(wallets.top) ? wallets.top : []).slice(0, 10).map((w) => ({ alias: text(w.alias, 30), label: keyOf(w.label ?? ''), score: optNum(w.score),
-      copied: optNum(w.copied), won: optNum(w.won), pnlUsd: optNum(w.pnl_usd) })).filter((w) => w.alias),
+      copied: optNum(w.copied), won: optNum(w.won), pnlUsd: optNum(w.pnl_usd), trusted: w.trusted === true })).filter((w) => w.alias),
   } : null,
   decisions: (Array.isArray(src.decisions) ? src.decisions : []).slice(0, 50).map((d) => ({
     at: d.at ? time(d.at, 'decisions.at') : null, symbol: text(d.symbol, 40), action: keyOf(d.action ?? ''), basket: text(d.basket, 20),
     ...(counts(d.wallet_breakdown) ? { wallets: counts(d.wallet_breakdown) } : {}), ...(flagsOf(d.risk_flags).length ? { flags: flagsOf(d.risk_flags) } : {}),
     reason: text(d.reason, 400) })).filter((d) => d.at && d.action),
   reasonStats: src.reason_stats_24h && typeof src.reason_stats_24h === 'object'
-    ? Object.fromEntries(Object.entries(src.reason_stats_24h).map(([g, o]) => [keyOf(g), Object.fromEntries(Object.entries(o || {}).map(([k, n]) => [text(k, 30), optNum(n)]).filter(([k, n]) => k && n != null))])) : null,
+    ? Object.fromEntries(Object.entries(src.reason_stats_24h).map(([g, o]) => [keyOf(g), typeof o === 'number' ? { jumlah: optNum(o) }
+      : Object.fromEntries(Object.entries(o || {}).map(([k, n]) => [text(k, 30), optNum(n)]).filter(([k, n]) => k && n != null))])) : null,
 } : null;
 const walletRows = wallets ? [['Wallet dipantau', `${optNum(wallets.tracked) ?? '—'} · ${optNum(wallets.active) ?? '—'} aktif`],
-  ...(wallets.by_label && typeof wallets.by_label === 'object' ? [['Label wallet', Object.entries(wallets.by_label).filter(([, n]) => optNum(n)).map(([k, n]) => `${text(k, 16)} ${n}`).join(' · ')]] : [])] : [];
+  ...(optNum(src.reserve_pct) != null ? [['Cadangan kas', `${src.reserve_pct}% untuk gas, tip, dan slippage — tidak dipakai membuka posisi`]] : []),
+  ...(optNum(wallets.trusted) != null ? [['Wallet tepercaya', `${wallets.trusted} · menjanjikan ${optNum(wallets.promising) ?? 0}`]] : []),
+  ...(wallets.by_label && typeof wallets.by_label === 'object' ? [['Label wallet', Object.entries(wallets.by_label).map(([k, n]) => [k, typeof n === 'object' && n ? optNum(n.total) : optNum(n)]).filter(([, n]) => n).map(([k, n]) => `${text(k, 16)} ${n}`).join(' · ')]] : [])] : [];
 const about = (Array.isArray(src.about) ? src.about : src.about ? [src.about] : []).map((x) => text(x, 500)).filter(Boolean);
 const sleeveInfo = [...(src.sleeves && typeof src.sleeves === 'object' ? Object.entries(src.sleeves).map(([k, v]) => [text(k, 30), text(v, 160)]).filter(([k, v]) => k && v) : []), ...baskets];
 const peak = optNum(pick(src, ['peak_equity_usd']));
