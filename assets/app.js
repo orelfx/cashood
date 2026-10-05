@@ -1107,7 +1107,7 @@ function renderCopyTrade(nav) {
 function renderPaperGeneric(nav, tr, tile) {
   const label = fundMeta(state.fund)?.label || 'Bot ini';
   setHTML($('#paperLead'), `${esc(tr.lead || label + ' belum memakai uang sungguhan.')}${tr.startedAt ? ` Riwayat sejak ${tgl(tr.startedAt)}.` : ''}`);
-  const base = [tile('Kondisi bot', esc(tr.status || '—'), tr.heartbeatAt ? `tanda hidup ${ago(tr.heartbeatAt)}` : 'tidak ada tanda hidup', tr.healthy ? 'pos' : 'neg')];
+  const base = [tile('Kondisi bot', esc(tr.status || '—'), tr.statusNote ? esc(tr.statusNote) : tr.heartbeatAt ? `tanda hidup ${ago(tr.heartbeatAt)}` : 'tidak ada tanda hidup', tr.statusTone || (tr.healthy ? 'pos' : 'neg'))];
   if (tr.peakUsd) base.push(tile('Turun dari puncak', pct(tr.drawdownPct), `puncak ${usd(tr.peakUsd, 0)}`, tr.drawdownPct >= 10 ? 'neg' : ''));
   setHTML($('#paperStats'), base.concat(tr.tiles.map((x) => tile(esc(x.k), x.usd != null ? usd(x.usd, 0) : x.pct != null ? pct(x.pct) : esc(x.v ?? '—'),
     esc(x.n || ''), x.tone || ''))).join(''));

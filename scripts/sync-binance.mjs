@@ -204,6 +204,15 @@ const snapshot = {
     retryAt: health.until,
     status: health.status,
     healthy: health.healthy,
+    // Bot hidup tapi sedang menahan request (rem bawaannya sendiri) atau
+    // menyambung ulang: itu bukan error dan bukan blokir IP. Ditulis kuning
+    // dengan penjelasan, bukan merah; merah tetap untuk bot mati/gangguan.
+    ...(health.alive && !health.usable && /anggaran|memulihkan|cooldown/.test(health.status) ? {
+      statusTone: 'warn',
+      statusNote: /cooldown/.test(health.status)
+        ? 'bot hidup · Binance minta jeda sebentar; posisi tetap dijaga SL/TP di bursa'
+        : 'bot hidup · menahan request supaya tidak melewati batas Binance; posisi tetap dijaga SL/TP di bursa',
+    } : {}),
     lead: `Bot crypto futures di Binance TESTNET — dananya virtual. Sejak ${startedAt ? tgl(startedAt) : '29 Sep'} berjalan dengan mesin baru `
       + `yang mencatat hasil bersih tiap trade dalam dolar. Riwayat mesin lama (Mei–Juni) tetap tersimpan sebagai arsip.`,
     tiles: [
@@ -211,7 +220,7 @@ const snapshot = {
         n: `${positions.length} posisi terbuka · equity − saldo wallet`, tone: status.account.equity - status.account.wallet >= 0 ? 'pos' : 'neg' },
       { k: 'Margin terpakai', usd: r2(status.account.initial_margin), n: `tersedia $${r2(status.account.available).toLocaleString('en-US')}` },
       { k: 'Leverage', v: [...new Set(positions.map((p) => p.futures.leverage).filter(Boolean))].map((x) => x + '×').join(' / ') || '—', n: 'per posisi, isolated/cross mengikuti bot' },
-      { k: 'Data akun terakhir', v: updatedAt ? new Date(updatedAt + WIB).toISOString().slice(11, 16) + ' WIB' : 'belum tersedia', n: health.usable ? 'akun berhasil diperiksa' : 'nilai terakhir; belum terverifikasi ulang', tone: health.usable ? 'pos' : 'neg' },
+      { k: 'Data akun terakhir', v: updatedAt ? new Date(updatedAt + WIB).toISOString().slice(11, 16) + ' WIB' : 'belum tersedia', n: health.usable ? 'akun berhasil diperiksa' : health.accountFresh ? 'masih segar (<10 menit); dicek ulang setelah jeda' : 'nilai terakhir; belum terverifikasi ulang', tone: health.usable ? 'pos' : health.accountFresh ? 'warn' : 'neg' },
       ...(health.until > now ? [{ k: 'Coba koneksi lagi', v: new Date(health.until + WIB).toISOString().slice(11, 19) + ' WIB', n: 'otomatis setelah batas waktu; bisa berubah jika Binance memperpanjang' }] : []),
       { k: 'Pindai pasar', v: String(act.scans), n: `24 jam · ${act.skips} kandidat dilewati` },
       { k: 'Buka · tutup', v: `${act.opened} · ${act.closed}`, n: '24 jam terakhir' },
