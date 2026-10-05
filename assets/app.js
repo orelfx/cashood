@@ -2790,6 +2790,7 @@ async function renderSafeboxInvoices() {
 
 function showSafebox() {
   state.view = 'safebox';
+  banner('');
   leaveHome();
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
@@ -3241,6 +3242,7 @@ async function renderUpdates() {
 
 function showUpdate() {
   state.view = 'update';
+  banner('');
   leaveHome();
   $('#tabs').hidden = true;
   ['portfolio', 'investor', 'analys', 'bot', 'tentang'].forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = true; });
@@ -3254,6 +3256,7 @@ function showUpdate() {
 
 function showAnalisa(fund) {
   state.view = 'analisa';
+  banner('');
   leaveHome();
   analisaFund = fund || analisaFund || state.funds[0]?.id;
   $('#tabs').hidden = true;
@@ -3319,6 +3322,7 @@ function leaveHome() {
 const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index'];
 function showGlobal(view, title) {
   state.view = view;
+  banner('');
   $('#tabs').hidden = true;
   GLOBAL_TABS.forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = t !== view; });
   $('#strip').hidden = true;
@@ -3523,6 +3527,7 @@ function showPemegang() { showGlobal('pemegang', 'Data investor — Cashood Head
 
 function showHome() {
   state.view = 'home';
+  banner('');
   $('#tabs').hidden = true;
   GLOBAL_TABS.forEach((t) => { if ($('#tab-' + t)) $('#tab-' + t).hidden = t !== 'home'; });
   $('#tab-home').hidden = false;
@@ -4070,7 +4075,10 @@ async function load({ force = false } = {}) {
     const msgs = [...state.ledger.warnings];
     if (nav.partial) msgs.push('Data belum lengkap atau belum terverifikasi. Jangan gunakan sebagai dasar transaksi.');
     if (nav.lpStale) msgs.push(`Snapshot sumber sudah ${ago(nav.updatedAt)}. Semua saldo memakai snapshot, bukan saldo live.`);
-    banner(msgs.join(' · ')); renderVisible();
+    // Peringatan milik satu dana hanya tampil di halaman dana itu; halaman
+    // ringkasan (beranda dll.) memuat dana bawaan di latar dan tidak boleh
+    // mewarisi peringatannya.
+    banner(state.view === 'fund' ? msgs.join(' · ') : ''); renderVisible();
     seriesJob.then(series => { if (valid()) { navPoints = series; if (state.view === 'fund') renderNavChart(); } });
     if (hbLoaded) refreshHeartbeat({ force });
   } catch (err) { if (valid()) banner('Gagal ambil data: ' + err.message, 'err'); }
