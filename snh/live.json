@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0ec98fde-a5b6-4f02-9f67-7dff6492298f",
-  "updatedAt": 1791202002341,
-  "generatedAt": "2026-10-05 19:06 WIB",
+  "generation": "7239bee0-d87b-44ea-9e89-8d61a155d13a",
+  "updatedAt": 1791202318113,
+  "generatedAt": "2026-10-05 19:11 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -82,12 +82,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791202002341,
+    "heartbeatAt": 1791202318113,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791201998788,
+    "lastScanAt": 1791202315520,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -108,8 +108,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "79",
-        "n": "24 jam · 4 diveto LLM"
+        "v": "84",
+        "n": "24 jam · 5 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -124,9 +124,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791202002341,
+      "lastDecisionAt": 1791202318113,
       "lastAction": "keputusan",
-      "lastReason": "SLM [degen]: Dilewati karena red flag: holder baru 9."
+      "lastReason": "swordcat [mid]: Dilewati karena red flag: insider/entrapment pegang 24%."
     }
   },
   "strategy": {
@@ -360,6 +360,102 @@
     },
     "decisions": [
       {
+        "at": 1791202316902,
+        "symbol": "swordcat",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 24%."
+      },
+      {
+        "at": 1791202286850,
+        "symbol": "BALL",
+        "action": "test",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 56,
+            "note": "bundler pegang 6.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 3.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 2.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 79,
+            "note": "9.5% holder wallet baru"
+          }
+        ],
+        "reason": "Uji coba: konsensus baru terpenuhi kalau wallet yang dinilai 'avoid' oleh LLM ikut dihitung. Dicatat sebagai posisi bayangan untuk menguji apakah penilaian LLM itu benar."
+      },
+      {
+        "at": 1791202249658,
+        "symbol": "Apiary",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 131,
+            "note": "bundler pegang 21.9%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 8.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 169,
+            "note": "11.4% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 7x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: smart #1012 has abysmal 23% winrate with only 1 over-5x winner out of 71 tokens and negative median exit (-7%), while writzzzz shows modest 5.2% ROI with zero over. Tetap dicatat sebagai posisi bayangan untuk menilai wallet-nya."
+      },
+      {
+        "at": 1791202049919,
+        "symbol": "AE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 7x."
+      },
+      {
+        "at": 1791202019547,
+        "symbol": "SLM",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 11."
+      },
+      {
         "at": 1791201918439,
         "symbol": "SLM",
         "action": "skip",
@@ -508,16 +604,6 @@
           }
         ],
         "reason": "Dilewati: biaya beli lalu jual 6,8% terlalu mahal (likuiditas tipis, batas 6%)."
-      },
-      {
-        "at": 1791201573090,
-        "symbol": "AE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 7x."
       },
       {
         "at": 1791200847132,
@@ -1034,103 +1120,12 @@
           "bot": 1
         },
         "reason": "Dilewati: harga sudah naik 185% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791190462624,
-        "symbol": "JENSEN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "bot": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 11."
-      },
-      {
-        "at": 1791190377066,
-        "symbol": "DOMAIN",
-        "action": "test",
-        "basket": "degen",
-        "wallets": {
-          "bot": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 11.6%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 7.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "20.7% holder wallet baru"
-          }
-        ],
-        "reason": "Uji coba: konsensus baru terpenuhi kalau wallet yang dinilai 'avoid' oleh LLM ikut dihitung. Dicatat sebagai posisi bayangan untuk menguji apakah penilaian LLM itu benar."
-      },
-      {
-        "at": 1791190188931,
-        "symbol": "glam",
-        "action": "test",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 8.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Uji coba: konsensus baru terpenuhi kalau wallet yang dinilai 'avoid' oleh LLM ikut dihitung. Dicatat sebagai posisi bayangan untuk menguji apakah penilaian LLM itu benar."
-      },
-      {
-        "at": 1791189971718,
-        "symbol": "SIGF",
-        "action": "test",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 14.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 5,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "9.9% holder wallet baru"
-          }
-        ],
-        "reason": "Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 29,
-        "red_flag": 31,
+        "red_flag": 34,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -1141,11 +1136,11 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 4
+        "llm": 5
       },
       "test": {
         "solo": 7,
-        "explore": 2,
+        "explore": 3,
         "chase": 0
       },
       "solo_entries": {
@@ -1174,7 +1169,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791202018745,
+    "generatedAt": 1791202319099,
     "trades": {
       "count": 1,
       "wins": 1,
