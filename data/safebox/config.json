@@ -1,20 +1,21 @@
 {
   "app": {
     "name": "Safe Box",
-    "tagline": "Simpanan fluktuatif · imbal hasil mengikuti hasil penempatan dana",
+    "tagline": "Simpanan · bunga harian mengikuti kinerja bot Cashood, maksimal 3% per bulan",
     "refreshMinutes": 5,
     "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/live.json",
     "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/nav.json"
   },
   "startedAt": "2026-09-12",
-  "note": "Simpanan dengan imbal hasil yang mengikuti hasil penempatan dana. Penempatannya rahasia dan menjadi kewenangan pengelola.",
+  "note": "Simpanan dengan bunga harian yang mengikuti kinerja bot Cashood. Penempatan dananya rahasia dan menjadi kewenangan pengelola.",
   "rate": {
-    "minMonthlyPct": 0.1,
+    "minMonthlyPct": 0,
     "maxMonthlyPct": 3,
-    "note": "Aturan pemilik 2026-09-20: imbal hasil dikunci 0,1%–3% per bulan, mengikuti hasil penempatan dana yang sebenarnya."
+    "dailyFrom": "2026-10-05",
+    "note": "Aturan pemilik 2026-10-05: bunga dihitung per hari mengikuti Cashood Index. Hari rugi 0; hari untung mengikuti kenaikannya tapi paling tinggi 0,1% per hari (3% per bulan)."
   },
   "display": {
-    "principalUsd": 3000,
+    "principalUsd": 1000,
     "note": "Jumlah pokok seluruh pemilik.",
     "capacityUsd": 10000
   },
@@ -30,6 +31,20 @@
       "name": "Si Nakal",
       "color": "#c084fc",
       "principalUsd": 1000
+    }
+  ],
+  "ownerEvents": [
+    {
+      "at": "2026-10-05T04:48:05.411Z",
+      "note": "Stefani keluar dari Safe Box (pindah ke Meridian), arahan pemilik 2026-10-05",
+      "owners": [
+        {
+          "id": "sinakal",
+          "name": "Si Nakal",
+          "color": "#c084fc",
+          "principalUsd": 1000
+        }
+      ]
     }
   ]
 }

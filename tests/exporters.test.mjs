@@ -34,5 +34,31 @@ test('all exporters produce coherent public snapshots; failed reads retain prior
    const dead=f.run(script,args,'unpriced');assert.equal(dead.status,0,dead.stderr);
    const after=JSON.parse(readFileSync(p,'utf8'));assert.equal(after.noMarketTokens.length,1);assert.equal(after.walletUsd,200.1);}
  }
- const good=f.run('sync-safebox.mjs',['--now']);assert.equal(good.status,0,good.stderr);const p=join(f.data,'safebox/live.json'),before=readFileSync(p,'utf8');const bad=f.run('sync-safebox.mjs',['--now'],'source');assert.notEqual(bad.status,0);assert.equal(readFileSync(p,'utf8'),before);
+ // Bunga Safe Box mengikuti index; sumber nilai penempatan hanya catatan internal.
+ // Kalau sumber itu gagal, bunga tetap terbit dan catatan internal tidak disentuh.
+ const good=f.run('sync-safebox.mjs',['--now']);assert.equal(good.status,0,good.stderr);const internal=join(f.data,'safebox/internal.json'),inBefore=readFileSync(internal,'utf8');
+ const bad=f.run('sync-safebox.mjs',['--now'],'source');assert.equal(bad.status,0,bad.stderr);assert.equal(readFileSync(internal,'utf8'),inBefore);
+ const sb=JSON.parse(readFileSync(join(f.data,'safebox/live.json'),'utf8'));assert.equal(sb.principalUsd,3000);assert.equal(sb.measure.maxMonthlyPct,3);
+}finally{rmSync(f.root,{recursive:true,force:true});}});
+test('reborn: buku keempat hot potato punya label dan baris sendiri; buku tak dikenal tidak menggagalkan sync; kertas terpisah',()=>{const f=fixture();try{
+ const bot=join(f.root,'bot'),t=Date.now()-3600e3;
+ const closed=[{strategy:'hotpotato',symbol:'HOT',netUsd:-95.14,netPct:-.2109,openedAt:t-9e6,closedAt:t,closeReason:'time limit',entryVia:'door',door:{rate60:.024,vol60Usd:32424.4,pool:'0x'+'9'.repeat(40),setAside:['ban']}},
+  {strategy:'bigcap',symbol:'BIG',netUsd:5,netPct:.01,openedAt:t-9e6,closedAt:t},{strategy:'kerupuk',symbol:'NEW',netUsd:1,netPct:.01,openedAt:t-9e6,closedAt:t}];
+ write(bot,'store.js',`export const getClosed=()=>[],getClosedSince=()=>${JSON.stringify(closed)},profitSweeps=()=>[],getOpen=()=>[{tokenId:"123",claimedQuote:1000000,entryVia:'door',door:{rate60:.027,vol60Usd:1000}}];`);
+ write(bot,'manager.js',`export const readBook=async()=>[{integrity:{complete:true},positions:[{tokenId:'123',strategy:'hotpotato',quoteToken:'${'0x'+'2'.repeat(40)}',basisQuote:100000000,principalUsd:100,feesUsd:2,valueUsd:102,symbol:'TEST',tickLower:0,tickUpper:10,currentTick:5,inRange:true}]}];`);
+ write(bot,'.state/performance.json',JSON.stringify({generatedAt:t,seats:{bigcap:{label:'big cap',cap:4,openNow:1,seatUsd:850},hotpotato:{label:'hot potato',cap:2,openNow:1,seatUsd:600}},capital:{workingCapitalUsd:13000,reserveUsd:650,bookUsd:13000,deployableUsd:12350}}));
+ write(bot,'.state/hotpotato/summary.json',JSON.stringify({generatedAt:t,sizeUsd:400,days:1.5,books:[{id:'d2',label:'degen board',seats:2,closed:12,won:10,usd:19.69,open:1,openUsd:-1.3}]}));
+ const out=join(f.data,'reborn/live.json'),r=f.run('sync.mjs',[out]);assert.equal(r.status,0,r.stderr);
+ const live=JSON.parse(readFileSync(out,'utf8'));
+ const keys=live.bookStats.all.books.map(b=>b.key);
+ for(const k of ['bigcap','multi','degen','hotpotato','kerupuk'])assert.ok(keys.includes(k),k);
+ const hot=live.bookStats.all.books.find(b=>b.key==='hotpotato');assert.equal(hot.label,'hot potato');assert.equal(hot.closes,1);assert.equal(hot.netUsd,-95.14);
+ assert.equal(live.bookStats.all.books.find(b=>b.key==='kerupuk').label,'kerupuk');
+ assert.equal(live.positions[0].bookLabel,'hot potato');assert.equal(live.positions[0].entryVia,'door');assert.equal(live.positions[0].door.rate60Pct,2.7);
+ const row=live.closedRecent.find(x=>x.symbol==='HOT');assert.equal(row.bookLabel,'hot potato');assert.deepEqual(row.door,{rate60Pct:2.4,vol60Usd:32424});
+ assert.equal(JSON.stringify(live).includes('9'.repeat(40)),false,'alamat pool tidak boleh terbit');
+ assert.equal(live.seats.books.find(s=>s.key==='hotpotato').cap,2);assert.equal(live.seats.reserveUsd,650);
+ // Kertas terbit terpisah dan bertanda; hasil asli tidak ikut menjumlahkannya.
+ assert.equal(live.paperBooks.paper,true);assert.equal(live.paperBooks.variants[0].netUsd,19.69);
+ const realTotal=live.bookStats.all.books.reduce((s,b)=>s+b.netUsd,0);assert.equal(Number(realTotal.toFixed(2)),-89.14);
 }finally{rmSync(f.root,{recursive:true,force:true});}});

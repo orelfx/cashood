@@ -11,7 +11,7 @@ import { atomicJSON, assertPublic } from './io.mjs';
 
 const WIB = 7 * 3600e3;
 // Hanya kolom ini yang boleh terbit; ID posisi, alamat, dan tiket tidak pernah ikut.
-const KEYS = ['symbol', 'strategy', 'netUsd', 'estUsd', 'netPct', 'rMultiple', 'holdMinutes', 'reason', 'reasonDetail', 'closedAt', 'investedUsd', 'feesUsd', 'lot', 'legacy'];
+const KEYS = ['symbol', 'strategy', 'bookLabel', 'entryVia', 'door', 'orderedBy', 'netUsd', 'estUsd', 'netPct', 'rMultiple', 'holdMinutes', 'reason', 'reasonDetail', 'closedAt', 'investedUsd', 'feesUsd', 'lot', 'legacy'];
 // Teks bebas dari bot (alasan tutup, nama strategi) bisa memuat alamat kontrak
 // atau kalimat panjang: alamat dipangkas, panjangnya dibatasi.
 const LIMIT = { symbol: 40, strategy: 60, reason: 90, reasonDetail: 240 };

@@ -18,7 +18,6 @@ run_snapshot() {
 # Independent funds may finish separately. Each exporter has its own writer lock.
 run_snapshot scripts/sync.mjs
 run_snapshot scripts/sync-meridian.mjs
-run_snapshot scripts/sync-safebox.mjs
 run_snapshot scripts/sync-ferari.mjs
 run_snapshot scripts/sync-charon.mjs
 run_snapshot scripts/sync-robsol.mjs
@@ -37,6 +36,8 @@ run_paper dgrh /root/cashood-inbox/devil-greed-robin-hood.json
 run_paper dgsol /root/cashood-inbox/devil-greed-solana.json
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
 run_snapshot scripts/sync-index.mjs
+# Bunga Safe Box mengikuti gerak harian index, jadi dihitung sesudahnya.
+run_snapshot scripts/sync-safebox.mjs
 [ -d "$WORK" ] || git worktree add -q "$WORK" data
 /usr/bin/node scripts/stage-data.mjs "$WORK" || failed=1
 cd "$WORK"

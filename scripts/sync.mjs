@@ -44,6 +44,25 @@ const { NATIVE, USDG, WETH, decimalsOf } = await load('chain/addresses.js');
 const { getClient } = await load('chain/rpc.js');
 const { ERC20_ABI } = await load('chain/abi.js');
 
+// Nama buku yang enak dibaca manusia ("multi" itu nama internal mid cap).
+// Buku yang kuncinya belum dikenal tetap terbit dengan kuncinya apa adanya —
+// buku baru di bot tidak boleh membuat sinkronisasi gagal.
+const BOOK_LABELS = { bigcap: 'big cap', multi: 'mid cap', degen: 'degen', hotpotato: 'hot potato' };
+const bookLabelOf = (key) => (key ? BOOK_LABELS[key] ?? String(key) : null);
+
+// Cara posisi masuk, dari catatan bot sendiri. `door` hanya ada di kursi hot
+// potato; yang diteruskan cuma ringkasan pintunya (laju bayar pool sejam
+// terakhir dan volumenya) — pool, venue, dan aturan internal tidak ikut terbit.
+const entryOf = (r) => {
+  const via = ['door', 'alarm', 'recovery'].includes(r?.entryVia) ? r.entryVia : null;
+  const rate = Number(r?.door?.rate60), vol = Number(r?.door?.vol60Usd);
+  return {
+    entryVia: via,
+    door: r?.door ? { rate60Pct: Number.isFinite(rate) ? Number((rate * 100).toFixed(2)) : null, vol60Usd: Number.isFinite(vol) ? Math.round(vol) : null } : null,
+    orderedBy: r?.orderedBy === 'operator' ? 'operator' : null,
+  };
+};
+
 const wallet = getWallet('multi');
 if (!wallet) throw new Error('wallet "multi" tidak ketemu — cek RR_* di .env');
 
@@ -151,10 +170,10 @@ for (const book of books) {
       // BUKU MILIK POSISI, bukan nama siklus. Siklus manajemen dideduplikasi
       // per dompet dan ketiga buku berbagi satu, jadi `book.strategy` selalu
       // "multi" — itu sebabnya seluruh baris di dasbor tertulis multi. Posisi
-      // sendiri selalu tahu bukunya: big cap, mid cap (multi), atau degen.
+      // sendiri selalu tahu bukunya: big cap, mid cap (multi), degen, hot potato.
       strategy: p.strategy ?? book.strategy ?? null,
-      // Nama yang enak dibaca manusia: "multi" itu nama internal buku mid cap.
-      bookLabel: { bigcap: 'big cap', multi: 'mid cap', degen: 'degen' }[p.strategy] ?? null,
+      bookLabel: bookLabelOf(p.strategy),
+      ...entryOf(record ?? p),
       inRange: p.inRange === true,
       principalUsd: Number(p.principalUsd) || 0,
       feesUsd: unclaimed,                          // belum dipanen
@@ -213,14 +232,12 @@ for (const r of closed) {
 }
 
 // ─── rekap per buku ──────────────────────────────────────────────────────
-// Tiga buku berbagi satu dompet, jadi tanpa pemisahan ini tidak kelihatan mana
-// yang menghasilkan. Ambangnya sama dengan win rate di atas (±0,5%): di
+// Empat buku berbagi satu dompet, jadi tanpa pemisahan ini tidak kelihatan mana
+// yang menghasilkan. Buku yang muncul di riwayat tapi belum dikenal ikut
+// mendapat baris sendiri dengan kuncinya apa adanya. Ambangnya sama dengan win rate di atas (±0,5%): di
 // dalamnya dihitung impas, bukan menang atau kalah.
-const BOOKS = [
-  { key: 'bigcap', label: 'big cap' },
-  { key: 'multi', label: 'mid cap' },
-  { key: 'degen', label: 'degen' },
-];
+const BOOKS = [...new Set([...Object.keys(BOOK_LABELS), ...closed.map((r) => r.strategy).filter(Boolean)])]
+  .map((key) => ({ key, label: bookLabelOf(key) }));
 const bookStats = (() => {
   // `now` baru lahir jauh di bawah (deret nilai); jam sendiri saja di sini.
   const t = Date.now();
@@ -260,6 +277,39 @@ const bookStats = (() => {
   }
   return out;
 })();
+
+// ─── kursi per buku dan buku kertas ──────────────────────────────────────
+// Tabel kursi dibaca dari laporan bot sendiri (.state/performance.json, ditulis
+// tiap heartbeat), bukan diketik ulang di sini — kalau bot mengubah jumlah
+// kursi, situs ikut. Hanya dibaca; gagal baca berarti blok ini kosong, bukan
+// snapshot gagal.
+const readState = (rel) => { try { return JSON.parse(readFileSync(resolve(RR_HOME, '.state', rel), 'utf8')); } catch { return null; } };
+const perf = readState('performance.json');
+const num = (v, dp = 2) => (Number.isFinite(Number(v)) ? Number(Number(v).toFixed(dp)) : null);
+const seats = perf?.seats ? {
+  at: Number(perf.generatedAt) || Date.parse(perf.generatedIso) || null,
+  books: Object.entries(perf.seats).map(([key, s]) => ({
+    key, label: bookLabelOf(key), cap: num(s?.cap, 0), openNow: num(s?.openNow, 0), seatUsd: num(s?.seatUsd),
+  })),
+  workingCapitalUsd: num(perf.capital?.workingCapitalUsd),
+  bookUsd: num(perf.capital?.bookUsd),
+  reserveUsd: num(perf.capital?.reserveUsd),
+  deployableUsd: num(perf.capital?.deployableUsd),
+} : null;
+// Hot potato juga jalan di atas kertas sebagai pembanding. ITU BUKAN UANG:
+// terbit terpisah dengan tanda paper, tidak pernah dijumlahkan ke hasil asli.
+const paperSummary = readState('hotpotato/summary.json');
+const paperBooks = Array.isArray(paperSummary?.books) ? {
+  paper: true,
+  book: 'hotpotato',
+  at: Number(paperSummary.generatedAt) || null,
+  seatUsd: num(paperSummary.sizeUsd),
+  days: num(paperSummary.days, 1),
+  variants: paperSummary.books.map((b) => ({
+    id: String(b.id ?? '').slice(0, 12), label: String(b.label ?? b.id ?? '').slice(0, 60), seats: num(b.seats, 0),
+    closes: num(b.closed, 0), wins: num(b.won, 0), netUsd: num(b.usd), open: num(b.open, 0), openUsd: num(b.openUsd),
+  })),
+} : null;
 
 const history = [...byDay.values()]
   .map((r) => ({ ...r, usd: Number(r.usd.toFixed(2)), winUsd: Number(r.winUsd.toFixed(2)), lossUsd: Number(r.lossUsd.toFixed(2)) }))
@@ -330,6 +380,8 @@ for (const id of Object.keys(feeBook)) if (!openIds.has(id)) delete feeBook[id];
 const closedRow = (r) => ({
   symbol: r.symbol ?? null,
   strategy: r.strategy ?? null,
+  bookLabel: bookLabelOf(r.strategy),
+  ...entryOf(r),
   netUsd: Number(Number(r.netUsd).toFixed(2)),
   netPct: Number.isFinite(Number(r.netPct)) ? Number((Number(r.netPct) * 100).toFixed(2)) : null,
   openedAt: Number(r.openedAt) || null,
@@ -439,6 +491,8 @@ const snapshot = {
   staleUsd: Number(carriedUsd.toFixed(2)),
   history,
   bookStats,
+  seats,
+  paperBooks,
   stats,
   closedRecent,
   tradesAll: closedAllRows,

@@ -8,7 +8,7 @@
  * dibayarkan ke pemilik menurut porsi pokok; pokok tetap di dalam Safe Box
  * ($3.000) dan terus bekerja. Tidak ada fee.
  *
- * Hak bunga dibaca dari buku akrual Safe Box (data/safebox/accrual-v2.local.json):
+ * Hak bunga dibaca dari buku akrual Safe Box (data/safebox/accrual-v3.local.json):
  * total hak tiap pemilik dikurangi yang sudah dibayar dan dikurangi bunga yang
  * lahir SESUDAH periode tutup. Jumlah yang dibayar dibulatkan ke bawah per sen;
  * sisa pecahan sen tetap menjadi hak pemilik di bulan berikutnya.
@@ -19,6 +19,7 @@
  */
 import Core from '../assets/core.js';
 import { atomicJSON, lock, readJSON } from './lib/io.mjs';
+import { ownersAt } from './lib/accrual.mjs';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -44,7 +45,7 @@ const periodLabel = `${BULAN[pm - 1]} ${py}`;
 const payLabel = `${Number(payIso.slice(8))} ${BULAN[Number(payIso.slice(5, 7)) - 1]} ${payIso.slice(0, 4)}`;
 
 const cfg = JSON.parse(readFileSync(resolve(DATA, 'config.json'), 'utf8'));
-const state = readJSON(resolve(DATA, 'accrual-v2.local.json'));
+const state = readJSON(resolve(DATA, 'accrual-v3.local.json'));
 if (!state?.balances) throw new Error('buku akrual Safe Box belum ada');
 const payoutFile = resolve(DATA, 'payouts.jsonl');
 const idOf = (owner) => `sb-${period}-${owner}`;
@@ -52,15 +53,19 @@ const already = existsSync(payoutFile) ? readFileSync(payoutFile, 'utf8').split(
 
 // Hak bunga periode = hak total − sudah dibayar − bunga yang lahir sesudah periode.
 const after = state.days.filter((d) => d.date >= payIso);
-const principal = cfg.owners.reduce((s, o) => s + Number(o.principalUsd), 0);
-const rows = cfg.owners.map((o) => {
+// Pokok dihitung dari pemilik yang aktif di akhir periode; pemilik yang sudah
+// keluar tetap mendapat baris selama masih punya sisa bunga.
+const activeEnd = ownersAt(cfg, periodEnd - 1);
+const everyone = [...new Map([...cfg.owners, ...(cfg.ownerEvents || []).flatMap((e) => e.owners)].map((o) => [o.id, o])).values()];
+const principal = activeEnd.reduce((s, o) => s + Number(o.principalUsd), 0);
+const rows = everyone.map((o) => ({ ...o, principalUsd: activeEnd.find((a) => a.id === o.id)?.principalUsd ?? 0 })).map((o) => {
   const b = state.balances[o.id] || { accrued: 0, paid: 0 };
   const prior = already.find((p) => p.id === idOf(o.id));
   const later = after.reduce((s, d) => s + (d.owners?.[o.id] || 0), 0);
   const entitled = prior ? Number(prior.usd) : Math.max(0, b.accrued - b.paid - later);
   const usd = prior ? Number(prior.usd) : Math.floor(entitled * 100 + 1e-6) / 100;
-  return { id: o.id, name: o.name, color: o.color, principalUsd: Number(o.principalUsd), share: (Number(o.principalUsd) / principal) * 100, usd, idr: 0 };
-});
+  return { id: o.id, name: o.name, color: o.color, principalUsd: Number(o.principalUsd), share: principal ? (Number(o.principalUsd) / principal) * 100 : 0, usd, idr: 0 };
+}).filter((r) => r.principalUsd > 0 || r.usd > 0);
 const total = Core.money(rows.reduce((s, r) => s + r.usd, 0));
 // Rupiah dibagi dengan sisa terbesar, supaya baris-barisnya pas dengan total.
 {
@@ -156,7 +161,7 @@ const html = `<!doctype html>
   <div class="tiles">
     <div class="tile"><div class="k">Pokok simpanan</div><div class="v num">${usd(principal, 0)}</div><div class="s num">${idr(principal * rate)}</div></div>
     <div class="tile"><div class="k">Imbal hasil ${esc(BULAN[pm - 1])}</div><div class="v num pos">${usd(total)}</div><div class="s">${tglPendek(fromIso)} – ${lastDay} ${BULAN[pm - 1].slice(0, 3)} · ${spanDays} hari</div></div>
-    <div class="tile"><div class="k">Laju setara</div><div class="v num">${pct(monthlyPct)}</div><div class="s">per bulan · batas ${pct(Number(cfg.rate?.minMonthlyPct ?? 0), 1)}–${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)}</div></div>
+    <div class="tile"><div class="k">Laju setara</div><div class="v num">${pct(monthlyPct)}</div><div class="s">per bulan · maks ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)}</div></div>
     <div class="tile hi"><div class="k">Ditarik &amp; dibayarkan</div><div class="v num">${usd(total)}</div><div class="s num">${idr(total * rate)}</div></div>
   </div>
 
@@ -176,8 +181,8 @@ const html = `<!doctype html>
     <div>
       <h3>Cara pembayaran</h3>
       <div class="steps">
-        <div class="step"><div class="n">1</div><div>Pokok ${usd(principal, 0)} ditempatkan pengelola dan menghasilkan imbal hasil setiap hari, mengikuti hasil penempatan yang benar-benar terjadi.</div></div>
-        <div class="step"><div class="n">2</div><div>Imbal hasil dicatat harian dan dikunci di antara ${pct(Number(cfg.rate?.minMonthlyPct ?? 0), 1)} dan ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)} per bulan. Tidak pernah negatif.</div></div>
+        <div class="step"><div class="n">1</div><div>Pokok ${usd(principal, 0)} disimpan pengelola. Bunganya dihitung setiap hari mengikuti kinerja bot Cashood (Cashood Index) hari itu.</div></div>
+        <div class="step"><div class="n">2</div><div>Hari bot rugi bunganya 0; hari bot untung paling tinggi ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3) / 30, 2)} per hari, jadi paling banyak ${pct(Number(cfg.rate?.maxMonthlyPct ?? 3), 0)} per bulan. Tidak pernah negatif.</div></div>
         <div class="step"><div class="n">3</div><div>Tiap tanggal 1, seluruh imbal hasil bulan sebelumnya <b>ditarik dan dibayarkan</b> menurut porsi pokok. Pokok tetap di dalam Safe Box dan terus bekerja.</div></div>
       </div>
       <div class="box"><b>Pokok tetap ${usd(principal, 0)}.</b> Imbal hasil tidak diputar ulang — setelah pembayaran ini saldo tiap pemilik kembali ke pokoknya, dan imbal hasil ${esc(BULAN[pm % 12])} mulai dihitung dari nol.</div>

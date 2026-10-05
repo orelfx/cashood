@@ -771,6 +771,7 @@ function renderLp(nav) {
       return `<tr>
         <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? r.tokenId)}</span>
             <div class="sub2">${esc(r.bookLabel ?? r.strategy ?? '')}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
+            ${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}
             <div class="sub2 m-only ${r.inRange ? 'pos' : 'neg'}">${r.inRange ? 'di dalam range' : 'di luar range'}${
               r.throughBandPct == null ? '' : ' · ' + r.throughBandPct.toFixed(0) + '%'}</div></td>
         <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
@@ -814,6 +815,18 @@ async function loadTradeDay(fund, day) {
   throw new Error('riwayat hari ' + day + ' tidak terbaca');
 }
 
+// Cara posisi masuk, ditulis singkat di bawah nama buku.
+function entryNote(r) {
+  if (r.entryVia === 'door') {
+    const rate = r.door?.rate60Pct, vol = r.door?.vol60Usd;
+    return 'masuk lewat pintu' + (rate != null ? ` · pool bayar ${pct(rate)}/jam` : '') + (vol != null ? ` · vol 1 jam ${usd(vol)}` : '');
+  }
+  if (r.entryVia === 'alarm') return 'masuk lewat alarm';
+  if (r.entryVia === 'recovery') return 'masuk ulang setelah stop';
+  if (r.orderedBy === 'operator') return 'dibuka atas perintah operator';
+  return '';
+}
+
 function closedRowsHtml(rows, absolute) {
   // Hasil dalam dolar kalau bot mencatatnya; bot yang hanya mencatat persen
   // ditulis "—" (atau ≈ perkiraan) di kolom dolar, bukan $0.
@@ -821,7 +834,7 @@ function closedRowsHtml(rows, absolute) {
   return rows.map((r) => `
     <tr>
       <td><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
-      <td class="dim">${esc(r.strategy ?? '—')}</td>
+      <td class="dim">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}</td>
       <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
       <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
       <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
@@ -1634,9 +1647,10 @@ async function renderReports() {
 }
 
 /**
- * Performa per buku: big cap, mid cap, degen.
+ * Performa per buku: big cap, mid cap, degen, hot potato (dan buku baru apa
+ * pun yang dikirim bot — kuncinya ditulis apa adanya).
  *
- * Ketiganya berbagi satu dompet, jadi tanpa dipisah tidak kelihatan mana yang
+ * Semuanya berbagi satu dompet, jadi tanpa dipisah tidak kelihatan mana yang
  * benar-benar menghasilkan. Win rate-nya memakai definisi yang sama dengan
  * laporan bot: menang dibanding posisi yang bergerak, impas dihitung terpisah.
  */
@@ -1650,8 +1664,11 @@ function renderBooks() {
   if (card.hidden) return;
 
   $('#segBook').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-w') === bookWindow));
+  // Kursi dibaca dari laporan bot sendiri, bukan diketik di situs.
+  const seatOf = new Map((state.nav?.seats?.books || []).map((s) => [s.key, s]));
   setHTML($('#bookTable').querySelector('tbody'), win.books.map((b) => `<tr>
-      <td><span class="who"><span class="chip" style="background:${BOOK_COLOR[b.key] || '#8b95a7'}"></span>${esc(b.label)}</span></td>
+      <td><span class="who"><span class="chip" style="background:${BOOK_COLOR[b.key] || '#8b95a7'}"></span>${esc(b.label)}</span>${
+        seatOf.has(b.key) ? `<div class="sub2">${seatOf.get(b.key).openNow ?? 0}/${seatOf.get(b.key).cap ?? '—'} kursi${seatOf.get(b.key).seatUsd ? ' · ' + usd(seatOf.get(b.key).seatUsd) + '/kursi' : ''}</div>` : ''}</td>
       <td class="num">${b.closes}</td>
       <td class="num ${b.winRate == null ? '' : cls(b.winRate - 50)}">${b.winRate == null ? '—' : pct(b.winRate, 1)}</td>
       <td class="num dim">${b.wins} / ${b.losses} / ${b.flat}</td>
@@ -1662,10 +1679,28 @@ function renderBooks() {
   const total = win.books.reduce((s, b) => s + b.netUsd, 0);
   const closes = win.books.reduce((s, b) => s + b.closes, 0);
   setHTML($('#bookHint'), `${closes} posisi ditutup ${win.label} · hasil gabungan <strong class="${cls(total)}">${signed(total)}</strong>. `
-    + 'Win rate dihitung dari posisi yang bergerak; kolom M / K / I adalah menang, kalah, dan impas (±0,5%, termasuk posisi yang harganya tidak pernah menyentuh rentang).');
+    + 'Win rate dihitung dari posisi yang bergerak; kolom M / K / I adalah menang, kalah, dan impas (±0,5%, termasuk posisi yang harganya tidak pernah menyentuh rentang).'
+    + (state.nav?.seats?.reserveUsd ? ` Cadangan bot ${usd(state.nav.seats.reserveUsd)}.` : ''));
+  renderPaperBooks();
 }
 
-const BOOK_COLOR = { bigcap: '#60a5fa', multi: '#4ade80', degen: '#fbbf24' };
+/** Hot potato di atas kertas — pembanding saja, bukan uang, tidak ikut total. */
+function renderPaperBooks() {
+  const box = $('#paperBooks');
+  if (!box) return;
+  const p = state.nav?.paperBooks;
+  box.hidden = !p?.variants?.length;
+  if (box.hidden) return;
+  setHTML(box, `<h3>Hot potato di atas kertas <span class="pill">kertas · bukan uang</span></h3>
+    <p class="hint">Simulasi pembanding dengan kursi ${usd(p.seatUsd)}, ${p.days ?? '—'} hari. Angka ini tidak dijumlahkan ke hasil asli di atas.</p>
+    <div class="table-scroll"><table><thead><tr><th>Varian</th><th class="num">Kursi</th><th class="num">Ditutup</th><th class="num">Menang</th><th class="num">Hasil kertas</th><th class="num">Terbuka</th></tr></thead><tbody>
+    ${p.variants.map((v) => `<tr><td>${esc(v.id)}<div class="sub2">${esc(v.label)}</div></td><td class="num">${v.seats ?? '—'}</td><td class="num">${v.closes ?? 0}</td>
+      <td class="num dim">${v.wins ?? 0}</td><td class="num ${cls(v.netUsd ?? 0)}">${v.netUsd == null ? '—' : signed(v.netUsd)}</td>
+      <td class="num dim">${v.open ?? 0}${v.openUsd ? ` · <span class="${cls(v.openUsd)}">${signed(v.openUsd)}</span>` : ''}</td></tr>`).join('')}
+    </tbody></table></div>`);
+}
+
+const BOOK_COLOR = { bigcap: '#60a5fa', multi: '#4ade80', degen: '#fbbf24', hotpotato: '#fb923c' };
 
 /** Kas cadangan: uang yang sudah dipindah keluar dari wallet kerja bot. */
 function renderTreasury() {
@@ -2297,7 +2332,11 @@ function renderSafebox() {
     // 2026-09-21): yang bekerja tetap uang pokoknya, bunganya menumpuk di
     // sampingnya. Memakai saldo di sini membuat bunga berbunga diam-diam.
     const modal = sbCapital == null ? d.principalUsd : sbCapital;
-    const perDayRate = d.principalUsd > 0 ? rate.perDayUsd / d.principalUsd : 0;
+    // Laju harian mengikuti kinerja bot (Cashood Index), dikurung 0 sampai
+    // batas harian. Tabel di bawah memakai rata-rata yang sudah terjadi dan
+    // batas atasnya — laju satu hari saja bisa 0 dan tidak mewakili.
+    const maxDay = Number(rate.maxDailyPct ?? (rate.maxMonthlyPct ?? 3) / 30) / 100;
+    const avgDay = Number(rate.avgMonthlyPct ?? 0) / 30 / 100;
 
     // Satu kolom saja. Bunga di sini TIDAK diputar lagi: yang menghasilkan
     // tetap pokoknya, dan bunga yang sudah masuk berhenti di tempatnya. Kolom
@@ -2305,11 +2344,12 @@ function renderSafebox() {
     // dilakukan Safe Box.
     const rows = [['1 hari', 1], ['1 minggu', 7], ['1 bulan', 30], ['3 bulan', 90], ['6 bulan', 180], ['1 tahun', 365]]
       .map(([label, days]) => {
-        const bunga = modal * perDayRate * days;
+        const avg = modal * avgDay * days, top = modal * maxDay * days;
         return `<tr>
           <td>${label}</td>
-          <td class="num pos">${usd(bunga)}</td>
-          <td class="num"><strong>${usd(modal + bunga)}</strong></td>
+          <td class="num pos">${usd(avg)}</td>
+          <td class="num pos">${usd(top)}</td>
+          <td class="num"><strong>${usd(modal + top)}</strong></td>
         </tr>`;
       }).join('');
 
@@ -2335,14 +2375,15 @@ function renderSafebox() {
           : `<div class="stat"><div class="k">Total bunga</div>
             <div class="v pos">${usd(d.interestUsd, 2)}</div>
             <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>`}
-          <div class="stat"><div class="k">Bunga per bulan</div>
-            <div class="v">${rate.monthlyPct == null ? '—' : pct(rate.monthlyPct)}</div>
-            <div class="n">setara ${rate.apyPct == null ? '—' : pct(rate.apyPct)} setahun</div></div>
+          <div class="stat"><div class="k">Laju hari ini</div>
+            <div class="v">${rate.dailyPct == null ? '—' : pct(rate.dailyPct, 2)} <span class="dim" style="font-size:.6em">/hari</span></div>
+            <div class="n">maks ${pct(rate.maxDailyPct ?? 0.1, 2)}/hari · rata-rata ${pct(rate.avgMonthlyPct ?? 0, 2)}/bulan</div></div>
         </div>
-        <p class="hint" style="margin-top:14px">Bunganya <strong>tidak tetap</strong>, tapi selalu di antara
-          <strong>${pctRate(rate.minMonthlyPct ?? 0)} dan ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>.
-          Bunga dihitung dari hasil penempatan dana yang teramati, dengan batas bawah dan atas sesuai aturan simpanan.
-          ${(d.quality?.estimated || d.quality?.feesEstimated || d.quality?.allocationEstimated) ? 'Sebagian penghitungan memakai estimasi; jeda pengamatan dibagi menurut waktu yang berlalu.' : 'Angka hari ini masih dapat bertambah sampai tengah malam WIB.'}
+        <p class="hint" style="margin-top:14px">Bunganya <strong>dihitung tiap hari mengikuti kinerja bot Cashood</strong>
+          (gerak <a href="#index">Cashood Index</a> hari itu, jam WIB). Hari bot rugi: bunga <strong>0</strong>. Hari bot untung:
+          bunga ikut naik, tapi <strong>paling tinggi ${pct(rate.maxDailyPct ?? 0.1, 2)} per hari</strong> — jadi sebulan paling banyak
+          <strong>${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong>, sebagus apa pun hasil botnya.
+          Angka hari ini masih bisa berubah sampai tengah malam WIB, lalu dikunci.
           Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran atau jaminan hasil investasi.</p>
       </section>
 
@@ -2354,7 +2395,7 @@ function renderSafebox() {
         <div class="table-scroll"><table class="mcards">
           <thead><tr><th>Pemilik</th><th class="num">Pokok</th><th class="num">Porsi</th><th class="num">Bunga hari ini</th><th class="num">Bunga berjalan</th><th class="num">Sudah ditarik</th><th class="num">Saldo</th></tr></thead>
           <tbody>${d.owners.map((o) => `<tr>
-            <td class="mc-head"><span class="who"><span class="chip" style="background:${o.color || '#2dd4bf'}"></span>${esc(o.name)}</span></td>
+            <td class="mc-head"><span class="who"><span class="chip" style="background:${o.color || '#2dd4bf'}"></span>${esc(o.name)}</span>${o.left ? '<div class="sub2">sudah keluar · sisa bunga dibayar tanggal 1</div>' : ''}</td>
             <td class="num" data-k="Pokok">${usd(o.principalUsd)}</td>
             <td class="num" data-k="Porsi">${pct(o.sharePct)}</td>
             <td class="num pos" data-k="Bunga hari ini">${usd(o.interestTodayUsd, 2)}</td>
@@ -2380,14 +2421,14 @@ function renderSafebox() {
           <h2>Bunga harian</h2>
           <span class="hint">imbal hasil tiap hari · berjalan ${usd(d.interestUsd, 2)}${Number(d.paidUsd) > 0 ? ` · sudah ditarik ${usd(d.paidUsd, 2)}` : ''}</span>
         </div>
-        <div class="table-scroll"><table class="daily"><thead><tr><th>Tanggal</th><th class="num">Bunga</th><th>Status</th></tr></thead><tbody>
+        <div class="table-scroll"><table class="daily"><thead><tr><th>Tanggal</th><th class="num">Laju</th><th class="num">Bunga</th><th>Status</th></tr></thead><tbody>
           ${(() => {
             // Hari sebelum pembayaran terakhir sudah ditarik ke pemilik; sesudahnya
             // masih berjalan dan akan ditarik tanggal 1 berikutnya.
             const cut = d.lastPayout?.at ? new Date(d.lastPayout.at + 7 * 3600e3).toISOString().slice(0, 10) : null;
             return [...d.days].reverse().slice(0, 14).map((x) => {
               const paid = cut && x.date < cut;
-              return `<tr><td>${fmtDay(x.date)}</td><td class="num pos">${usd(x.usd, 2)}</td>
+              return `<tr><td>${fmtDay(x.date)}</td><td class="num dim">${x.ratePct == null ? '—' : pct(x.ratePct, 3)}</td><td class="num pos">${usd(x.usd, 2)}</td>
                 <td class="${paid ? 'dim' : 'pos'}">${paid ? `ditarik ${fmtDay(cut)}` : 'berjalan'}</td></tr>`;
             }).join('');
           })()}
@@ -2399,15 +2440,15 @@ function renderSafebox() {
           <h2>Apa itu Safe Box</h2>
           <span class="hint">cara kerjanya, apa adanya</span>
         </div>
-        <p class="lead">Safe Box bekerja seperti deposito: dana yang masuk dikelola ke berbagai instrumen investasi,
-          di dalam maupun di luar Cashood, dan mengembalikan bunga <strong>${pctRate(rate.minMonthlyPct ?? 0)}–${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>
-          yang dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
+        <p class="lead">Safe Box bekerja seperti deposito: pokoknya disimpan pengelola, dan bunganya mengikuti kinerja
+          bot-bot Cashood — <strong>0 sampai ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>,
+          dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
         <div class="two">
           <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
-            <li>Besarnya mengikuti hasil penempatan dana yang benar-benar terjadi hari itu, bukan janji persentase tetap.</li>
-            <li>Karena itu bunganya naik-turun: hari yang ramai membayar lebih besar, hari yang sepi lebih kecil.</li>
-            <li>Sekecil apa pun hasilnya, bunga tidak pernah di bawah ${pctRate(rate.minMonthlyPct ?? 0)} per bulan, dan sebesar apa pun
-                tidak melebihi ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan.</li>
+            <li>Tiap hari dilihat gerak Cashood Index — gabungan kinerja bot-bot Cashood yang memakai uang asli.</li>
+            <li>Index turun atau datar hari itu: bunga hari itu <strong>0</strong>. Index naik: bunganya sebesar kenaikan itu.</li>
+            <li>Ada batas harian <strong>${pct(rate.maxDailyPct ?? 0.1, 2)}</strong>. Satu hari yang untung besar tetap dibayar paling tinggi
+                segitu, jadi sebulan tidak pernah lebih dari ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}.</li>
             <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
             <li><strong>Bunga tidak diputar ulang.</strong> Yang bekerja tetap uang pokok; bunga menumpuk di sampingnya
                 dan tidak ikut menghasilkan bunga baru.</li>
@@ -2415,8 +2456,8 @@ function renderSafebox() {
           <div><h3 class="sub-h">Yang dijamin dan yang tidak</h3><ul class="plain">
             <li><strong>Pokok simpanan dijamin tidak hilang.</strong> Tidak ada margin call, tidak ada likuidasi yang bisa
                 menghapus dana di dalam Safe Box.</li>
-            <li><strong>Anti rugi, tapi tidak pasti untung.</strong> Pada bulan yang buruk bunganya bisa mendekati nol —
-                yang tidak terjadi adalah saldonya berkurang.</li>
+            <li><strong>Anti rugi, tapi tidak pasti untung.</strong> Hari bot rugi bunganya 0 dan bulan yang buruk bisa
+                hampir tanpa bunga — yang tidak terjadi adalah saldonya berkurang.</li>
             <li>Ke instrumen mana dana ini ditempatkan bersifat rahasia dan menjadi kewenangan pengelola.</li>
             <li>Bunga dan saldo di halaman ini dihitung ulang setiap hari dari catatan yang sama; tidak ada angka
                 yang ditulis tangan.</li>
@@ -2427,7 +2468,7 @@ function renderSafebox() {
       <section class="card">
         <div class="card-head">
           <h2>Kalau laju bunganya bertahan</h2>
-          <span class="hint">hitungan lurus dari laju hari ini, bukan proyeksi pasar</span>
+          <span class="hint">laju rata-rata yang sudah terjadi dan batas tertingginya — bukan proyeksi pasar</span>
         </div>
         <div class="calc">
           <label class="field">
@@ -2440,11 +2481,11 @@ function renderSafebox() {
           </div>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Jangka</th><th class="num">Bunga terkumpul</th><th class="num">Pokok + bunga</th></tr></thead>
+          <thead><tr><th>Jangka</th><th class="num">Bunga · laju rata-rata</th><th class="num">Bunga · maksimal</th><th class="num">Pokok + bunga maks</th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
-        <p class="hint disclaimer">Tabel ini mengalikan laju bunga hari ini ke depan — bukan ramalan. Laju itu naik
-          dan turun mengikuti hasil penempatan dana. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
+        <p class="hint disclaimer">Tabel ini mengalikan laju rata-rata sejauh ini dan batas maksimal ${pct(rate.maxDailyPct ?? 0.1, 2)}/hari
+          ke depan — bukan ramalan. Bunga nyatanya mengikuti kinerja bot tiap hari. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
           tetap uang pokok, dan bunga yang sudah masuk berhenti di tempatnya — pokok ${usd(modal, 0)} yang sudah
           berbunga ${usd(100, 0)} tetap bekerja dengan ${usd(modal, 0)}, bukan ${usd(modal + 100, 0)}.</p>
       </section>`);
@@ -2732,7 +2773,7 @@ async function renderPortofolio() {
       <div class="table-scroll"><table class="porto-tbl"><tbody>
         ${(box.owners || []).map(o => `<tr><td>${esc(o.name)}</td><td class="num">${pct(o.sharePct)}</td><td class="num">${usd(o.balanceUsd)}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · ${box.measure?.monthlyPct == null ? '—' : pct(box.measure.monthlyPct)} per bulan.</p>
+      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · laju ${box.measure?.dailyPct == null ? '—' : pct(box.measure.dailyPct, 2)}/hari (maks ${pct(box.measure?.maxDailyPct ?? 0.1, 2)}).</p>
     </div>` : ''));
 }
 
@@ -3533,18 +3574,17 @@ async function renderHome() {
   };
   const safeCard = () => {
     const sb = state.safebox || {};
-    const monthly = box?.measure?.monthlyPct;
     const today = box && box.principalUsd ? ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100 : null;
     return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
       <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
-        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · imbal hasil 0–3% per bulan</div></div>
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga harian ikut kinerja bot, maks 3%/bulan</div></div>
         ${today == null ? '' : `<span class="chg up">▲ ${pct(today, 3)}<small>hari ini</small></span>`}</div>
       <p class="prod-desc">${esc(sb.blurb || '')}</p>
       <div class="prod-nums">
         <div><span class="k">Simpanan</span><span class="v">${box ? usd(box.balanceUsd, 0) : '—'}</span></div>
-        <div><span class="k">Imbal hasil</span><span class="v pos">${monthly == null ? '—' : pct(monthly) + '<small>/bulan</small>'}</span></div>
+        <div><span class="k">Bunga hari ini</span><span class="v pos">${box?.measure?.dailyPct == null ? '—' : pct(box.measure.dailyPct, 2) + '<small>/hari</small>'}</span></div>
         <div><span class="k">Sudah ditarik</span><span class="v pos">${box ? usd(box.paidUsd || 0, 2) : '—'}</span></div>
-        <div><span class="k">Pemilik</span><span class="v">${box ? String((box.owners || []).length) : '—'}</span></div>
+        <div><span class="k">Pemilik</span><span class="v">${box ? String((box.owners || []).filter((o) => !o.left).length) : '—'}</span></div>
         <div><span class="k">Jenis</span><span class="v txt">${esc(sb.type || 'Simpanan')}</span></div>
         <div><span class="k">Pokok</span><span class="v txt">dijaga, tanpa fee</span></div>
       </div>
