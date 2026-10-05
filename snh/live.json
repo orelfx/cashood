@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "fa8a3eb5-0152-4f09-a3d8-c3ca30002e6a",
-  "updatedAt": 1791187930650,
-  "generatedAt": "2026-10-05 15:12 WIB",
+  "generation": "3f38e621-9f00-49db-9c9c-8877872a6788",
+  "updatedAt": 1791188505317,
+  "generatedAt": "2026-10-05 15:21 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791187930650,
+    "heartbeatAt": 1791188505317,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791187927832,
+    "lastScanAt": 1791188502172,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,13 +109,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "6",
+        "v": "13",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1376",
-        "n": "156 aktif"
+        "v": "1379",
+        "n": "187 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791187930650,
+      "lastDecisionAt": 1791188505317,
       "lastAction": "keputusan",
-      "lastReason": "Agency [mid]: Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+      "lastReason": "Instinct [low]: Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
     }
   },
   "strategy": {
@@ -146,7 +146,7 @@
       ],
       [
         "Wallet dipantau",
-        "1376 · 156 aktif"
+        "1379 · 187 aktif"
       ],
       [
         "Label wallet",
@@ -194,33 +194,33 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1376,
-      "active": 156,
-      "passive": 1220,
+      "tracked": 1379,
+      "active": 187,
+      "passive": 1192,
       "byLabel": [
         {
           "key": "bot",
-          "total": 694,
+          "total": 696,
           "active": 0,
-          "passive": 694
+          "passive": 696
         },
         {
           "key": "smart",
-          "total": 491,
-          "active": 121,
-          "passive": 370
+          "total": 490,
+          "active": 148,
+          "passive": 342
         },
         {
           "key": "kol",
-          "total": 84,
-          "active": 9,
-          "passive": 75
+          "total": 85,
+          "active": 12,
+          "passive": 73
         },
         {
           "key": "dolphin",
           "total": 61,
-          "active": 26,
-          "passive": 35
+          "active": 27,
+          "passive": 34
         },
         {
           "key": "blacklist",
@@ -239,6 +239,12 @@
           "total": 3,
           "active": 0,
           "passive": 3
+        },
+        {
+          "key": "lp",
+          "total": 1,
+          "active": 0,
+          "passive": 1
         }
       ],
       "definitions": {
@@ -331,7 +337,44 @@
     },
     "decisions": [
       {
-        "at": 1791187890978,
+        "at": 1791188446858,
+        "symbol": "Instinct",
+        "action": "test",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 331,
+            "note": "bundler pegang 16.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 9.9%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 733,
+            "note": "17.4% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 15x likuiditas"
+          }
+        ],
+        "reason": "Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
+      },
+      {
+        "at": 1791188215988,
         "symbol": "Agency",
         "action": "skip",
         "basket": "mid",
@@ -341,17 +384,27 @@
         "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
       },
       {
-        "at": 1791187765971,
-        "symbol": "Agency",
+        "at": 1791188207538,
+        "symbol": "Jdog",
         "action": "skip",
-        "basket": "mid",
+        "basket": "degen",
         "wallets": {
-          "smart": 2
+          "smart": 1
         },
-        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+        "reason": "Dilewati karena red flag: bundler pegang 34% supply."
       },
       {
-        "at": 1791187653775,
+        "at": 1791187997891,
+        "symbol": "Jdog",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 43% supply."
+      },
+      {
+        "at": 1791187956638,
         "symbol": "ASTEROID",
         "action": "skip",
         "basket": "degen",
@@ -359,16 +412,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 14%."
-      },
-      {
-        "at": 1791187644853,
-        "symbol": "Agency",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
       },
       {
         "at": 1791184356425,
@@ -416,8 +459,8 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 3,
-        "red_flag": 2,
+        "chase": 6,
+        "red_flag": 5,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -431,7 +474,7 @@
         "llm": 0
       },
       "test": {
-        "solo": 0
+        "solo": 1
       },
       "solo_entries": {},
       "partial": {
@@ -457,7 +500,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791188213678,
+    "generatedAt": 1791188518118,
     "trades": {
       "count": 1,
       "wins": 1,
