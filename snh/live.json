@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f915b64d-7e7c-48e4-a4e2-78fdc5d8a1f9",
-  "updatedAt": 1791192098531,
-  "generatedAt": "2026-10-05 16:21 WIB",
+  "generation": "a08e5575-1b01-4fdf-8897-5f877b3e657f",
+  "updatedAt": 1791192378561,
+  "generatedAt": "2026-10-05 16:26 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791192098531,
+    "heartbeatAt": 1791192378561,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791192083098,
+    "lastScanAt": 1791192377313,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,13 +109,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "37",
-        "n": "24 jam · 0 diveto LLM"
+        "v": "43",
+        "n": "24 jam · 1 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1385",
-        "n": "215 aktif"
+        "n": "208 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791192098531,
+      "lastDecisionAt": 1791192378561,
       "lastAction": "keputusan",
-      "lastReason": "Cadence [low]: Dilewati: harga sudah naik 126% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      "lastReason": "Camel [degen]: Dilewati karena red flag: bundler pegang 34% supply."
     }
   },
   "strategy": {
@@ -146,7 +146,7 @@
       ],
       [
         "Wallet dipantau",
-        "1385 · 215 aktif"
+        "1385 · 208 aktif"
       ],
       [
         "Cadangan kas",
@@ -205,8 +205,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1385,
-      "active": 215,
-      "passive": 1170,
+      "active": 208,
+      "passive": 1177,
       "trusted": 0,
       "promising": 8,
       "byLabel": [
@@ -219,8 +219,8 @@
         {
           "key": "smart",
           "total": 484,
-          "active": 166,
-          "passive": 318
+          "active": 159,
+          "passive": 325
         },
         {
           "key": "kol",
@@ -361,18 +361,71 @@
     },
     "decisions": [
       {
-        "at": 1791192092558,
-        "symbol": "Cadence",
+        "at": 1791192358750,
+        "symbol": "Camel",
         "action": "skip",
-        "basket": "low",
+        "basket": "degen",
         "wallets": {
-          "smart": 3,
-          "dolphin": 1
+          "smart": 2
         },
-        "reason": "Dilewati: harga sudah naik 126% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+        "reason": "Dilewati karena red flag: bundler pegang 34% supply."
       },
       {
-        "at": 1791191993994,
+        "at": 1791192186537,
+        "symbol": "TERMINAL",
+        "action": "test",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 20.8%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 9.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "21.6% holder wallet baru"
+          }
+        ],
+        "reason": "Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
+      },
+      {
+        "at": 1791192171622,
+        "symbol": "shoggoth",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 625,
+            "note": "bundler pegang 8.3%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 2.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "10.7% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Modest 5.1% ROI with 47% winrate and zero multi-bag winners (all wins under 2x) suggests this wallet is market-making with tight stops rather than having true a. Tetap dicatat sebagai posisi bayangan untuk menilai wallet-nya."
+      },
+      {
+        "at": 1791192114420,
         "symbol": "SHINU",
         "action": "skip",
         "basket": "degen",
@@ -382,7 +435,7 @@
         "reason": "Dilewati karena red flag: insider/entrapment pegang 14%."
       },
       {
-        "at": 1791191993325,
+        "at": 1791192113760,
         "symbol": "Tilcayo",
         "action": "skip",
         "basket": "low",
@@ -392,7 +445,7 @@
         "reason": "Dilewati karena red flag: insider/entrapment pegang 23%."
       },
       {
-        "at": 1791191982375,
+        "at": 1791192102738,
         "symbol": "Agency",
         "action": "skip",
         "basket": "mid",
@@ -400,6 +453,17 @@
           "smart": 1
         },
         "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+      },
+      {
+        "at": 1791192092558,
+        "symbol": "Cadence",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah naik 126% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
       },
       {
         "at": 1791191972258,
@@ -765,8 +829,8 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 16,
-        "red_flag": 14,
+        "chase": 17,
+        "red_flag": 17,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -777,10 +841,10 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 0
+        "llm": 1
       },
       "test": {
-        "solo": 3,
+        "solo": 4,
         "explore": 2
       },
       "solo_entries": {
@@ -809,7 +873,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791192116339,
+    "generatedAt": 1791192411183,
     "trades": {
       "count": 1,
       "wins": 1,
