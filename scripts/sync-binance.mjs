@@ -61,6 +61,7 @@ const baru = db.prepare("SELECT body FROM trades WHERE status='CLOSED' ORDER BY 
     holdMinutes: Math.round((t.closed_ms - t.opened_ms) / 60000),
     strategy: `${t.direction === 'LONG' ? 'long' : 'short'} · ${label(t.strategy)}`,
     reason: EXIT[t.exit_reason] || (t.exit_reason ? label(t.exit_reason) : 'ditutup bursa (SL/TP)'),
+    ...(t.exit_detail || t.reason_text ? { reasonDetail: [t.exit_detail, t.reason_text && 'Masuk: ' + t.reason_text].filter(Boolean).join(' · ').slice(0, 240) } : {}),
     feesUsd: r2(Number(t.commission_usd || 0) + Number(t.funding_usd || 0)),
     equityAtEntry: Number(t.equity_at_entry) || null,
     openedAt: t.opened_ms,
@@ -96,7 +97,7 @@ const positions = activeLedger.map((a, i) => {
       timeframe: t.signal?.context?.timeframe || null,
       exploration: t.signal?.context?.entry_mode === 'exploration',
     },
-    thesis: t.signal?.context?.hypothesis ? String(t.signal.context.hypothesis).slice(0, 200) : null,
+    thesis: t.reason_text ? String(t.reason_text).slice(0, 300) : t.signal?.context?.hypothesis ? String(t.signal.context.hypothesis).slice(0, 200) : null,
     principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0, pnlUsd: Number.isFinite(Number(t.unrealized_usd)) ? r2(t.unrealized_usd) : null,
     stale: !health.usable,
   };

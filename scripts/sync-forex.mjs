@@ -65,6 +65,7 @@ const tutup = db.prepare('SELECT * FROM trades ORDER BY exit_time').all().map((t
     holdMinutes: buka && tutupAt ? Math.round((tutupAt - buka) / 60000) : null,
     strategy: `${t.direction === 'LONG' ? 'beli' : 'jual'} · ${String(t.setup_type || '').replace(/_/g, ' ')}`.trim(),
     reason: REASON[t.exit_reason] || String(t.exit_reason || '—').replace(/_/g, ' '),
+    ...(t.entry_reasoning ? { reasonDetail: String(t.entry_reasoning).replace(/\s+/g, ' ').slice(0, 240) } : {}),
     lot: Number(t.lot) || null,
   };
   saldo += net;
@@ -100,7 +101,13 @@ const positions = db.prepare("SELECT * FROM positions WHERE status='open' ORDER 
   tpPrice: Number(p.tp) || null,
   bookLabel: `${p.direction === 'LONG' ? 'beli' : 'jual'} · ${String(p.setup_type || '').replace(/_/g, ' ')}`,
   ageMinutes: ms(p.entry_time) ? Math.round((now - ms(p.entry_time)) / 60000) : null,
-  principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0, pnlUsd: null,
+  // Alasan masuk, keyakinan, dan nilai berjalan baru terisi kalau bot mencatatnya
+  // (entry_reasoning, confidence, floating_usd / current_price).
+  ...(p.entry_reasoning ? { thesis: String(p.entry_reasoning).replace(/\s+/g, ' ').slice(0, 300) } : {}),
+  ...(Number.isFinite(Number(p.confidence)) && p.confidence !== null ? { confidence: Number(p.confidence) } : {}),
+  ...(Number(p.current_price) ? { priceUsd: Number(p.current_price) } : {}),
+  principalUsd: 0, feesUsd: 0, investedUsd: null, collectedFeesUsd: 0,
+  pnlUsd: p.floating_usd != null && Number.isFinite(Number(p.floating_usd)) ? r2(p.floating_usd) : null,
 }));
 
 // ─── status bot ───────────────────────────────────────────────────────────

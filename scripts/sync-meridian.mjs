@@ -369,6 +369,9 @@ const closedAll = (tracking.entries || []).filter((e) => Number.isFinite(Date.pa
     netPct: Number.isFinite(pct) ? r2(pct) : null,
     holdMinutes: opened ? Math.round((at - opened) / 60000) : null,
     reason: String(e.close_reason || '').split(':')[0].replace(/_/g, ' ') || null,
+    // Rincian sesudah titik dua (kalau bot menulisnya); alamat dipangkas oleh lib/trades.mjs.
+    ...(String(e.close_reason || '').includes(':') ? { reasonDetail: String(e.close_reason).split(':').slice(1).join(':').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').trim().slice(0, 240) || undefined } : {}),
+    ...(e.exit_detail ? { reasonDetail: String(e.exit_detail).replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b/g, '…').slice(0, 240) } : {}),
     closedAt: at,
   };
 }).sort((a, b) => b.closedAt - a.closedAt);
