@@ -1,0 +1,191 @@
+{
+  "fund": "snh",
+  "schemaVersion": 2,
+  "generation": "26630655-06ed-4842-8682-9e33b2e13a6f",
+  "updatedAt": 1791180764924,
+  "generatedAt": "2026-10-05 13:12 WIB",
+  "usdIdr": null,
+  "totalUsd": 1000,
+  "botWalletUsd": 1000,
+  "walletUsd": 1000,
+  "lpUsd": 0,
+  "treasuryUsd": 0,
+  "holdings": [
+    {
+      "symbol": "Kas (paper)",
+      "amount": 1000,
+      "price": 1,
+      "usd": 1000
+    }
+  ],
+  "positions": [],
+  "history": [],
+  "historyNote": "belum ada trade yang ditutup di buku paper ini",
+  "stats": {
+    "closedCount": 0,
+    "openCount": 0,
+    "graded": 0,
+    "wins": 0,
+    "losses": 0,
+    "winRate": null,
+    "realisedUsd": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "worstClosePct": null,
+    "timezone": "Asia/Jakarta (UTC+7)"
+  },
+  "closedRecent": [],
+  "tradeDays": [],
+  "trading": {
+    "paper": true,
+    "mode": "paper",
+    "initialUsd": 1000,
+    "cashUsd": 1000,
+    "positionsUsd": 0,
+    "realizedUsd": 0,
+    "unrealizedUsd": 0,
+    "pnlUsd": 0,
+    "paused": false,
+    "startedAt": 1791176825000,
+    "heartbeatAt": 1791180764924,
+    "status": "running",
+    "healthy": true,
+    "peakUsd": 1000,
+    "drawdownPct": 0,
+    "lastScanAt": 1791180762032,
+    "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
+    "tiles": [
+      {
+        "k": "Posisi terbuka",
+        "v": "0",
+        "n": "4 basket"
+      },
+      {
+        "k": "Kas",
+        "usd": 1000,
+        "n": "belum dipakai"
+      },
+      {
+        "k": "Belum terealisasi",
+        "v": "+$0.0000",
+        "n": "dari posisi terbuka",
+        "tone": "pos"
+      },
+      {
+        "k": "Sinyal wallet",
+        "v": "0",
+        "n": "24 jam · 0 diveto LLM"
+      },
+      {
+        "k": "Wallet dipantau",
+        "v": "1345",
+        "n": "106 aktif"
+      },
+      {
+        "k": "Buka · tutup",
+        "v": "0 · 0",
+        "n": "24 jam terakhir"
+      }
+    ],
+    "llm": null
+  },
+  "strategy": {
+    "title": "SnipeHunt — buku paper",
+    "about": [
+      "SnipeHunt tidak menebak coin. Ia memantau ribuan wallet trader Solana, menyaring yang benar-benar untung dan aktif trading, lalu ikut masuk (simulasi) hanya ketika beberapa wallet bagus membeli coin yang sama. Setiap coin tetap lolos cek red flag dulu, posisi dikelola dengan take profit bertahap dan stop, dan hasilnya dipakai untuk menilai ulang wallet yang diikuti."
+    ],
+    "system": [
+      [
+        "Mode",
+        "paper"
+      ],
+      [
+        "Model LLM",
+        "MiniMax-M2.7"
+      ],
+      [
+        "Wallet dipantau",
+        "1345 · 106 aktif"
+      ],
+      [
+        "Label wallet",
+        "smart 485 · whale 3 · dolphin 49 · kol 86 · bot 707 · fresh 15 · blacklist 24"
+      ]
+    ],
+    "requirements": [
+      [
+        "degen (launch)",
+        "alokasi 50% · $500 · kursi maks 2.5% equity · 0 terbuka"
+      ],
+      [
+        "low (core)",
+        "alokasi 15% · $150 · kursi maks 4% equity · 0 terbuka"
+      ],
+      [
+        "mid (core)",
+        "alokasi 15% · $150 · kursi maks 5% equity · 0 terbuka"
+      ],
+      [
+        "big (core)",
+        "alokasi 20% · $200 · kursi maks 5% equity · 0 terbuka"
+      ]
+    ],
+    "requirementsTitle": "Basket modal",
+    "ruleList": [
+      "Masuk hanya saat beberapa wallet terverifikasi membeli coin yang sama dalam jendela waktu basket (degen 2 wallet/20 menit, low–big 3 wallet).",
+      "Setiap wallet dicek on-chain dulu: hanya yang benar-benar trading coin yang dihitung; wallet LP, arbitrase, bot, dan tidak aktif dibuang.",
+      "Skor wallet minimal 60/100, mengutamakan edge bersih (expectancy, PnL realized per token), penalti churn dan wallet terlalu populer.",
+      "Filter red flag: honeypot, tax, mint/freeze authority, scam warning, likuiditas & rasio likuiditas/MC, top-10, holder, dev, bundler, insider, sniper, fresh wallet, wash volume.",
+      "Tidak mengejar harga: batal kalau harga sudah naik melewati batas (degen 35%, low 30%, mid 20%, big 12%) dari harga beli wallet pertama.",
+      "Slippage dipakai sebagai toleransi (transaksi gagal kalau lebih buruk), dan kursi dikecilkan kalau biaya beli-jual terlalu mahal.",
+      "Degen (launch): kursi 1–2,5% equity, TP +40% jual 50% dan +120% jual sisa, SL 25%.",
+      "Low/mid/big (core): kursi 2–5% equity, TP bertahap 25% + 25%, sisanya runner dengan trailing; SL 25/18/12%.",
+      "Keluar juga saat mayoritas wallet yang diikuti menjual, saat rug, atau saat batas waktu tahan tercapai.",
+      "LLM (MiniMax-M2.7) menilai kelompok wallet di balik sinyal, bukan coin-nya, dan bisa memveto.",
+      "Dry run: semua transaksi simulasi, tanpa eksekusi live."
+    ],
+    "risks": []
+  },
+  "quality": {
+    "complete": true,
+    "reasons": []
+  },
+  "costsShareUsd": 0,
+  "performance": {
+    "generatedAt": 1791180908319,
+    "trades": null,
+    "equity": {
+      "days": 0,
+      "spanDays": 1,
+      "returnPct": 0,
+      "maxDrawdownPct": 0,
+      "maxDrawdownAt": null,
+      "maxDrawdownUsd": 0,
+      "maxDrawdownPeakUsd": 1000,
+      "maxDrawdownTroughUsd": 1000,
+      "currentDrawdownPct": 0,
+      "currentDrawdownUsd": 0,
+      "positiveDaysPct": null,
+      "bestDayPct": null,
+      "worstDayPct": null,
+      "sharpe": null,
+      "sortino": null,
+      "calmar": null,
+      "since": 1791176825000
+    },
+    "profitUsd": 0,
+    "profitPct": 0,
+    "recoveryFactor": null,
+    "score": {
+      "axes": {
+        "winRate": null,
+        "profitFactor": null,
+        "risk": 100,
+        "recovery": null,
+        "consistency": null
+      },
+      "overall": 100,
+      "complete": false
+    }
+  }
+}
