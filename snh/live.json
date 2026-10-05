@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "27d14cd5-56f4-4e77-b125-b5c78aca8745",
-  "updatedAt": 1791189705454,
-  "generatedAt": "2026-10-05 15:41 WIB",
+  "generation": "a48dcd0b-16ad-43b1-b4cb-51288c5c216f",
+  "updatedAt": 1791189947168,
+  "generatedAt": "2026-10-05 15:45 WIB",
   "usdIdr": null,
   "totalUsd": 1005.7595312108923,
   "botWalletUsd": 1005.7595312108923,
@@ -83,12 +83,12 @@
     "pnlUsd": 5.759531210892305,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791189705454,
+    "heartbeatAt": 1791189947168,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 0.36,
-    "lastScanAt": 1791189703285,
+    "lastScanAt": 1791189931740,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -109,12 +109,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "15",
+        "v": "17",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1379",
+        "v": "1380",
         "n": "223 aktif"
       },
       {
@@ -125,9 +125,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791189705454,
+      "lastDecisionAt": 1791189947168,
       "lastAction": "keputusan",
-      "lastReason": "Mentor [degen]: Dilewati karena red flag: insider/entrapment pegang 13%."
+      "lastReason": "Agency [mid]: Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
     }
   },
   "strategy": {
@@ -146,7 +146,7 @@
       ],
       [
         "Wallet dipantau",
-        "1379 · 223 aktif"
+        "1380 · 223 aktif"
       ],
       [
         "Label wallet",
@@ -183,7 +183,8 @@
       "Tidak mengejar harga: batal kalau harga sudah naik melewati batas dari harga beli wallet pertama (degen 35%, low 30%, mid 20%, big 12%).",
       "Cek bisa keluar: biaya beli lalu jual (fee, price impact, tx) dihitung sebelum masuk; kursi dikecilkan atau sinyal dilewati kalau terlalu mahal. Toleransi slippage: degen 22%, low 15%, mid 10%, big 10%.",
       "Ambil profit bertahap, mulai dari profit kecil supaya tidak jadi exit liquidity: degen +20% jual 30%, +50% jual 35%, +120% jual 35%; low +20% jual 25%, +60% jual 25%, +200% jual 25%, sisanya runner dengan trailing 35%; mid +20% jual 25%, +45% jual 25%, +120% jual 25%, sisanya runner dengan trailing…",
-      "Setelah profit pertama diambil, sisa posisi dijaga stop di titik impas: posisi yang sudah untung tidak dibiarkan berubah jadi rugi.",
+      "Setelah profit pertama diambil, sisa posisi dijaga stop di titik impas yang sudah memperhitungkan biaya jual (fee + price impact): posisi yang sudah untung tidak dibiarkan berubah jadi rugi.",
+      "Uji coba tanpa modal: wallet yang dinilai 'avoid' oleh LLM tidak pernah dipakai untuk posisi sungguhan, tapi sinyal yang butuh mereka dijalankan sebagai posisi bayangan untuk menguji penilaian itu.",
       "Ikut keluar bersama smart money: kalau satu wallet yang diikuti keluar saat kita untung, 50% sisa posisi ikut dijual; kalau separuh wallet keluar, semua dijual. Bot juga mengambil profit lebih awal kalau posisi mendekati waktu/level jual kebiasaan wallet yang diikuti.",
       "Stop loss: degen 25%, low 25%, mid 18%, big 12%. Batas waktu tahan: degen 4 jam, low 24 jam, mid 72 jam, big tanpa batas.",
       "Rotasi: posisi mid/big yang datar (±8–10%) lebih dari 48 jam dijual untuk memberi tempat sinyal yang lebih bagus, hanya kalau kas tidak cukup.",
@@ -194,15 +195,15 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1379,
+      "tracked": 1380,
       "active": 223,
-      "passive": 1156,
+      "passive": 1157,
       "byLabel": [
         {
           "key": "bot",
-          "total": 699,
+          "total": 700,
           "active": 0,
-          "passive": 699
+          "passive": 700
         },
         {
           "key": "smart",
@@ -337,6 +338,33 @@
     },
     "decisions": [
       {
+        "at": 1791189935100,
+        "symbol": "Agency",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
+      },
+      {
+        "at": 1791189747302,
+        "symbol": "SIGF",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 16%."
+      },
+      {
         "at": 1791189155221,
         "symbol": "Mentor",
         "action": "skip",
@@ -392,16 +420,6 @@
           }
         ],
         "reason": "Uji coba solo: satu wallet yang pernah membawa untung membeli sendirian. Dicatat sebagai posisi bayangan untuk menguji apakah wallet ini layak diikuti sendirian."
-      },
-      {
-        "at": 1791188215988,
-        "symbol": "Agency",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga beli wallet pertama tidak diketahui, jadi tidak bisa dipastikan bot tidak mengejar harga."
       },
       {
         "at": 1791188207538,
@@ -479,8 +497,8 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 7,
-        "red_flag": 6,
+        "chase": 8,
+        "red_flag": 7,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -494,7 +512,8 @@
         "llm": 0
       },
       "test": {
-        "solo": 1
+        "solo": 1,
+        "explore": 0
       },
       "solo_entries": {},
       "partial": {
@@ -520,7 +539,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791189710849,
+    "generatedAt": 1791190010958,
     "trades": {
       "count": 1,
       "wins": 1,
