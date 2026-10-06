@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b4fa0bf9-57d8-4f3d-8cc8-c7a70bccb547",
-  "updatedAt": 1791305760829,
-  "generatedAt": "2026-10-06 23:56 WIB",
+  "generation": "cf5ec55e-54ff-46aa-bf18-cbbfdaaa038a",
+  "updatedAt": 1791306060851,
+  "generatedAt": "2026-10-07 00:01 WIB",
   "usdIdr": null,
-  "totalUsd": 964.5962049486026,
+  "totalUsd": 965.0496027375414,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 964.5962049486026,
+  "botWalletUsd": 965.0496027375414,
   "walletUsd": 956.5533509474304,
-  "lpUsd": 8.042854,
+  "lpUsd": 8.49625179,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 9.663670211590208,
       "investedUsd": 9.663670211590208,
-      "principalUsd": 8.042854,
-      "valueUsd": 8.042854,
+      "principalUsd": 8.49625179,
+      "valueUsd": 8.49625179,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -1.6208162104180897,
-      "pnlPct": -16.77,
+      "pnlUsd": -1.1674184214792547,
+      "pnlPct": -12.08,
       "entryPriceUsd": 0.00022297209,
-      "priceUsd": 0.00019336203,
-      "ageMinutes": 26,
+      "priceUsd": 0.00020426412,
+      "ageMinutes": 31,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -72,7 +72,7 @@
       "firstWallet": "smart #451",
       "llmScore": 92,
       "peakPct": 0,
-      "ddPct": -14.75,
+      "ddPct": -16.3,
       "stale": false
     }
   ],
@@ -1125,18 +1125,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 956.5533509474304,
-    "positionsUsd": 8.042854,
+    "positionsUsd": 8.49625179,
     "realizedUsd": -33.78297884,
-    "unrealizedUsd": -1.62081621,
-    "pnlUsd": -35.403795051397424,
+    "unrealizedUsd": -1.16741842,
+    "pnlUsd": -34.95039726245864,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791305760829,
+    "heartbeatAt": 1791306060851,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 4.44,
-    "lastScanAt": 1791305757649,
+    "drawdownPct": 4.4,
+    "lastScanAt": 1791306058547,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1151,7 +1151,7 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$1.6208",
+        "v": "−$1.1674",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
@@ -1173,9 +1173,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791305760829,
+      "lastDecisionAt": 1791306060851,
       "lastAction": "keputusan",
-      "lastReason": "MENTOR [degen]: Diveto LLM: Both wallets have negative avg_pnl_pct on our copies (-11.9% and -4.5%), very low winrates (35-36%) with almost all wins under 2x, and Wallet 2 shows high churn. Tidak dimasuki."
+      "lastReason": "MENTOR [degen]: Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1410,6 +1410,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791305764134,
+        "symbol": "MENTOR",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791305525887,
         "symbol": "MENTOR",
@@ -2183,34 +2193,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 10%."
-      },
-      {
-        "at": 1791293268861,
-        "symbol": "CHONK",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah naik 192% dari beli wallet pertama (batas 15%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 77,
-        "below_entry": 1,
+        "below_entry": 2,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 121,
+        "red_flag": 120,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2260,7 +2253,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791305813968,
+    "generatedAt": 1791306128212,
     "trades": {
       "count": 28,
       "wins": 10,
@@ -2299,36 +2292,36 @@
       "lastAt": 1791277080434
     },
     "equity": {
-      "days": 1,
+      "days": 2,
       "spanDays": 1.5,
-      "returnPct": -3.54,
+      "returnPct": -3.5,
       "maxDrawdownPct": 4.09,
       "maxDrawdownAt": 1791305760829,
       "maxDrawdownUsd": 41.16,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 964.6,
-      "currentDrawdownPct": 4.09,
-      "currentDrawdownUsd": 41.16,
-      "positiveDaysPct": 0,
-      "bestDayPct": -2.32,
+      "currentDrawdownPct": 4.05,
+      "currentDrawdownUsd": 40.71,
+      "positiveDaysPct": 50,
+      "bestDayPct": 0.05,
       "worstDayPct": -2.32,
       "sharpe": null,
       "sortino": null,
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -35.4,
-    "profitPct": -3.54,
-    "recoveryFactor": -0.86,
+    "profitUsd": -34.95,
+    "profitPct": -3.5,
+    "recoveryFactor": -0.85,
     "score": {
       "axes": {
         "winRate": 35.71,
         "profitFactor": 0,
         "risk": 89.78,
         "recovery": 0,
-        "consistency": 0
+        "consistency": 50
       },
-      "overall": 25.1,
+      "overall": 35.1,
       "complete": true
     }
   }
