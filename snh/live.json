@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "14e960b1-513a-414b-a83c-47dcc235a40c",
-  "updatedAt": 1791263209111,
-  "generatedAt": "2026-10-06 12:06 WIB",
+  "generation": "f1b44b50-1fe0-482e-b222-c7b89eb4a620",
+  "updatedAt": 1791263509111,
+  "generatedAt": "2026-10-06 12:11 WIB",
   "usdIdr": null,
   "totalUsd": 977.1113911297434,
   "nativeSymbol": "SOL",
@@ -1067,12 +1067,12 @@
     "pnlUsd": -22.888608870256576,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791263209111,
+    "heartbeatAt": 1791263509111,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 3.2,
-    "lastScanAt": 1791263205148,
+    "lastScanAt": 1791263505937,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1093,7 +1093,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "296",
+        "v": "297",
         "n": "24 jam · 32 diveto LLM"
       },
       {
@@ -1109,9 +1109,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791263209111,
+      "lastDecisionAt": 1791263509111,
       "lastAction": "keputusan",
-      "lastReason": "darwin [low]: Dilewati: harga sudah naik 72% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      "lastReason": "CNDR [mid]: Dilewati karena red flag: 10 holder terbesar pegang 77%."
     }
   },
   "strategy": {
@@ -1344,6 +1344,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791263398088,
+        "symbol": "CNDR",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 77%."
+      },
       {
         "at": 1791263161624,
         "symbol": "darwin",
@@ -2339,44 +2349,12 @@
           }
         ],
         "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 1 menit. Hasil -0,7%."
-      },
-      {
-        "at": 1791249639669,
-        "symbol": "MENTOR",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 428,
-            "note": "bundler pegang 10.7%"
-          },
-          {
-            "type": "rat",
-            "count": 10,
-            "note": "insider/entrapment pegang 0.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 603,
-            "note": "6.9% holder wallet baru"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,77, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 92,
-        "red_flag": 134,
+        "red_flag": 135,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -2420,7 +2398,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791263212561,
+    "generatedAt": 1791263550872,
     "trades": {
       "count": 23,
       "wins": 9,
