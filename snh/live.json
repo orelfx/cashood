@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3b2da009-aa5d-4776-97fe-38254dda609b",
-  "updatedAt": 1791325301808,
-  "generatedAt": "2026-10-07 05:21 WIB",
+  "generation": "7ebbbdd0-2d3d-4bfe-ace6-b3b5f41db6ae",
+  "updatedAt": 1791325564392,
+  "generatedAt": "2026-10-07 05:26 WIB",
   "usdIdr": null,
   "totalUsd": 959.5221321704768,
   "nativeSymbol": "SOL",
@@ -1088,12 +1088,12 @@
     "pnlUsd": -40.477867829523234,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791325301808,
+    "heartbeatAt": 1791325564392,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.94,
-    "lastScanAt": 1791325301410,
+    "lastScanAt": 1791325563895,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1115,7 +1115,7 @@
       {
         "k": "Sinyal wallet",
         "v": "240",
-        "n": "24 jam · 41 diveto LLM"
+        "n": "24 jam · 42 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1130,9 +1130,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791325301808,
+      "lastDecisionAt": 1791325564392,
       "lastAction": "keputusan",
-      "lastReason": "UP [low]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "SPLICE [low]: Diveto LLM: Zero wins in 6 actual copy attempts averaging -18.7% loss; all wins are under 2x with massive token churn, suggesting these are fee-dependent high-frequency tra. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1367,6 +1367,39 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791325550524,
+        "symbol": "SPLICE",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 15.3%"
+          },
+          {
+            "type": "rat",
+            "count": 6,
+            "note": "insider/entrapment pegang 10.7%"
+          },
+          {
+            "type": "sniper",
+            "count": 6,
+            "note": "sniper awal masih pegang 0.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "10.0% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Zero wins in 6 actual copy attempts averaging -18.7% loss; all wins are under 2x with massive token churn, suggesting these are fee-dependent high-frequency tra. Tidak dimasuki."
+      },
       {
         "at": 1791325298806,
         "symbol": "UP",
@@ -2411,53 +2444,11 @@
           }
         ],
         "reason": "Take profit bertahap (TP2): jual sebagian senilai $2,65; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791309152837,
-        "symbol": "Buto",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 22.59% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 730,
-            "note": "bundler pegang 61.2%"
-          },
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 8.0%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 13.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 431,
-            "note": "14.8% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 17x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $1,95; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 52,
+        "chase": 51,
         "below_entry": 21,
         "no_pullback": 0,
         "wallet_left": 1,
@@ -2480,7 +2471,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 41
+        "llm": 42
       },
       "test": {
         "solo": 6,
@@ -2513,7 +2504,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791325319118,
+    "generatedAt": 1791325617596,
     "trades": {
       "count": 34,
       "wins": 12,
@@ -2556,7 +2547,7 @@
       "spanDays": 1.7,
       "returnPct": -4.05,
       "maxDrawdownPct": 4.6,
-      "maxDrawdownAt": 1791325301808,
+      "maxDrawdownAt": 1791325564392,
       "maxDrawdownUsd": 46.24,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 959.52,
