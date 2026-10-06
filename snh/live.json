@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "80cc4740-472a-4fff-926c-17d05be5b376",
-  "updatedAt": 1791273409216,
-  "generatedAt": "2026-10-06 14:56 WIB",
+  "generation": "a2bcbae9-b69d-416b-b8d2-1772478fdff6",
+  "updatedAt": 1791273709218,
+  "generatedAt": "2026-10-06 15:01 WIB",
   "usdIdr": null,
   "totalUsd": 968.824530958053,
   "nativeSymbol": "SOL",
@@ -1081,12 +1081,12 @@
     "pnlUsd": -31.175469041947053,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791273409216,
+    "heartbeatAt": 1791273709218,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.02,
-    "lastScanAt": 1791273406933,
+    "lastScanAt": 1791273707965,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1107,7 +1107,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "321",
+        "v": "322",
         "n": "24 jam · 39 diveto LLM"
       },
       {
@@ -1123,9 +1123,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791273409216,
+      "lastDecisionAt": 1791273709218,
       "lastAction": "keputusan",
-      "lastReason": "TEST [degen]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "APU [low]: Dilewati: harga sudah naik 118% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -1156,7 +1156,7 @@
       ],
       [
         "Label wallet",
-        "smart 505 · dolphin 61 · bot 847 · blacklist 64 · lp 1 · fresh 22 · kol 95 · whale 4"
+        "smart 505 · dolphin 61 · bot 848 · blacklist 64 · lp 1 · fresh 22 · kol 94 · whale 4"
       ]
     ],
     "requirements": [
@@ -1210,9 +1210,9 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 847,
+          "total": 848,
           "active": 0,
-          "passive": 847
+          "passive": 848
         },
         {
           "key": "smart",
@@ -1222,9 +1222,9 @@
         },
         {
           "key": "kol",
-          "total": 95,
+          "total": 94,
           "active": 13,
-          "passive": 82
+          "passive": 81
         },
         {
           "key": "blacklist",
@@ -1358,6 +1358,17 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791273510231,
+        "symbol": "APU",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah naik 118% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
       {
         "at": 1791272199861,
         "symbol": "RAM",
@@ -2592,43 +2603,11 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 53% supply."
-      },
-      {
-        "at": 1791255518248,
-        "symbol": "uncpus",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 41,
-            "note": "bundler pegang 17.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 7.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 35,
-            "note": "9.3% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets have terrible winrates (30-33%) with most wins under 2x and zero over-5x winners; Wallet 1 already cost us -4.5% on our only copy, and high token c. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 99,
+        "chase": 100,
         "red_flag": 142,
         "round_trip_cost": 5,
         "basket_full": 0,
@@ -2673,7 +2652,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791273414774,
+    "generatedAt": 1791273716604,
     "trades": {
       "count": 27,
       "wins": 10,
