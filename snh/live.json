@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8e446341-d22c-4f0c-95aa-0331a48cfacb",
-  "updatedAt": 1791278509223,
-  "generatedAt": "2026-10-06 16:21 WIB",
+  "generation": "bc210ebd-85a2-4124-a567-556004f1cbad",
+  "updatedAt": 1791278809224,
+  "generatedAt": "2026-10-06 16:26 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791278509223,
+    "heartbeatAt": 1791278809224,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791278505733,
+    "lastScanAt": 1791278806754,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1101,8 +1101,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "291",
-        "n": "24 jam · 39 diveto LLM"
+        "v": "287",
+        "n": "24 jam · 38 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791278509223,
+      "lastDecisionAt": 1791278809224,
       "lastAction": "keputusan",
-      "lastReason": "DOT [degen]: Dilewati karena red flag: 10 holder terbesar pegang 67.37%."
+      "lastReason": "DOT [degen]: Dilewati karena red flag: 10 holder terbesar pegang 56.79%."
     }
   },
   "strategy": {
@@ -1352,6 +1352,17 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791278709405,
+        "symbol": "DOT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1,
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 56.79%."
+      },
       {
         "at": 1791278108423,
         "symbol": "DOT",
@@ -2573,44 +2584,12 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show weak edge: smart #768 has modest realized PnL but zero outsized wins (all under 2x), and smart #463 has negative realized PnL with -51.8% median g. Tidak dimasuki."
-      },
-      {
-        "at": 1791258023196,
-        "symbol": "MAYA",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 6.6%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 4.4%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "11.0% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets lack any big winners (over_x5=0) and Wallet 2 is underwater (-$218), providing no asymmetric edge for copy-trading. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 84,
-        "red_flag": 132,
+        "red_flag": 130,
         "round_trip_cost": 4,
         "basket_full": 0,
         "slippage": 0,
@@ -2621,10 +2600,10 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 39
+        "llm": 38
       },
       "test": {
-        "solo": 15,
+        "solo": 14,
         "explore": 8,
         "chase": 5
       },
@@ -2654,7 +2633,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791278525245,
+    "generatedAt": 1791278818794,
     "trades": {
       "count": 28,
       "wins": 10,
