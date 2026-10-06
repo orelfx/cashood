@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "911de8e1-d496-4fc6-ac8b-150088dfd145",
-  "updatedAt": 1791255408316,
-  "generatedAt": "2026-10-06 09:56 WIB",
+  "generation": "2516f30e-2bbd-48df-a4cc-549ac81cc1db",
+  "updatedAt": 1791255708316,
+  "generatedAt": "2026-10-06 10:01 WIB",
   "usdIdr": null,
   "totalUsd": 976.7686811623787,
   "nativeSymbol": "SOL",
@@ -1061,12 +1061,12 @@
     "pnlUsd": -23.231318837621302,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791255408316,
+    "heartbeatAt": 1791255708316,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 3.23,
-    "lastScanAt": 1791255406634,
+    "lastScanAt": 1791255707349,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1087,8 +1087,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "278",
-        "n": "24 jam · 26 diveto LLM"
+        "v": "280",
+        "n": "24 jam · 27 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1103,9 +1103,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791255408316,
+      "lastDecisionAt": 1791255708316,
       "lastAction": "keputusan",
-      "lastReason": "DONE [degen]: Dilewati: harga sudah naik 236% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      "lastReason": "UP [low]: Dilewati karena red flag: bundler pegang 53% supply."
     }
   },
   "strategy": {
@@ -1338,6 +1338,55 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791255628041,
+        "symbol": "UP",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 5,
+            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 53% supply."
+      },
+      {
+        "at": 1791255518248,
+        "symbol": "uncpus",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 41,
+            "note": "bundler pegang 17.7%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 7.7%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 35,
+            "note": "9.3% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets have terrible winrates (30-33%) with most wins under 2x and zero over-5x winners; Wallet 1 already cost us -4.5% on our only copy, and high token c. Tidak dimasuki."
+      },
       {
         "at": 1791254810805,
         "symbol": "DONE",
@@ -2232,96 +2281,12 @@
           }
         ],
         "reason": "Keluar (trailing): Harga turun 25% dari puncak +98% setelah 4 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +22,1%."
-      },
-      {
-        "at": 1791244200912,
-        "symbol": "NEURALS",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 13.97% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.88%"
-          },
-          {
-            "type": "bundler",
-            "count": 109,
-            "note": "bundler pegang 42.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.0%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 3.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 48,
-            "note": "15.8% holder wallet baru"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $4,52, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791244134408,
-        "symbol": "NEURALS",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 13.97% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.88%"
-          },
-          {
-            "type": "bundler",
-            "count": 109,
-            "note": "bundler pegang 42.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.0%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 3.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 48,
-            "note": "15.8% holder wallet baru"
-          }
-        ],
-        "reason": "Take profit bertahap (TP2): jual sebagian senilai $5,56; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 86,
-        "red_flag": 130,
+        "red_flag": 131,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -2332,7 +2297,7 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 26
+        "llm": 27
       },
       "test": {
         "solo": 14,
@@ -2365,7 +2330,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791255412797,
+    "generatedAt": 1791255716164,
     "trades": {
       "count": 21,
       "wins": 7,
