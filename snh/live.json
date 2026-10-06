@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c43d8ec0-006d-44bd-8d8c-db6d7cb6eda2",
-  "updatedAt": 1791321063413,
-  "generatedAt": "2026-10-07 04:11 WIB",
+  "generation": "44aee8f0-8632-45f2-b314-e643989f2425",
+  "updatedAt": 1791321363413,
+  "generatedAt": "2026-10-07 04:16 WIB",
   "usdIdr": null,
   "totalUsd": 959.7590183270627,
   "nativeSymbol": "SOL",
@@ -1098,12 +1098,12 @@
     "pnlUsd": -40.24098167293732,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791321063413,
+    "heartbeatAt": 1791321363413,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.92,
-    "lastScanAt": 1791321059843,
+    "lastScanAt": 1791321359195,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1124,7 +1124,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "238",
+        "v": "237",
         "n": "24 jam · 39 diveto LLM"
       },
       {
@@ -1140,9 +1140,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791321063413,
+      "lastDecisionAt": 1791321363413,
       "lastAction": "keputusan",
-      "lastReason": "JOHNPORK [degen]: Dilewati: harga sudah -44% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "RULR [low]: Dilewati karena red flag: 10 holder terbesar pegang 51.03%."
     }
   },
   "strategy": {
@@ -1377,6 +1377,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791321206800,
+        "symbol": "RULR",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 51.03%."
+      },
       {
         "at": 1791320944802,
         "symbol": "JOHNPORK",
@@ -2487,38 +2497,11 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791305525887,
-        "symbol": "MENTOR",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 476,
-            "note": "bundler pegang 20.6%"
-          },
-          {
-            "type": "rat",
-            "count": 10,
-            "note": "insider/entrapment pegang 1.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets have negative avg_pnl_pct on our copies (-11.9% and -4.5%), very low winrates (35-36%) with almost all wins under 2x, and Wallet 2 shows high churn. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 53,
+        "chase": 52,
         "below_entry": 17,
         "no_pullback": 0,
         "wallet_left": 1,
@@ -2574,7 +2557,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791321112610,
+    "generatedAt": 1791321413303,
     "trades": {
       "count": 33,
       "wins": 12,
