@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "499c7074-3884-4f0d-bf9e-d32812c7ce91",
-  "updatedAt": 1791270709171,
-  "generatedAt": "2026-10-06 14:11 WIB",
+  "generation": "0f752ed6-00b2-4307-af71-8f4ed08f992d",
+  "updatedAt": 1791271009171,
+  "generatedAt": "2026-10-06 14:16 WIB",
   "usdIdr": null,
   "totalUsd": 972.0897752129937,
   "nativeSymbol": "SOL",
@@ -1073,12 +1073,12 @@
     "pnlUsd": -27.910224787006314,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791270709171,
+    "heartbeatAt": 1791271009171,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 3.7,
-    "lastScanAt": 1791270706532,
+    "lastScanAt": 1791271006344,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1099,7 +1099,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "315",
+        "v": "316",
         "n": "24 jam · 37 diveto LLM"
       },
       {
@@ -1115,9 +1115,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791270709171,
+      "lastDecisionAt": 1791271009171,
       "lastAction": "keputusan",
-      "lastReason": "phubber [low]: Diveto LLM: High churn (112 tokens/7d) with 4.2-min median holds and 43% winrate produces modest realized gains ($6.4k) that don't justify copy-trading risk in a low-cap ba. Tidak dimasuki."
+      "lastReason": "RAM [low]: Dilewati: harga sudah naik 53% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -1350,6 +1350,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791270767823,
+        "symbol": "RAM",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1,
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah naik 53% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
+      {
+        "at": 1791270761630,
+        "symbol": "XAVIER",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah naik 109% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      },
       {
         "at": 1791269181075,
         "symbol": "phubber",
@@ -2469,56 +2490,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 7."
-      },
-      {
-        "at": 1791253203867,
-        "symbol": "Kurimanju",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 194,
-            "note": "bundler pegang 6.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets show extreme churn (270-346 tokens/week) with minimal PnL per token and coordinated entry timing—consistent with bots rather than skilled inde. Tidak dimasuki."
-      },
-      {
-        "at": 1791253201561,
-        "symbol": "momonga",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 140,
-            "note": "bundler pegang 5.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.7%"
-          }
-        ],
-        "reason": "Diveto LLM: High churn (270-346 tokens/wk) with modest realized PnL and tiny winners, one wallet negative, tiny $5k market cap makes copy entries risky with no copy history. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 96,
-        "red_flag": 143,
+        "chase": 98,
+        "red_flag": 142,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -2562,7 +2539,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791270715406,
+    "generatedAt": 1791271045184,
     "trades": {
       "count": 25,
       "wins": 9,
