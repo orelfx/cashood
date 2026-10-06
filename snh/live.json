@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9207e60c-5ffc-4f12-ab50-2ede587157c0",
-  "updatedAt": 1791323164317,
-  "generatedAt": "2026-10-07 04:46 WIB",
+  "generation": "29fbe6f5-1ce6-4a99-bde5-7a180513011f",
+  "updatedAt": 1791323464316,
+  "generatedAt": "2026-10-07 04:51 WIB",
   "usdIdr": null,
   "totalUsd": 959.7590183270627,
   "nativeSymbol": "SOL",
@@ -1098,12 +1098,12 @@
     "pnlUsd": -40.24098167293732,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791323164317,
+    "heartbeatAt": 1791323464316,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.92,
-    "lastScanAt": 1791323162519,
+    "lastScanAt": 1791323462136,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1124,8 +1124,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "241",
-        "n": "24 jam · 39 diveto LLM"
+        "v": "242",
+        "n": "24 jam · 41 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1140,9 +1140,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791323164317,
+      "lastDecisionAt": 1791323464316,
       "lastAction": "keputusan",
-      "lastReason": "UP [low]: Diveto LLM: No big winners (zero x2-x5+ outcomes across most), negative copy history on 2 of 3 tracked wallets (avg -33.5% and -37.9%), and zero over_x5 outcomes signal the. Tidak dimasuki."
+      "lastReason": "CULT [degen]: Diveto LLM: Both wallets lack copy-trading history and have weak asymmetric upside (91-token churn with tiny wins for smart #769; smart #1088 has zero over_x5 despite solid real. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1173,7 +1173,7 @@
       ],
       [
         "Label wallet",
-        "smart 512 · dolphin 63 · bot 892 · blacklist 78 · lp 1 · fresh 27 · kol 110 · whale 2"
+        "smart 513 · dolphin 63 · bot 891 · blacklist 79 · lp 1 · fresh 27 · kol 109 · whale 2"
       ]
     ],
     "requirements": [
@@ -1229,27 +1229,27 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 892,
+          "total": 891,
           "active": 0,
-          "passive": 892
+          "passive": 891
         },
         {
           "key": "smart",
-          "total": 512,
+          "total": 513,
           "active": 123,
-          "passive": 389
+          "passive": 390
         },
         {
           "key": "kol",
-          "total": 110,
+          "total": 109,
           "active": 13,
-          "passive": 97
+          "passive": 96
         },
         {
           "key": "blacklist",
-          "total": 78,
+          "total": 79,
           "active": 0,
-          "passive": 78
+          "passive": 79
         },
         {
           "key": "dolphin",
@@ -1377,6 +1377,61 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791323187126,
+        "symbol": "CULT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 143,
+            "note": "bundler pegang 14.1%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 7.4%"
+          },
+          {
+            "type": "sniper",
+            "count": 4,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets lack copy-trading history and have weak asymmetric upside (91-token churn with tiny wins for smart #769; smart #1088 has zero over_x5 despite solid real. Tidak dimasuki."
+      },
+      {
+        "at": 1791323175915,
+        "symbol": "UP",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 29.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 9.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "6.3% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Zero x2+ winners across all wallets, two wallets with 30-40% copy losses, no edge despite modest realized PnL; carry risk of coordinated dump at low market cap. Tidak dimasuki."
+      },
       {
         "at": 1791323155022,
         "symbol": "UP",
@@ -2475,27 +2530,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791308990077,
-        "symbol": "GINU",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $1714."
-      },
-      {
-        "at": 1791308824926,
-        "symbol": "CNDR",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2,
-          "kol": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 77%."
       }
     ],
     "reasonStats": {
@@ -2506,7 +2540,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 110,
+        "red_flag": 109,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2523,7 +2557,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 39
+        "llm": 41
       },
       "test": {
         "solo": 6,
@@ -2556,7 +2590,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791323212539,
+    "generatedAt": 1791323513778,
     "trades": {
       "count": 33,
       "wins": 12,
