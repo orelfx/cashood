@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "037d9d7f-3d73-4056-8bad-09065c02457b",
-  "updatedAt": 1791316563236,
-  "generatedAt": "2026-10-07 02:56 WIB",
+  "generation": "769a73b6-1012-4b91-b36f-f9dc6ddae79b",
+  "updatedAt": 1791316863377,
+  "generatedAt": "2026-10-07 03:01 WIB",
   "usdIdr": null,
   "totalUsd": 963.2834032401829,
   "nativeSymbol": "SOL",
@@ -166,15 +166,16 @@
       "reason": "stop loss",
       "reasonDetail": "Stop di titik impas setelah profit sebagian diamankan. · ikut 3 wallet",
       "feesUsd": 0.44999999999999996,
-      "entry": "3 wallet terverifikasi (3 dolphin) membeli dalam 5 menit (batas 60 menit). Masuk di -15% dari harga beli wallet yang diikuti (di dalam zona beli), semua cek red flag lolos; tanda kecil (rat, sniper, fresh, dev) masih di bawah batas. Beli bertahap: 50% saat sinyal; sisanya menunggu dip 10% di bawah b",
+      "entry": "3 wallet terverifikasi (1 bot · 2 dolphin) membeli dalam 5 menit (batas 60 menit). Masuk di -15% dari harga beli wallet yang diikuti (di dalam zona beli), semua cek red flag lolos; tanda kecil (rat, sniper, fresh, dev) masih di bawah batas. Beli bertahap: 50% saat sinyal; sisanya menunggu dip 10% di",
       "exitDetail": "Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 0 menit.",
       "walletsSold": {
-        "dolphin": 1
+        "bot": 1
       },
       "modeLabel": "konsensus",
       "mode": "consensus",
       "wallets": {
-        "dolphin": 3
+        "bot": 1,
+        "dolphin": 2
       },
       "flags": [
         {
@@ -1100,12 +1101,12 @@
     "pnlUsd": -36.716596759817094,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791316563236,
+    "heartbeatAt": 1791316863377,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.57,
-    "lastScanAt": 1791316562655,
+    "lastScanAt": 1791316858917,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1126,13 +1127,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "245",
+        "v": "246",
         "n": "24 jam · 41 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1673",
-        "n": "165 aktif"
+        "n": "164 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1142,9 +1143,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791316563236,
+      "lastDecisionAt": 1791316863377,
       "lastAction": "keputusan",
-      "lastReason": "RARI [low]: Dilewati karena red flag: bundler pegang 86% supply."
+      "lastReason": "Rari [degen]: Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1163,7 +1164,7 @@
       ],
       [
         "Wallet dipantau",
-        "1673 · 165 aktif"
+        "1673 · 164 aktif"
       ],
       [
         "Cadangan kas",
@@ -1175,7 +1176,7 @@
       ],
       [
         "Label wallet",
-        "smart 516 · dolphin 64 · bot 880 · blacklist 78 · lp 1 · fresh 27 · kol 105 · whale 2"
+        "smart 516 · dolphin 63 · bot 881 · blacklist 78 · lp 1 · fresh 27 · kol 105 · whale 2"
       ]
     ],
     "requirements": [
@@ -1224,16 +1225,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1673,
-      "active": 165,
-      "passive": 1508,
+      "active": 164,
+      "passive": 1509,
       "trusted": 2,
       "promising": 13,
       "byLabel": [
         {
           "key": "bot",
-          "total": 880,
+          "total": 881,
           "active": 0,
-          "passive": 880
+          "passive": 881
         },
         {
           "key": "smart",
@@ -1255,8 +1256,8 @@
         },
         {
           "key": "dolphin",
-          "total": 64,
-          "active": 28,
+          "total": 63,
+          "active": 27,
           "passive": 36
         },
         {
@@ -1380,6 +1381,24 @@
     },
     "decisions": [
       {
+        "at": 1791316579187,
+        "symbol": "Rari",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
         "at": 1791316431496,
         "symbol": "RARI",
         "action": "skip",
@@ -1465,7 +1484,8 @@
         "action": "exit",
         "basket": "low",
         "wallets": {
-          "dolphin": 3
+          "bot": 1,
+          "dolphin": 2
         },
         "flags": [
           {
@@ -1497,7 +1517,8 @@
         "action": "partial",
         "basket": "low",
         "wallets": {
-          "dolphin": 3
+          "bot": 1,
+          "dolphin": 2
         },
         "flags": [
           {
@@ -1529,7 +1550,8 @@
         "action": "enter",
         "basket": "low",
         "wallets": {
-          "dolphin": 3
+          "bot": 1,
+          "dolphin": 2
         },
         "flags": [
           {
@@ -2517,23 +2539,12 @@
           }
         ],
         "reason": "Dilewati: harga sudah naik 32% dari beli wallet pertama (batas 15%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791301217090,
-        "symbol": "Venice",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah naik 935% dari beli wallet pertama (batas 15%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 66,
-        "below_entry": 10,
+        "below_entry": 11,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2588,7 +2599,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791316610533,
+    "generatedAt": 1791316913789,
     "trades": {
       "count": 32,
       "wins": 12,
