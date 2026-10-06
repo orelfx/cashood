@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d9323fd4-46b5-41d4-ac18-c0ed110b4633",
-  "updatedAt": 1791303109611,
-  "generatedAt": "2026-10-06 23:11 WIB",
+  "generation": "1b410095-8ff4-4365-a55c-2da2ef40defc",
+  "updatedAt": 1791303409611,
+  "generatedAt": "2026-10-06 23:16 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791303109611,
+    "heartbeatAt": 1791303409611,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791303107523,
+    "lastScanAt": 1791303405725,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791303109611,
+      "lastDecisionAt": 1791303409611,
       "lastAction": "keputusan",
-      "lastReason": "VCAT [low]: Dilewati: harga sudah naik 53% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      "lastReason": "VCAT [low]: Dilewati karena red flag: insider/entrapment pegang 56%."
     }
   },
   "strategy": {
@@ -1150,7 +1150,7 @@
       ],
       [
         "Label wallet",
-        "smart 510 · dolphin 61 · bot 873 · blacklist 74 · lp 1 · fresh 26 · kol 103 · whale 3"
+        "smart 509 · dolphin 61 · bot 873 · blacklist 74 · lp 1 · fresh 27 · kol 103 · whale 3"
       ]
     ],
     "requirements": [
@@ -1210,9 +1210,9 @@
         },
         {
           "key": "smart",
-          "total": 510,
+          "total": 509,
           "active": 132,
-          "passive": 378
+          "passive": 377
         },
         {
           "key": "kol",
@@ -1234,9 +1234,9 @@
         },
         {
           "key": "fresh",
-          "total": 26,
+          "total": 27,
           "active": 0,
-          "passive": 26
+          "passive": 27
         },
         {
           "key": "whale",
@@ -1352,6 +1352,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791303213600,
+        "symbol": "VCAT",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 56%."
+      },
       {
         "at": 1791302612492,
         "symbol": "VCAT",
@@ -2041,16 +2058,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 40%."
-      },
-      {
-        "at": 1791288297883,
-        "symbol": "CWS",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 4."
       }
     ],
     "reasonStats": {
@@ -2100,7 +2107,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791303158790,
+    "generatedAt": 1791303417117,
     "trades": {
       "count": 28,
       "wins": 10,
