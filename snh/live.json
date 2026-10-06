@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f87aeaf7-fb5d-4399-9b1e-7247783b78d3",
-  "updatedAt": 1791299509607,
-  "generatedAt": "2026-10-06 22:11 WIB",
+  "generation": "b5037cde-3748-4c19-be60-1ec040efa48a",
+  "updatedAt": 1791299809607,
+  "generatedAt": "2026-10-06 22:16 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791299509607,
+    "heartbeatAt": 1791299809607,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791299505488,
+    "lastScanAt": 1791299806462,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1101,8 +1101,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "258",
-        "n": "24 jam · 34 diveto LLM"
+        "v": "260",
+        "n": "24 jam · 35 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791299509607,
+      "lastDecisionAt": 1791299809607,
       "lastAction": "keputusan",
-      "lastReason": "DBC [degen]: Dilewati: harga sudah naik 132% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      "lastReason": "ICAT [degen]: Dilewati karena red flag: bundler pegang 36% supply."
     }
   },
   "strategy": {
@@ -1352,6 +1352,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791299761676,
+        "symbol": "ICAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 36% supply."
+      },
+      {
+        "at": 1791299630212,
+        "symbol": "SNARKSTR",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 217,
+            "note": "bundler pegang 7.8%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 14.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 5,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 930,
+            "note": "6.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Low 31% winrate with 164 tokens/week, 13 tokens created, and zero over-5x winners suggests heavy churn with no asymmetric edge; copy signal too thin (1 copy) to. Tidak dimasuki."
+      },
       {
         "at": 1791299303932,
         "symbol": "DBC",
@@ -1972,33 +2019,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 1."
-      },
-      {
-        "at": 1791286553985,
-        "symbol": "PUMPNITE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 5."
-      },
-      {
-        "at": 1791286463058,
-        "symbol": "Human",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 42% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 76,
-        "red_flag": 125,
+        "red_flag": 126,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2009,7 +2035,7 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 34
+        "llm": 35
       },
       "test": {
         "solo": 9,
@@ -2042,7 +2068,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791299516665,
+    "generatedAt": 1791299815787,
     "trades": {
       "count": 28,
       "wins": 10,
