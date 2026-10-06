@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ba6352d5-8a70-44ff-aa6c-15decbad644c",
-  "updatedAt": 1791317163377,
-  "generatedAt": "2026-10-07 03:06 WIB",
+  "generation": "45a855d4-2619-484f-bc5e-b929ff14b930",
+  "updatedAt": 1791317463382,
+  "generatedAt": "2026-10-07 03:11 WIB",
   "usdIdr": null,
   "totalUsd": 963.2834032401829,
   "nativeSymbol": "SOL",
@@ -1101,12 +1101,12 @@
     "pnlUsd": -36.716596759817094,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791317163377,
+    "heartbeatAt": 1791317463382,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.57,
-    "lastScanAt": 1791317163259,
+    "lastScanAt": 1791317462968,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1143,9 +1143,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791317163377,
+      "lastDecisionAt": 1791317463382,
       "lastAction": "keputusan",
-      "lastReason": "Furrari [low]: Dilewati karena red flag: bundler pegang 52% supply."
+      "lastReason": "Rari [degen]: Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1380,6 +1380,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791317180321,
+        "symbol": "Rari",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791317091643,
         "symbol": "Furrari",
@@ -2521,28 +2539,17 @@
           }
         ],
         "reason": "Dilewati: harga sudah naik 61% dari beli wallet pertama (batas 15%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791301821509,
-        "symbol": "Venice",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah naik 861% dari beli wallet pertama (batas 15%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 65,
-        "below_entry": 11,
+        "below_entry": 12,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 109,
+        "red_flag": 108,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2592,7 +2599,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791317211624,
+    "generatedAt": 1791317513413,
     "trades": {
       "count": 32,
       "wins": 12,
