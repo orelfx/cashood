@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b6f3c64d-974d-48b2-96eb-10cdc8f3e298",
-  "updatedAt": 1791316263235,
-  "generatedAt": "2026-10-07 02:51 WIB",
+  "generation": "037d9d7f-3d73-4056-8bad-09065c02457b",
+  "updatedAt": 1791316563236,
+  "generatedAt": "2026-10-07 02:56 WIB",
   "usdIdr": null,
   "totalUsd": 963.2834032401829,
   "nativeSymbol": "SOL",
@@ -1100,12 +1100,12 @@
     "pnlUsd": -36.716596759817094,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791316263235,
+    "heartbeatAt": 1791316563236,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.57,
-    "lastScanAt": 1791316263214,
+    "lastScanAt": 1791316562655,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1126,25 +1126,25 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "244",
+        "v": "245",
         "n": "24 jam · 41 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1672",
+        "v": "1673",
         "n": "165 aktif"
       },
       {
         "k": "Buka · tutup",
-        "v": "19 · 21",
+        "v": "19 · 20",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791316263235,
+      "lastDecisionAt": 1791316563236,
       "lastAction": "keputusan",
-      "lastReason": "Human [low]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "RARI [low]: Dilewati karena red flag: bundler pegang 86% supply."
     }
   },
   "strategy": {
@@ -1163,7 +1163,7 @@
       ],
       [
         "Wallet dipantau",
-        "1672 · 165 aktif"
+        "1673 · 165 aktif"
       ],
       [
         "Cadangan kas",
@@ -1175,7 +1175,7 @@
       ],
       [
         "Label wallet",
-        "smart 515 · dolphin 64 · bot 880 · blacklist 78 · lp 1 · fresh 27 · kol 105 · whale 2"
+        "smart 516 · dolphin 64 · bot 880 · blacklist 78 · lp 1 · fresh 27 · kol 105 · whale 2"
       ]
     ],
     "requirements": [
@@ -1223,9 +1223,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1672,
+      "tracked": 1673,
       "active": 165,
-      "passive": 1507,
+      "passive": 1508,
       "trusted": 2,
       "promising": 13,
       "byLabel": [
@@ -1237,9 +1237,9 @@
         },
         {
           "key": "smart",
-          "total": 515,
+          "total": 516,
           "active": 123,
-          "passive": 392
+          "passive": 393
         },
         {
           "key": "kol",
@@ -1379,6 +1379,17 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791316431496,
+        "symbol": "RARI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3,
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 86% supply."
+      },
       {
         "at": 1791315303829,
         "symbol": "SHINU",
@@ -2517,23 +2528,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati: harga sudah naik 935% dari beli wallet pertama (batas 15%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791300803834,
-        "symbol": "VCAT",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 31%."
       }
     ],
     "reasonStats": {
@@ -2544,7 +2538,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 108,
+        "red_flag": 109,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2572,14 +2566,14 @@
         "jumlah": 1
       },
       "partial": {
-        "take profit": 10,
+        "take profit": 9,
         "anticipate": 6,
         "early follow": 1
       },
       "exit": {
         "follow exit": 6,
         "take profit": 1,
-        "stop": 12,
+        "stop": 11,
         "trailing": 2,
         "time limit": 0,
         "rug": 0,
@@ -2594,7 +2588,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791316315464,
+    "generatedAt": 1791316610533,
     "trades": {
       "count": 32,
       "wins": 12,
