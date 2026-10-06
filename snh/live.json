@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c0967739-07af-4730-8011-9ecaf80ea65b",
-  "updatedAt": 1791264409112,
-  "generatedAt": "2026-10-06 12:26 WIB",
+  "generation": "8ffe89ac-eb14-4b24-b44a-f83bba8d74dc",
+  "updatedAt": 1791264709113,
+  "generatedAt": "2026-10-06 12:31 WIB",
   "usdIdr": null,
   "totalUsd": 977.1113911297434,
   "nativeSymbol": "SOL",
@@ -1067,12 +1067,12 @@
     "pnlUsd": -22.888608870256576,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791264409112,
+    "heartbeatAt": 1791264709113,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 3.2,
-    "lastScanAt": 1791264405177,
+    "lastScanAt": 1791264705287,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1093,7 +1093,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "300",
+        "v": "302",
         "n": "24 jam · 32 diveto LLM"
       },
       {
@@ -1109,9 +1109,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791264409112,
+      "lastDecisionAt": 1791264709113,
       "lastAction": "keputusan",
-      "lastReason": "darwin [low]: Dilewati: harga sudah naik 54% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      "lastReason": "CNDR [mid]: Dilewati karena red flag: 10 holder terbesar pegang 76%."
     }
   },
   "strategy": {
@@ -1345,6 +1345,33 @@
     },
     "decisions": [
       {
+        "at": 1791264609468,
+        "symbol": "CNDR",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
+      },
+      {
+        "at": 1791264535554,
+        "symbol": "SILLY",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah naik 63% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      },
+      {
         "at": 1791264219670,
         "symbol": "darwin",
         "action": "skip",
@@ -1370,23 +1397,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: bundler pegang 28.43% supply."
-      },
-      {
-        "at": 1791264004021,
-        "symbol": "CNDR",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
       },
       {
         "at": 1791263398088,
@@ -2323,22 +2333,12 @@
           }
         ],
         "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
-      },
-      {
-        "at": 1791252024335,
-        "symbol": "HOE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah naik 358% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 93,
-        "red_flag": 137,
+        "chase": 94,
+        "red_flag": 138,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -2382,7 +2382,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791264460467,
+    "generatedAt": 1791264774843,
     "trades": {
       "count": 23,
       "wins": 9,
