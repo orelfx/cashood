@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "cfdf5473-5387-4b1c-96cc-98023a9b3863",
-  "updatedAt": 1791251807871,
-  "generatedAt": "2026-10-06 08:56 WIB",
+  "generation": "21a55621-5717-495b-b4b5-0b66c8f47d18",
+  "updatedAt": 1791252107872,
+  "generatedAt": "2026-10-06 09:01 WIB",
   "usdIdr": null,
   "totalUsd": 984.998213546901,
   "nativeSymbol": "SOL",
@@ -975,12 +975,12 @@
     "pnlUsd": -15.001786453099044,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791251807871,
+    "heartbeatAt": 1791252107872,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 2.42,
-    "lastScanAt": 1791251807319,
+    "lastScanAt": 1791252104509,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1001,12 +1001,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "254",
+        "v": "256",
         "n": "24 jam · 21 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1567",
+        "v": "1568",
         "n": "171 aktif"
       },
       {
@@ -1017,9 +1017,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791251807871,
+      "lastDecisionAt": 1791252107872,
       "lastAction": "keputusan",
-      "lastReason": "HIGCAT [degen]: Dilewati karena red flag: holder baru 8."
+      "lastReason": "HOE [degen]: Dilewati: harga sudah naik 358% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -1038,7 +1038,7 @@
       ],
       [
         "Wallet dipantau",
-        "1567 · 171 aktif"
+        "1568 · 171 aktif"
       ],
       [
         "Cadangan kas",
@@ -1050,7 +1050,7 @@
       ],
       [
         "Label wallet",
-        "smart 503 · dolphin 61 · bot 820 · blacklist 62 · lp 1 · fresh 22 · kol 94 · whale 4"
+        "smart 500 · dolphin 61 · bot 823 · blacklist 62 · lp 1 · fresh 23 · kol 94 · whale 4"
       ]
     ],
     "requirements": [
@@ -1096,23 +1096,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1567,
+      "tracked": 1568,
       "active": 171,
-      "passive": 1396,
+      "passive": 1397,
       "trusted": 3,
       "promising": 11,
       "byLabel": [
         {
           "key": "bot",
-          "total": 820,
+          "total": 823,
           "active": 0,
-          "passive": 820
+          "passive": 823
         },
         {
           "key": "smart",
-          "total": 503,
+          "total": 500,
           "active": 129,
-          "passive": 374
+          "passive": 371
         },
         {
           "key": "kol",
@@ -1134,9 +1134,9 @@
         },
         {
           "key": "fresh",
-          "total": 22,
+          "total": 23,
           "active": 0,
-          "passive": 22
+          "passive": 23
         },
         {
           "key": "whale",
@@ -1214,15 +1214,6 @@
           "trusted": false
         },
         {
-          "alias": "smart #668",
-          "label": "smart",
-          "score": 96.4,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
           "alias": "smart #564",
           "label": "smart",
           "score": 95.8,
@@ -1241,6 +1232,15 @@
           "trusted": false
         },
         {
+          "alias": "smart #668",
+          "label": "smart",
+          "score": 93.6,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
           "alias": "smart #652",
           "label": "smart",
           "score": 93.1,
@@ -1252,6 +1252,34 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791252024335,
+        "symbol": "HOE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah naik 358% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      },
+      {
+        "at": 1791251934466,
+        "symbol": "Ants",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 27%."
+      },
       {
         "at": 1791251561142,
         "symbol": "HIGCAT",
@@ -2262,59 +2290,12 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 50% supply."
-      },
-      {
-        "at": 1791234411433,
-        "symbol": "TANG",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 294,
-            "note": "bundler pegang 32.0%"
-          },
-          {
-            "type": "rat",
-            "count": 18,
-            "note": "insider/entrapment pegang 7.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 6,
-            "note": "sniper awal masih pegang 0.6%"
-          },
-          {
-            "type": "fresh",
-            "count": 404,
-            "note": "24.0% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 8x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP2): jual sebagian senilai $3,79; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791234329735,
-        "symbol": "Doxycyclinu",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah naik 48% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 80,
-        "red_flag": 119,
+        "chase": 81,
+        "red_flag": 120,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -2358,7 +2339,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791251811705,
+    "generatedAt": 1791252111899,
     "trades": {
       "count": 19,
       "wins": 7,
