@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "87823459-7bf2-47de-9d3a-7b7aa3165174",
-  "updatedAt": 1791283309263,
-  "generatedAt": "2026-10-06 17:41 WIB",
+  "generation": "b0dba649-c2ba-4974-b43a-015e3898fa29",
+  "updatedAt": 1791283609266,
+  "generatedAt": "2026-10-06 17:46 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791283309263,
+    "heartbeatAt": 1791283609266,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791283307959,
+    "lastScanAt": 1791283608304,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791283309263,
+      "lastDecisionAt": 1791283609266,
       "lastAction": "keputusan",
-      "lastReason": ".FART [degen]: Dilewati karena red flag: bundler pegang 60% supply."
+      "lastReason": "MultiStonks [degen]: Dilewati: harga sudah naik 59% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -1352,6 +1352,17 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791283528020,
+        "symbol": "MultiStonks",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah naik 59% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      },
       {
         "at": 1791281202716,
         "symbol": ".FART",
@@ -2526,43 +2537,6 @@
           }
         ],
         "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,78, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791259929951,
-        "symbol": "монета",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 21.46% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 155,
-            "note": "bundler pegang 29.9%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 5.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 172,
-            "note": "13.4% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets have very low winrates (30-33%) and negative median gains (-5%), with the better one only marginally positive on our single copy; high churn and ve. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2612,7 +2586,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791283314873,
+    "generatedAt": 1791283620026,
     "trades": {
       "count": 28,
       "wins": 10,
