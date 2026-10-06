@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0b27f0f0-9b15-425e-8654-3a6e68ee4121",
-  "updatedAt": 1791313862649,
-  "generatedAt": "2026-10-07 02:11 WIB",
+  "generation": "4f6c914f-09a9-468f-9cef-cdbbda81f7c1",
+  "updatedAt": 1791314162649,
+  "generatedAt": "2026-10-07 02:16 WIB",
   "usdIdr": null,
-  "totalUsd": 968.6149189018827,
+  "totalUsd": 968.3198137591927,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 968.6149189018827,
+  "botWalletUsd": 968.3198137591927,
   "walletUsd": 960.3344739816254,
-  "lpUsd": 8.28044492,
+  "lpUsd": 7.98533978,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 7.247752658692656,
       "investedUsd": 7.247752658692656,
-      "principalUsd": 8.28044492,
-      "valueUsd": 8.28044492,
+      "principalUsd": 7.98533978,
+      "valueUsd": 7.98533978,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 1.0326922615646197,
-      "pnlPct": 14.25,
+      "pnlUsd": 0.7375871188747007,
+      "pnlPct": 10.18,
       "entryPriceUsd": 0.00022297209,
-      "priceUsd": 0.00026542133,
-      "ageMinutes": 161,
+      "priceUsd": 0.00025595978,
+      "ageMinutes": 166,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1144,18 +1144,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 960.3344739816254,
-    "positionsUsd": 8.28044492,
+    "positionsUsd": 7.98533978,
     "realizedUsd": -32.41777336,
-    "unrealizedUsd": 1.03269226,
-    "pnlUsd": -31.385081098117325,
+    "unrealizedUsd": 0.73758712,
+    "pnlUsd": -31.680186240807302,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791313862649,
+    "heartbeatAt": 1791314162649,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 4.04,
-    "lastScanAt": 1791313861315,
+    "drawdownPct": 4.07,
+    "lastScanAt": 1791314160563,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1170,14 +1170,14 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$1.0327",
+        "v": "+$0.7376",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "254",
-        "n": "24 jam · 42 diveto LLM"
+        "v": "255",
+        "n": "24 jam · 43 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1192,9 +1192,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791313862649,
+      "lastDecisionAt": 1791314162649,
       "lastAction": "keputusan",
-      "lastReason": "tomy [degen]: Dilewati: harga sudah -95% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "slopcannon [mid]: Diveto LLM: Group carried by top_followed wallet (smart #427) that created 4 tokens and has low 23% winrate; all wallets show poor over_x5 wins and high churn, limiting asymm. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1429,6 +1429,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791314064845,
+        "symbol": "slopcannon",
+        "action": "veto",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 16.3%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 6.4%"
+          },
+          {
+            "type": "sniper",
+            "count": 30,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "17.1% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 19x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Group carried by top_followed wallet (smart #427) that created 4 tokens and has low 23% winrate; all wallets show poor over_x5 wins and high churn, limiting asymm. Tidak dimasuki."
+      },
       {
         "at": 1791313526873,
         "symbol": "SHINU",
@@ -2437,16 +2480,6 @@
           "kol": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
-      },
-      {
-        "at": 1791298480747,
-        "symbol": "Mongo",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
       }
     ],
     "reasonStats": {
@@ -2474,7 +2507,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 42
+        "llm": 43
       },
       "test": {
         "solo": 8,
@@ -2507,7 +2540,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791313915884,
+    "generatedAt": 1791314212621,
     "trades": {
       "count": 29,
       "wins": 11,
@@ -2548,25 +2581,25 @@
     "equity": {
       "days": 2,
       "spanDays": 1.6,
-      "returnPct": -3.14,
+      "returnPct": -3.17,
       "maxDrawdownPct": 4.09,
       "maxDrawdownAt": 1791305760829,
       "maxDrawdownUsd": 41.16,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 964.6,
-      "currentDrawdownPct": 3.69,
-      "currentDrawdownUsd": 37.14,
+      "currentDrawdownPct": 3.72,
+      "currentDrawdownUsd": 37.44,
       "positiveDaysPct": 50,
-      "bestDayPct": 0.42,
+      "bestDayPct": 0.39,
       "worstDayPct": -2.32,
       "sharpe": null,
       "sortino": null,
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -31.39,
-    "profitPct": -3.14,
-    "recoveryFactor": -0.76,
+    "profitUsd": -31.68,
+    "profitPct": -3.17,
+    "recoveryFactor": -0.77,
     "score": {
       "axes": {
         "winRate": 37.93,
