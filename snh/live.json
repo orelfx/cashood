@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "637f1814-1c21-45f6-af2d-83ae1210833b",
-  "updatedAt": 1791254808315,
-  "generatedAt": "2026-10-06 09:46 WIB",
+  "generation": "f9737302-1bc4-4936-8241-904b961b96fb",
+  "updatedAt": 1791255108316,
+  "generatedAt": "2026-10-06 09:51 WIB",
   "usdIdr": null,
   "totalUsd": 976.7686811623787,
   "nativeSymbol": "SOL",
@@ -212,16 +212,18 @@
       "reason": "ikut wallet keluar",
       "reasonDetail": "Sebagian besar wallet yang diikuti sudah menjual, jadi posisi ikut ditutup. · ikut 3 wallet",
       "feesUsd": 0.44999999999999996,
-      "entry": "Uji coba: 3 wallet (3 smart) membeli, tapi harga sudah naik 255% dari beli wallet pertama; dicatat sebagai posisi bayangan. Harga baru naik 255% dari beli wallet pertama, semua cek red flag lolos; tanda kecil (blacklist, bundler, bundler, rat, fresh, wash) masih di bawah batas. Kursi 7,0% dari modal",
+      "entry": "Uji coba: 3 wallet (2 smart · 1 bot) membeli, tapi harga sudah naik 255% dari beli wallet pertama; dicatat sebagai posisi bayangan. Harga baru naik 255% dari beli wallet pertama, semua cek red flag lolos; tanda kecil (blacklist, bundler, bundler, rat, fresh, wash) masih di bawah batas. Kursi 7,0% da",
       "exitDetail": "2 dari 3 wallet yang diikuti sudah menjual setelah 0 menit, jadi posisi ikut ditutup.",
       "walletsSold": {
-        "smart": 2
+        "smart": 1,
+        "bot": 1
       },
       "modeLabel": "uji batas chase",
       "mode": "chase_test",
       "test": true,
       "wallets": {
-        "smart": 3
+        "smart": 2,
+        "bot": 1
       },
       "flags": [
         {
@@ -1059,12 +1061,12 @@
     "pnlUsd": -23.231318837621302,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791254808315,
+    "heartbeatAt": 1791255108316,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 3.23,
-    "lastScanAt": 1791254805515,
+    "lastScanAt": 1791255108141,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1085,13 +1087,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "277",
+        "v": "278",
         "n": "24 jam · 26 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1573",
-        "n": "173 aktif"
+        "v": "1574",
+        "n": "172 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1101,9 +1103,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791254808315,
+      "lastDecisionAt": 1791255108316,
       "lastAction": "keputusan",
-      "lastReason": "DOGECHAN [degen]: Diveto LLM: Both wallets show identical outcome distributions, low win rates, no big winners, and negative copy history with avg PnL -11.9% and -2.9%, suggesting same opera. Tidak dimasuki."
+      "lastReason": "DONE [degen]: Dilewati: harga sudah naik 236% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -1122,7 +1124,7 @@
       ],
       [
         "Wallet dipantau",
-        "1573 · 173 aktif"
+        "1574 · 172 aktif"
       ],
       [
         "Cadangan kas",
@@ -1134,7 +1136,7 @@
       ],
       [
         "Label wallet",
-        "smart 503 · dolphin 61 · bot 825 · blacklist 63 · lp 1 · fresh 22 · kol 94 · whale 4"
+        "smart 502 · dolphin 61 · bot 827 · blacklist 63 · lp 1 · fresh 22 · kol 94 · whale 4"
       ]
     ],
     "requirements": [
@@ -1180,22 +1182,22 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1573,
-      "active": 173,
-      "passive": 1400,
+      "tracked": 1574,
+      "active": 172,
+      "passive": 1402,
       "trusted": 2,
       "promising": 12,
       "byLabel": [
         {
           "key": "bot",
-          "total": 825,
+          "total": 827,
           "active": 0,
-          "passive": 825
+          "passive": 827
         },
         {
           "key": "smart",
-          "total": 503,
-          "active": 131,
+          "total": 502,
+          "active": 130,
           "passive": 372
         },
         {
@@ -1336,6 +1338,17 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791254810805,
+        "symbol": "DONE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah naik 236% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      },
       {
         "at": 1791254632990,
         "symbol": "SPLICE",
@@ -1919,7 +1932,8 @@
         "action": "exit",
         "basket": "mid",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -1961,7 +1975,8 @@
         "action": "partial",
         "basket": "mid",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -2003,7 +2018,8 @@
         "action": "enter",
         "basket": "mid",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -2300,53 +2316,11 @@
           }
         ],
         "reason": "Take profit bertahap (TP2): jual sebagian senilai $5,56; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791244120953,
-        "symbol": "NEURALS",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 13.97% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.88%"
-          },
-          {
-            "type": "bundler",
-            "count": 109,
-            "note": "bundler pegang 42.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.0%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 3.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 48,
-            "note": "15.8% holder wallet baru"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $4,33; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 85,
+        "chase": 86,
         "red_flag": 130,
         "round_trip_cost": 5,
         "basket_full": 0,
@@ -2391,7 +2365,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791254811472,
+    "generatedAt": 1791255114145,
     "trades": {
       "count": 21,
       "wins": 7,
