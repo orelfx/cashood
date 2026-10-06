@@ -1,22 +1,22 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8ffe89ac-eb14-4b24-b44a-f83bba8d74dc",
-  "updatedAt": 1791264709113,
-  "generatedAt": "2026-10-06 12:31 WIB",
+  "generation": "354fdb84-3637-47d8-a274-031c71923bc8",
+  "updatedAt": 1791265028445,
+  "generatedAt": "2026-10-06 12:37 WIB",
   "usdIdr": null,
-  "totalUsd": 977.1113911297434,
+  "totalUsd": 976.1222306667594,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 977.1113911297434,
-  "walletUsd": 977.1113911297434,
+  "botWalletUsd": 976.1222306667594,
+  "walletUsd": 976.1222306667594,
   "lpUsd": 0,
   "treasuryUsd": 0,
   "holdings": [
     {
       "symbol": "Kas (paper)",
-      "amount": 977.1113911297434,
+      "amount": 976.1222306667594,
       "price": 1,
-      "usd": 977.1113911297434
+      "usd": 976.1222306667594
     }
   ],
   "positions": [],
@@ -30,27 +30,87 @@
     },
     {
       "date": "2026-10-06",
-      "usd": -9.51,
-      "closes": 17,
+      "usd": -10.5,
+      "closes": 18,
       "wins": 8,
-      "losses": 9
+      "losses": 10
     }
   ],
   "historyNote": "hasil trade paper yang sudah ditutup",
   "stats": {
-    "closedCount": 23,
+    "closedCount": 24,
     "openCount": 0,
-    "graded": 23,
+    "graded": 24,
     "wins": 9,
-    "losses": 14,
-    "winRate": 39.13,
-    "realisedUsd": -22.88860887,
+    "losses": 15,
+    "winRate": 37.5,
+    "realisedUsd": -23.87776933,
     "bestDay": null,
     "worstDay": null,
     "worstClosePct": -38.82366645029348,
     "timezone": "Asia/Jakarta (UTC+7)"
   },
   "closedRecent": [
+    {
+      "symbol": "darwin",
+      "strategy": "low",
+      "investedUsd": 9.771113911297435,
+      "netUsd": -0.989160462984086,
+      "netPct": -10.123313185822255,
+      "holdMinutes": 0,
+      "reason": "ikut wallet keluar",
+      "reasonDetail": "Sebagian besar wallet yang diikuti sudah menjual, jadi posisi ikut ditutup. · ikut 2 wallet",
+      "feesUsd": 0.3,
+      "entry": "Uji coba: wallet menjanjikan (1 smart · 1 kol) membeli sendirian, dicatat sebagai posisi bayangan. Harga baru naik -22% dari beli wallet pertama, semua cek red flag lolos; tanda kecil (blacklist, bundler, rat, sniper, fresh, wash) masih di bawah batas. Kursi 5,0% dari modal basket low (rentang 5–20%",
+      "exitDetail": "1 dari 2 wallet yang diikuti sudah menjual setelah 0 menit, jadi posisi ikut ditutup.",
+      "walletsSold": {
+        "smart": 1
+      },
+      "modeLabel": "uji solo",
+      "mode": "solo_test",
+      "test": true,
+      "wallets": {
+        "smart": 1,
+        "kol": 1
+      },
+      "flags": [
+        {
+          "type": "blacklist",
+          "count": 2,
+          "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+        },
+        {
+          "type": "bundler",
+          "count": 736,
+          "note": "bundler pegang 18.1%"
+        },
+        {
+          "type": "rat",
+          "count": 1,
+          "note": "insider/entrapment pegang 7.9%"
+        },
+        {
+          "type": "sniper",
+          "count": 3,
+          "note": "sniper awal masih pegang 0.0%"
+        },
+        {
+          "type": "fresh",
+          "count": 1000,
+          "note": "21.7% holder wallet baru"
+        },
+        {
+          "type": "wash",
+          "count": null,
+          "note": "volume 1 jam 18x likuiditas"
+        }
+      ],
+      "firstWallet": "smart #548",
+      "llmScore": 78,
+      "peakPct": 0,
+      "ddPct": -11.62,
+      "closedAt": 1791265028228
+    },
     {
       "symbol": "TERMINAL",
       "strategy": "degen",
@@ -986,58 +1046,6 @@
       "peakPct": 0,
       "ddPct": -27.89,
       "closedAt": 1791208339675
-    },
-    {
-      "symbol": "DIPS",
-      "strategy": "degen",
-      "investedUsd": 11.961481633825823,
-      "netUsd": -4.081851364309302,
-      "netPct": -34.12496452585148,
-      "holdMinutes": 0,
-      "reason": "stop loss",
-      "reasonDetail": "ikut 1 wallet",
-      "feesUsd": 0.3,
-      "entry": "Uji coba: wallet menjanjikan (1 smart) membeli sendirian, dicatat sebagai posisi bayangan. Harga baru naik 1% dari beli wallet pertama, semua cek red flag lolos; tanda kecil (bundler, dev, bundler, rat, fresh) masih di bawah batas. Kursi 3,0% dari modal basket degen (rentang 3–10%) sesuai kekuatan s",
-      "exitDetail": "Harga turun sampai batas stop 25% setelah 0 menit; puncak sempat +7%.",
-      "walletsSold": {},
-      "modeLabel": "uji solo",
-      "mode": "solo_test",
-      "test": true,
-      "wallets": {
-        "smart": 1
-      },
-      "flags": [
-        {
-          "type": "bundler",
-          "count": null,
-          "note": "bundler membeli 10.34% supply di blok peluncuran"
-        },
-        {
-          "type": "dev",
-          "count": null,
-          "note": "dev masih pegang 0.88%"
-        },
-        {
-          "type": "bundler",
-          "count": 133,
-          "note": "bundler pegang 37.9%"
-        },
-        {
-          "type": "rat",
-          "count": null,
-          "note": "insider/entrapment pegang 1.1%"
-        },
-        {
-          "type": "fresh",
-          "count": 75,
-          "note": "17.5% holder wallet baru"
-        }
-      ],
-      "firstWallet": "smart #1012",
-      "llmScore": 68,
-      "peakPct": 6.63,
-      "ddPct": -31.07,
-      "closedAt": 1791207163737
     }
   ],
   "tradeDays": [
@@ -1050,29 +1058,29 @@
     },
     {
       "d": "2026-10-06",
-      "n": 17,
-      "usd": -9.51,
+      "n": 18,
+      "usd": -10.5,
       "w": 8,
-      "l": 9
+      "l": 10
     }
   ],
   "trading": {
     "paper": true,
     "mode": "paper",
     "initialUsd": 1000,
-    "cashUsd": 977.1113911297434,
+    "cashUsd": 976.1222306667594,
     "positionsUsd": 0,
-    "realizedUsd": -22.88860887,
+    "realizedUsd": -23.87776933,
     "unrealizedUsd": 0,
-    "pnlUsd": -22.888608870256576,
+    "pnlUsd": -23.87776933324062,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791264709113,
+    "heartbeatAt": 1791265028445,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 3.2,
-    "lastScanAt": 1791264705287,
+    "drawdownPct": 3.3,
+    "lastScanAt": 1791265027399,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1082,7 +1090,7 @@
       },
       {
         "k": "Kas",
-        "usd": 977.1113911297434,
+        "usd": 976.1222306667594,
         "n": "belum dipakai"
       },
       {
@@ -1093,8 +1101,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "302",
-        "n": "24 jam · 32 diveto LLM"
+        "v": "304",
+        "n": "24 jam · 33 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1103,15 +1111,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "23 · 23",
+        "v": "24 · 24",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791264709113,
+      "lastDecisionAt": 1791265028445,
       "lastAction": "keputusan",
-      "lastReason": "CNDR [mid]: Dilewati karena red flag: 10 holder terbesar pegang 76%."
+      "lastReason": "darwin [low]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
     }
   },
   "strategy": {
@@ -1138,17 +1146,17 @@
       ],
       [
         "Wallet tepercaya",
-        "2 · menjanjikan 12"
+        "2 · menjanjikan 11"
       ],
       [
         "Label wallet",
-        "smart 495 · dolphin 61 · bot 841 · blacklist 63 · lp 1 · fresh 21 · kol 93 · whale 4"
+        "smart 495 · dolphin 61 · bot 840 · blacklist 63 · lp 1 · fresh 21 · kol 94 · whale 4"
       ]
     ],
     "requirements": [
       [
         "degen (launch)",
-        "alokasi 40% · $391 · kursi 3–10% basket · maks 4% equity · 0 terbuka"
+        "alokasi 40% · $390 · kursi 3–10% basket · maks 4% equity · 0 terbuka"
       ],
       [
         "low (core)",
@@ -1156,7 +1164,7 @@
       ],
       [
         "mid (core)",
-        "alokasi 15% · $147 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
+        "alokasi 15% · $146 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
       ],
       [
         "big (core)",
@@ -1192,13 +1200,13 @@
       "active": 173,
       "passive": 1406,
       "trusted": 2,
-      "promising": 12,
+      "promising": 11,
       "byLabel": [
         {
           "key": "bot",
-          "total": 841,
+          "total": 840,
           "active": 0,
-          "passive": 841
+          "passive": 840
         },
         {
           "key": "smart",
@@ -1208,9 +1216,9 @@
         },
         {
           "key": "kol",
-          "total": 93,
+          "total": 94,
           "active": 14,
-          "passive": 79
+          "passive": 80
         },
         {
           "key": "blacklist",
@@ -1344,6 +1352,135 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791265028228,
+        "symbol": "darwin",
+        "action": "exit",
+        "basket": "low",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 736,
+            "note": "bundler pegang 18.1%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 7.9%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "21.7% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 18x likuiditas"
+          }
+        ],
+        "reason": "Keluar (follow exit): 1 dari 2 wallet yang diikuti sudah menjual setelah 0 menit, jadi posisi ikut ditutup. Hasil -10,1%."
+      },
+      {
+        "at": 1791265025443,
+        "symbol": "darwin",
+        "action": "enter",
+        "basket": "low",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 736,
+            "note": "bundler pegang 18.1%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 7.9%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "21.7% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 18x likuiditas"
+          }
+        ],
+        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      },
+      {
+        "at": 1791264841940,
+        "symbol": "darwin",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 721,
+            "note": "bundler pegang 16.4%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 5.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "20.1% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 12x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: smart #548 is a skilled asymmetric trader but kol #1335 (KOL, 0 big winners, token creator) drags the group down and has no copy history to validate. Tidak dimasuki."
+      },
       {
         "at": 1791264609468,
         "symbol": "CNDR",
@@ -2276,63 +2413,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 2."
-      },
-      {
-        "at": 1791252220978,
-        "symbol": "ELONMUSK",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 12."
-      },
-      {
-        "at": 1791252164837,
-        "symbol": "HIGCAT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 11."
-      },
-      {
-        "at": 1791252129317,
-        "symbol": "SPLICE",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 4.0%"
-          },
-          {
-            "type": "rat",
-            "count": 6,
-            "note": "insider/entrapment pegang 12.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 6,
-            "note": "sniper awal masih pegang 0.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "12.9% holder wallet baru"
-          }
-        ],
-        "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
       }
     ],
     "reasonStats": {
@@ -2349,10 +2429,10 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 32
+        "llm": 33
       },
       "test": {
-        "solo": 16,
+        "solo": 17,
         "explore": 8,
         "chase": 4
       },
@@ -2365,7 +2445,7 @@
         "early follow": 0
       },
       "exit": {
-        "follow exit": 5,
+        "follow exit": 6,
         "take profit": 1,
         "stop": 14,
         "trailing": 2,
@@ -2382,25 +2462,25 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791264774843,
+    "generatedAt": 1791265037545,
     "trades": {
-      "count": 23,
+      "count": 24,
       "wins": 9,
-      "losses": 14,
+      "losses": 15,
       "flat": 0,
-      "winRate": 39.13,
+      "winRate": 37.5,
       "usdComplete": true,
-      "netUsd": -22.89,
+      "netUsd": -23.88,
       "grossProfitUsd": 19.16,
-      "grossLossUsd": -42.05,
-      "profitFactor": 0.46,
+      "grossLossUsd": -43.04,
+      "profitFactor": 0.45,
       "profitFactorBasis": "usd",
-      "expectancyUsd": -1,
-      "expectancyPct": -6.2,
+      "expectancyUsd": -0.99,
+      "expectancyPct": -6.36,
       "avgWinUsd": 2.13,
-      "avgLossUsd": -3,
+      "avgLossUsd": -2.87,
       "avgWinPct": 17.55,
-      "avgLossPct": -21.47,
+      "avgLossPct": -20.71,
       "best": {
         "usd": 9.54,
         "pct": 97.41,
@@ -2415,42 +2495,42 @@
       },
       "longestWinStreak": 2,
       "longestLossStreak": 6,
-      "avgHoldMinutes": 23,
-      "tradesPerDay": 23,
+      "avgHoldMinutes": 22,
+      "tradesPerDay": 24,
       "firstAt": 1791181695631,
-      "lastAt": 1791260870106
+      "lastAt": 1791265028228
     },
     "equity": {
       "days": 1,
       "spanDays": 1,
-      "returnPct": -2.29,
+      "returnPct": -2.39,
       "maxDrawdownPct": 2.98,
       "maxDrawdownAt": 1791257888856,
       "maxDrawdownUsd": 29.99,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 975.76,
-      "currentDrawdownPct": 2.85,
-      "currentDrawdownUsd": 28.65,
+      "currentDrawdownPct": 2.95,
+      "currentDrawdownUsd": 29.64,
       "positiveDaysPct": 0,
-      "bestDayPct": -1.05,
-      "worstDayPct": -1.05,
+      "bestDayPct": -1.15,
+      "worstDayPct": -1.15,
       "sharpe": null,
       "sortino": null,
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -22.89,
-    "profitPct": -2.29,
-    "recoveryFactor": -0.76,
+    "profitUsd": -23.88,
+    "profitPct": -2.39,
+    "recoveryFactor": -0.8,
     "score": {
       "axes": {
-        "winRate": 39.13,
+        "winRate": 37.5,
         "profitFactor": 0,
         "risk": 92.55,
         "recovery": 0,
         "consistency": 0
       },
-      "overall": 26.34,
+      "overall": 26.01,
       "complete": true
     }
   }
