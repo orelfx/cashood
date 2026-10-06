@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d1870fd1-69c9-42b1-94d7-7764c6467d2a",
-  "updatedAt": 1791328564398,
-  "generatedAt": "2026-10-07 06:16 WIB",
+  "generation": "c4334487-c182-4079-beba-eee5da136b2d",
+  "updatedAt": 1791328864399,
+  "generatedAt": "2026-10-07 06:21 WIB",
   "usdIdr": null,
   "totalUsd": 956.8037890806575,
   "nativeSymbol": "SOL",
@@ -1103,12 +1103,12 @@
     "pnlUsd": -43.19621091934255,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791328564398,
+    "heartbeatAt": 1791328864399,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.21,
-    "lastScanAt": 1791328562869,
+    "lastScanAt": 1791328864234,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1145,9 +1145,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791328564398,
+      "lastDecisionAt": 1791328864399,
       "lastAction": "keputusan",
-      "lastReason": "RMPL [degen]: Dilewati karena red flag: insider/entrapment pegang 13%."
+      "lastReason": "AUTON [mid]: Dilewati karena red flag: bundler pegang 51% supply."
     }
   },
   "strategy": {
@@ -1382,6 +1382,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791328843210,
+        "symbol": "AUTON",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 5
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 51% supply."
+      },
       {
         "at": 1791328386859,
         "symbol": "RMPL",
@@ -2403,38 +2420,6 @@
           }
         ],
         "reason": "Satu wallet yang diikuti sudah keluar; ikut jual setengah sisa posisi senilai $3,71 selagi untung."
-      },
-      {
-        "at": 1791314314486,
-        "symbol": "Human",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 3
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 9.4%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "18.2% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2495,7 +2480,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791328618156,
+    "generatedAt": 1791328925052,
     "trades": {
       "count": 35,
       "wins": 12,
