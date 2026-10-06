@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ef75760e-f0cc-41f1-987a-ccf98a378d73",
-  "updatedAt": 1791328264398,
-  "generatedAt": "2026-10-07 06:11 WIB",
+  "generation": "d1870fd1-69c9-42b1-94d7-7764c6467d2a",
+  "updatedAt": 1791328564398,
+  "generatedAt": "2026-10-07 06:16 WIB",
   "usdIdr": null,
   "totalUsd": 956.8037890806575,
   "nativeSymbol": "SOL",
@@ -1103,12 +1103,12 @@
     "pnlUsd": -43.19621091934255,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791328264398,
+    "heartbeatAt": 1791328564398,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.21,
-    "lastScanAt": 1791328261388,
+    "lastScanAt": 1791328562869,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1129,7 +1129,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "247",
+        "v": "248",
         "n": "24 jam · 43 diveto LLM"
       },
       {
@@ -1145,9 +1145,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791328264398,
+      "lastDecisionAt": 1791328564398,
       "lastAction": "keputusan",
-      "lastReason": "AUTON [mid]: Dilewati: harga sudah -18% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "RMPL [degen]: Dilewati karena red flag: insider/entrapment pegang 13%."
     }
   },
   "strategy": {
@@ -1382,6 +1382,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791328386859,
+        "symbol": "RMPL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 13%."
+      },
+      {
+        "at": 1791328360919,
+        "symbol": "MAYA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791328241283,
         "symbol": "AUTON",
@@ -2415,92 +2435,12 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791314294063,
-        "symbol": "BROS",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 184,
-            "note": "bundler pegang 10.0%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 5.3%"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 18x likuiditas"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791314064845,
-        "symbol": "slopcannon",
-        "action": "veto",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 16.3%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 6.4%"
-          },
-          {
-            "type": "sniper",
-            "count": 30,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "17.1% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 19x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: Group carried by top_followed wallet (smart #427) that created 4 tokens and has low 23% winrate; all wallets show poor over_x5 wins and high churn, limiting asymm. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 50,
-        "below_entry": 25,
+        "below_entry": 26,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2555,7 +2495,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791328318930,
+    "generatedAt": 1791328618156,
     "trades": {
       "count": 35,
       "wins": 12,
