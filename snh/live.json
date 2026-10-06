@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "08e08f18-e568-406e-afb4-cc3a221e8cce",
-  "updatedAt": 1791280909232,
-  "generatedAt": "2026-10-06 17:01 WIB",
+  "generation": "c1bc5b7b-5445-44a3-8113-56354ccf9a34",
+  "updatedAt": 1791281209255,
+  "generatedAt": "2026-10-06 17:06 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791280909232,
+    "heartbeatAt": 1791281209255,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791280906019,
+    "lastScanAt": 1791281205717,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1101,7 +1101,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "285",
+        "v": "286",
         "n": "24 jam · 37 diveto LLM"
       },
       {
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791280909232,
+      "lastDecisionAt": 1791281209255,
       "lastAction": "keputusan",
-      "lastReason": "$ROKHA [degen]: Dilewati karena red flag: insider/entrapment pegang 25%."
+      "lastReason": ".FART [degen]: Dilewati karena red flag: bundler pegang 60% supply."
     }
   },
   "strategy": {
@@ -1352,6 +1352,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791281202716,
+        "symbol": ".FART",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 60% supply."
+      },
       {
         "at": 1791279633863,
         "symbol": "$ROKHA",
@@ -2545,29 +2563,12 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets have very low winrates (30-33%) and negative median gains (-5%), with the better one only marginally positive on our single copy; high churn and ve. Tidak dimasuki."
-      },
-      {
-        "at": 1791259696079,
-        "symbol": "SLOP",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah naik 121% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 84,
-        "red_flag": 131,
+        "red_flag": 132,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2611,7 +2612,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791280912831,
+    "generatedAt": 1791281212082,
     "trades": {
       "count": 28,
       "wins": 10,
