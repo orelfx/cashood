@@ -14,6 +14,7 @@
  * yang sama, `true_usd ?? usd`.
  */
 
+import { buildPeakDrawdown } from './lib/peak-drawdown.mjs';
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -378,6 +379,12 @@ const closedAll = (tracking.entries || []).filter((e) => Number.isFinite(Date.pa
   };
 }).sort((a, b) => b.closedAt - a.closedAt);
 snapshot.closedRecent = closedAll.slice(0, 20);
+// Puncak & titik terendah tiap posisi (bot mencatatnya sejak 6 Okt 2026); dari
+// arsip Cashood, jadi tidak terbatas 200 penutupan terakhir di berkas bot.
+snapshot.peakDrawdown = buildPeakDrawdown(tracking.entries || [], (e) => {
+  const opened = state.positions?.[e.position]?.deployed_at;
+  return opened ? Date.parse(opened) : null;
+});
 snapshot.tradesAll = closedAll;
 snapshot.tradesFlatBand = 0.05;
 snapshot.stats.closedCount = closedAll.length;

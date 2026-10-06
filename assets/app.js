@@ -444,6 +444,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     seats: snap.seats || null,                   // kursi per buku (Reborn)
     paperBooks: snap.paperBooks || null,         // buku kertas pembanding (Reborn hot potato)
     copyTrade: snap.copyTrade || null,           // segmen wallet & jejak keputusan (SnipeHunt)
+    peakDrawdown: snap.peakDrawdown || null,     // puncak & titik terendah posisi LP (Meridian)
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -1318,6 +1319,49 @@ function stratDetails(r, extra = []) {
     f.riskUsd != null ? `<div class="sub2">risiko awal menurut bot ${usd(f.riskUsd)}</div>` : '',
   ].join('');
   return more ? `<details class="fx-det"><summary>${esc(shortStrategy(r))}</summary>${more}</details>` : `<b>${esc(shortStrategy(r))}</b>`;
+}
+
+/**
+ * Puncak & titik terendah posisi LP (Meridian, sejak 6 Okt 2026). Persen basis
+ * SOL, sama dengan hasil akhir bot. Titik terendah yang tidak diketahui tampil
+ * "—", tidak pernah 0.
+ */
+const pdView = { all: false };
+function renderPeakDrawdown(nav) {
+  const pd = nav?.peakDrawdown;
+  const card = $('#pdCard');
+  if (!card) return;
+  card.hidden = !pd;
+  if (!pd) return;
+  const p = (v) => (v == null ? '<span class="dim">—</span>' : `<span class="${cls(v)}">${v > 0 ? '+' : ''}${pct(v)}</span>`);
+  const note = `<p class="hint">Data puncak &amp; titik terendah dikumpulkan sejak 6 Oktober 2026. Persen dihitung dengan basis SOL, sama seperti hasil akhir bot — bukan dolar. Kolom puncak dan terendah: rata-rata · median. <b>Pulih ≤−10%</b> = sempat turun 10% atau lebih tapi akhirnya ditutup untung.</p>`;
+  if (!pd.rows?.length) { setHTML($('#pdBody'), note + '<p class="dim">Belum ada posisi yang ditutup sejak pencatatan dimulai.</p>'); return; }
+  const head = '<tr><th>Kelompok</th><th class="num">Ditutup</th><th class="num" title="rata-rata · median">Puncak</th><th class="num" title="rata-rata · median">Terendah</th><th class="num">Terburuk</th><th class="num" title="sempat turun ≤ −10% tapi akhirnya ditutup untung">Pulih ≤−10%</th><th class="num">Median hasil</th></tr>';
+  const row = (g) => `<tr><td class="mc-head"><b>${esc(g.label)}</b></td>
+    <td class="num" data-k="Ditutup">${g.closes}</td>
+    <td class="num" data-k="Puncak (rata² · median)">${p(g.avgPeak)} · ${p(g.medPeak)}</td>
+    <td class="num" data-k="Terendah (rata² · median)">${p(g.avgDd)} · ${p(g.medDd)}${g.ddKnown < g.closes ? `<div class="sub2">${g.ddKnown}/${g.closes} tercatat</div>` : ''}</td>
+    <td class="num" data-k="Terendah terburuk">${p(g.worstDd)}</td>
+    <td class="num" data-k="Pulih dari ≤ −10%">${g.recovered}</td>
+    <td class="num" data-k="Median hasil akhir">${p(g.medClose)}</td></tr>`;
+  const rows = pdView.all ? pd.rows : pd.rows.slice(0, 15);
+  setHTML($('#pdBody'), `${note}
+    <h3 class="sub-h">Per basket</h3>
+    <div class="table-scroll"><table class="mcards pd-tbl"><thead>${head}</thead><tbody>${pd.books.map(row).join('')}</tbody></table></div>
+    <h3 class="sub-h">Per koin <span class="dim">(minimal 3 posisi ditutup)</span></h3>
+    ${pd.coins.length ? `<div class="table-scroll"><table class="mcards pd-tbl"><thead>${head.replace('Kelompok', 'Koin')}</thead><tbody>${pd.coins.map(row).join('')}</tbody></table></div>` : '<p class="dim">Belum ada koin dengan 3 posisi ditutup atau lebih.</p>'}
+    <h3 class="sub-h">Per posisi</h3>
+    <div class="table-scroll"><table class="mcards pd-tbl"><thead><tr><th>Koin</th><th>Basket</th><th class="num">Hasil akhir</th><th class="num">Puncak</th><th class="num">Terendah</th><th>Duluan</th><th>Alasan tutup</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr><td class="mc-head"><b>${esc(r.symbol)}</b><div class="sub2">${tglRingkas(r.closedAt)}${r.netUsd != null ? ` · ${signed(r.netUsd)}` : ''}</div></td>
+      <td data-k="Basket">${esc(r.bookLabel)}</td>
+      <td class="num" data-k="Hasil akhir">${p(r.closePct)}</td>
+      <td class="num" data-k="Puncak">${p(r.peakPct)}${r.peakAt ? `<div class="sub2">${tglRingkas(r.peakAt)}</div>` : ''}</td>
+      <td class="num" data-k="Terendah">${p(r.ddPct)}${r.partial ? ' <span class="pill warn" title="titik terendah mulai dicatat setelah posisi dibuka">parsial</span>' : ''}${r.ddAt ? `<div class="sub2">${tglRingkas(r.ddAt)}</div>` : ''}</td>
+      <td data-k="Duluan">${r.first ? (r.first === 'puncak' ? 'puncak dulu' : r.first === 'terendah' ? 'terendah dulu' : 'bersamaan') : '<span class="dim">—</span>'}</td>
+      <td class="mc-wide" data-k="Alasan tutup">${r.exitDetail ? `<span class="fx-why">${esc(r.exitDetail)}</span>` : '<span class="dim">—</span>'}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${pd.rows.length > 15 ? `<button class="btn ghost dec-more" id="pdMore">${pdView.all ? 'sembunyikan' : `tampilkan semua ${pd.rows.length} posisi`}</button>` : ''}`);
+  if ($('#pdMore')) $('#pdMore').onclick = () => { pdView.all = !pdView.all; renderPeakDrawdown(nav); };
 }
 
 /** Biaya langganan bulanan. Dibayar dari luar wallet, jadi tidak masuk NAV. */
@@ -4049,6 +4093,7 @@ function renderAll() {
   hideEmptyCards(state.nav);
   renderSummary(state.ledger, state.nav);
   renderPaper(state.nav);
+  renderPeakDrawdown(state.nav);
   // Tab Analys membaca blok kinerja dari snapshot; kalau tab itu yang sedang
   // terbuka saat data tiba, ia harus digambar ulang — bukan tertinggal kosong.
   if (currentTab === 'analys' && state.view === 'fund') renderAnalys();
