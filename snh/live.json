@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ae2e9a61-4a47-488e-a836-50295b1fc08e",
-  "updatedAt": 1791295609580,
-  "generatedAt": "2026-10-06 21:06 WIB",
+  "generation": "bb230f56-6b32-46c7-97d9-65792609ffae",
+  "updatedAt": 1791295909597,
+  "generatedAt": "2026-10-06 21:11 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791295609580,
+    "heartbeatAt": 1791295909597,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791295605722,
+    "lastScanAt": 1791295905319,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1101,7 +1101,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "256",
+        "v": "258",
         "n": "24 jam · 35 diveto LLM"
       },
       {
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791295609580,
+      "lastDecisionAt": 1791295909597,
       "lastAction": "keputusan",
-      "lastReason": "CHONK [low]: Dilewati: harga sudah naik 473% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      "lastReason": "Snow [degen]: Dilewati: harga sudah naik 41% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
     }
   },
   "strategy": {
@@ -1352,6 +1352,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791295880566,
+        "symbol": "Snow",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah naik 41% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      },
+      {
+        "at": 1791295686911,
+        "symbol": "CHONK",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah naik 130% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
+      {
+        "at": 1791295647161,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $3638."
+      },
       {
         "at": 1791295081329,
         "symbol": "CHONK",
@@ -2088,76 +2125,11 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah naik 37% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791273958065,
-        "symbol": "CLAUDIA",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 9x."
-      },
-      {
-        "at": 1791273510231,
-        "symbol": "APU",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah naik 118% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791272199861,
-        "symbol": "RAM",
-        "action": "exit",
-        "basket": "mid",
-        "wallets": {
-          "smart": 4,
-          "dolphin": 1,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 38.6%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 7.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 10,
-            "note": "sniper awal masih pegang 1.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "21.0% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 1.1%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 10x likuiditas"
-          }
-        ],
-        "reason": "Keluar (stop): Harga turun sampai batas stop 18% setelah 3 menit; puncak sempat +6%. Hasil -24,3%."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 77,
+        "chase": 79,
         "red_flag": 121,
         "round_trip_cost": 0,
         "basket_full": 0,
@@ -2202,7 +2174,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791295653448,
+    "generatedAt": 1791295918068,
     "trades": {
       "count": 28,
       "wins": 10,
