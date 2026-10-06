@@ -683,13 +683,21 @@ function renderOwners(rows) {
   setHTML($('#unitHint'), `${num(state.ledger.totalUnits, 2)} unit beredar · 1 unit = ${usd(state.ledger.totalUnits > 0 ? state.nav.totalUsd / state.ledger.totalUnits : 0, 4)}`);
 }
 
+// Lama/umur dalam kata yang jelas ("2 jam 15 mnt", "1 hari 3 jam") — format
+// lama "1h 0j" terbaca seperti "1 jam".
 const dur = (minutes) => {
   const m = Math.max(0, Math.round(Number(minutes) || 0));
-  if (m < 60) return m + 'm';
+  if (m < 60) return m + ' mnt';
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}j ${m % 60}m`;
-  return `${Math.floor(h / 24)}h ${h % 24}j`;
+  if (h < 24) return `${h} jam${m % 60 ? ` ${m % 60} mnt` : ''}`;
+  return `${Math.floor(h / 24)} hari${h % 24 ? ` ${h % 24} jam` : ''}`;
 };
+// Umur posisi + kapan dibuka (dihitung dari umur saat snapshot dibuat).
+function ageHtml(r, nav) {
+  if (!Number.isFinite(Number(r.ageMinutes)) || r.ageMinutes === null) return '<span class="dim">—</span>';
+  const opened = nav?.updatedAt ? nav.updatedAt - Number(r.ageMinutes) * 60000 : null;
+  return `${dur(r.ageMinutes)}${opened ? `<div class="sub2">sejak ${tglRingkas(opened)}</div>` : ''}`;
+}
 
 let holdPage = 0;
 const HOLD_PER_PAGE = 5;
@@ -788,20 +796,20 @@ function renderLp(nav) {
     .map((r) => {
       const band = r.throughBandPct == null ? '' : `<span class="band">${r.throughBandPct.toFixed(0)}%</span>`;
       return `<tr>
-        <td><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? r.tokenId)}</span>
+        <td class="mc-head"><span class="who"><span class="chip" style="background:${r.inRange ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? r.tokenId)}</span>
             <div class="sub2">${esc(r.bookLabel ?? r.strategy ?? '')}${r.feePct ? ' · fee ' + r.feePct + '%' : ''}</div>
             ${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}
             ${r.thesis ? `<details class="fx-det lp-why"><summary>Alasan buka</summary><p class="fx-why">${esc(r.thesis)}</p></details>` : ''}
             <div class="sub2 m-only ${r.inRange ? 'pos' : 'neg'}">${r.inRange ? 'di dalam range' : 'di luar range'}${
               r.throughBandPct == null ? '' : ' · ' + r.throughBandPct.toFixed(0) + '%'}</div></td>
-        <td><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
-        <td class="num dim">${dur(r.ageMinutes)}</td>
-        <td class="num">${r.investedUsd == null ? '<span class="dim">—</span>' : usd(r.investedUsd)}</td>
-        <td class="num"><strong>${r.valueUsd == null ? '—' : usd(r.valueUsd)}</strong></td>
-        <td class="num pos">${usd((r.totalFeesUsd ?? r.feesUsd) || 0)}<div class="sub2">${
+        <td data-k="Status"><span class="pill ${r.inRange ? 'in' : 'out2'}">${r.inRange ? 'di dalam range' : 'di luar range'}</span> ${band}</td>
+        <td class="num" data-k="Umur">${ageHtml(r, nav)}</td>
+        <td class="num" data-k="Modal">${r.investedUsd == null ? '<span class="dim">—</span>' : usd(r.investedUsd)}</td>
+        <td class="num" data-k="Nilai"><strong>${r.valueUsd == null ? '—' : usd(r.valueUsd)}</strong></td>
+        <td class="num pos" data-k="Total fee">${usd((r.totalFeesUsd ?? r.feesUsd) || 0)}<div class="sub2">${
           r.collectedFeesUsd > 0 ? `${usd(r.collectedFeesUsd)} dipanen` : 'belum dipanen'
         }</div></td>
-        <td class="num ${cls(r.pnlUsd)}">${r.pnlUsd == null ? '—' : signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
+        <td class="num ${cls(r.pnlUsd)}" data-k="Untung / rugi">${r.pnlUsd == null ? '—' : signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
       </tr>`;
     }).join(''));
 
@@ -888,13 +896,13 @@ function closedRowsHtml(rows, absolute) {
   const tone = (r) => (r.netUsd != null ? r.netUsd : r.netPct);
   return rows.map((r) => `
     <tr>
-      <td><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
-      <td class="dim">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}${modeBadge(r) ? `<div>${modeBadge(r)}</div>` : ''}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
-      <td class="num dim">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
-      <td class="num ${cls(r.netUsd ?? r.estUsd)}">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
-      <td class="num ${cls(tone(r))}">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
-      <td class="dim">${reasonCell(r)}</td>
-      <td class="num dim nowrap">${absolute ? tglRingkas(r.closedAt) : ago(r.closedAt)}</td>
+      <td class="mc-head"><span class="who"><span class="chip" style="background:${tone(r) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol ?? '—')}</span></td>
+      <td class="dim mc-wide" data-k="Strategi">${esc(r.bookLabel ?? r.strategy ?? '—')}${entryNote(r) ? `<div class="sub2">${esc(entryNote(r))}</div>` : ''}${modeBadge(r) ? `<div>${modeBadge(r)}</div>` : ''}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
+      <td class="num dim" data-k="Lama">${r.holdMinutes == null ? '—' : dur(r.holdMinutes)}</td>
+      <td class="num ${cls(r.netUsd ?? r.estUsd)}" data-k="Hasil">${r.netUsd != null ? signed(r.netUsd) : r.estUsd != null ? `<span title="perkiraan: ukuran posisi × persen × harga saat dicatat">≈${signed(r.estUsd)}</span>` : '<span class="dim">—</span>'}</td>
+      <td class="num ${cls(tone(r))}" data-k="%">${r.netPct == null ? '—' : (r.netPct > 0 ? '+' : '') + pct(r.netPct)}</td>
+      <td class="dim mc-wide" data-k="Alasan">${reasonCell(r)}</td>
+      <td class="num dim nowrap" data-k="Ditutup">${absolute ? tglRingkas(r.closedAt) : ago(r.closedAt)}</td>
     </tr>`).join('');
 }
 // "1 Okt 13:14" (WIB); tahun hanya ditulis kalau bukan tahun ini.
@@ -1206,27 +1214,27 @@ function renderTrades(nav) {
     ].join('')}` : '');
     setHTML($('#lpHead'), '<tr><th>Pair</th><th>Strategi</th><th class="num">Umur</th><th class="num">Entry</th><th class="num">Harga sekarang</th><th class="num">SL / TP</th><th class="num">Floating</th></tr>');
     setHTML(body, rows.map((r) => `<tr>
-      <td><span class="who"><span class="chip" style="background:${r.direction === 'LONG' ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span></td>
-      <td class="fx-strat"><span class="pill ${r.direction === 'LONG' ? 'in' : 'out2'}">${r.direction === 'LONG' ? 'BELI' : 'JUAL'}</span> ${stratDetails(r, [`${r.lot ?? '—'} lot`])}</td>
-      <td class="num dim">${dur(r.ageMinutes)}</td>
-      <td class="num">${r.entryPrice ?? '—'}</td><td class="num ${r.priceUsd ? '' : 'dim'}">${r.priceUsd ?? '—'}</td>
-      <td class="num"><span class="neg">${r.slPrice ?? '—'}</span> / <span class="pos">${r.tpPrice ?? '—'}</span></td>
-      <td class="num ${r.floatingUsd == null ? 'dim' : cls(r.floatingUsd)}">${r.floatingUsd == null ? 'di equity' : `<b>${signed(r.floatingUsd)}</b>`}</td></tr>`).join(''));
+      <td class="mc-head"><span class="who"><span class="chip" style="background:${r.direction === 'LONG' ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span></td>
+      <td class="fx-strat mc-wide" data-k="Strategi"><span class="pill ${r.direction === 'LONG' ? 'in' : 'out2'}">${r.direction === 'LONG' ? 'BELI' : 'JUAL'}</span> ${stratDetails(r, [`${r.lot ?? '—'} lot`])}</td>
+      <td class="num" data-k="Umur">${ageHtml(r, nav)}</td>
+      <td class="num" data-k="Entry">${r.entryPrice ?? '—'}</td><td class="num ${r.priceUsd ? '' : 'dim'}" data-k="Harga sekarang">${r.priceUsd ?? '—'}</td>
+      <td class="num" data-k="SL / TP"><span class="neg">${r.slPrice ?? '—'}</span> / <span class="pos">${r.tpPrice ?? '—'}</span></td>
+      <td class="num ${r.floatingUsd == null ? 'dim' : cls(r.floatingUsd)}" data-k="Floating">${r.floatingUsd == null ? 'di equity' : `<b>${signed(r.floatingUsd)}</b>`}</td></tr>`).join(''));
     $('#lpHint').textContent = `harga masuk · SL / TP · nilai berjalan sudah termasuk di nilai akun · ${ago(nav.updatedAt)}`;
     return;
   }
   setHTML(body, [...rows].sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)).map((r) => `<tr>
-      <td><span class="who"><span class="chip" style="background:${r.pnlUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span>
+      <td class="mc-head"><span class="who"><span class="chip" style="background:${r.pnlUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span>
         ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}${r.stale ? '<div class="sub2 neg">harga belum terverifikasi</div>' : ''}</td>
-      <td class="fx-strat">${stratDetails({ ...r, bookLabel: r.bookLabel || '—' }, [r.strategy && r.strategy !== r.bookLabel ? r.strategy : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.partialDone ? 'sebagian sudah dijual' : '',
+      <td class="fx-strat mc-wide" data-k="Rencana">${stratDetails({ ...r, bookLabel: r.bookLabel || '—' }, [r.strategy && r.strategy !== r.bookLabel ? r.strategy : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.partialDone ? 'sebagian sudah dijual' : '',
           r.firstWallet ? `pertama beli: ${r.firstWallet}` : '', r.llmScore != null ? `skor LLM ${r.llmScore}` : ''])}
         ${modeBadge(r)}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
-      <td class="num dim">${dur(r.ageMinutes)}</td>
-      <td class="num">${usd(r.costUsd)}</td>
-      <td class="num"><strong>${usd(r.valueUsd)}</strong></td>
-      <td class="num">${r.stopPct == null && r.targetPct == null ? '<span class="dim">belum diisi bot</span>'
+      <td class="num" data-k="Umur">${ageHtml(r, nav)}</td>
+      <td class="num" data-k="Modal">${usd(r.costUsd)}</td>
+      <td class="num" data-k="Nilai jual"><strong>${usd(r.valueUsd)}</strong></td>
+      <td class="num" data-k="Stop / target">${r.stopPct == null && r.targetPct == null ? '<span class="dim">belum diisi bot</span>'
         : `<span class="neg">${r.stopPct == null ? '—' : '−' + pct(r.stopPct, 1)}</span> / <span class="pos">${r.targetPct == null ? '—' : '+' + pct(r.targetPct, 1)}</span>`}</td>
-      <td class="num ${cls(r.pnlUsd)}">${signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
+      <td class="num ${cls(r.pnlUsd)}" data-k="Untung / rugi">${signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
     </tr>`).join(''));
   $('#lpHint').textContent = `nilai = hasil jual bersih menurut quote · dihitung ${ago(nav.updatedAt)}`
     + (rows.some((p) => p.stale) ? ' · ada harga yang belum diperbarui' : '');
@@ -1269,20 +1277,21 @@ function renderFutures(nav, rows, body, tile) {
     tile('Kalau semua kena TP', signed(atTp), `untung maksimal · ${ofEq(atTp)}`, 'pos'),
     tile('Floating sekarang', signed(fl), `real-time${fx ? ' dari MT5' : ''} · ${rows.length} posisi`, cls(fl)),
   ].join('')}`);
-  setHTML($('#lpHead'), `<tr><th>Pair</th><th>Strategi</th><th class="num">${fx ? (marginKnown.length ? 'Lot · margin' : 'Lot · kontrak') : 'Ukuran · margin'}</th><th class="num">${fx ? 'Entry → sekarang' : 'Entry → mark'}</th><th class="num">SL / TP</th><th class="num">${fx ? 'Floating' : 'Untung / rugi'}</th></tr>`);
+  setHTML($('#lpHead'), `<tr><th>Pair</th><th>Strategi</th><th class="num">Umur</th><th class="num">${fx ? (marginKnown.length ? 'Lot · margin' : 'Lot · kontrak') : 'Ukuran · margin'}</th><th class="num">${fx ? 'Entry → sekarang' : 'Entry → mark'}</th><th class="num">SL / TP</th><th class="num">${fx ? 'Floating' : 'Untung / rugi'}</th></tr>`);
   const px = (v) => (v == null ? '—' : Number(v) < 1 ? Number(v).toPrecision(4) : Number(v).toLocaleString('en-US', { maximumFractionDigits: 4 }));
   setHTML(body, [...rows].sort((a, b) => (a.ageMinutes ?? 0) - (b.ageMinutes ?? 0)).map((r) => { const f = r.futures || {}; const long = r.direction === 'LONG';
     const sl = move(r, r.slPrice), tp = move(r, r.tpPrice);
     return `<tr>
-      <td><b>${esc(r.symbol)}</b>${fx ? '' : '<span class="dim">USDT</span>'}
+      <td class="mc-head"><b>${esc(r.symbol)}</b>${fx ? '' : '<span class="dim">USDT</span>'}
         <div class="sub2"><span class="pill ${long ? 'in' : 'out2'}">${fx ? (long ? 'BELI' : 'JUAL') : long ? 'LONG' : 'SHORT'}</span>${f.leverage ? ` <span class="pill">${f.leverage}×</span>` : ''}</div>
         <div class="sub2 m-only">${esc(shortStrategy(r))} · ${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}</div></td>
-      <td class="fx-strat">${stratDetails(r, [f.timeframe, f.exploration ? 'mode eksplorasi' : ''])}</td>
-      <td class="num">${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">${f.marginUsd != null ? 'margin ' + usd(f.marginUsd) : fx && f.notionalUsd != null ? 'kontrak ' + usd(f.notionalUsd, 0) : 'margin —'}</div></td>
-      <td class="num">${px(r.entryPrice)}<div class="sub2">${f.markPrice ? '→ ' + px(f.markPrice) : '→ —'}</div></td>
-      <td class="num"><div class="fx-px"><span class="neg">${px(r.slPrice)}</span> / <span class="pos">${px(r.tpPrice)}</span></div>
+      <td class="fx-strat mc-wide" data-k="Strategi">${stratDetails(r, [f.timeframe, f.exploration ? 'mode eksplorasi' : ''])}</td>
+      <td class="num" data-k="Umur">${ageHtml(r, nav)}</td>
+      <td class="num" data-k="${fx ? 'Lot' : 'Ukuran'}">${fx ? `${r.lot ?? '—'} lot` : f.notionalUsd != null ? usd(f.notionalUsd, 0) : '—'}<div class="sub2">${f.marginUsd != null ? 'margin ' + usd(f.marginUsd) : fx && f.notionalUsd != null ? 'kontrak ' + usd(f.notionalUsd, 0) : 'margin —'}</div></td>
+      <td class="num" data-k="Entry → ${fx ? 'sekarang' : 'mark'}">${px(r.entryPrice)}<div class="sub2">${f.markPrice ? '→ ' + px(f.markPrice) : '→ —'}</div></td>
+      <td class="num" data-k="SL / TP"><div class="fx-px"><span class="neg">${px(r.slPrice)}</span> / <span class="pos">${px(r.tpPrice)}</span></div>
         <div class="sub2 fx-pot"><span class="neg">${signed(sl)}</span><i> / </i><span class="pos">${signed(tp)}</span></div></td>
-      <td class="num ${f.unrealizedUsd == null ? '' : cls(f.unrealizedUsd)}">${f.unrealizedUsd == null ? '<span class="dim">—</span><div class="sub2">menunggu bot</div>'
+      <td class="num ${f.unrealizedUsd == null ? '' : cls(f.unrealizedUsd)}" data-k="${fx ? 'Floating' : 'Untung / rugi'}">${f.unrealizedUsd == null ? '<span class="dim">—</span><div class="sub2">menunggu bot</div>'
         : `<b>${signed(f.unrealizedUsd)}</b><div class="sub2 ${cls(f.unrealizedUsd)}">${f.marginUsd ? 'ROE ' + (f.unrealizedUsd >= 0 ? '+' : '') + pct((f.unrealizedUsd / f.marginUsd) * 100, 1) : ''}</div>`}</td>
     </tr>`; }).join(''));
   $('#lpHint').textContent = fx ? `akun demo MT5 · SL/TP dihitung dari risiko awal bot · floating dari MT5 · ${ago(nav.updatedAt)}` : `SL/TP dari harga entry × ukuran, sebelum biaya · floating per posisi ${rows.some((r) => r.futures?.unrealizedUsd != null) ? 'dari bot' : 'belum dikirim bot (total akun tetap benar)'} · ${ago(nav.updatedAt)}`;

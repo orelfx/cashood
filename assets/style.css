@@ -1351,3 +1351,40 @@ td .fx-det summary { color: var(--text); font-weight: 500; }
 .pill.test { color: #c084fc; border-color: #3b2a4f; background: #1a1224; }
 .mode-pill { margin: 4px 4px 0 0; display: inline-block; }
 .rs-chip.test { border-color: #3b2a4f; background: #1a1224; color: #d8b4fe; }
+
+/* ══ HP: tabel posisi & riwayat jadi kartu lengkap (2026-10-06) ══
+   Semua kolom tampil dengan labelnya — tidak ada yang disembunyikan. Label
+   duduk di kiri, nilainya (boleh beberapa baris) rata kanan. */
+@media (max-width: 640px) {
+  #lpTable.mcards td:nth-child(n), #closedTable.mcards td:nth-child(n) {
+    display: block; position: relative; text-align: right; padding: 6px 0 6px 42%; min-height: 26px; white-space: normal; }
+  #lpTable.mcards td[data-k]::before, #closedTable.mcards td[data-k]::before {
+    position: absolute; left: 0; top: 7px; max-width: 40%; text-align: left; }
+  #lpTable.mcards td.mc-head, #closedTable.mcards td.mc-head { padding: 0 0 6px; text-align: left; grid-column: 1 / -1; }
+  #lpTable.mcards td.mc-wide, #closedTable.mcards td.mc-wide { grid-column: 1 / -1; text-align: left; padding-left: 0; padding-top: 22px; }
+  #lpTable.mcards td.mc-wide::before, #closedTable.mcards td.mc-wide::before { top: 4px; max-width: none; }
+  #lpTable.mcards tr, #closedTable.mcards tr { grid-template-columns: 1fr; gap: 0; padding: 14px 4px; }
+  #lpTable.mcards .m-only, #closedTable.mcards .m-only { display: none !important; }
+  #lpTable.mcards .fx-px { display: block; }
+  #lpTable.mcards .fx-pot span { display: inline; }
+  #lpTable.mcards .fx-pot i { display: inline; }
+  #lpTable.mcards .sub2.why, #closedTable.mcards .sub2.why, #lpTable.mcards .fx-why, #closedTable.mcards .fx-why { max-width: none; }
+  #lpTable.mcards .band { display: inline; margin-left: 6px; }
+  #lpTable.mcards td + td, #closedTable.mcards td + td { border-top: 1px dashed rgba(255,255,255,.05); }
+}
+/* Kartu HP versi ringkas: label kecil di atas nilai, dua kolom per baris. */
+@media (max-width: 640px) {
+  #lpTable.mcards tr, #closedTable.mcards tr { grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 14px 4px; }
+  #lpTable.mcards td:nth-child(n), #closedTable.mcards td:nth-child(n) { padding: 0; text-align: left; min-height: 0; border-top: 0; }
+  #lpTable.mcards td[data-k]::before, #closedTable.mcards td[data-k]::before {
+    position: static; display: block; max-width: none; margin-bottom: 2px; font: 500 10.5px var(--sans); letter-spacing: .3px; text-transform: uppercase; }
+  #lpTable.mcards td.mc-wide, #closedTable.mcards td.mc-wide { padding-top: 0; }
+  #lpTable.mcards td .sub2, #closedTable.mcards td .sub2 { text-align: left; }
+  .mcards .wchips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .mcards .wchip, .mcards .fchip { display: inline-flex; align-items: center; gap: 3px; }
+  #lpSummary.stats { grid-template-columns: 1fr 1fr; }
+  #lpSummary.stats .stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  #closedTable.mcards td:nth-child(n) { max-width: none; min-width: 0; }
+}
