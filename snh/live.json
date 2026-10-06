@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d9b3290d-3d10-4f6d-a543-229b02b7e63b",
-  "updatedAt": 1791283909266,
-  "generatedAt": "2026-10-06 17:51 WIB",
+  "generation": "ef4a292d-18bd-435b-ad66-4718ebeaf3e3",
+  "updatedAt": 1791284209267,
+  "generatedAt": "2026-10-06 17:56 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791283909266,
+    "heartbeatAt": 1791284209267,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791283908928,
+    "lastScanAt": 1791284207399,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1101,8 +1101,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "281",
-        "n": "24 jam · 37 diveto LLM"
+        "v": "282",
+        "n": "24 jam · 38 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791283909266,
+      "lastDecisionAt": 1791284209267,
       "lastAction": "keputusan",
-      "lastReason": "MultiStonks [degen]: Dilewati: harga sudah naik 59% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
+      "lastReason": "MultiStonks [degen]: Diveto LLM: memeqi carries a trojan tag (known pump-dumper) and smart #161 has 17 catastrophic losses vs 0 over-5x wins despite 90 tokens traded, indicating poor risk-reward . Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1352,6 +1352,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791284148062,
+        "symbol": "MultiStonks",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 335,
+            "note": "bundler pegang 10.9%"
+          },
+          {
+            "type": "rat",
+            "count": 3,
+            "note": "insider/entrapment pegang 0.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 447,
+            "note": "10.6% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 34x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: memeqi carries a trojan tag (known pump-dumper) and smart #161 has 17 catastrophic losses vs 0 over-5x wins despite 90 tokens traded, indicating poor risk-reward . Tidak dimasuki."
+      },
+      {
+        "at": 1791284061882,
+        "symbol": "AOA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
       {
         "at": 1791283528020,
         "symbol": "MultiStonks",
@@ -2473,76 +2516,12 @@
           }
         ],
         "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 51 menit. Hasil +0,7%."
-      },
-      {
-        "at": 1791260426280,
-        "symbol": "Ash",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 12.0%"
-          },
-          {
-            "type": "rat",
-            "count": 8,
-            "note": "insider/entrapment pegang 10.3%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "18.3% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,15, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791259966581,
-        "symbol": "TERMINAL",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 10.5%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 7.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "14.9% holder wallet baru"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,78, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 80,
-        "red_flag": 131,
+        "chase": 79,
+        "red_flag": 132,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2553,7 +2532,7 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 37
+        "llm": 38
       },
       "test": {
         "solo": 14,
@@ -2586,7 +2565,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791283962717,
+    "generatedAt": 1791284219584,
     "trades": {
       "count": 28,
       "wins": 10,
