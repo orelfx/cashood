@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "370b5c5d-b597-4062-a514-2821cb072572",
-  "updatedAt": 1791263809112,
-  "generatedAt": "2026-10-06 12:16 WIB",
+  "generation": "f23ba48e-23b0-4253-9999-60acc3e8ee7d",
+  "updatedAt": 1791264109112,
+  "generatedAt": "2026-10-06 12:21 WIB",
   "usdIdr": null,
   "totalUsd": 977.1113911297434,
   "nativeSymbol": "SOL",
@@ -1067,12 +1067,12 @@
     "pnlUsd": -22.888608870256576,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791263809112,
+    "heartbeatAt": 1791264109112,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 3.2,
-    "lastScanAt": 1791263806446,
+    "lastScanAt": 1791264105341,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1093,7 +1093,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "297",
+        "v": "298",
         "n": "24 jam · 32 diveto LLM"
       },
       {
@@ -1109,9 +1109,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791263809112,
+      "lastDecisionAt": 1791264109112,
       "lastAction": "keputusan",
-      "lastReason": "CNDR [mid]: Dilewati karena red flag: 10 holder terbesar pegang 77%."
+      "lastReason": "CNDR [mid]: Dilewati karena red flag: 10 holder terbesar pegang 76%."
     }
   },
   "strategy": {
@@ -1344,6 +1344,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791264004021,
+        "symbol": "CNDR",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
+      },
       {
         "at": 1791263398088,
         "symbol": "CNDR",
@@ -2317,44 +2334,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 8."
-      },
-      {
-        "at": 1791249647622,
-        "symbol": "MENTOR",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 428,
-            "note": "bundler pegang 10.7%"
-          },
-          {
-            "type": "rat",
-            "count": 10,
-            "note": "insider/entrapment pegang 0.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 603,
-            "note": "6.9% holder wallet baru"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 1 menit. Hasil -0,7%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 92,
-        "red_flag": 135,
+        "red_flag": 136,
         "round_trip_cost": 5,
         "basket_full": 0,
         "slippage": 0,
@@ -2398,7 +2383,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791263862435,
+    "generatedAt": 1791264114116,
     "trades": {
       "count": 23,
       "wins": 9,
