@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "98002ac2-271f-4c12-9f6e-efe7765b6bd4",
-  "updatedAt": 1791318963387,
-  "generatedAt": "2026-10-07 03:36 WIB",
+  "generation": "93f8660a-f842-47b0-87fd-5aa441451255",
+  "updatedAt": 1791319263387,
+  "generatedAt": "2026-10-07 03:41 WIB",
   "usdIdr": null,
   "totalUsd": 959.7590183270627,
   "nativeSymbol": "SOL",
@@ -207,16 +207,15 @@
       "reason": "stop loss",
       "reasonDetail": "Stop di titik impas setelah profit sebagian diamankan. · ikut 3 wallet",
       "feesUsd": 0.44999999999999996,
-      "entry": "3 wallet terverifikasi (1 bot · 2 dolphin) membeli dalam 5 menit (batas 60 menit). Masuk di -15% dari harga beli wallet yang diikuti (di dalam zona beli), semua cek red flag lolos; tanda kecil (rat, sniper, fresh, dev) masih di bawah batas. Beli bertahap: 50% saat sinyal; sisanya menunggu dip 10% di",
+      "entry": "3 wallet terverifikasi (3 dolphin) membeli dalam 5 menit (batas 60 menit). Masuk di -15% dari harga beli wallet yang diikuti (di dalam zona beli), semua cek red flag lolos; tanda kecil (rat, sniper, fresh, dev) masih di bawah batas. Beli bertahap: 50% saat sinyal; sisanya menunggu dip 10% di bawah b",
       "exitDetail": "Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 0 menit.",
       "walletsSold": {
-        "bot": 1
+        "dolphin": 1
       },
       "modeLabel": "konsensus",
       "mode": "consensus",
       "wallets": {
-        "bot": 1,
-        "dolphin": 2
+        "dolphin": 3
       },
       "flags": [
         {
@@ -1099,12 +1098,12 @@
     "pnlUsd": -40.24098167293732,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791318963387,
+    "heartbeatAt": 1791319263387,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.92,
-    "lastScanAt": 1791318959708,
+    "lastScanAt": 1791319259129,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1125,25 +1124,25 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "245",
+        "v": "242",
         "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1676",
-        "n": "164 aktif"
+        "n": "166 aktif"
       },
       {
         "k": "Buka · tutup",
-        "v": "20 · 21",
+        "v": "19 · 20",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791318963387,
+      "lastDecisionAt": 1791319263387,
       "lastAction": "keputusan",
-      "lastReason": "TWEETCRAFT [low]: Dilewati karena red flag: 10 holder terbesar pegang 72%."
+      "lastReason": "ABU [low]: Dilewati karena red flag: insider/entrapment pegang 25%."
     }
   },
   "strategy": {
@@ -1162,7 +1161,7 @@
       ],
       [
         "Wallet dipantau",
-        "1676 · 164 aktif"
+        "1676 · 166 aktif"
       ],
       [
         "Cadangan kas",
@@ -1174,7 +1173,7 @@
       ],
       [
         "Label wallet",
-        "smart 513 · dolphin 64 · bot 885 · blacklist 78 · lp 1 · fresh 27 · kol 106 · whale 2"
+        "smart 512 · dolphin 65 · bot 885 · blacklist 78 · lp 1 · fresh 27 · kol 106 · whale 2"
       ]
     ],
     "requirements": [
@@ -1223,8 +1222,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1676,
-      "active": 164,
-      "passive": 1512,
+      "active": 166,
+      "passive": 1510,
       "trusted": 2,
       "promising": 13,
       "byLabel": [
@@ -1236,9 +1235,9 @@
         },
         {
           "key": "smart",
-          "total": 513,
-          "active": 122,
-          "passive": 391
+          "total": 512,
+          "active": 123,
+          "passive": 389
         },
         {
           "key": "kol",
@@ -1254,8 +1253,8 @@
         },
         {
           "key": "dolphin",
-          "total": 64,
-          "active": 27,
+          "total": 65,
+          "active": 28,
           "passive": 37
         },
         {
@@ -1379,6 +1378,16 @@
     },
     "decisions": [
       {
+        "at": 1791319046511,
+        "symbol": "ABU",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 25%."
+      },
+      {
         "at": 1791318742898,
         "symbol": "TWEETCRAFT",
         "action": "skip",
@@ -1398,16 +1407,6 @@
           "kol": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 75% supply."
-      },
-      {
-        "at": 1791318441921,
-        "symbol": "ABU",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 25%."
       },
       {
         "at": 1791317824988,
@@ -1605,8 +1604,7 @@
         "action": "exit",
         "basket": "low",
         "wallets": {
-          "bot": 1,
-          "dolphin": 2
+          "dolphin": 3
         },
         "flags": [
           {
@@ -1638,8 +1636,7 @@
         "action": "partial",
         "basket": "low",
         "wallets": {
-          "bot": 1,
-          "dolphin": 2
+          "dolphin": 3
         },
         "flags": [
           {
@@ -1671,8 +1668,7 @@
         "action": "enter",
         "basket": "low",
         "wallets": {
-          "bot": 1,
-          "dolphin": 2
+          "dolphin": 3
         },
         "flags": [
           {
@@ -2540,13 +2536,13 @@
     ],
     "reasonStats": {
       "skip": {
-        "chase": 62,
+        "chase": 59,
         "below_entry": 13,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 110,
+        "red_flag": 111,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2579,7 +2575,7 @@
         "early follow": 1
       },
       "exit": {
-        "follow exit": 6,
+        "follow exit": 5,
         "take profit": 1,
         "stop": 12,
         "trailing": 2,
@@ -2596,7 +2592,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791319016337,
+    "generatedAt": 1791319323155,
     "trades": {
       "count": 33,
       "wins": 12,
