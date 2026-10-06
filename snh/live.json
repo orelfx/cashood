@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "43bc6982-ff43-4885-8fa7-4bafea82bd0f",
-  "updatedAt": 1791293809577,
-  "generatedAt": "2026-10-06 20:36 WIB",
+  "generation": "8345654b-19fc-41ca-9c10-c45352a9720f",
+  "updatedAt": 1791294109577,
+  "generatedAt": "2026-10-06 20:41 WIB",
   "usdIdr": null,
   "totalUsd": 966.3670211590206,
   "nativeSymbol": "SOL",
@@ -1075,12 +1075,12 @@
     "pnlUsd": -33.632978840979376,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791293809577,
+    "heartbeatAt": 1791294109577,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.27,
-    "lastScanAt": 1791293806373,
+    "lastScanAt": 1791294108317,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1102,7 +1102,7 @@
       {
         "k": "Sinyal wallet",
         "v": "258",
-        "n": "24 jam · 36 diveto LLM"
+        "n": "24 jam · 35 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1117,9 +1117,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791293809577,
+      "lastDecisionAt": 1791294109577,
       "lastAction": "keputusan",
-      "lastReason": "Instinct [degen]: Dilewati karena red flag: insider/entrapment pegang 10%."
+      "lastReason": "iPAID [degen]: Dilewati karena red flag: bundler pegang 28.53% supply."
     }
   },
   "strategy": {
@@ -1150,7 +1150,7 @@
       ],
       [
         "Label wallet",
-        "smart 508 · dolphin 61 · bot 863 · blacklist 72 · lp 1 · fresh 25 · kol 99 · whale 3"
+        "smart 507 · dolphin 61 · bot 864 · blacklist 72 · lp 1 · fresh 25 · kol 99 · whale 3"
       ]
     ],
     "requirements": [
@@ -1204,15 +1204,15 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 863,
+          "total": 864,
           "active": 0,
-          "passive": 863
+          "passive": 864
         },
         {
           "key": "smart",
-          "total": 508,
+          "total": 507,
           "active": 135,
-          "passive": 373
+          "passive": 372
         },
         {
           "key": "kol",
@@ -1352,6 +1352,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791293900686,
+        "symbol": "iPAID",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 28.53% supply."
+      },
+      {
+        "at": 1791293870928,
+        "symbol": "CHONK",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah naik 342% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
+      },
       {
         "at": 1791293501874,
         "symbol": "Instinct",
@@ -2254,32 +2281,11 @@
           }
         ],
         "reason": "Diveto LLM: Two of four wallets show negative copy history (-28.7%, -10.1% avg PnL), kol #1335 is a high-churn KOL with 343 tokens and a token creation, and the group has ze. Tidak dimasuki."
-      },
-      {
-        "at": 1791271363863,
-        "symbol": "XAVIER",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah naik 96% dari beli wallet pertama (batas 35%). Tidak mengejar harga."
-      },
-      {
-        "at": 1791270767823,
-        "symbol": "RAM",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1,
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah naik 53% dari beli wallet pertama (batas 30%). Tidak mengejar harga."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 77,
+        "chase": 78,
         "red_flag": 122,
         "round_trip_cost": 0,
         "basket_full": 0,
@@ -2291,7 +2297,7 @@
         "reserve": 0
       },
       "veto": {
-        "llm": 36
+        "llm": 35
       },
       "test": {
         "solo": 9,
@@ -2324,7 +2330,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791293816311,
+    "generatedAt": 1791294115684,
     "trades": {
       "count": 28,
       "wins": 10,
