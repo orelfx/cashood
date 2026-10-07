@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "781951ed-edc6-4ded-ac00-a6653bd04d93",
-  "updatedAt": 1791385269385,
-  "generatedAt": "2026-10-07 22:01 WIB",
+  "generation": "7f688f34-35c0-4243-9963-2b9a5aa0b04c",
+  "updatedAt": 1791385569385,
+  "generatedAt": "2026-10-07 22:06 WIB",
   "usdIdr": null,
   "totalUsd": 949.4980963839783,
   "nativeSymbol": "SOL",
@@ -1144,12 +1144,12 @@
     "pnlUsd": -50.50190361602165,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791385269385,
+    "heartbeatAt": 1791385569385,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.94,
-    "lastScanAt": 1791385265149,
+    "lastScanAt": 1791385568493,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1186,9 +1186,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791385269385,
+      "lastDecisionAt": 1791385569385,
       "lastAction": "keputusan",
-      "lastReason": "CLOUT [degen]: Dilewati karena red flag: bundler pegang 41% supply."
+      "lastReason": "AI [low]: Dilewati karena red flag: insider/entrapment pegang 15%."
     }
   },
   "strategy": {
@@ -1423,6 +1423,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791385404656,
+        "symbol": "AI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 15%."
+      },
       {
         "at": 1791384479901,
         "symbol": "CLOUT",
@@ -2662,48 +2679,6 @@
           }
         ],
         "reason": "Take profit bertahap (TP1): jual sebagian senilai $5,34; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791334127581,
-        "symbol": "JOBS",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 7.05% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.75%"
-          },
-          {
-            "type": "bundler",
-            "count": 108,
-            "note": "bundler pegang 39.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.1%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 24.6%"
-          },
-          {
-            "type": "fresh",
-            "count": 56,
-            "note": "15.6% holder wallet baru"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $5,39, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
@@ -2764,7 +2739,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791385327394,
+    "generatedAt": 1791385625654,
     "trades": {
       "count": 40,
       "wins": 13,
