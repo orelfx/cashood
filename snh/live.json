@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3e72a913-3197-4949-8c75-b775170d0718",
-  "updatedAt": 1791378369295,
-  "generatedAt": "2026-10-07 20:06 WIB",
+  "generation": "0e14d34a-f716-42cb-bb40-3b3342f6280e",
+  "updatedAt": 1791378669294,
+  "generatedAt": "2026-10-07 20:11 WIB",
   "usdIdr": null,
   "totalUsd": 949.9093445722046,
   "nativeSymbol": "SOL",
@@ -1129,12 +1129,12 @@
     "pnlUsd": -50.090655427795355,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791378369295,
+    "heartbeatAt": 1791378669294,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.9,
-    "lastScanAt": 1791378366736,
+    "lastScanAt": 1791378669060,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1155,13 +1155,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "176",
+        "v": "178",
         "n": "24 jam · 38 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1740",
-        "n": "167 aktif"
+        "v": "1741",
+        "n": "164 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1171,9 +1171,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791378369295,
+      "lastDecisionAt": 1791378669294,
       "lastAction": "keputusan",
-      "lastReason": "BACK [degen]: Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "SLING [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1192,7 +1192,7 @@
       ],
       [
         "Wallet dipantau",
-        "1740 · 167 aktif"
+        "1741 · 164 aktif"
       ],
       [
         "Cadangan kas",
@@ -1204,7 +1204,7 @@
       ],
       [
         "Label wallet",
-        "smart 513 · dolphin 59 · bot 923 · blacklist 98 · lp 1 · fresh 28 · kol 115 · whale 3"
+        "smart 513 · dolphin 59 · bot 924 · blacklist 98 · lp 1 · fresh 28 · kol 115 · whale 3"
       ]
     ],
     "requirements": [
@@ -1252,23 +1252,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1740,
-      "active": 167,
-      "passive": 1573,
+      "tracked": 1741,
+      "active": 164,
+      "passive": 1577,
       "trusted": 2,
       "promising": 14,
       "byLabel": [
         {
           "key": "bot",
-          "total": 923,
+          "total": 924,
           "active": 0,
-          "passive": 923
+          "passive": 924
         },
         {
           "key": "smart",
           "total": 513,
-          "active": 127,
-          "passive": 386
+          "active": 124,
+          "passive": 389
         },
         {
           "key": "kol",
@@ -1408,6 +1408,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791378532723,
+        "symbol": "SLING",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791378526362,
+        "symbol": "BACK",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 45.49% supply."
+      },
       {
         "at": 1791377922808,
         "symbol": "BACK",
@@ -2665,82 +2685,6 @@
           }
         ],
         "reason": "Diveto LLM: Both are profitable scalpers but have zero over-5x winners in 58 tokens and wallet smart #920 has failed our copy-trades (-11.9% avg); they're skilled but offer n. Tidak dimasuki."
-      },
-      {
-        "at": 1791330927535,
-        "symbol": "Ash",
-        "action": "exit",
-        "basket": "low",
-        "wallets": {
-          "smart": 3,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 10.5%"
-          },
-          {
-            "type": "rat",
-            "count": 8,
-            "note": "insider/entrapment pegang 11.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "16.8% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 9 menit. Hasil -8,1%."
-      },
-      {
-        "at": 1791330919318,
-        "symbol": "Ash",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 3,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 10.5%"
-          },
-          {
-            "type": "rat",
-            "count": 8,
-            "note": "insider/entrapment pegang 11.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "16.8% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Satu wallet yang diikuti sudah keluar; ikut jual setengah sisa posisi senilai $1,71 selagi untung."
       }
     ],
     "reasonStats": {
@@ -2751,7 +2695,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 74,
+        "red_flag": 76,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2801,7 +2745,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791378419210,
+    "generatedAt": 1791378715005,
     "trades": {
       "count": 39,
       "wins": 13,
