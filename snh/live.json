@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "00955482-6538-49f9-a6ff-3e4907e3bd72",
-  "updatedAt": 1791387369388,
-  "generatedAt": "2026-10-07 22:36 WIB",
+  "generation": "19314da9-6abb-4cf6-af54-3f0d273b8a1d",
+  "updatedAt": 1791387669394,
+  "generatedAt": "2026-10-07 22:41 WIB",
   "usdIdr": null,
   "totalUsd": 949.4980963839783,
   "nativeSymbol": "SOL",
@@ -1144,12 +1144,12 @@
     "pnlUsd": -50.50190361602165,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791387369388,
+    "heartbeatAt": 1791387669394,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.94,
-    "lastScanAt": 1791387366199,
+    "lastScanAt": 1791387667833,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1186,9 +1186,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791387369388,
+      "lastDecisionAt": 1791387669394,
       "lastAction": "keputusan",
-      "lastReason": "Bunker [degen]: Dilewati karena red flag: holder baru 16."
+      "lastReason": "QUANT [degen]: Dilewati karena red flag: holder baru 17."
     }
   },
   "strategy": {
@@ -1423,6 +1423,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791387526023,
+        "symbol": "QUANT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 17."
+      },
       {
         "at": 1791386798373,
         "symbol": "Bunker",
@@ -2592,39 +2602,17 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets have negative our_copies PnL (-8.2%, -2.9%), zero over-5x winners despite 58-59 tokens, and 43% winrate means followers bear 57% losing outcomes wi. Tidak dimasuki."
-      },
-      {
-        "at": 1791335390067,
-        "symbol": "2he",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 9.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 28,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets show negative avg_pnl_pct on our actual copies (-8.2%, -2.9%) and neither has any over_x5 winners, indicating poor follow performance despite decen. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 6,
+        "chase": 5,
         "below_entry": 35,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 60,
+        "red_flag": 61,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2674,7 +2662,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791387405301,
+    "generatedAt": 1791387716555,
     "trades": {
       "count": 40,
       "wins": 13,
