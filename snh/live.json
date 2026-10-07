@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "37ac0411-66a0-4ee7-a9a4-f5b9e9381c21",
-  "updatedAt": 1791342364719,
-  "generatedAt": "2026-10-07 10:06 WIB",
+  "generation": "fd57bcd3-068f-48dc-a5da-2fef72f6d19f",
+  "updatedAt": 1791342664719,
+  "generatedAt": "2026-10-07 10:11 WIB",
   "usdIdr": null,
   "totalUsd": 952.3039651080531,
   "nativeSymbol": "SOL",
@@ -1113,12 +1113,12 @@
     "pnlUsd": -47.69603489194685,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791342364719,
+    "heartbeatAt": 1791342664719,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.66,
-    "lastScanAt": 1791342361514,
+    "lastScanAt": 1791342663185,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1140,12 +1140,12 @@
       {
         "k": "Sinyal wallet",
         "v": "224",
-        "n": "24 jam · 45 diveto LLM"
+        "n": "24 jam · 44 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1706",
-        "n": "160 aktif"
+        "n": "159 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1155,9 +1155,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791342364719,
+      "lastDecisionAt": 1791342664719,
       "lastAction": "keputusan",
-      "lastReason": "compute [low]: Diveto LLM: Our prior copies of these wallets show catastrophic results (-26.5% and -30%), the only whale has 0 over_x5 winners, and high churn with short holds signals deg. Tidak dimasuki."
+      "lastReason": "ELON [low]: Dilewati karena red flag: insider/entrapment pegang 32%."
     }
   },
   "strategy": {
@@ -1176,7 +1176,7 @@
       ],
       [
         "Wallet dipantau",
-        "1706 · 160 aktif"
+        "1706 · 159 aktif"
       ],
       [
         "Cadangan kas",
@@ -1237,8 +1237,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1706,
-      "active": 160,
-      "passive": 1546,
+      "active": 159,
+      "passive": 1547,
       "trusted": 2,
       "promising": 14,
       "byLabel": [
@@ -1251,14 +1251,14 @@
         {
           "key": "smart",
           "total": 515,
-          "active": 122,
-          "passive": 393
+          "active": 121,
+          "passive": 394
         },
         {
           "key": "kol",
           "total": 113,
-          "active": 15,
-          "passive": 98
+          "active": 16,
+          "passive": 97
         },
         {
           "key": "blacklist",
@@ -1269,8 +1269,8 @@
         {
           "key": "dolphin",
           "total": 59,
-          "active": 23,
-          "passive": 36
+          "active": 22,
+          "passive": 37
         },
         {
           "key": "fresh",
@@ -1345,18 +1345,18 @@
           "trusted": false
         },
         {
-          "alias": "dolphin #1627",
-          "label": "dolphin",
-          "score": 98,
+          "alias": "smart #1706",
+          "label": "smart",
+          "score": 100,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
           "trusted": false
         },
         {
-          "alias": "smart #1706",
-          "label": "smart",
-          "score": 97.6,
+          "alias": "dolphin #1627",
+          "label": "dolphin",
+          "score": 98,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1392,6 +1392,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791342509863,
+        "symbol": "ELON",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 32%."
+      },
       {
         "at": 1791341526978,
         "symbol": "compute",
@@ -2719,33 +2729,6 @@
           }
         ],
         "reason": "Diveto LLM: Zero x2+ winners across all wallets, two wallets with 30-40% copy losses, no edge despite modest realized PnL; carry risk of coordinated dump at low market cap. Tidak dimasuki."
-      },
-      {
-        "at": 1791323155022,
-        "symbol": "UP",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 28.5%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 11.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "6.9% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: No big winners (zero x2-x5+ outcomes across most), negative copy history on 2 of 3 tracked wallets (avg -33.5% and -37.9%), and zero over_x5 outcomes signal the. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2756,7 +2739,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 95,
+        "red_flag": 96,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2773,7 +2756,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 45
+        "llm": 44
       },
       "test": {
         "solo": 5,
@@ -2806,7 +2789,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791342472389,
+    "generatedAt": 1791342713623,
     "trades": {
       "count": 38,
       "wins": 13,
