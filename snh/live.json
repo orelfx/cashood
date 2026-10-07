@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0d806dfd-c8b5-4eb5-b95b-25897d541840",
-  "updatedAt": 1791378969294,
-  "generatedAt": "2026-10-07 20:16 WIB",
+  "generation": "7dd05ced-da8a-42b2-8644-de6a3e0c661c",
+  "updatedAt": 1791379269309,
+  "generatedAt": "2026-10-07 20:21 WIB",
   "usdIdr": null,
   "totalUsd": 949.9093445722046,
   "nativeSymbol": "SOL",
@@ -1129,12 +1129,12 @@
     "pnlUsd": -50.090655427795355,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791378969294,
+    "heartbeatAt": 1791379269309,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.9,
-    "lastScanAt": 1791378967045,
+    "lastScanAt": 1791379266279,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1155,13 +1155,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "176",
-        "n": "24 jam · 38 diveto LLM"
+        "v": "177",
+        "n": "24 jam · 39 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1742",
-        "n": "164 aktif"
+        "n": "163 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1171,9 +1171,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791378969294,
+      "lastDecisionAt": 1791379269309,
       "lastAction": "keputusan",
-      "lastReason": "SLING [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "XGT [degen]: Diveto LLM: Both wallets are modestly profitable with clean realized PnL but zero wins over 2x across 59+ token trades, indicating insufficient upside edge for copy-trading. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1192,7 +1192,7 @@
       ],
       [
         "Wallet dipantau",
-        "1742 · 164 aktif"
+        "1742 · 163 aktif"
       ],
       [
         "Cadangan kas",
@@ -1204,7 +1204,7 @@
       ],
       [
         "Label wallet",
-        "smart 512 · dolphin 59 · bot 926 · blacklist 98 · lp 1 · fresh 28 · kol 115 · whale 3"
+        "smart 513 · dolphin 59 · bot 925 · blacklist 98 · lp 1 · fresh 28 · kol 115 · whale 3"
       ]
     ],
     "requirements": [
@@ -1253,22 +1253,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1742,
-      "active": 164,
-      "passive": 1578,
+      "active": 163,
+      "passive": 1579,
       "trusted": 2,
       "promising": 14,
       "byLabel": [
         {
           "key": "bot",
-          "total": 926,
+          "total": 925,
           "active": 0,
-          "passive": 926
+          "passive": 925
         },
         {
           "key": "smart",
-          "total": 512,
-          "active": 124,
-          "passive": 388
+          "total": 513,
+          "active": 123,
+          "passive": 390
         },
         {
           "key": "kol",
@@ -1408,6 +1408,28 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791379204610,
+        "symbol": "XGT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 311,
+            "note": "bundler pegang 13.5%"
+          },
+          {
+            "type": "rat",
+            "count": 5,
+            "note": "insider/entrapment pegang 2.2%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets are modestly profitable with clean realized PnL but zero wins over 2x across 59+ token trades, indicating insufficient upside edge for copy-trading. Tidak dimasuki."
+      },
       {
         "at": 1791378532723,
         "symbol": "SLING",
@@ -2643,48 +2665,6 @@
           }
         ],
         "reason": "Diveto LLM: Zero over-5x winners and poor copy history (-11.9% avg) make asymmetry unlikely despite solid realized PnL; neither wallet offers the edge copy-traders need. Tidak dimasuki."
-      },
-      {
-        "at": 1791332464082,
-        "symbol": "FEEMINERS",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 17.69% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.6%"
-          },
-          {
-            "type": "bundler",
-            "count": 126,
-            "note": "bundler pegang 46.1%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.3%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 2.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 60,
-            "note": "16.3% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Both are profitable scalpers but have zero over-5x winners in 58 tokens and wallet smart #920 has failed our copy-trades (-11.9% avg); they're skilled but offer n. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2712,7 +2692,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 38
+        "llm": 39
       },
       "test": {
         "solo": 1,
@@ -2745,7 +2725,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791379013353,
+    "generatedAt": 1791379324626,
     "trades": {
       "count": 39,
       "wins": 13,
