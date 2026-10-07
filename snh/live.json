@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bc74f544-7476-4675-aa89-e006fec82d74",
-  "updatedAt": 1791411069850,
-  "generatedAt": "2026-10-08 05:11 WIB",
+  "generation": "e4024443-197b-48db-8eff-7f2cacd0f509",
+  "updatedAt": 1791411369849,
+  "generatedAt": "2026-10-08 05:16 WIB",
   "usdIdr": null,
   "totalUsd": 957.0305229960925,
   "nativeSymbol": "SOL",
@@ -1179,12 +1179,12 @@
     "pnlUsd": -42.969477003907514,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791411069850,
+    "heartbeatAt": 1791411369849,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791411068972,
+    "lastScanAt": 1791411366416,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1205,8 +1205,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "108",
-        "n": "24 jam · 25 diveto LLM"
+        "v": "109",
+        "n": "24 jam · 27 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1215,15 +1215,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "12 · 12",
+        "v": "11 · 12",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791411069850,
+      "lastDecisionAt": 1791411369849,
       "lastAction": "keputusan",
-      "lastReason": "SHITCOIN [low]: Dilewati: harga sudah -49% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "HI [degen]: Diveto LLM: All three wallets show poor copy-trading results (negative avg_pnl_pct on 2 of 3) and zero over_x5 winners despite high token counts, suggesting realized gains . Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1458,6 +1458,70 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791411248832,
+        "symbol": "HI",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 248,
+            "note": "bundler pegang 18.0%"
+          },
+          {
+            "type": "rat",
+            "count": 5,
+            "note": "insider/entrapment pegang 1.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 192,
+            "note": "7.0% holder wallet baru"
+          },
+          {
+            "type": "top10",
+            "count": null,
+            "note": "10 holder terbesar pegang 33.5%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show poor copy-trading results (negative avg_pnl_pct on 2 of 3) and zero over_x5 winners despite high token counts, suggesting realized gains . Tidak dimasuki."
+      },
+      {
+        "at": 1791411229807,
+        "symbol": "HI",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 248,
+            "note": "bundler pegang 20.9%"
+          },
+          {
+            "type": "rat",
+            "count": 5,
+            "note": "insider/entrapment pegang 7.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 192,
+            "note": "8.9% holder wallet baru"
+          },
+          {
+            "type": "top10",
+            "count": null,
+            "note": "10 holder terbesar pegang 36.4%"
+          }
+        ],
+        "reason": "Diveto LLM: Wallet 1 has good metrics but basket is carried by weak wallets with poor copy history (avg -8.2% and -2.9% PnL on our copies), making it high-risk for a $12k m. Tidak dimasuki."
+      },
       {
         "at": 1791410854669,
         "symbol": "SHITCOIN",
@@ -2642,33 +2706,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 7."
-      },
-      {
-        "at": 1791385721241,
-        "symbol": "SIGOV",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $2070."
-      },
-      {
-        "at": 1791385404656,
-        "symbol": "AI",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 15%."
       }
     ],
     "reasonStats": {
@@ -2696,11 +2733,11 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 25
+        "llm": 27
       },
       "test": {
         "solo": 0,
-        "explore": 6,
+        "explore": 5,
         "chase": 0
       },
       "solo_entries": {
@@ -2729,7 +2766,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791411122348,
+    "generatedAt": 1791411414903,
     "trades": {
       "count": 45,
       "wins": 17,
