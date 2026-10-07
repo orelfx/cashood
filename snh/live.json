@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "2cb8b079-7163-4138-a550-e223adea4fad",
-  "updatedAt": 1791381369338,
-  "generatedAt": "2026-10-07 20:56 WIB",
+  "generation": "bebb2bda-5094-47c0-bc2d-b00a5170c780",
+  "updatedAt": 1791381669349,
+  "generatedAt": "2026-10-07 21:01 WIB",
   "usdIdr": null,
   "totalUsd": 949.9093445722046,
   "nativeSymbol": "SOL",
@@ -1129,12 +1129,12 @@
     "pnlUsd": -50.090655427795355,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791381369338,
+    "heartbeatAt": 1791381669349,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.9,
-    "lastScanAt": 1791381365030,
+    "lastScanAt": 1791381667163,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1171,9 +1171,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791381369338,
+      "lastDecisionAt": 1791381669349,
       "lastAction": "keputusan",
-      "lastReason": "XGT [degen]: Diveto LLM: Both wallets are modestly profitable with clean realized PnL but zero wins over 2x across 59+ token trades, indicating insufficient upside edge for copy-trading. Tidak dimasuki."
+      "lastReason": "SPAWN [degen]: Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1408,6 +1408,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791381652538,
+        "symbol": "SPAWN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791381580390,
+        "symbol": "REF",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 95x."
+      },
       {
         "at": 1791379204610,
         "symbol": "XGT",
@@ -2613,64 +2634,12 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 65.42% supply."
-      },
-      {
-        "at": 1791332853282,
-        "symbol": "Elytra",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 46.41% supply."
-      },
-      {
-        "at": 1791332480559,
-        "symbol": "FEEMINERS",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 17.69% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.6%"
-          },
-          {
-            "type": "bundler",
-            "count": 128,
-            "note": "bundler pegang 52.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.4%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 2.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 62,
-            "note": "16.7% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Zero over-5x winners and poor copy history (-11.9% avg) make asymmetry unlikely despite solid realized PnL; neither wallet offers the edge copy-traders need. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 11,
-        "below_entry": 34,
+        "chase": 10,
+        "below_entry": 35,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2725,7 +2694,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791381416603,
+    "generatedAt": 1791381721325,
     "trades": {
       "count": 39,
       "wins": 13,
