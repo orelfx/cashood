@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0ec0cb1d-77c6-47d1-a418-cd956e4d1bd2",
-  "updatedAt": 1791384369381,
-  "generatedAt": "2026-10-07 21:46 WIB",
+  "generation": "9666db35-348f-4ce7-a3dc-afbb2023fadb",
+  "updatedAt": 1791384669383,
+  "generatedAt": "2026-10-07 21:51 WIB",
   "usdIdr": null,
   "totalUsd": 949.4980963839783,
   "nativeSymbol": "SOL",
@@ -1144,12 +1144,12 @@
     "pnlUsd": -50.50190361602165,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791384369381,
+    "heartbeatAt": 1791384669383,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.94,
-    "lastScanAt": 1791384365336,
+    "lastScanAt": 1791384667236,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1170,13 +1170,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "155",
+        "v": "156",
         "n": "24 jam · 38 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1745",
-        "n": "163 aktif"
+        "n": "161 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1186,9 +1186,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791384369381,
+      "lastDecisionAt": 1791384669383,
       "lastAction": "keputusan",
-      "lastReason": "FIAT [low]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "CLOUT [degen]: Dilewati karena red flag: bundler pegang 41% supply."
     }
   },
   "strategy": {
@@ -1207,7 +1207,7 @@
       ],
       [
         "Wallet dipantau",
-        "1745 · 163 aktif"
+        "1745 · 161 aktif"
       ],
       [
         "Cadangan kas",
@@ -1219,7 +1219,7 @@
       ],
       [
         "Label wallet",
-        "smart 515 · dolphin 59 · bot 924 · blacklist 100 · lp 1 · fresh 28 · kol 114 · whale 4"
+        "smart 513 · dolphin 58 · bot 924 · blacklist 103 · lp 1 · fresh 28 · kol 114 · whale 4"
       ]
     ],
     "requirements": [
@@ -1268,8 +1268,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1745,
-      "active": 163,
-      "passive": 1582,
+      "active": 161,
+      "passive": 1584,
       "trusted": 2,
       "promising": 14,
       "byLabel": [
@@ -1281,27 +1281,27 @@
         },
         {
           "key": "smart",
-          "total": 515,
-          "active": 122,
-          "passive": 393
+          "total": 513,
+          "active": 121,
+          "passive": 392
         },
         {
           "key": "kol",
           "total": 114,
-          "active": 17,
-          "passive": 97
+          "active": 16,
+          "passive": 98
         },
         {
           "key": "blacklist",
-          "total": 100,
+          "total": 103,
           "active": 0,
-          "passive": 100
+          "passive": 103
         },
         {
           "key": "dolphin",
-          "total": 59,
+          "total": 58,
           "active": 22,
-          "passive": 37
+          "passive": 36
         },
         {
           "key": "fresh",
@@ -1423,6 +1423,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791384479901,
+        "symbol": "CLOUT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 41% supply."
+      },
       {
         "at": 1791382032912,
         "symbol": "FIAT",
@@ -2694,48 +2704,6 @@
           }
         ],
         "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $5,39, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791333968394,
-        "symbol": "JOBS",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 7.05% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.75%"
-          },
-          {
-            "type": "bundler",
-            "count": 108,
-            "note": "bundler pegang 39.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.1%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 24.6%"
-          },
-          {
-            "type": "fresh",
-            "count": 56,
-            "note": "15.6% holder wallet baru"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2746,7 +2714,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 60,
+        "red_flag": 61,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2796,7 +2764,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791384417193,
+    "generatedAt": 1791384719620,
     "trades": {
       "count": 40,
       "wins": 13,
