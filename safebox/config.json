@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Safe Box",
-    "tagline": "Simpanan · bunga ikut kinerja bot, jatah per minggu, maksimal 3% per bulan",
+    "tagline": "Simpanan · bunga minimal 0,5%/bulan, naik ikut kinerja bot sampai 3%/bulan",
     "refreshMinutes": 5,
     "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/live.json",
     "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/safebox/nav.json"
@@ -9,13 +9,13 @@
   "startedAt": "2026-09-12",
   "note": "Simpanan dengan bunga harian yang mengikuti kinerja bot Cashood. Penempatan dananya rahasia dan menjadi kewenangan pengelola.",
   "rate": {
-    "minMonthlyPct": 0,
+    "minMonthlyPct": 0.5,
     "maxMonthlyPct": 3,
     "weeklyQuotaPct": 0.75,
     "reserveMaxPct": 3,
     "windowDays": 7,
     "dailyFrom": "2026-10-05",
-    "note": "Aturan pemilik 2026-10-05 (revisi ketiga): bunga harian = rata-rata kenaikan Cashood Index 7 hari terakhir. Jatah 0,75% per minggu (Senin–Minggu); kelebihan disimpan sebagai cadangan dan dipakai mengisi hari-hari minggu rugi (paling banyak jatah harian normal). Sebulan paling banyak 3% dari pokok — batas atas, bukan janji."
+    "note": "Aturan pemilik 2026-10-05, revisi 2026-10-07: bunga harian minimal 0,5% per bulan (±0,0167% per hari, ditanggung pengelola) walau bot sedang rugi; saat bot untung, bunga mengikuti rata-rata kenaikan Cashood Index 7 hari dengan jatah 0,75% per minggu dan maksimal 3% per bulan. Kelebihan disimpan sebagai cadangan untuk minggu rugi. Berlaku mundur sejak 5 Okt."
   },
   "display": {
     "principalUsd": 1000,
