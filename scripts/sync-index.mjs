@@ -36,7 +36,8 @@ const now = Date.now();
 const r = (n, dp = 4) => Number(Number(n).toFixed(dp));
 
 const registry = JSON.parse(readFileSync(resolve(ROOT, 'data', 'funds.json'), 'utf8'));
-const members = (registry.funds || []).filter((f) => !f.paper);
+// Staking dll. (index:false) bukan bot: tidak ikut index, juga bukan patokan bunga Safe Box.
+const members = (registry.funds || []).filter((f) => !f.paper && f.index !== false);
 
 /** Harga saham dan nilai sisi pengelola sebuah dana pada waktu `t`. */
 function quote(cfg, navUsd, t) {

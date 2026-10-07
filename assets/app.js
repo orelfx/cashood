@@ -90,7 +90,7 @@ function getJSON(url, { fresh = false } = {}) {
       if (list.index) quiet(getJSON(RAW_BASE + 'index/live.json'));
     }));
     const guess = first || 'reborn';
-    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance', 'dgrh', 'dgsol', 'snh'].includes(guess) ? guess : 'reborn';
+    const fund = ['reborn', 'meridian', 'ferari', 'robsol', 'charon', 'forex', 'binance', 'dgrh', 'dgsol', 'snh', 'staking'].includes(guess) ? guess : 'reborn';
     quiet(getJSON(`data/${fund}/config.json`));
     for (const file of ['live.json', 'nav.json']) quiet(getJSON(RAW_BASE + fund + '/' + file));
   } catch { /* konteks aneh: lewati saja, pemuatan biasa tetap jalan */ }
@@ -445,6 +445,7 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     paperBooks: snap.paperBooks || null,         // buku kertas pembanding (Reborn hot potato)
     copyTrade: snap.copyTrade || null,           // segmen wallet & jejak keputusan (SnipeHunt)
     peakDrawdown: snap.peakDrawdown || null,     // puncak & titik terendah posisi LP (Meridian)
+    staking: snap.staking || null,               // staking MET (dana Staking)
     treasuryMoves: Array.isArray(snap.treasuryMoves) ? snap.treasuryMoves : [],
     treasuryOpeningUsd: Number(snap.treasuryOpeningUsd) || 0,
     treasuryOpeningLabel: snap.treasuryOpeningLabel || null,
@@ -1024,7 +1025,8 @@ function applyFundKind() {
   $('#shareCard').hidden = t;
   if ($('#stripShare')) $('#stripShare').hidden = t;
   $('#paperCard').hidden = !t;
-  $('#copyCard').hidden = true; $('#decisionCard').hidden = true; $('#topWalletCard').hidden = true;   // dibuka renderCopyTrade kalau datanya ada
+  $('#copyCard').hidden = true; $('#decisionCard').hidden = true; $('#topWalletCard').hidden = true;
+  if ($('#stakeCard')) $('#stakeCard').hidden = true;   // dibuka renderCopyTrade kalau datanya ada
   $('#lpTable').classList.remove('fx', 'fxf');                       // dipasang lagi oleh renderTrades
   const shareBtn = document.querySelector('#segSeries [data-s="share"]');
   if (shareBtn) shareBtn.hidden = t;
@@ -1326,6 +1328,46 @@ function stratDetails(r, extra = []) {
  * SOL, sama dengan hasil akhir bot. Titik terendah yang tidak diketahui tampil
  * "—", tidak pernah 0.
  */
+/**
+ * Staking MET: berapa MET di-stake, nilainya terhadap harga beli (rugi kalau
+ * harga MET turun), rewards (diklaim + pending), dan dari mana hasilnya —
+ * staking (perkiraan dari APR publik) vs referral (sisanya).
+ */
+function renderStaking(nav) {
+  const card = $('#stakeCard');
+  if (!card) return;
+  const k = nav?.staking;
+  card.hidden = !k;
+  // Staking tidak punya posisi LP, riwayat tutup, atau status LP: kartunya disembunyikan.
+  document.body.classList.toggle('is-staking', Boolean(k));
+  if (!k) return;
+  const tile = (t, v, n, c = '') => `<div class="stat"><div class="k">${t}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const rw = k.rewards || {}, st = k.stats || {};
+  const perDay = Number(rw.perDayUsd) || 0, stakeDay = Number(k.estStakingPerDayUsd) || 0, refDay = Math.max(0, perDay - stakeDay);
+  const monthPct = (d) => (k.metUsd ? (d * 30 / k.metUsd) * 100 : null);
+  const left = st.cycle?.end ? Math.max(0, (st.cycle.end - Date.now()) / 86400e3) : null;
+  setHTML($('#stakeHint'), rw.asOf ? `rewards dari halaman Meteora per ${tglRingkas(rw.asOf)} · stake & harga dibaca otomatis` : 'stake & harga dibaca otomatis');
+  setHTML($('#stakeBody'), `<div class="stats">${[
+    tile('MET di-stake', `${Number(k.stakedMet).toLocaleString('id-ID', { maximumFractionDigits: 2 })} MET`, `${pct(k.sharePct, 5)} dari ${st.totalStakedMet ? (st.totalStakedMet / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' jt' : '—'} MET`),
+    tile('Harga MET', usd(k.price, 4), k.avgBuyPrice ? `beli rata² ${usd(k.avgBuyPrice, 4)} · <span class="${cls(k.priceChangePct)}">${k.priceChangePct > 0 ? '+' : ''}${pct(k.priceChangePct)}</span>` : 'harga beli belum diisi'),
+    tile('Nilai MET', usd(k.metUsd), k.priceChangeUsd == null ? '' : `<span class="${cls(k.priceChangeUsd)}">${signed(k.priceChangeUsd)}</span> dari harga beli`, ''),
+    tile('Rewards', usd(rw.totalUsd), `diklaim ${usd(rw.claimedUsd)} · pending ${usd(rw.pendingUsd)}`, 'pos'),
+    tile('Untung / rugi bersih', signed(k.pnlUsd), `nilai MET + rewards − modal ${usd(k.costUsd)}`, cls(k.pnlUsd)),
+  ].join('')}</div>
+  <h3 class="sub-h">Dari mana hasilnya</h3>
+  <div class="table-scroll"><table class="mcards"><thead><tr><th>Sumber</th><th class="num">Per hari</th><th class="num">Per bulan</th><th class="num">Per tahun</th></tr></thead><tbody>
+    <tr><td class="mc-head">Staking <span class="dim">(APR ${pct(st.stakingAprPct ?? 0, 2)}, perkiraan)</span></td><td class="num" data-k="Per hari">${usd(stakeDay)}</td><td class="num" data-k="Per bulan">${usd(stakeDay * 30)} · ${pct(monthPct(stakeDay) ?? 0, 2)}</td><td class="num" data-k="Per tahun">${pct(st.stakingAprPct ?? 0, 1)}</td></tr>
+    <tr><td class="mc-head">Referral <span class="dim">(sisa dari rewards)</span></td><td class="num" data-k="Per hari">${usd(refDay)}</td><td class="num" data-k="Per bulan">${usd(refDay * 30)} · ${pct(monthPct(refDay) ?? 0, 1)}</td><td class="num" data-k="Per tahun">${pct((monthPct(refDay) ?? 0) * 12, 0)}</td></tr>
+    <tr class="mc-total"><td class="mc-head"><b>Total</b> <span class="dim">(laju siklus ${rw.cycle ?? '—'} sejauh ini)</span></td><td class="num" data-k="Per hari"><b>${usd(perDay)}</b></td><td class="num" data-k="Per bulan"><b>${usd(perDay * 30)} · ${pct(monthPct(perDay) ?? 0, 1)}</b></td><td class="num" data-k="Per tahun"><b>${pct((monthPct(perDay) ?? 0) * 12, 0)}</b></td></tr>
+  </tbody></table></div>
+  <p class="hint">Persen dihitung terhadap nilai MET sekarang (${usd(k.metUsd, 0)}). Hasil referral tidak tergantung jumlah MET — ia ikut volume LP orang yang diajak. Staking: perkiraan dari APR publik Meteora; rincian pastinya hanya di halaman Meteora (butuh login wallet).</p>
+  ${st.cycle ? `<p class="hint">Siklus ${esc(st.cycle.id)}: ${tglRingkas(st.cycle.start)} – ${tglRingkas(st.cycle.end)}${left != null ? ` · sisa ${left.toFixed(1).replace('.', ',')} hari` : ''} · estimasi rewards seluruh staker ${usd(st.cycle.estimatedRewardsUsd, 0)} · ${Number(st.totalStakers || 0).toLocaleString('id-ID')} staker. Rewards siklus bisa diklaim setelah siklus selesai.</p>` : ''}
+  <h3 class="sub-h">Pembelian MET</h3>
+  <div class="table-scroll"><table class="mcards"><thead><tr><th>Tanggal</th><th class="num">MET</th><th class="num">Harga beli</th><th class="num">Modal</th></tr></thead><tbody>
+    ${(k.buys || []).map((b) => `<tr><td class="mc-head">${esc(b.date)}${b.note && /perkira/i.test(b.note) ? ' <span class="pill warn" title="' + esc(b.note) + '">perkiraan</span>' : ''}</td><td class="num" data-k="MET">${b.met == null ? '—' : Number(b.met).toLocaleString('id-ID', { maximumFractionDigits: 2 })}</td><td class="num" data-k="Harga beli">${b.price == null ? '—' : usd(b.price, 4)}</td><td class="num" data-k="Modal">${usd(b.usd)}</td></tr>`).join('')}
+  </tbody></table></div>`);
+}
+
 const pdView = { all: false };
 function renderPeakDrawdown(nav) {
   const pd = nav?.peakDrawdown;
@@ -2996,6 +3038,7 @@ async function loadFundBrief(id) {
       // Arus uang masuk/keluar dana (setoran +, penarikan & dividen −), untuk
       // memisahkan perubahan nilai karena kinerja dari perubahan karena setoran.
       flows: cashFlows(cfg),
+      staking: snap?.staking || null,
       cfg,
       type: meta?.type || null,
       perf: snap?.performance || null,
@@ -3353,7 +3396,7 @@ const ICON = {
   globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
   coins: '<ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v5c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M9 15v2c0 1.7 2.7 3 6 3s6-1.3 6-3v-5c0-1.6-2.4-2.9-5.5-3"/>',
 };
-const FUND_ICON = { reborn: 'trend', meridian: 'orbit', ferari: 'zap', robsol: 'sun', charon: 'flask', forex: 'globe', binance: 'coins' };
+const FUND_ICON = { reborn: 'trend', meridian: 'orbit', ferari: 'zap', robsol: 'sun', charon: 'flask', forex: 'globe', binance: 'coins', staking: 'vault' };
 const svgIcon = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ICON.info}</svg>`;
 const iconTile = (name, color) => `<span class="itile" style="--c:${color}"><i class="orb a"></i><i class="orb b"></i><i class="orb c"></i><span class="ibox">${svgIcon(name)}</span></span>`;
 
@@ -3887,7 +3930,11 @@ async function renderHome() {
     // digratiskan ditulis dicoret, supaya investor tahu tarif normalnya.
     const fee = !b ? '—' : `${b.costsUsd ? usd(b.costsUsd, 0) + '<small>/bln</small> · ' : ''}${b.feePct > 0
       ? `${b.feePct}%` : b.feeStdPct > 0 ? `<s>${b.feeStdPct}%</s> <em class="free">free</em>` : '<em class="free">free</em>'}`;
-    const nums = f.paper
+    const k = b?.staking;
+    const nums = k
+      ? [['Nilai dana', usd(b.totalUsd, 0), ''], ['Untung / rugi', pnlCell, cls(b.pnlUsd)], ['MET di-stake', Number(k.stakedMet).toLocaleString('id-ID', { maximumFractionDigits: 0 }), ''],
+        ['Rewards', usd(k.rewards?.totalUsd || 0, 2), 'pos'], ['Harga MET vs beli', k.priceChangePct == null ? '—' : `${k.priceChangePct > 0 ? '+' : ''}${pct(k.priceChangePct, 1)}`, cls(k.priceChangePct ?? 0)], ['Jenis', esc(f.type || '—'), 'txt']]
+      : f.paper
       ? [['Nilai simulasi', b ? usd(b.totalUsd, 0) : '—', ''], ['Hasil', pnlCell, b ? cls(b.pnlUsd) : ''], ['Win rate', b?.winRate == null ? '—' : pct(b.winRate, 0), ''],
         ['Trade ditutup', b ? String(b.closedCount) : '—', ''], ['Jenis', esc(f.type || '—'), 'txt'], ['Dana', esc(f.money || 'virtual'), 'txt']]
       : [['Nilai dana', b ? usd(b.totalUsd, 0) : '—', ''], ['Untung / rugi', pnlCell, b ? cls(b.pnlUsd) : ''], ['Win rate', b?.winRate == null ? '—' : pct(b.winRate, 0), ''],
@@ -3940,7 +3987,8 @@ async function renderHome() {
       <span class="prod-go">Buka Cashood Index <b>→</b></span></a>`;
   };
   setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
-    const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : [])] : state.funds.filter((f) => f.risk === r.key).map(card);
+    // Low risk: Safe Box & Index (kartu khusus) ditambah dana biasa berisiko rendah (Staking).
+    const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : []), ...state.funds.filter((f) => f.risk === 'low').map(card)] : state.funds.filter((f) => f.risk === r.key).map(card);
     if (!items.length) return '';
     return `<div class="risk-group" style="--rc:${r.color}">
       <div class="rg-head"><span class="rg-badge">${r.title}</span><span class="rg-note">${r.note}</span></div>
@@ -4095,6 +4143,7 @@ function renderAll() {
   renderSummary(state.ledger, state.nav);
   renderPaper(state.nav);
   renderPeakDrawdown(state.nav);
+  renderStaking(state.nav);
   // Tab Analys membaca blok kinerja dari snapshot; kalau tab itu yang sedang
   // terbuka saat data tiba, ia harus digambar ulang — bukan tertinggal kosong.
   if (currentTab === 'analys' && state.view === 'fund') renderAnalys();

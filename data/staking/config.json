@@ -1,0 +1,104 @@
+{
+  "app": {
+    "name": "Cashood",
+    "tagline": "Staking MET · Meteora · low risk",
+    "currency": "USD",
+    "refreshMinutes": 5,
+    "snapshotUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/staking/live.json",
+    "navUrl": "https://raw.githubusercontent.com/orelfx/cashood/data/staking/nav.json"
+  },
+  "wallet": {
+    "chainName": "Solana",
+    "_note": "Alamat wallet sengaja tidak dicantumkan; jumlah stake dibaca dari blockchain."
+  },
+  "navOverrideUsd": null,
+  "owners": [
+    {
+      "id": "orel",
+      "name": "Orel",
+      "color": "#f97316"
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-07-23",
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 32.25,
+      "met": 200.371596,
+      "founding": true,
+      "id": "stk-beli-1",
+      "note": "200,37 MET di-stake 23 Jul; harga beli diperkirakan dari harga MET hari itu ($0,1609) — ganti kalau harga beli sebenarnya beda"
+    },
+    {
+      "date": "2026-09-28",
+      "at": 1790560800000,
+      "type": "deposit",
+      "owner": "orel",
+      "usd": 512.68,
+      "met": 1345.859889,
+      "navBefore": 76.33,
+      "id": "stk-beli-2",
+      "note": "1.345,86 MET di-stake 28 Sep; harga beli diperkirakan dari harga MET hari itu ($0,3809) — ganti kalau harga beli sebenarnya beda"
+    }
+  ],
+  "rewards": {
+    "asOf": "2026-10-07T08:04:00Z",
+    "cycle": 3,
+    "claimedUsd": 38.74,
+    "pendingUsd": 74.68,
+    "note": "diisi dari halaman Meteora (rincian per wallet butuh login wallet); total sepanjang waktu $113,42"
+  },
+  "costs": {
+    "note": "Tanpa biaya bulanan.",
+    "items": [],
+    "shared": false,
+    "primary": false
+  },
+  "fund": {
+    "note": "Staking MET di Meteora. Modal = harga beli MET; rugi kalau harga MET turun di bawah harga beli, ditutup oleh rewards.",
+    "capacityUsd": 1000,
+    "navGuardPct": 60,
+    "navGuardNote": "Harga MET bisa bergerak besar dalam sehari."
+  },
+  "strategy": {
+    "title": "Staking — MET di Meteora",
+    "about": [
+      "MET di-stake di program Referral Staking Meteora. Staker mendapat bagian dari protocol fee DLMM Meteora, dibayar dalam USDC per siklus ±30 hari. Pemilik kode referral juga mendapat bagian dari fee LP yang ia ajak.",
+      "Jumlah MET yang di-stake dibaca langsung dari blockchain; harga MET dari pasar. Rewards per wallet hanya terlihat setelah login wallet di Meteora, jadi diisi pemilik dari halaman itu."
+    ],
+    "requirements": [
+      [
+        "Stake minimum",
+        "200 MET"
+      ],
+      [
+        "Pembagian",
+        "USDC per siklus (±30 hari), bisa diklaim setelah siklus selesai"
+      ],
+      [
+        "Aset",
+        "MET (token Meteora)"
+      ]
+    ],
+    "risks": [
+      "Harga MET naik-turun: kalau turun di bawah harga beli, nilai modal ikut turun walau rewards jalan.",
+      "Rewards mengikuti volume fee DLMM Meteora; bulan sepi = rewards kecil.",
+      "Unstake punya masa tunggu dari program Meteora."
+    ],
+    "system": [
+      [
+        "Jaringan",
+        "Solana"
+      ],
+      [
+        "Program",
+        "Meteora Referral Staking"
+      ],
+      [
+        "Reward",
+        "USDC"
+      ]
+    ]
+  }
+}

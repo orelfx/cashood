@@ -23,6 +23,7 @@ run_snapshot scripts/sync-charon.mjs
 run_snapshot scripts/sync-robsol.mjs
 run_snapshot scripts/sync-forex.mjs
 run_snapshot scripts/sync-binance.mjs
+run_snapshot scripts/sync-staking.mjs
 # Buku paper devil greed: bot-nya menaruh berkas di kotak masuk; diimpor kalau ada.
 run_paper() {
   [ -f "$2" ] || return 0
@@ -44,7 +45,7 @@ run_snapshot scripts/sync-safebox.mjs
 /usr/bin/node scripts/stage-data.mjs "$WORK" || failed=1
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
-  git add -- reborn meridian ferari robsol charon forex binance safebox index
+  git add -- reborn meridian ferari robsol staking charon forex binance safebox index
   [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi

@@ -9,7 +9,7 @@ if(!process.argv[2]||destination===ROOT)throw new Error('Direktori staging ekspl
 let failed=false;
 // Buku paper impor (dgrh, dgsol, snh) baru ikut terbit setelah snapshot-nya diimpor.
 const OPTIONAL=new Set(['dgrh','dgsol','snh']);
-for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','snh','safebox','index']){
+for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','snh','staking','safebox','index']){
  if(OPTIONAL.has(fund)&&!existsSync(resolve(ROOT,'data',fund,'live.json')))continue;
  try{
   const dir=resolve(ROOT,'data',fund),live=readJSON(resolve(dir,'live.json'));if(!live)throw new Error('Snapshot belum ada');
