@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "92206b7b-a2ed-4b63-aec7-57d71eb5a241",
-  "updatedAt": 1791333064438,
-  "generatedAt": "2026-10-07 07:31 WIB",
+  "generation": "16d233ef-436b-47eb-8c7c-49358570b208",
+  "updatedAt": 1791333364454,
+  "generatedAt": "2026-10-07 07:36 WIB",
   "usdIdr": null,
   "totalUsd": 951.3381934509562,
   "nativeSymbol": "SOL",
@@ -1119,12 +1119,12 @@
     "pnlUsd": -48.66180654904383,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791333064438,
+    "heartbeatAt": 1791333364454,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.75,
-    "lastScanAt": 1791333063421,
+    "lastScanAt": 1791333363663,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1145,7 +1145,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "249",
+        "v": "248",
         "n": "24 jam · 47 diveto LLM"
       },
       {
@@ -1161,9 +1161,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791333064438,
+      "lastDecisionAt": 1791333364454,
       "lastAction": "keputusan",
-      "lastReason": "Elytra [degen]: Dilewati karena red flag: bundler pegang 46.41% supply."
+      "lastReason": "SPILL [degen]: Dilewati karena red flag: bundler pegang 65.42% supply."
     }
   },
   "strategy": {
@@ -1398,6 +1398,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791333070690,
+        "symbol": "SPILL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 65.42% supply."
+      },
       {
         "at": 1791332853282,
         "symbol": "Elytra",
@@ -2583,27 +2600,17 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: bundler pegang 27.38% supply."
-      },
-      {
-        "at": 1791319760198,
-        "symbol": "iPAID",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
-        "chase": 46,
+        "chase": 44,
         "below_entry": 28,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 106,
+        "red_flag": 107,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2653,7 +2660,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791333159697,
+    "generatedAt": 1791333418918,
     "trades": {
       "count": 37,
       "wins": 12,
