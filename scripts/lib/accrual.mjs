@@ -61,7 +61,10 @@ export function accrue(cfg,previous,observation,payouts=[]){
  const maxD=cfg.rate?.maxDailyPct==null?Infinity:Core.number(cfg.rate.maxDailyPct,'Batas harian',0)/100;
  const weekQ=Core.number(cfg.rate?.weeklyQuotaPct??maxM/4,'Jatah mingguan',0)/100;
  const reserveMax=Core.number(cfg.rate?.reserveMaxPct??maxM,'Batas cadangan',0)/100;
- const limits={windowDays:Core.number(cfg.rate?.windowDays??7,'Jendela rata-rata',1),maxDaily:maxD,minDaily:minM/100/30};
+ // Lantai harian (minMonthlyPct / 30) dibayar pengelola apa pun kinerja bot;
+ // laju dari index dihitung terpisah supaya cadangan tetap tahu minggu rugi.
+ const floorDaily=minM/100/30;
+ const limits={windowDays:Core.number(cfg.rate?.windowDays??7,'Jendela rata-rata',1),maxDaily:maxD,minDaily:0};
  const state=previous?structuredClone(previous):{version:3,from:Core.eventTime({date:cfg.rate?.dailyFrom||Core.day(now)}),days:[],balances:{},payoutIds:[]};
  if(state.version!==3)throw new Error('State bunga Safe Box bukan versi harian');
  if(state.at&&now<state.at)throw new Error('Waktu pengamatan mundur');
@@ -72,16 +75,18 @@ export function accrue(cfg,previous,observation,payouts=[]){
   const r=windowRate(points,closeAt,limits);
   const active=ownersAt(cfg,closeAt);
   const date=Core.day(start),month=date.slice(0,7),week=weekOf(date);
-  const entry={date,ratePct:Number((r.rate*100).toFixed(4)),windowMovePct:r.missing?null:Number((r.move*100).toFixed(4)),windowDays:Number(r.spanDays.toFixed(2)),usd:0,owners:{},estimated:r.missing};
+  const entry={date,ratePct:Number((Math.max(r.rate,floorDaily)*100).toFixed(4)),botRatePct:Number((r.rate*100).toFixed(4)),floorPct:Number((floorDaily*100).toFixed(4)),windowMovePct:r.missing?null:Number((r.move*100).toFixed(4)),windowDays:Number(r.spanDays.toFixed(2)),usd:0,owners:{},estimated:r.missing};
   for(const o of active){
    const b=(state.balances[o.id] ||= {id:o.id,name:o.name,color:o.color,accrued:0,paid:0});
    const P=o.principalUsd,sum=(keep)=>state.days.filter(d=>keep(d.date)).reduce((t,d)=>t+(d.owners?.[o.id]||0),0);
    // Sisa jatah minggu ini dan bulan ini, dari yang sudah dicatat.
    const room=Math.max(0,Math.min(P*weekQ-sum((d)=>weekOf(d)===week),P*maxM/100-sum((d)=>d.startsWith(month))));
-   const raw=P*r.rate,reserve=Number(b.reserve)||0;
-   let amount=Math.min(room,raw),fromReserve=0;
-   // Minggu rugi: isi sebagian dari cadangan kelebihan minggu-minggu sebelumnya.
-   if(r.rate<=0)fromReserve=Math.min(reserve,room,P*weekQ/7),amount=fromReserve;
+   const raw=P*r.rate,floor=P*floorDaily,reserve=Number(b.reserve)||0;
+   // Bunga = hasil bot atau lantai minimum, mana yang lebih besar, dalam jatah.
+   let amount=Math.min(room,Math.max(raw,floor)),fromReserve=0;
+   // Minggu rugi (laju bot 0): di atas lantai, isi sebagian dari cadangan
+   // kelebihan minggu-minggu sebelumnya, sampai jatah harian normal.
+   if(r.rate<=0){fromReserve=Math.max(0,Math.min(reserve,room-amount,P*weekQ/7-amount));amount+=fromReserve;}
    const excess=Math.max(0,raw-amount);
    amount=Number(amount.toFixed(4));
    if(excess>1e-9)entry.capped=true;

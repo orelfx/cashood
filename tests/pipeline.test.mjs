@@ -17,6 +17,10 @@ const sbPts=[];for(let h=-7*24;h<=6*24;h++)sbPts.push({t:sbStart+h*3600000,usd:h
 test('Safe Box: bunga harian = rata-rata kenaikan index 7 hari, tanpa batas harian',()=>{const s=accrue(sbd,null,{at:sbStart+DAY,points:sbPts});
  // 5 Okt ditutup 23:59: jendela mulai 28 Sep 23:59 (index 101) sampai 107 → 5,94% ÷ 7 hari ≈ 0,85%/hari.
  assert.ok(s.days[0].ratePct>0.84&&s.days[0].ratePct<0.86,String(s.days[0].ratePct));assert.ok(s.days[0].windowDays>6.9);});
+test('Safe Box: lantai minimum tetap dibayar saat bot rugi, dan tidak menggantikan hasil bot yang lebih besar',()=>{const down=[{t:sbStart-8*DAY,usd:100},{t:sbStart+DAY-1,usd:90}];
+ const s=accrue({...sbd,rate:{...sbd.rate,minMonthlyPct:0.5}},null,{at:sbStart+DAY,points:down});
+ assert.equal(s.days[0].botRatePct,0);assert.equal(Number(s.days[0].usd.toFixed(4)),Number((3000*0.005/30).toFixed(4)));   // $0,50/hari untuk $3.000
+ const up=accrue({...sbd,rate:{...sbd.rate,minMonthlyPct:0.5}},null,{at:sbStart+DAY,points:sbPts});assert.ok(up.days[0].usd>3000*0.005/30);});
 test('Safe Box: seminggu datar atau turun = 0',()=>{const flat=[{t:sbStart-8*DAY,usd:100},{t:sbStart+DAY-1,usd:99}];const s=accrue(sbd,null,{at:sbStart+DAY,points:flat});assert.equal(s.days[0].ratePct,0);assert.equal(s.balances.a.accrued,0);});
 test('Safe Box: jatah 0,75% per minggu, kelebihan jadi cadangan, sebulan tetap paling banyak 3%',()=>{const m0=Core.eventTime({date:'2026-11-01'}),pts=[];for(let i=-8;i<=40;i++)pts.push({t:m0+i*DAY,usd:100*1.01**i});
  const s=accrue({...sbd,rate:{...sbd.rate,dailyFrom:'2026-11-01'}},null,{at:m0+35*DAY,points:pts});const nov=s.days.filter(d=>d.date.startsWith('2026-11'));

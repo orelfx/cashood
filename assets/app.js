@@ -2693,9 +2693,9 @@ function renderSafebox() {
             <div class="n">jatah minggu ini ${pct(rate.weekUsedPct ?? 0, 2)} / ${pct(rate.weekQuotaPct ?? 0.75, 2)} · bulan ini ${pct(rate.monthUsedPct ?? 0, 2)} / ${pctRate(rate.maxMonthlyPct ?? 3)}${
               Number(rate.reserveUsd) > 0 ? ` · cadangan ${usd(rate.reserveUsd, 2)}` : ''}</div></div>
         </div>
-        <p class="hint" style="margin-top:14px">Bunganya <strong>dihitung tiap hari mengikuti kinerja bot Cashood</strong>:
-          rata-rata kenaikan <a href="#index">Cashood Index</a> selama ${rate.windowDays ?? 7} hari terakhir. Satu hari turun tidak langsung
-          membuat bunga 0. Jatahnya <strong>${pct(rate.weekQuotaPct ?? 0.75, 2)} per minggu</strong>: minggu yang bagus berhenti di jatah itu dan
+        <p class="hint" style="margin-top:14px">Bunganya <strong>minimal ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan</strong>, dibayar tiap hari
+          walau bot sedang rugi. Saat bot untung, bunga naik <strong>mengikuti kinerja bot Cashood</strong>: rata-rata kenaikan
+          <a href="#index">Cashood Index</a> selama ${rate.windowDays ?? 7} hari terakhir. Jatahnya <strong>${pct(rate.weekQuotaPct ?? 0.75, 2)} per minggu</strong>: minggu yang bagus berhenti di jatah itu dan
           kelebihannya disimpan sebagai cadangan; minggu yang rugi diisi sebagian dari cadangan itu. Sebulan
           <strong>paling banyak ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok — itu batas atas, bukan janji.
           Angka hari ini masih bisa berubah sampai tengah malam WIB, lalu dikunci.
@@ -2756,12 +2756,13 @@ function renderSafebox() {
           <span class="hint">cara kerjanya, apa adanya</span>
         </div>
         <p class="lead">Safe Box bekerja seperti deposito: pokoknya disimpan pengelola, dan bunganya mengikuti kinerja
-          bot-bot Cashood — <strong>0 sampai ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>,
+          bot-bot Cashood — <strong>${pctRate(rate.minMonthlyPct ?? 0.5)} sampai ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>,
           dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
         <div class="two">
           <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
             <li>Tiap hari dilihat Cashood Index — gabungan kinerja bot-bot Cashood yang memakai uang asli.</li>
-            <li>Bunga hari itu = rata-rata kenaikan index ${rate.windowDays ?? 7} hari terakhir. Seminggu turun atau datar: tidak ada bunga baru dari bot.</li>
+            <li><strong>Lantai: ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan</strong> (±${pct((rate.minMonthlyPct ?? 0.5) / 30, 4)} per hari), ditanggung pengelola — dibayar walau seminggu bot rugi.</li>
+            <li>Kalau bot untung, bunga hari itu = rata-rata kenaikan index ${rate.windowDays ?? 7} hari terakhir, kalau itu lebih besar dari lantai.</li>
             <li>Jatah <strong>${pct(rate.weekQuotaPct ?? 0.75, 2)} per minggu</strong> (Senin–Minggu). Kalau penuh, bunga minggu itu berhenti dan
                 kelebihannya <strong>disimpan sebagai cadangan</strong>.</li>
             <li>Minggu yang rugi diisi dari cadangan itu, paling banyak jatah harian normal — jadi bunga tidak langsung kosong.</li>
@@ -2774,8 +2775,8 @@ function renderSafebox() {
           <div><h3 class="sub-h">Yang dijamin dan yang tidak</h3><ul class="plain">
             <li><strong>Pokok simpanan dijamin tidak hilang.</strong> Tidak ada margin call, tidak ada likuidasi yang bisa
                 menghapus dana di dalam Safe Box.</li>
-            <li><strong>Anti rugi, tapi tidak pasti untung.</strong> Hari bot rugi bunganya 0 dan bulan yang buruk bisa
-                hampir tanpa bunga — yang tidak terjadi adalah saldonya berkurang.</li>
+            <li><strong>Anti rugi, bunga minimal ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan.</strong> Bulan yang buruk tetap mendapat bunga lantai;
+                yang tidak terjadi adalah saldonya berkurang.</li>
             <li>Ke instrumen mana dana ini ditempatkan bersifat rahasia dan menjadi kewenangan pengelola.</li>
             <li>Bunga dan saldo di halaman ini dihitung ulang setiap hari dari catatan yang sama; tidak ada angka
                 yang ditulis tangan.</li>
@@ -3905,7 +3906,7 @@ async function renderHome() {
     const today = box && box.principalUsd ? ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100 : null;
     return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
       <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
-        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga ikut kinerja bot, jatah per minggu, maks 3%/bulan</div></div>
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga 0,5–3%/bulan, naik ikut kinerja bot</div></div>
         ${today == null ? '' : `<span class="chg up">▲ ${pct(today, 3)}<small>hari ini</small></span>`}</div>
       <p class="prod-desc">${esc(sb.blurb || '')}</p>
       <div class="prod-nums">

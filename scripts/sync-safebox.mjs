@@ -57,7 +57,7 @@ const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedA
   fromReserveTodayUsd:Core.money(Object.values(today?.fromReserve||{}).reduce((t,v)=>t+v,0)),
   avgMonthlyPct:Number((avgDaily*30).toFixed(3)),apyPct:Number((avgDaily*365).toFixed(3)),perDayUsd:today?.usd||0,
   minMonthlyPct:Number(cfg.rate?.minMonthlyPct??0),maxMonthlyPct:maxM,spanDays:done.length,
-  basis:'rata-rata kenaikan Cashood Index '+(cfg.rate?.windowDays??7)+' hari terakhir; jatah per minggu, kelebihan disimpan untuk minggu rugi; paling banyak '+String(maxM).replace('.',',')+'% per bulan',since:Core.day(state.from)},
+  basis:'minimal '+String(cfg.rate?.minMonthlyPct??0).replace('.',',')+'% per bulan; di atasnya rata-rata kenaikan Cashood Index '+(cfg.rate?.windowDays??7)+' hari terakhir; jatah per minggu, kelebihan disimpan untuk minggu rugi; paling banyak '+String(maxM).replace('.',',')+'% per bulan',since:Core.day(state.from)},
  };
 assertPublic(snapshot);
 const navFile=resolve(DIR,'nav.json'),old=readJSON(navFile,{points:[]});
