@@ -1343,7 +1343,13 @@ function renderStaking(nav) {
   if (!k) return;
   const tile = (t, v, n, c = '') => `<div class="stat"><div class="k">${t}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   const rw = k.rewards || {}, st = k.stats || {};
-  const perDay = Number(rw.perDayUsd) || 0, stakeDay = Number(k.estStakingPerDayUsd) || 0, refDay = Math.max(0, perDay - stakeDay);
+  // Pembagian staking vs referral: pakai rincian asli dari Meteora kalau ada,
+  // kalau belum, perkiraan dari APR publik.
+  const sp = rw.split, spTotal = sp ? (sp.stakerUsd + sp.referrerUsd + sp.referredUsd) : 0;
+  const perDay = Number(rw.perDayUsd) || 0;
+  const stakeDay = sp && spTotal ? perDay * sp.stakerUsd / spTotal : (Number(k.estStakingPerDayUsd) || 0);
+  const refDay = sp && spTotal ? perDay * (sp.referrerUsd + sp.referredUsd) / spTotal : Math.max(0, perDay - stakeDay);
+  const capNear = k.capPerCycleUsd && k.projectedCycleUsd ? k.projectedCycleUsd / k.capPerCycleUsd : null;
   const monthPct = (d) => (k.metUsd ? (d * 30 / k.metUsd) * 100 : null);
   const left = st.cycle?.end ? Math.max(0, (st.cycle.end - Date.now()) / 86400e3) : null;
   setHTML($('#stakeHint'), rw.asOf ? `rewards dari halaman Meteora per ${tglRingkas(rw.asOf)} · stake & harga dibaca otomatis` : 'stake & harga dibaca otomatis');
@@ -1356,10 +1362,13 @@ function renderStaking(nav) {
   ].join('')}</div>
   <h3 class="sub-h">Dari mana hasilnya</h3>
   <div class="table-scroll"><table class="mcards"><thead><tr><th>Sumber</th><th class="num">Per hari</th><th class="num">Per bulan</th><th class="num">Per tahun</th></tr></thead><tbody>
-    <tr><td class="mc-head">Staking <span class="dim">(APR ${pct(st.stakingAprPct ?? 0, 2)}, perkiraan)</span></td><td class="num" data-k="Per hari">${usd(stakeDay)}</td><td class="num" data-k="Per bulan">${usd(stakeDay * 30)} · ${pct(monthPct(stakeDay) ?? 0, 2)}</td><td class="num" data-k="Per tahun">${pct(st.stakingAprPct ?? 0, 1)}</td></tr>
-    <tr><td class="mc-head">Referral <span class="dim">(sisa dari rewards)</span></td><td class="num" data-k="Per hari">${usd(refDay)}</td><td class="num" data-k="Per bulan">${usd(refDay * 30)} · ${pct(monthPct(refDay) ?? 0, 1)}</td><td class="num" data-k="Per tahun">${pct((monthPct(refDay) ?? 0) * 12, 0)}</td></tr>
+    <tr><td class="mc-head">Staking <span class="dim">${sp ? `(asli: ${usd(sp.stakerUsd)} dari ${usd(spTotal)})` : `(APR ${pct(st.stakingAprPct ?? 0, 2)}, perkiraan)`}</span></td><td class="num" data-k="Per hari">${usd(stakeDay)}</td><td class="num" data-k="Per bulan">${usd(stakeDay * 30)} · ${pct(monthPct(stakeDay) ?? 0, 2)}</td><td class="num" data-k="Per tahun">${pct(st.stakingAprPct ?? 0, 1)}</td></tr>
+    <tr><td class="mc-head">Referral <span class="dim">${sp ? `(asli: referrer ${usd(sp.referrerUsd)} + referred ${usd(sp.referredUsd)})` : '(sisa dari rewards)'}</span></td><td class="num" data-k="Per hari">${usd(refDay)}</td><td class="num" data-k="Per bulan">${usd(refDay * 30)} · ${pct(monthPct(refDay) ?? 0, 1)}</td><td class="num" data-k="Per tahun">${pct((monthPct(refDay) ?? 0) * 12, 0)}</td></tr>
     <tr class="mc-total"><td class="mc-head"><b>Total</b> <span class="dim">(laju siklus ${rw.cycle ?? '—'} sejauh ini)</span></td><td class="num" data-k="Per hari"><b>${usd(perDay)}</b></td><td class="num" data-k="Per bulan"><b>${usd(perDay * 30)} · ${pct(monthPct(perDay) ?? 0, 1)}</b></td><td class="num" data-k="Per tahun"><b>${pct((monthPct(perDay) ?? 0) * 12, 0)}</b></td></tr>
   </tbody></table></div>
+  ${k.capPerCycleUsd ? `<div class="stake-cap ${capNear > 0.85 ? 'warn' : ''}"><b>Batas rewards per siklus: ${usd(k.capPerCycleUsd)}</b> (${String(st.stakeCapRate).replace('.', ',')} USDC × ${Number(k.stakedMet).toLocaleString('id-ID', { maximumFractionDigits: 0 })} MET di-stake).
+    ${k.projectedCycleUsd ? `Perkiraan rewards siklus ini ${usd(k.projectedCycleUsd)} — ${pct(capNear * 100, 0)} dari batas.` : ''}
+    ${capNear > 0.85 ? ' Hampir mentok: kalau referral terus naik, kelebihannya tidak dibayar. Menambah stake menaikkan batas (+$10 per 100 MET).' : ''}</div>` : ''}
   <p class="hint">Persen dihitung terhadap nilai MET sekarang (${usd(k.metUsd, 0)}). Hasil referral tidak tergantung jumlah MET — ia ikut volume LP orang yang diajak. Staking: perkiraan dari APR publik Meteora; rincian pastinya hanya di halaman Meteora (butuh login wallet).</p>
   ${st.cycle ? `<p class="hint">Siklus ${esc(st.cycle.id)}: ${tglRingkas(st.cycle.start)} – ${tglRingkas(st.cycle.end)}${left != null ? ` · sisa ${left.toFixed(1).replace('.', ',')} hari` : ''} · estimasi rewards seluruh staker ${usd(st.cycle.estimatedRewardsUsd, 0)} · ${Number(st.totalStakers || 0).toLocaleString('id-ID')} staker. Rewards siklus bisa diklaim setelah siklus selesai.</p>` : ''}
   <h3 class="sub-h">Pembelian MET</h3>

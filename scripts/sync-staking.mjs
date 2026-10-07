@@ -75,7 +75,7 @@ try {
   const s = await (await fetch('https://referral.meteora.ag/api/v1/campaigns/dlmm-campaign/stats', { signal: AbortSignal.timeout(15000) })).json();
   stats = {
     totalStakedMet: r2(s.totalStakedMet), totalStakers: Number(s.totalStakers) || null,
-    aprPct: r2(s.estimatedStakingAprPct), stakingAprPct: r2(s.aprBreakdown?.stakingAprPct), referralAprPct: r2(s.aprBreakdown?.referralAprPct),
+    aprPct: r2(s.estimatedStakingAprPct), stakeCapRate: Number(s.stakeCapRate) || null, minStakeMet: Number(s.minStakeMet) || null, stakingAprPct: r2(s.aprBreakdown?.stakingAprPct), referralAprPct: r2(s.aprBreakdown?.referralAprPct),
     cycle: s.currentEpoch ? { id: String(s.currentEpoch.epochId || '').replace(/^dlmm-campaign-/, ''), start: Date.parse(s.currentEpoch.epochStart), end: Date.parse(s.currentEpoch.epochEnd), estimatedRewardsUsd: r2(s.currentEpoch.estimatedRewardsUsd) } : null,
   };
 } catch { /* statistik tidak wajib */ }
@@ -124,7 +124,12 @@ const snapshot = {
     stakedMet: Number(stakedMet.toFixed(4)), sharePct: Number((share * 100).toFixed(6)), price,
     metUsd, costUsd, avgBuyPrice: avgBuy ? Number(avgBuy.toFixed(6)) : null, priceChangeUsd,
     priceChangePct: avgBuy ? r2((price / avgBuy - 1) * 100) : null,
-    rewards: { claimedUsd, pendingUsd, totalUsd: rewardsUsd, asOf: rewardsAsOf, cycle: rw.cycle ?? null, perDayUsd: pendingPerDay, note: rw.note || null },
+    rewards: { claimedUsd, pendingUsd, totalUsd: rewardsUsd, asOf: rewardsAsOf, cycle: rw.cycle ?? null, perDayUsd: pendingPerDay, note: rw.note || null,
+      // Rincian sepanjang waktu dari halaman Meteora (kalau diisi).
+      ...(rw.stakerUsd != null ? { split: { stakerUsd: r2(rw.stakerUsd), referrerUsd: r2(rw.referrerUsd), referredUsd: r2(rw.referredUsd) } } : {}) },
+    // Batas rewards per siklus = stakeCapRate (USDC) × MET yang di-stake.
+    capPerCycleUsd: stats?.stakeCapRate ? r2(stats.stakeCapRate * stakedMet) : null,
+    projectedCycleUsd: pendingPerDay && cycleDays ? r2(pendingPerDay * cycleDays) : null,
     pnlUsd: r2(metUsd + rewardsUsd - costUsd),
     estStakingPerDayUsd: estStakingPerDay,
     stats, cycleDays: cycleDays && r2(cycleDays), elapsedDays: elapsedDays && r2(elapsedDays),
