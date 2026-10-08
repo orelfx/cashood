@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ceb639cb-d25e-4c6b-8379-4d9353e18510",
-  "updatedAt": 1791487875358,
-  "generatedAt": "2026-10-09 02:31 WIB",
+  "generation": "98bf709f-e72d-4e3b-a718-6d5069016809",
+  "updatedAt": 1791488175360,
+  "generatedAt": "2026-10-09 02:36 WIB",
   "usdIdr": null,
   "totalUsd": 961.4048276615757,
   "nativeSymbol": "SOL",
@@ -1157,12 +1157,12 @@
     "pnlUsd": -38.59517233842428,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791487875358,
+    "heartbeatAt": 1791488175360,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.76,
-    "lastScanAt": 1791487874621,
+    "lastScanAt": 1791488174897,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1183,7 +1183,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "207",
+        "v": "208",
         "n": "24 jam · 46 diveto LLM"
       },
       {
@@ -1199,9 +1199,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791487875358,
+      "lastDecisionAt": 1791488175360,
       "lastAction": "keputusan",
-      "lastReason": "KOTH [degen]: Dilewati: harga sudah -54% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "OFFICIAL [low]: Dilewati karena red flag: 30% holder wallet baru (sybil)."
     }
   },
   "strategy": {
@@ -1436,6 +1436,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791488040550,
+        "symbol": "OFFICIAL",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: 30% holder wallet baru (sybil)."
+      },
       {
         "at": 1791487588051,
         "symbol": "KOTH",
@@ -2500,16 +2518,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 12."
-      },
-      {
-        "at": 1791476636403,
-        "symbol": "TIDECOIN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 9."
       }
     ],
     "reasonStats": {
@@ -2520,7 +2528,7 @@
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 102,
+        "red_flag": 103,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2570,7 +2578,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791487917837,
+    "generatedAt": 1791488218593,
     "trades": {
       "count": 49,
       "wins": 19,
