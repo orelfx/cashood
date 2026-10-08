@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "36f65c2d-983d-4350-9d60-53cd5213070c",
-  "updatedAt": 1791468973680,
-  "generatedAt": "2026-10-08 21:16 WIB",
+  "generation": "8c1472e0-8a8f-49c6-84d7-398cd4ab1e71",
+  "updatedAt": 1791469273685,
+  "generatedAt": "2026-10-08 21:21 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791468973680,
+    "heartbeatAt": 1791469273685,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791468971757,
+    "lastScanAt": 1791469271888,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,13 +1166,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "129",
-        "n": "24 jam · 20 diveto LLM"
+        "v": "131",
+        "n": "24 jam · 21 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1824",
-        "n": "166 aktif"
+        "n": "167 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791468973680,
+      "lastDecisionAt": 1791469273685,
       "lastAction": "keputusan",
-      "lastReason": "e/acc [mid]: Dilewati karena red flag: bundler pegang 50% supply."
+      "lastReason": "STREAM [degen]: Diveto LLM: Wallet smart #564 has poor copy history (1 rug, 0.3% avg PnL) and high churn (146 tokens/week) despite decent realized PnL, while Wallet smart #1087 has no copy hist. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1203,7 +1203,7 @@
       ],
       [
         "Wallet dipantau",
-        "1824 · 166 aktif"
+        "1824 · 167 aktif"
       ],
       [
         "Cadangan kas",
@@ -1215,7 +1215,7 @@
       ],
       [
         "Label wallet",
-        "smart 518 · dolphin 53 · bot 964 · blacklist 140 · lp 2 · fresh 33 · kol 110 · whale 4"
+        "smart 519 · dolphin 53 · bot 963 · blacklist 140 · lp 2 · fresh 33 · kol 110 · whale 4"
       ]
     ],
     "requirements": [
@@ -1264,21 +1264,21 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1824,
-      "active": 166,
-      "passive": 1658,
+      "active": 167,
+      "passive": 1657,
       "trusted": 2,
       "promising": 16,
       "byLabel": [
         {
           "key": "bot",
-          "total": 964,
+          "total": 963,
           "active": 0,
-          "passive": 964
+          "passive": 963
         },
         {
           "key": "smart",
-          "total": 518,
-          "active": 132,
+          "total": 519,
+          "active": 133,
           "passive": 386
         },
         {
@@ -1419,6 +1419,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791469090553,
+        "symbol": "STREAM",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 22.43% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 2.01%"
+          },
+          {
+            "type": "bundler",
+            "count": 119,
+            "note": "bundler pegang 31.7%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 2.9%"
+          },
+          {
+            "type": "fresh",
+            "count": 96,
+            "note": "10.0% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Wallet smart #564 has poor copy history (1 rug, 0.3% avg PnL) and high churn (146 tokens/week) despite decent realized PnL, while Wallet smart #1087 has no copy hist. Tidak dimasuki."
+      },
+      {
+        "at": 1791469039232,
+        "symbol": "OWL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 21."
+      },
       {
         "at": 1791468106436,
         "symbol": "e/acc",
@@ -2099,26 +2146,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: bundler pegang 27.06% supply."
-      },
-      {
-        "at": 1791430476839,
-        "symbol": "MENTOR",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati: harga sudah -37% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791428326105,
-        "symbol": "BDOG",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 8."
       }
     ],
     "reasonStats": {
@@ -2129,7 +2156,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 69,
+        "red_flag": 70,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2146,7 +2173,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 20
+        "llm": 21
       },
       "test": {
         "solo": 0,
@@ -2179,7 +2206,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791469021921,
+    "generatedAt": 1791469327265,
     "trades": {
       "count": 48,
       "wins": 18,
