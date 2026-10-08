@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e7506f20-4823-41f3-8464-f0fd4c9675f6",
-  "updatedAt": 1791470773698,
-  "generatedAt": "2026-10-08 21:46 WIB",
+  "generation": "ad090208-1cd9-4f21-bde9-eae2734bd430",
+  "updatedAt": 1791471073699,
+  "generatedAt": "2026-10-08 21:51 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791470773698,
+    "heartbeatAt": 1791471073699,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791470772274,
+    "lastScanAt": 1791471069931,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,7 +1166,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "135",
+        "v": "137",
         "n": "24 jam · 21 diveto LLM"
       },
       {
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791470773698,
+      "lastDecisionAt": 1791471073699,
       "lastAction": "keputusan",
-      "lastReason": "SM64 [degen]: Dilewati karena red flag: holder baru 10."
+      "lastReason": "Altruists [degen]: Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1420,6 +1420,44 @@
     },
     "decisions": [
       {
+        "at": 1791471001803,
+        "symbol": "Altruists",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791470896406,
+        "symbol": "401sik",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791470846626,
+        "symbol": "OWL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 17."
+      },
+      {
         "at": 1791470605732,
         "symbol": "SM64",
         "action": "skip",
@@ -1448,16 +1486,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 11."
-      },
-      {
-        "at": 1791469644116,
-        "symbol": "OWL",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 17."
       },
       {
         "at": 1791469090553,
@@ -2118,40 +2146,12 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: 26% holder wallet baru (sybil)."
-      },
-      {
-        "at": 1791433438893,
-        "symbol": "KEK",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
-      },
-      {
-        "at": 1791433387278,
-        "symbol": "CAPYBARA",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 2,
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 60% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 28,
+        "below_entry": 30,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2206,7 +2206,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791470817632,
+    "generatedAt": 1791471117166,
     "trades": {
       "count": 48,
       "wins": 18,
