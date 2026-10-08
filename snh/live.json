@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5b51385a-847a-446f-a064-bd0c5e2784d3",
-  "updatedAt": 1791426970182,
-  "generatedAt": "2026-10-08 09:36 WIB",
+  "generation": "e3e9283f-0a6b-44df-b21e-0f13849eedbb",
+  "updatedAt": 1791427270182,
+  "generatedAt": "2026-10-08 09:41 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791426970182,
+    "heartbeatAt": 1791427270182,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791426969666,
+    "lastScanAt": 1791427269004,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1172,8 +1172,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "106",
-        "n": "24 jam · 24 diveto LLM"
+        "v": "107",
+        "n": "24 jam · 25 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791426970182,
+      "lastDecisionAt": 1791427270182,
       "lastAction": "keputusan",
-      "lastReason": "NIGGA [degen]: Dilewati: harga sudah -47% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "BORDR [mid]: Diveto LLM: KOL wallet dominates with 89% of group PnL, creates tokens (pump/dump risk), has 35k followers (crowding), and no copy history with us; other wallets are weak w. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1425,6 +1425,50 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791427186033,
+        "symbol": "BORDR",
+        "action": "veto",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1,
+          "kol": 1,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 38.6%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.9%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "10.7% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: KOL wallet dominates with 89% of group PnL, creates tokens (pump/dump risk), has 35k followers (crowding), and no copy history with us; other wallets are weak w. Tidak dimasuki."
+      },
       {
         "at": 1791426836598,
         "symbol": "NIGGA",
@@ -2448,43 +2492,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: bundler pegang 53% supply."
-      },
-      {
-        "at": 1791405226526,
-        "symbol": "Eko",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 8.98% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 327,
-            "note": "bundler pegang 28.6%"
-          },
-          {
-            "type": "rat",
-            "count": 7,
-            "note": "insider/entrapment pegang 3.4%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 12.6%"
-          }
-        ],
-        "reason": "Keluar (follow exit): 2 dari 2 wallet yang diikuti sudah menjual setelah 15 menit, jadi posisi ikut ditutup. TP1 sudah kena di +20%. Hasil +10,2%."
       }
     ],
     "reasonStats": {
@@ -2512,7 +2519,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 24
+        "llm": 25
       },
       "test": {
         "solo": 0,
@@ -2545,7 +2552,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791427044257,
+    "generatedAt": 1791427317571,
     "trades": {
       "count": 47,
       "wins": 18,
