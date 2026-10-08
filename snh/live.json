@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "34321e4c-3dc1-4bda-991d-4d4ac1dbbbe3",
-  "updatedAt": 1791482475323,
-  "generatedAt": "2026-10-09 01:01 WIB",
+  "generation": "0a711325-e20d-4a60-bf78-aa1c9858b2f5",
+  "updatedAt": 1791482775323,
+  "generatedAt": "2026-10-09 01:06 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791482475323,
+    "heartbeatAt": 1791482775323,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791482474460,
+    "lastScanAt": 1791482772397,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,8 +1166,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "184",
-        "n": "24 jam · 39 diveto LLM"
+        "v": "185",
+        "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791482475323,
+      "lastDecisionAt": 1791482775323,
       "lastAction": "keputusan",
-      "lastReason": "OpenHuman [degen]: Dilewati: harga sudah -34% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "tardigrade [low]: Diveto LLM: All three wallets show losing copy history (0 wins, negative avg PnL), Wallet 2 exhibits sniper behavior (114/236 round trips under 2min), Wallet 1 has poor 31%. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1419,6 +1419,39 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791482632703,
+        "symbol": "tardigrade",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 339,
+            "note": "bundler pegang 24.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.7%"
+          },
+          {
+            "type": "fresh",
+            "count": 480,
+            "note": "15.3% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 16x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show losing copy history (0 wins, negative avg PnL), Wallet 2 exhibits sniper behavior (114/236 round trips under 2min), Wallet 1 has poor 31%. Tidak dimasuki."
+      },
       {
         "at": 1791482336731,
         "symbol": "OpenHuman",
@@ -2209,44 +2242,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 6."
-      },
-      {
-        "at": 1791471721355,
-        "symbol": "Altruists",
-        "action": "wait",
-        "basket": "low",
-        "wallets": {
-          "smart": 4,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 589,
-            "note": "bundler pegang 26.4%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 12.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 821,
-            "note": "19.8% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 5x likuiditas"
-          }
-        ],
-        "reason": "Menunggu pullback: harga sudah +116% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
       }
     ],
     "reasonStats": {
@@ -2274,7 +2269,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 39
+        "llm": 40
       },
       "test": {
         "solo": 0,
@@ -2307,7 +2302,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791482524650,
+    "generatedAt": 1791482819168,
     "trades": {
       "count": 48,
       "wins": 18,
