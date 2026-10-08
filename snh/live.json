@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c370d646-ca7d-4448-b1a3-bae9c17c28dd",
-  "updatedAt": 1791480975320,
-  "generatedAt": "2026-10-09 00:36 WIB",
+  "generation": "6c2efdb7-1e54-4a67-813f-782dcc41a20b",
+  "updatedAt": 1791481275321,
+  "generatedAt": "2026-10-09 00:41 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791480975320,
+    "heartbeatAt": 1791481275321,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791480974520,
+    "lastScanAt": 1791481272088,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,8 +1166,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "176",
-        "n": "24 jam · 36 diveto LLM"
+        "v": "180",
+        "n": "24 jam · 38 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791480975320,
+      "lastDecisionAt": 1791481275321,
       "lastAction": "keputusan",
-      "lastReason": "Pao [degen]: Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Quantum [degen]: Diveto LLM: All three wallets show negative realized PnL (-$150 to -$463) over 7 days with tiny median exit gains (1.5-3.8%) despite 60-66% win rates, indicating scalping s. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1419,6 +1419,71 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791481099290,
+        "symbol": "Quantum",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 131,
+            "note": "bundler pegang 19.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show negative realized PnL (-$150 to -$463) over 7 days with tiny median exit gains (1.5-3.8%) despite 60-66% win rates, indicating scalping s. Tidak dimasuki."
+      },
+      {
+        "at": 1791481093123,
+        "symbol": "DUNKCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 8."
+      },
+      {
+        "at": 1791481079605,
+        "symbol": "Quantum",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 131,
+            "note": "bundler pegang 17.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets have high churn (~50 tokens/day), negative realized PnL, and median exit gains under 3%—they grind wins but leak more in losses and fees; no c. Tidak dimasuki."
+      },
+      {
+        "at": 1791481014468,
+        "symbol": "OURA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 37% supply."
+      },
       {
         "at": 1791480720886,
         "symbol": "Pao",
@@ -2241,54 +2306,6 @@
           }
         ],
         "reason": "Diveto LLM: Nova has 33% winrate with median exit at -12.7% loss and 69k followers (crowding risk), while the smart wallet has -$1,344 realized PnL; combined basket lacks s. Tidak dimasuki."
-      },
-      {
-        "at": 1791471340612,
-        "symbol": "PQCINU",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 7."
-      },
-      {
-        "at": 1791471115289,
-        "symbol": "BCAT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 2."
-      },
-      {
-        "at": 1791471001803,
-        "symbol": "Altruists",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791470896406,
-        "symbol": "401sik",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2299,7 +2316,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 92,
+        "red_flag": 94,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2316,7 +2333,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 36
+        "llm": 38
       },
       "test": {
         "solo": 0,
@@ -2349,7 +2366,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791481018767,
+    "generatedAt": 1791481320243,
     "trades": {
       "count": 48,
       "wins": 18,
