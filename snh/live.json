@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c5390cf6-69e1-4f73-8852-3a7017e7650d",
-  "updatedAt": 1791501075468,
-  "generatedAt": "2026-10-09 06:11 WIB",
+  "generation": "d71d0514-a136-470d-81cf-2a1ae2682fc6",
+  "updatedAt": 1791501375468,
+  "generatedAt": "2026-10-09 06:16 WIB",
   "usdIdr": null,
   "totalUsd": 961.4048276615757,
   "nativeSymbol": "SOL",
@@ -1157,12 +1157,12 @@
     "pnlUsd": -38.59517233842428,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791501075468,
+    "heartbeatAt": 1791501375468,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.76,
-    "lastScanAt": 1791501073900,
+    "lastScanAt": 1791501374813,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1183,8 +1183,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "200",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "201",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1199,9 +1199,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791501075468,
+      "lastDecisionAt": 1791501375468,
       "lastAction": "keputusan",
-      "lastReason": "TSI [degen]: Dilewati: harga sudah -67% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "vamp [low]: Diveto LLM: Group quality dragged down by two 'trojan'-tagged wallets (kol #185 at 34% winrate with 34 losses over -50%, smart #1053 with -$89 realized PnL) who show heavy bot. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1436,6 +1436,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791501121372,
+        "symbol": "vamp",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 6.71% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 267,
+            "note": "bundler pegang 25.1%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 4.3%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 7.2%"
+          },
+          {
+            "type": "fresh",
+            "count": 400,
+            "note": "6.7% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 12x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Group quality dragged down by two 'trojan'-tagged wallets (kol #185 at 34% winrate with 34 losses over -50%, smart #1053 with -$89 realized PnL) who show heavy bot. Tidak dimasuki."
+      },
       {
         "at": 1791500965828,
         "symbol": "TSI",
@@ -2456,16 +2499,6 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show negative realized PnL (-$462/-$463) despite 65-66% winrate, indicating they cut winners too early (median exit +3.8%/-1.5%) while accumulating. Tidak dimasuki."
-      },
-      {
-        "at": 1791483302043,
-        "symbol": "TWEETCRAFT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 15."
       }
     ],
     "reasonStats": {
@@ -2493,7 +2526,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 44
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2526,7 +2559,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791501119180,
+    "generatedAt": 1791501442909,
     "trades": {
       "count": 49,
       "wins": 19,
