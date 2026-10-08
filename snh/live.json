@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f9edbdaa-1bb9-4fb3-9fd3-f5d036724fcc",
-  "updatedAt": 1791435370274,
-  "generatedAt": "2026-10-08 11:56 WIB",
+  "generation": "b93c8107-35d2-4419-869a-3540069bbc65",
+  "updatedAt": 1791435670277,
+  "generatedAt": "2026-10-08 12:01 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791435370274,
+    "heartbeatAt": 1791435670277,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791435367936,
+    "lastScanAt": 1791435666860,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1172,8 +1172,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "115",
-        "n": "24 jam · 23 diveto LLM"
+        "v": "116",
+        "n": "24 jam · 24 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791435370274,
+      "lastDecisionAt": 1791435670277,
       "lastAction": "keputusan",
-      "lastReason": "Capygun [degen]: Dilewati karena red flag: holder baru 7."
+      "lastReason": "Grokbot [degen]: Diveto LLM: Both wallets have negative realized PnL despite high winrates, extreme token churn (~50/day), only micro-winners (median 3-6% gains) with zero to one over-5x wi. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1425,6 +1425,38 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791435541750,
+        "symbol": "Grokbot",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 355,
+            "note": "bundler pegang 6.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 2.9%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets have negative realized PnL despite high winrates, extreme token churn (~50/day), only micro-winners (median 3-6% gains) with zero to one over-5x wi. Tidak dimasuki."
+      },
+      {
+        "at": 1791435502312,
+        "symbol": "BOT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -64% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791435326313,
         "symbol": "Capygun",
@@ -2423,43 +2455,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 21%."
-      },
-      {
-        "at": 1791411843837,
-        "symbol": "ELON",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 44% supply."
-      },
-      {
-        "at": 1791411672893,
-        "symbol": "HI",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 248,
-            "note": "bundler pegang 18.0%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 1.1%"
-          },
-          {
-            "type": "top10",
-            "count": null,
-            "note": "10 holder terbesar pegang 34.8%"
-          }
-        ],
-        "reason": "Diveto LLM: Only 1 of 3 wallets has positive copy history (avg +6.3%), others are negative (-8.2%, -2.9%); all have sub-40% winrates, zero over-5x winners, and coordinated . Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2487,7 +2482,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 23
+        "llm": 24
       },
       "test": {
         "solo": 0,
@@ -2520,7 +2515,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791435415620,
+    "generatedAt": 1791435715958,
     "trades": {
       "count": 47,
       "wins": 18,
