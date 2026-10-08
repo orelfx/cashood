@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4c856c9c-46ef-4f39-afc4-d6fa3a83d243",
-  "updatedAt": 1791476173724,
-  "generatedAt": "2026-10-08 23:16 WIB",
+  "generation": "10161c68-44ea-42b8-8755-5b468e3dfebe",
+  "updatedAt": 1791476475283,
+  "generatedAt": "2026-10-08 23:21 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791476173724,
+    "heartbeatAt": 1791476475283,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791476171807,
+    "lastScanAt": 1791476462926,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,7 +1166,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "162",
+        "v": "163",
         "n": "24 jam · 32 diveto LLM"
       },
       {
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791476173724,
+      "lastDecisionAt": 1791476475283,
       "lastAction": "keputusan",
-      "lastReason": "QUBIT [degen]: Diveto LLM: All three wallets show negative realized PnL (-$150 to -$463) despite high churn (275-349 tokens/week), with overwhelming majority of wins being under 2x and me. Tidak dimasuki."
+      "lastReason": "SARP [big]: Dilewati karena red flag: likuiditas cuma 0.7% dari market cap."
     }
   },
   "strategy": {
@@ -1215,7 +1215,7 @@
       ],
       [
         "Label wallet",
-        "smart 516 · dolphin 54 · bot 966 · blacklist 143 · lp 2 · fresh 34 · kol 111 · whale 4"
+        "smart 515 · dolphin 54 · bot 967 · blacklist 143 · lp 2 · fresh 34 · kol 111 · whale 4"
       ]
     ],
     "requirements": [
@@ -1271,15 +1271,15 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 966,
+          "total": 967,
           "active": 0,
-          "passive": 966
+          "passive": 967
         },
         {
           "key": "smart",
-          "total": 516,
+          "total": 515,
           "active": 126,
-          "passive": 390
+          "passive": 389
         },
         {
           "key": "blacklist",
@@ -1419,6 +1419,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791476259266,
+        "symbol": "SARP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.7% dari market cap."
+      },
       {
         "at": 1791476037154,
         "symbol": "QUBIT",
@@ -2272,39 +2282,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: 44% holder wallet baru (sybil)."
-      },
-      {
-        "at": 1791462153981,
-        "symbol": "PLAGUE",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 3,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 19.6%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 13.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "7.1% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Diveto LLM: Zero multi-baggers (x2+) across all four wallets, negative copy history on three with 30% losses, and smart #1797 has extreme churn (489 buys/sells/week) with $5 p. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2315,7 +2292,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 83,
+        "red_flag": 84,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2365,7 +2342,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791476217906,
+    "generatedAt": 1791476530550,
     "trades": {
       "count": 48,
       "wins": 18,
