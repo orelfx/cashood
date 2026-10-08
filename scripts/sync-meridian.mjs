@@ -158,10 +158,13 @@ const prevPos = new Map((prevLive?.positions || []).map((x) => [String(x.tokenId
 const ditolak = [];
 
 const positions = (book.positions || []).map((p) => {
-  const value = trueUsd(p, 'total_value');
+  // The bot reports principal and claimable fees separately. Its book report
+  // adds them; total_value_true_usd is not fee-inclusive (tools/pnl.js).
+  const principal = trueUsd(p, 'total_value');
   const unclaimed = trueUsd(p, 'unclaimed_fees');
   const collected = trueUsd(p, 'collected_fees');
   const pnl = trueUsd(p, 'pnl');
+  const value = principal + unclaimed;
   const span = num(p.upper_bin) - num(p.lower_bin);
   const through = span > 0 ? ((num(p.active_bin) - num(p.lower_bin)) / span) * 100 : null;
   return {
@@ -170,8 +173,10 @@ const positions = (book.positions || []).map((p) => {
     strategy: p.strategy || 'dlmm',
     inRange: p.in_range === true,
     valueUsd: Number(value.toFixed(2)),
-    investedUsd: Number((value - pnl).toFixed(2)),
-    principalUsd: Number(Math.max(0, value - unclaimed).toFixed(2)),
+    // Net contributed basis = current equity + claimed fees - lifecycle PnL.
+    // Claimed fees already sit in the wallet; do not add them to LP equity.
+    investedUsd: Number((value + collected - pnl).toFixed(2)),
+    principalUsd: Number(principal.toFixed(2)),
     feesUsd: Number(unclaimed.toFixed(2)),
     collectedFeesUsd: Number(collected.toFixed(2)),
     totalFeesUsd: Number((collected + unclaimed).toFixed(2)),

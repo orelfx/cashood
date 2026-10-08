@@ -26,7 +26,16 @@ function fixture(){const root=mkdtempSync(join(tmpdir(),'cashood-exporter-')),bo
  return {root,data,run};}
 test('all exporters produce coherent public snapshots; failed reads retain prior snapshots',()=>{const f=fixture();try{
  for(const [fund,script,args,fail] of [['reborn','sync.mjs',[join(f.data,'reborn/live.json')],'balance'],['meridian','sync-meridian.mjs',[],'positions'],['ferari','sync-ferari.mjs',[],'lp']]){
-  const r=f.run(script,args);assert.equal(r.status,0,`${fund}: ${r.stderr}`);const p=join(f.data,fund,'live.json'),text=readFileSync(p,'utf8'),live=JSON.parse(text);Core.validateSnapshot(live,{complete:true});assert.match(live.positions[0].tokenId,/^pos-/);assert.equal(text.includes('"tokenId": "123"'),false);if(fund==='meridian')assert.equal(live.walletUsd,200.1);
+  const r=f.run(script,args);assert.equal(r.status,0,`${fund}: ${r.stderr}`);const p=join(f.data,fund,'live.json'),text=readFileSync(p,'utf8'),live=JSON.parse(text);Core.validateSnapshot(live,{complete:true});assert.match(live.positions[0].tokenId,/^pos-/);assert.equal(text.includes('"tokenId": "123"'),false);if(fund==='meridian'){
+   assert.equal(live.walletUsd,200.1);
+   // Bot principal is $100; $2 is still claimable and $1 was already claimed.
+   // Current LP equity is $102, net capital basis $100, lifecycle profit $3.
+   assert.equal(live.totalUsd,302.1,'unclaimed fees must be included once in NAV');
+   assert.equal(live.positions[0].principalUsd,100);
+   assert.equal(live.positions[0].valueUsd,102);
+   assert.equal(live.positions[0].investedUsd,100);
+   assert.equal(live.positions[0].pnlUsd,3,'claimed fees must not be counted twice in PnL');
+  }
   const failed=f.run(script,args,fail);assert.notEqual(failed.status,0,`${fund} accepted a partial read`);assert.equal(readFileSync(p,'utf8'),text);if(fund==='meridian'){
    // Harga tidak bisa dicari: tetap menolak, snapshot lama dipertahankan.
    assert.notEqual(f.run(script,args,'unpriced-offline').status,0);assert.equal(readFileSync(p,'utf8'),text);
