@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f8facc60-9edb-4efe-b464-a185d3798b59",
-  "updatedAt": 1791449170527,
-  "generatedAt": "2026-10-08 15:46 WIB",
+  "generation": "67a74fa8-0fe7-49ba-90d0-dd3cb5ccdd9d",
+  "updatedAt": 1791449470527,
+  "generatedAt": "2026-10-08 15:51 WIB",
   "usdIdr": null,
   "totalUsd": 956.5201616807605,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": -3.76,
       "entryPriceUsd": 0.00015594826,
       "priceUsd": 0.00015639444,
-      "ageMinutes": 21,
+      "ageMinutes": 26,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1201,12 +1201,12 @@
     "pnlUsd": -43.47983831923955,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791449170527,
+    "heartbeatAt": 1791449470527,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.24,
-    "lastScanAt": 1791449168638,
+    "lastScanAt": 1791449470162,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1227,7 +1227,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "120",
+        "v": "121",
         "n": "24 jam · 20 diveto LLM"
       },
       {
@@ -1243,9 +1243,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791449170527,
+      "lastDecisionAt": 1791449470527,
       "lastAction": "keputusan",
-      "lastReason": "wrld [degen]: Dilewati: harga sudah -45% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "wrld [degen]: Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1480,6 +1480,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791449454423,
+        "symbol": "wrld",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791448566012,
         "symbol": "wrld",
@@ -2310,65 +2327,12 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets have very low winrates (26-34%) and low PnL per token ($3-37), survive on small wins and churn, with zero x2-x5 winners despite high volume - lacks. Tidak dimasuki."
-      },
-      {
-        "at": 1791419519602,
-        "symbol": "SharkTank",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 20.56% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 553,
-            "note": "bundler pegang 24.1%"
-          },
-          {
-            "type": "rat",
-            "count": 6,
-            "note": "insider/entrapment pegang 6.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 707,
-            "note": "21.3% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 15x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: Group carried by dolphin #1317 and dolphin #145 which both failed our_copies (-26.5%, -18.9%) with high churn; only smart #850 shows positive copy history but its 78.3 sco. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 26,
+        "below_entry": 27,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2423,7 +2387,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791449216864,
+    "generatedAt": 1791449518527,
     "trades": {
       "count": 47,
       "wins": 18,
