@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9aa7b215-cca2-4831-81b3-aafbea85f32e",
-  "updatedAt": 1791485475354,
-  "generatedAt": "2026-10-09 01:51 WIB",
+  "generation": "5216c2f0-e02d-49b6-b086-892c403ca49d",
+  "updatedAt": 1791485775354,
+  "generatedAt": "2026-10-09 01:56 WIB",
   "usdIdr": null,
   "totalUsd": 961.4048276615757,
   "nativeSymbol": "SOL",
@@ -1157,12 +1157,12 @@
     "pnlUsd": -38.59517233842428,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791485475354,
+    "heartbeatAt": 1791485775354,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.76,
-    "lastScanAt": 1791485472625,
+    "lastScanAt": 1791485771998,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1183,7 +1183,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "198",
+        "v": "199",
         "n": "24 jam · 44 diveto LLM"
       },
       {
@@ -1199,9 +1199,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791485475354,
+      "lastDecisionAt": 1791485775354,
       "lastAction": "keputusan",
-      "lastReason": "Bunker [degen]: Diveto LLM: All four wallets show negative realized PnL (-150 to -463 USD) despite decent win rates (60-66%), indicating a classic 'win small/lose big' pattern; combined wi. Tidak dimasuki."
+      "lastReason": "OFFICIAL [low]: Menunggu pullback: harga sudah +60% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
     }
   },
   "strategy": {
@@ -1232,7 +1232,7 @@
       ],
       [
         "Label wallet",
-        "smart 521 · dolphin 51 · bot 974 · blacklist 144 · lp 2 · fresh 34 · kol 113 · whale 4"
+        "smart 519 · dolphin 51 · bot 976 · blacklist 144 · lp 2 · fresh 34 · kol 113 · whale 4"
       ]
     ],
     "requirements": [
@@ -1288,15 +1288,15 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 974,
+          "total": 976,
           "active": 0,
-          "passive": 974
+          "passive": 976
         },
         {
           "key": "smart",
-          "total": 521,
+          "total": 519,
           "active": 133,
-          "passive": 388
+          "passive": 386
         },
         {
           "key": "blacklist",
@@ -1436,6 +1436,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791485770931,
+        "symbol": "OFFICIAL",
+        "action": "wait",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 35.43% supply di blok peluncuran"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.4%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 1.3%"
+          },
+          {
+            "type": "fresh",
+            "count": 522,
+            "note": "15.2% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 19x likuiditas"
+          }
+        ],
+        "reason": "Menunggu pullback: harga sudah +60% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
+      },
       {
         "at": 1791485349222,
         "symbol": "Bunker",
@@ -2402,16 +2445,6 @@
           "smart": 4
         },
         "reason": "Dilewati karena red flag: holder baru 13."
-      },
-      {
-        "at": 1791474395348,
-        "symbol": "REFLECT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 95x."
       }
     ],
     "reasonStats": {
@@ -2433,7 +2466,7 @@
         "reserve": 0
       },
       "wait": {
-        "jumlah": 4
+        "jumlah": 5
       },
       "add": {
         "jumlah": 0
@@ -2472,7 +2505,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791485520974,
+    "generatedAt": 1791485818362,
     "trades": {
       "count": 49,
       "wins": 19,
