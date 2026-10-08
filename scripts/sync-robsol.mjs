@@ -18,6 +18,7 @@ import Core from '../assets/core.js';
 import { atomicJSON, lock } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
 import { cashoodEnv } from './lib/rpc-env.mjs';
+import { solanaPrices } from './lib/solana-prices.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'robsol');
@@ -82,14 +83,12 @@ for (const programId of TOKEN_PROGRAMS) {
   }
 }
 const mints = [...new Set([SOL_MINT, ...tokenAccounts.map((t) => t.mint)])];
-const priceRes = await fetch('https://lite-api.jup.ag/price/v3?ids=' + mints.slice(0, 50).join(','), { signal: AbortSignal.timeout(15000) });
-if (!priceRes.ok) throw new Error('harga Jupiter tidak terbaca; snapshot lama dipertahankan');
-const prices = await priceRes.json();
+const { prices, noMarket } = await solanaPrices(mints);
 const solPrice = num(prices[SOL_MINT]?.usdPrice);
 if (!(solPrice > 0)) throw new Error('harga SOL tidak terbaca');
 
-// Token tanpa harga dinilai $0 dan tidak disebut namanya: yang terbit hanya
-// simbol yang dikenal, bukan alamat mint.
+// Only tokens with no market in both responding sources receive zero value.
+// Source failures abort the export instead of quietly dropping wallet assets.
 const KNOWN = { [SOL_MINT]: 'wSOL', EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC', Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: 'USDT' };
 let dustUsd = 0, dustCount = 0;
 const holdings = [{ symbol: 'SOL', amount: lamports / 1e9, price: solPrice, usd: (lamports / 1e9) * solPrice }];
@@ -216,6 +215,7 @@ const snapshot = {
   walletUsd: r2(walletUsd),
   lpUsd: r2(lpUsd),
   holdings: holdingsOut,
+  noMarketTokenCount: noMarket.length,
   positions,
   lpSource: 'lpagent',
   history,

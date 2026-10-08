@@ -61,10 +61,14 @@ function cli(command) {
 const balance = cli('balance');
 const book = cli('positions');
 if (!Array.isArray(book.positions) || balance.error || book.error) throw new Error('CLI mengembalikan data parsial');
+if (balance.tokens_unavailable === true || !Array.isArray(balance.tokens)) throw new Error('Daftar saldo token tidak tersedia; snapshot lama dipertahankan');
 const solPrice = Core.number(balance.sol_price, 'Harga SOL', .01);
 for (const key of ['sol','sol_usd','usdc']) Core.number(balance[key], key, 0);
-// Some balance providers include SOL/USDC again in the token list.
-const mainMints = new Set(['So11111111111111111111111111111111111111112','EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v']);
+// Helius repeats its SOL summary in the token list. RPC fallback instead reads
+// native SOL with getBalance: an SPL wSOL account there is a separate asset.
+const wrappedSolMint = 'So11111111111111111111111111111111111111112';
+const mainMints = new Set(['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v']);
+if (balance.degraded !== 'helius_unavailable_rpc_fallback') mainMints.add(wrappedSolMint);
 const extraTokens = (balance.tokens || []).filter(t => !mainMints.has(t.mint));
 const unpricedTokens = extraTokens.filter(t => Core.number(t.balance,'Saldo token',0)>0 && t.usd == null);
 
@@ -123,7 +127,7 @@ const holdings = [
   { symbol: 'SOL', amount: num(balance.sol), price: solPrice, usd: num(balance.sol_usd) },
   { symbol: 'USDC', amount: num(balance.usdc), price: 1, usd: num(balance.usdc) },
   ...extraTokens.filter(t=>t.balance>0).map((t) => ({
-    symbol: t.symbol || String(t.mint || '').slice(0, 8),
+    symbol: t.mint === wrappedSolMint ? 'wSOL' : t.symbol || String(t.mint || '').slice(0, 8),
     amount: num(t.balance), price: null, usd: num(t.usd),
   })),
 ].filter((h) => h.usd > 0);

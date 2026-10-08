@@ -14,7 +14,10 @@ function fixture(){const root=mkdtempSync(join(tmpdir(),'cashood-exporter-')),bo
  write(bot,'manager.js',`export const readBook=async()=>[{integrity:{complete:true},positions:[{tokenId:'123',quoteToken:'${usdg}',basisQuote:100000000,principalUsd:100,feesUsd:2,valueUsd:102,symbol:'TEST',tickLower:0,tickUpper:10,currentTick:5,inRange:true}]}];`);
  write(bot,'store.js','export const getClosed=()=>[],getClosedSince=()=>[],profitSweeps=()=>[],getOpen=()=>[{tokenId:"123",claimedQuote:1000000}];');
  write(bot,'venue/lpagent.js',`export const openPositions=async()=>{if(process.env.FAIL==='lp')throw Error('RPC');return [{tokenId:'123',pairName:'TEST',currentValue:100,unCollectedFee:2,inputValue:100,collectedFee:1,poolInfo:{feeTier:3000},ageHour:1}];};`);
- write(bot,'cli.js',`setInterval(()=>{},300000);const balance={sol_price:100,sol:1,sol_usd:100,usdc:100,tokens:[{mint:'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',symbol:'USDC',balance:100,usd:100},{mint:'dust',symbol:'DUST',balance:1,usd:.1}]};const positions={positions:[{position:'S'.repeat(40),pair:'TOKEN/SOL',total_value_true_usd:100,unclaimed_fees_true_usd:2,collected_fees_true_usd:1,pnl_true_usd:3,lower_bin:0,upper_bin:10,active_bin:5}]};if(process.env.FAIL==='positions')delete positions.positions;if(String(process.env.FAIL).startsWith('unpriced'))balance.tokens.push({mint:'unknown',balance:10,usd:null});console.log(JSON.stringify(process.argv[2]==='balance'?balance:positions));`);
+ write(bot,'cli.js',`setInterval(()=>{},300000);const balance={sol_price:100,sol:1,sol_usd:100,usdc:100,tokens:[{mint:'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',symbol:'USDC',balance:100,usd:100},{mint:'dust',symbol:'DUST',balance:1,usd:.1}]};const positions={positions:[{position:'S'.repeat(40),pair:'TOKEN/SOL',total_value_true_usd:100,unclaimed_fees_true_usd:2,collected_fees_true_usd:1,pnl_true_usd:3,lower_bin:0,upper_bin:10,active_bin:5}]};if(process.env.FAIL==='tokens')balance.tokens_unavailable=true;
+if(process.env.FAIL==='wrapped'){balance.degraded='helius_unavailable_rpc_fallback';balance.tokens.push({mint:'So11111111111111111111111111111111111111112',symbol:'wSOL',balance:2,usd:200});}
+if(process.env.FAIL==='sol-duplicate')balance.tokens.push({mint:'So11111111111111111111111111111111111111112',symbol:'SOL',balance:1,usd:100});
+if(process.env.FAIL==='positions')delete positions.positions;if(String(process.env.FAIL).startsWith('unpriced'))balance.tokens.push({mint:'unknown',balance:10,usd:null});console.log(JSON.stringify(process.argv[2]==='balance'?balance:positions));`);
  const cfg={owners:[{id:'a',name:'A'}],events:[{id:'initial',date:'2026-09-01',owner:'a',type:'deposit',usd:1000,founding:true}],fund:{capacityUsd:10000},costs:{items:[]},dividend:{basis:'nav',distributePct:100,reinvestPct:0},treasury:{openingUsd:0}};
  for(const fund of ['reborn','meridian','ferari'])write(data,`${fund}/config.json`,JSON.stringify(cfg));
  write(data,'ferari/wallet.local.json',JSON.stringify({address}));
@@ -37,6 +40,7 @@ test('all exporters produce coherent public snapshots; failed reads retain prior
    assert.equal(live.positions[0].pnlUsd,3,'claimed fees must not be counted twice in PnL');
   }
   const failed=f.run(script,args,fail);assert.notEqual(failed.status,0,`${fund} accepted a partial read`);assert.equal(readFileSync(p,'utf8'),text);if(fund==='meridian'){
+   assert.notEqual(f.run(script,args,'tokens').status,0);assert.equal(readFileSync(p,'utf8'),text);
    // Harga tidak bisa dicari: tetap menolak, snapshot lama dipertahankan.
    assert.notEqual(f.run(script,args,'unpriced-offline').status,0);assert.equal(readFileSync(p,'utf8'),text);
    // Dua pasar menjawab dan tidak ada pasar sama sekali: $0, tapi dicatat terang.
@@ -71,3 +75,14 @@ test('reborn: buku keempat hot potato punya label dan baris sendiri; buku tak di
  assert.equal(live.paperBooks.paper,true);assert.equal(live.paperBooks.variants[0].netUsd,19.69);
  const realTotal=live.bookStats.all.books.reduce((s,b)=>s+b.netUsd,0);assert.equal(Number(realTotal.toFixed(2)),-89.14);
 }finally{rmSync(f.root,{recursive:true,force:true});}});
+
+test('Meridian counts wrapped SOL separately for RPC balances and deduplicates Helius SOL',()=>{
+ for(const [mode,walletUsd] of [['wrapped',400.1],['sol-duplicate',200.1]]){
+  const f=fixture();try{
+   const r=f.run('sync-meridian.mjs',[],mode);assert.equal(r.status,0,r.stderr);
+   const live=JSON.parse(readFileSync(join(f.data,'meridian/live.json'),'utf8'));
+   assert.equal(live.walletUsd,walletUsd);
+   assert.equal(live.totalUsd,Core.money(walletUsd+102));
+  }finally{rmSync(f.root,{recursive:true,force:true});}
+ }
+});
