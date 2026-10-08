@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8c5f7d40-3a04-4d81-bda0-584455307513",
-  "updatedAt": 1791433270262,
-  "generatedAt": "2026-10-08 11:21 WIB",
+  "generation": "a0cdbced-b8d1-40cf-93f0-5effecf40875",
+  "updatedAt": 1791433570263,
+  "generatedAt": "2026-10-08 11:26 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791433270262,
+    "heartbeatAt": 1791433570263,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791433269009,
+    "lastScanAt": 1791433569712,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1172,7 +1172,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "111",
+        "v": "113",
         "n": "24 jam · 23 diveto LLM"
       },
       {
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791433270262,
+      "lastDecisionAt": 1791433570263,
       "lastAction": "keputusan",
-      "lastReason": "七仔 [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "KEK [degen]: Dilewati karena red flag: insider/entrapment pegang 19%."
     }
   },
   "strategy": {
@@ -1425,6 +1425,34 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791433438893,
+        "symbol": "KEK",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
+      },
+      {
+        "at": 1791433387278,
+        "symbol": "CAPYBARA",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 2,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 60% supply."
+      },
       {
         "at": 1791432141034,
         "symbol": "七仔",
@@ -2454,48 +2482,6 @@
           }
         ],
         "reason": "Diveto LLM: All three wallets show poor copy-trading results (negative avg_pnl_pct on 2 of 3) and zero over_x5 winners despite high token counts, suggesting realized gains . Tidak dimasuki."
-      },
-      {
-        "at": 1791411229807,
-        "symbol": "HI",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 248,
-            "note": "bundler pegang 20.9%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 7.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 192,
-            "note": "8.9% holder wallet baru"
-          },
-          {
-            "type": "top10",
-            "count": null,
-            "note": "10 holder terbesar pegang 36.4%"
-          }
-        ],
-        "reason": "Diveto LLM: Wallet 1 has good metrics but basket is carried by weak wallets with poor copy history (avg -8.2% and -2.9% PnL on our copies), making it high-risk for a $12k m. Tidak dimasuki."
-      },
-      {
-        "at": 1791410854669,
-        "symbol": "SHITCOIN",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati: harga sudah -49% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2506,7 +2492,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 55,
+        "red_flag": 57,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2556,7 +2542,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791433345187,
+    "generatedAt": 1791433616915,
     "trades": {
       "count": 47,
       "wins": 18,
