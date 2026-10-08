@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "27b3711b-ed71-4fd1-bf0e-f04a1de94c95",
-  "updatedAt": 1791466573656,
-  "generatedAt": "2026-10-08 20:36 WIB",
+  "generation": "7ee536f3-c38d-4aa0-809c-9921acbd3a18",
+  "updatedAt": 1791466873660,
+  "generatedAt": "2026-10-08 20:41 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791466573656,
+    "heartbeatAt": 1791466873660,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791466573335,
+    "lastScanAt": 1791466870113,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,8 +1166,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "126",
-        "n": "24 jam · 19 diveto LLM"
+        "v": "128",
+        "n": "24 jam · 20 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791466573656,
+      "lastDecisionAt": 1791466873660,
       "lastAction": "keputusan",
-      "lastReason": "Agency [mid]: Dilewati karena red flag: insider/entrapment pegang 20%."
+      "lastReason": "CATE [big]: Dilewati karena red flag: insider/entrapment pegang 58%."
     }
   },
   "strategy": {
@@ -1419,6 +1419,45 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791466843679,
+        "symbol": "CATE",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 58%."
+      },
+      {
+        "at": 1791466626722,
+        "symbol": "darwin",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 12.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "16.0% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets with copy history show -30% avg PnL, no big winners (all under 2x), and dolphin #371 exhibits bot-like 2min sniper exits—past copy failures outweigh re. Tidak dimasuki."
+      },
       {
         "at": 1791466526461,
         "symbol": "Agency",
@@ -2115,33 +2154,6 @@
           }
         ],
         "reason": "Diveto LLM: All wallets show 42% winrate with zero over-x5 winners and negative-to-marginal median exit gains—copy history too thin to validate, and the market cap is too l. Tidak dimasuki."
-      },
-      {
-        "at": 1791427721649,
-        "symbol": "BDOG",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 9."
-      },
-      {
-        "at": 1791427596559,
-        "symbol": "PQC",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 41.79% supply."
       }
     ],
     "reasonStats": {
@@ -2152,7 +2164,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 65,
+        "red_flag": 66,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2169,7 +2181,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 19
+        "llm": 20
       },
       "test": {
         "solo": 0,
@@ -2202,7 +2214,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791466626723,
+    "generatedAt": 1791466925049,
     "trades": {
       "count": 48,
       "wins": 18,
