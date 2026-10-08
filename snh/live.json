@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bb7350b5-4456-4853-a0e2-a52fff1a9a10",
-  "updatedAt": 1791503175481,
-  "generatedAt": "2026-10-09 06:46 WIB",
+  "generation": "9c365ca0-79da-4473-a24c-8162bb3e0c7c",
+  "updatedAt": 1791503475483,
+  "generatedAt": "2026-10-09 06:51 WIB",
   "usdIdr": null,
   "totalUsd": 961.3176330018855,
   "nativeSymbol": "SOL",
@@ -1171,12 +1171,12 @@
     "pnlUsd": -38.6823669981145,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791503175481,
+    "heartbeatAt": 1791503475483,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.77,
-    "lastScanAt": 1791503174861,
+    "lastScanAt": 1791503471432,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1197,7 +1197,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "204",
+        "v": "205",
         "n": "24 jam · 46 diveto LLM"
       },
       {
@@ -1213,9 +1213,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791503175481,
+      "lastDecisionAt": 1791503475483,
       "lastAction": "keputusan",
-      "lastReason": "Animal [low]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "COIN [low]: Dilewati: harga sudah -35% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1450,6 +1450,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791503296255,
+        "symbol": "COIN",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -35% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791502762906,
         "symbol": "Animal",
@@ -2665,22 +2683,12 @@
           }
         ],
         "reason": "Menunggu pullback: harga sudah +25% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
-      },
-      {
-        "at": 1791484507997,
-        "symbol": "TWEETCRAFT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 20."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 40,
+        "below_entry": 41,
         "no_pullback": 0,
         "wallet_left": 2,
         "breakdown": 0,
@@ -2735,7 +2743,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791503217608,
+    "generatedAt": 1791503518338,
     "trades": {
       "count": 50,
       "wins": 19,
