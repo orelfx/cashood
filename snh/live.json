@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d1b10112-6f8d-4bae-b5d7-73f66ccd86ed",
-  "updatedAt": 1791471373702,
-  "generatedAt": "2026-10-08 21:56 WIB",
+  "generation": "13b767f8-78e5-4bce-8893-c580919ef3cb",
+  "updatedAt": 1791471673702,
+  "generatedAt": "2026-10-08 22:01 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791471373702,
+    "heartbeatAt": 1791471673702,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791471372321,
+    "lastScanAt": 1791471669657,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,8 +1166,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "139",
-        "n": "24 jam · 21 diveto LLM"
+        "v": "141",
+        "n": "24 jam · 23 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791471373702,
+      "lastDecisionAt": 1791471673702,
       "lastAction": "keputusan",
-      "lastReason": "PQCINU [degen]: Dilewati karena red flag: holder baru 7."
+      "lastReason": "Altruists [low]: Diveto LLM: This basket has high churn (avg 105+ tokens/week), weak realized PnL, and is effectively carried by one wallet with low conviction (smart #248 has only $104 reali. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1419,6 +1419,91 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791471625278,
+        "symbol": "Altruists",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 547,
+            "note": "bundler pegang 25.5%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 12.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 738,
+            "note": "20.1% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          }
+        ],
+        "reason": "Diveto LLM: This basket has high churn (avg 105+ tokens/week), weak realized PnL, and is effectively carried by one wallet with low conviction (smart #248 has only $104 reali. Tidak dimasuki."
+      },
+      {
+        "at": 1791471512125,
+        "symbol": "401sik",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 17.99% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 439,
+            "note": "bundler pegang 14.9%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 2.9%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 19.5%"
+          },
+          {
+            "type": "fresh",
+            "count": 648,
+            "note": "8.7% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 31x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Nova has 33% winrate with median exit at -12.7% loss and 69k followers (crowding risk), while the smart wallet has -$1,344 realized PnL; combined basket lacks s. Tidak dimasuki."
+      },
       {
         "at": 1791471340612,
         "symbol": "PQCINU",
@@ -2114,38 +2199,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -64% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791435928507,
-        "symbol": "Capygun",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 11."
-      },
-      {
-        "at": 1791435541750,
-        "symbol": "Grokbot",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 355,
-            "note": "bundler pegang 6.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.9%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets have negative realized PnL despite high winrates, extreme token churn (~50/day), only micro-winners (median 3-6% gains) with zero to one over-5x wi. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2173,7 +2226,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 21
+        "llm": 23
       },
       "test": {
         "solo": 0,
@@ -2206,7 +2259,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791471419693,
+    "generatedAt": 1791471729018,
     "trades": {
       "count": 48,
       "wins": 18,
