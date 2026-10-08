@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "90447e31-60c8-4f94-98af-a4f504c02b6b",
-  "updatedAt": 1791486075354,
-  "generatedAt": "2026-10-09 02:01 WIB",
+  "generation": "044fc273-c2d6-43c6-8404-efb39f4f3804",
+  "updatedAt": 1791486375355,
+  "generatedAt": "2026-10-09 02:06 WIB",
   "usdIdr": null,
   "totalUsd": 961.4048276615757,
   "nativeSymbol": "SOL",
@@ -1157,12 +1157,12 @@
     "pnlUsd": -38.59517233842428,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791486075354,
+    "heartbeatAt": 1791486375355,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.76,
-    "lastScanAt": 1791486074636,
+    "lastScanAt": 1791486371453,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1183,13 +1183,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "201",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "203",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1844",
-        "n": "169 aktif"
+        "n": "168 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1199,9 +1199,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791486075354,
+      "lastDecisionAt": 1791486375355,
       "lastAction": "keputusan",
-      "lastReason": "PEPTIDES [degen]: Dilewati: harga sudah -87% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Caviar [degen]: Diveto LLM: smart #328 has negative copy history (-4.5% avg) and heavy 2-min exits suggest bot behavior that crowds out followers; smart #272 has zero over_x5 wins, inadequate . Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1220,7 +1220,7 @@
       ],
       [
         "Wallet dipantau",
-        "1844 · 169 aktif"
+        "1844 · 168 aktif"
       ],
       [
         "Cadangan kas",
@@ -1281,8 +1281,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1844,
-      "active": 169,
-      "passive": 1675,
+      "active": 168,
+      "passive": 1676,
       "trusted": 3,
       "promising": 16,
       "byLabel": [
@@ -1295,8 +1295,8 @@
         {
           "key": "smart",
           "total": 519,
-          "active": 133,
-          "passive": 386
+          "active": 132,
+          "passive": 387
         },
         {
           "key": "blacklist",
@@ -1436,6 +1436,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791486240875,
+        "symbol": "Caviar",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 4.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 7.3%"
+          },
+          {
+            "type": "fresh",
+            "count": 307,
+            "note": "5.9% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: smart #328 has negative copy history (-4.5% avg) and heavy 2-min exits suggest bot behavior that crowds out followers; smart #272 has zero over_x5 wins, inadequate . Tidak dimasuki."
+      },
+      {
+        "at": 1791486075963,
+        "symbol": "Caviar",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
+      },
       {
         "at": 1791485839678,
         "symbol": "PEPTIDES",
@@ -2437,33 +2474,6 @@
           }
         ],
         "reason": "Diveto LLM: All three wallets show negative realized PnL (-$150 to -$463) despite high churn (275-349 tokens/week), with overwhelming majority of wins being under 2x and me. Tidak dimasuki."
-      },
-      {
-        "at": 1791476016183,
-        "symbol": "fallout",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 7."
-      },
-      {
-        "at": 1791475906152,
-        "symbol": "QUBIT",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 105,
-            "note": "bundler pegang 14.7%"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets show identical patterns (12.8 min median hold, 0.09 chunk share, similar losses), likely same operator; negative realized PnL, only 2-3 x2+ wi. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2474,7 +2484,7 @@
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 101,
+        "red_flag": 102,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2491,7 +2501,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 44
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2524,7 +2534,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791486123623,
+    "generatedAt": 1791486420595,
     "trades": {
       "count": 49,
       "wins": 19,
