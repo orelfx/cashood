@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "75d52737-ff7c-4cfd-8b3a-780ddb8ca8fe",
-  "updatedAt": 1791472573707,
-  "generatedAt": "2026-10-08 22:16 WIB",
+  "generation": "48ef067c-0b23-4156-a0ce-a64db183ec6c",
+  "updatedAt": 1791472873708,
+  "generatedAt": "2026-10-08 22:21 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791472573707,
+    "heartbeatAt": 1791472873708,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791472573314,
+    "lastScanAt": 1791472871938,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791472573707,
+      "lastDecisionAt": 1791472873708,
       "lastAction": "keputusan",
-      "lastReason": "PQCINU [degen]: Dilewati karena red flag: holder baru 13."
+      "lastReason": "Bobcoin [degen]: Dilewati: harga sudah -59% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1215,7 +1215,7 @@
       ],
       [
         "Label wallet",
-        "smart 520 · dolphin 53 · bot 964 · blacklist 141 · lp 2 · fresh 34 · kol 111 · whale 4"
+        "smart 519 · dolphin 53 · bot 965 · blacklist 141 · lp 2 · fresh 34 · kol 111 · whale 4"
       ]
     ],
     "requirements": [
@@ -1271,15 +1271,15 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 964,
+          "total": 965,
           "active": 0,
-          "passive": 964
+          "passive": 965
         },
         {
           "key": "smart",
-          "total": 520,
+          "total": 519,
           "active": 129,
-          "passive": 391
+          "passive": 390
         },
         {
           "key": "blacklist",
@@ -1419,6 +1419,41 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791472739238,
+        "symbol": "Bobcoin",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -59% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791472677424,
+        "symbol": "Altruists",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 5,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 5,
+            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 43% supply."
+      },
       {
         "at": 1791472542097,
         "symbol": "PQCINU",
@@ -2260,60 +2295,17 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -41% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791447885386,
-        "symbol": "SHINU",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 919,
-            "note": "bundler pegang 7.8%"
-          },
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 10.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "9.1% holder wallet baru"
-          }
-        ],
-        "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
-      },
-      {
-        "at": 1791447828826,
-        "symbol": "Bilbo",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 30,
+        "below_entry": 31,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 80,
+        "red_flag": 79,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2363,7 +2355,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791472624612,
+    "generatedAt": 1791472937913,
     "trades": {
       "count": 48,
       "wins": 18,
