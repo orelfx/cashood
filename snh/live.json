@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "85b63df0-d957-4f1a-ac8d-4f2bca736f6b",
-  "updatedAt": 1791447070365,
-  "generatedAt": "2026-10-08 15:11 WIB",
+  "generation": "c14c0b5d-467c-497a-91d7-3bac475ace5a",
+  "updatedAt": 1791447370365,
+  "generatedAt": "2026-10-08 15:16 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791447070365,
+    "heartbeatAt": 1791447370365,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791447068267,
+    "lastScanAt": 1791447368694,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1172,7 +1172,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "113",
+        "v": "115",
         "n": "24 jam · 20 diveto LLM"
       },
       {
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791447070365,
+      "lastDecisionAt": 1791447370365,
       "lastAction": "keputusan",
-      "lastReason": "Tweetboy [degen]: Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Reaper [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1425,6 +1425,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791447117179,
+        "symbol": "Reaper",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791447096306,
+        "symbol": "Tweetboy",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -35% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791446495028,
         "symbol": "Tweetboy",
@@ -2351,38 +2372,17 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 46.77% supply."
-      },
-      {
-        "at": 1791417178437,
-        "symbol": "GIF",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 30.99% supply."
-      },
-      {
-        "at": 1791416031403,
-        "symbol": "PROJECT89",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 22,
+        "below_entry": 23,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 59,
+        "red_flag": 60,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2432,7 +2432,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791447140714,
+    "generatedAt": 1791447413493,
     "trades": {
       "count": 47,
       "wins": 18,
