@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4e720ec3-5f8b-4ec8-92fe-2c059d137c7d",
-  "updatedAt": 1791448270365,
-  "generatedAt": "2026-10-08 15:31 WIB",
+  "generation": "1ba9f94c-4656-4e12-ab19-d65fa6c1ad7f",
+  "updatedAt": 1791448570365,
+  "generatedAt": "2026-10-08 15:36 WIB",
   "usdIdr": null,
-  "totalUsd": 956.32232389531,
+  "totalUsd": 956.5129209390782,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 956.32232389531,
+  "botWalletUsd": 956.5129209390782,
   "walletUsd": 948.4614775764979,
-  "lpUsd": 7.86084632,
+  "lpUsd": 8.05144336,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 8.373619600296955,
       "investedUsd": 8.373619600296955,
-      "principalUsd": 7.86084632,
-      "valueUsd": 7.86084632,
+      "principalUsd": 8.05144336,
+      "valueUsd": 8.05144336,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -0.5127732814848791,
-      "pnlPct": -6.12,
+      "pnlUsd": -0.3221762377166826,
+      "pnlPct": -3.85,
       "entryPriceUsd": 0.00015594826,
-      "priceUsd": 0.00015255427,
-      "ageMinutes": 6,
+      "priceUsd": 0.00015625391,
+      "ageMinutes": 11,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -70,8 +70,8 @@
       ],
       "firstWallet": "smart #451",
       "llmScore": 92,
-      "peakPct": 0,
-      "ddPct": -2.18,
+      "peakPct": 0.52,
+      "ddPct": -2.19,
       "stale": false
     }
   ],
@@ -1195,18 +1195,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 948.4614775764979,
-    "positionsUsd": 7.86084632,
+    "positionsUsd": 8.05144336,
     "realizedUsd": -43.16490282,
-    "unrealizedUsd": -0.51277328,
-    "pnlUsd": -43.67767610469002,
+    "unrealizedUsd": -0.32217624,
+    "pnlUsd": -43.487079060921815,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791448270365,
+    "heartbeatAt": 1791448570365,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 5.26,
-    "lastScanAt": 1791448268453,
+    "drawdownPct": 5.24,
+    "lastScanAt": 1791448570225,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1221,13 +1221,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$0.5128",
+        "v": "−$0.3222",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "118",
+        "v": "120",
         "n": "24 jam · 20 diveto LLM"
       },
       {
@@ -1243,9 +1243,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791448270365,
+      "lastDecisionAt": 1791448570365,
       "lastAction": "keputusan",
-      "lastReason": "wrld [degen]: Dilewati: harga sudah -41% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "wrld [degen]: Dilewati: harga sudah -45% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1480,6 +1480,34 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791448566012,
+        "symbol": "wrld",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -45% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791448431607,
+        "symbol": "Bilbo",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
+      },
       {
         "at": 1791447960314,
         "symbol": "wrld",
@@ -2335,81 +2363,17 @@
           }
         ],
         "reason": "Diveto LLM: Group carried by dolphin #1317 and dolphin #145 which both failed our_copies (-26.5%, -18.9%) with high churn; only smart #850 shows positive copy history but its 78.3 sco. Tidak dimasuki."
-      },
-      {
-        "at": 1791419492185,
-        "symbol": "BLASTAR",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 650,
-            "note": "bundler pegang 14.4%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 5,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "7.6% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets show poor copy-trading history (avg -2.9% and -8.2% pnl), zero over_x5 winners despite 130+ combined trades, and heavy bot-like churn suggesting th. Tidak dimasuki."
-      },
-      {
-        "at": 1791419473529,
-        "symbol": "BLASTAR",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 650,
-            "note": "bundler pegang 15.9%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 5,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "7.4% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets have poor copy history (avg_pnl_pct negative), zero over_x5 winners, and very high churn (~10 tokens/day) suggesting bot/sniper behavior rather tha. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 25,
+        "below_entry": 26,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 60,
+        "red_flag": 61,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2459,7 +2423,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791448313586,
+    "generatedAt": 1791448614273,
     "trades": {
       "count": 47,
       "wins": 18,
@@ -2500,24 +2464,24 @@
     "equity": {
       "days": 3,
       "spanDays": 3.1,
-      "returnPct": -4.37,
+      "returnPct": -4.35,
       "maxDrawdownPct": 5.61,
       "maxDrawdownAt": 1791388569394,
       "maxDrawdownUsd": 56.47,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 949.29,
-      "currentDrawdownPct": 4.92,
-      "currentDrawdownUsd": 49.44,
+      "currentDrawdownPct": 4.9,
+      "currentDrawdownUsd": 49.25,
       "positiveDaysPct": 33.33,
-      "bestDayPct": 0.49,
+      "bestDayPct": 0.51,
       "worstDayPct": -2.32,
       "sharpe": null,
       "sortino": null,
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -43.68,
-    "profitPct": -4.37,
+    "profitUsd": -43.49,
+    "profitPct": -4.35,
     "recoveryFactor": -0.77,
     "score": {
       "axes": {
