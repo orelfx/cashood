@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "798514cc-25ed-4e66-8cdd-4c262bda7c6d",
-  "updatedAt": 1791424870132,
-  "generatedAt": "2026-10-08 09:01 WIB",
+  "generation": "8e6eff63-e8d3-42a8-9592-9d72514e133c",
+  "updatedAt": 1791425170132,
+  "generatedAt": "2026-10-08 09:06 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791424870132,
+    "heartbeatAt": 1791425170132,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791424869388,
+    "lastScanAt": 1791425169143,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791424870132,
+      "lastDecisionAt": 1791425170132,
       "lastAction": "keputusan",
-      "lastReason": "TON618 [low]: Dilewati karena red flag: insider/entrapment pegang 18%."
+      "lastReason": "BORDR [low]: Menunggu pullback: harga sudah +133% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
     }
   },
   "strategy": {
@@ -1425,6 +1425,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791425068678,
+        "symbol": "BORDR",
+        "action": "wait",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 579,
+            "note": "bundler pegang 25.9%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 6.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 836,
+            "note": "7.9% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Menunggu pullback: harga sudah +133% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
+      },
       {
         "at": 1791424238744,
         "symbol": "TON618",
@@ -2436,48 +2479,6 @@
           }
         ],
         "reason": "Keluar (trailing): Harga turun 30% dari puncak +92% setelah 5 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +20,8%."
-      },
-      {
-        "at": 1791404244898,
-        "symbol": "Wrap",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 73,
-            "note": "bundler pegang 13.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 7.4%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 2.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 132,
-            "note": "9.8% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.0%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP2): jual sebagian senilai $2,52; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
@@ -2488,7 +2489,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 51,
+        "red_flag": 50,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2499,7 +2500,7 @@
         "reserve": 0
       },
       "wait": {
-        "jumlah": 0
+        "jumlah": 1
       },
       "add": {
         "jumlah": 0
@@ -2538,7 +2539,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791424918937,
+    "generatedAt": 1791425218858,
     "trades": {
       "count": 47,
       "wins": 18,
