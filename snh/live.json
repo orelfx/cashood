@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b2263f40-3dc1-45e4-813a-b34c6516ae29",
-  "updatedAt": 1791427870185,
-  "generatedAt": "2026-10-08 09:51 WIB",
+  "generation": "e48f61da-d220-445b-9e25-36134e8508de",
+  "updatedAt": 1791428170186,
+  "generatedAt": "2026-10-08 09:56 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791427870185,
+    "heartbeatAt": 1791428170186,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791427868458,
+    "lastScanAt": 1791428167453,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791427870185,
+      "lastDecisionAt": 1791428170186,
       "lastAction": "keputusan",
-      "lastReason": "BDOG [degen]: Dilewati karena red flag: holder baru 9."
+      "lastReason": "BORDR [mid]: Diveto LLM: All wallets show 42% winrate with zero over-x5 winners and negative-to-marginal median exit gains—copy history too thin to validate, and the market cap is too l. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1425,6 +1425,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791427986454,
+        "symbol": "BORDR",
+        "action": "veto",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 38.5%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "10.5% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: All wallets show 42% winrate with zero over-x5 winners and negative-to-marginal median exit gains—copy history too thin to validate, and the market cap is too l. Tidak dimasuki."
+      },
       {
         "at": 1791427721649,
         "symbol": "BDOG",
@@ -2487,17 +2530,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 50% supply."
-      },
-      {
-        "at": 1791408052946,
-        "symbol": "XP",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 41% supply."
       }
     ],
     "reasonStats": {
@@ -2558,7 +2590,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791427916489,
+    "generatedAt": 1791428220496,
     "trades": {
       "count": 47,
       "wins": 18,
