@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e3fb1937-405f-4fc9-91c9-573b6e6e0816",
-  "updatedAt": 1791425770176,
-  "generatedAt": "2026-10-08 09:16 WIB",
+  "generation": "e710bdb0-e17f-42e0-a030-11cc6e5610b3",
+  "updatedAt": 1791426070176,
+  "generatedAt": "2026-10-08 09:21 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791425770176,
+    "heartbeatAt": 1791426070176,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791425767652,
+    "lastScanAt": 1791426069414,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1172,12 +1172,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "102",
+        "v": "103",
         "n": "24 jam · 25 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1782",
+        "v": "1783",
         "n": "165 aktif"
       },
       {
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791425770176,
+      "lastDecisionAt": 1791426070176,
       "lastAction": "keputusan",
-      "lastReason": "SI [mid]: Diveto LLM: Wallet dolphin #211 has 0 wins in 2 our_copies with -5.9% avg PnL, smart #464 shows high-churn bot-like behavior with 257 tokens and sub-minute median holds, and the . Tidak dimasuki."
+      "lastReason": "BORDR [low]: Dilewati: wallet yang diikuti sudah keluar sebelum harga kembali ke zona beli."
     }
   },
   "strategy": {
@@ -1209,7 +1209,7 @@
       ],
       [
         "Wallet dipantau",
-        "1782 · 165 aktif"
+        "1783 · 165 aktif"
       ],
       [
         "Cadangan kas",
@@ -1221,7 +1221,7 @@
       ],
       [
         "Label wallet",
-        "smart 494 · dolphin 56 · bot 950 · blacklist 137 · lp 2 · fresh 31 · kol 108 · whale 4"
+        "smart 495 · dolphin 56 · bot 950 · blacklist 137 · lp 2 · fresh 31 · kol 108 · whale 4"
       ]
     ],
     "requirements": [
@@ -1269,9 +1269,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1782,
+      "tracked": 1783,
       "active": 165,
-      "passive": 1617,
+      "passive": 1618,
       "trusted": 3,
       "promising": 17,
       "byLabel": [
@@ -1283,9 +1283,9 @@
         },
         {
           "key": "smart",
-          "total": 494,
+          "total": 495,
           "active": 121,
-          "passive": 373
+          "passive": 374
         },
         {
           "key": "blacklist",
@@ -1425,6 +1425,49 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791425834574,
+        "symbol": "BORDR",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 579,
+            "note": "bundler pegang 25.9%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 6.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 836,
+            "note": "7.9% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: wallet yang diikuti sudah keluar sebelum harga kembali ke zona beli."
+      },
       {
         "at": 1791425342692,
         "symbol": "SI",
@@ -2428,43 +2471,6 @@
           }
         ],
         "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $2,50, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791404307971,
-        "symbol": "Eko",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 8.98% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 327,
-            "note": "bundler pegang 28.6%"
-          },
-          {
-            "type": "rat",
-            "count": 7,
-            "note": "insider/entrapment pegang 3.4%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 12.6%"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2472,7 +2478,7 @@
         "chase": 0,
         "below_entry": 17,
         "no_pullback": 0,
-        "wallet_left": 0,
+        "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
         "red_flag": 50,
@@ -2525,7 +2531,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791425836125,
+    "generatedAt": 1791426124389,
     "trades": {
       "count": 47,
       "wins": 18,
