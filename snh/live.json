@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "072bee1d-1cc9-4144-9a07-48d803dc9a9e",
-  "updatedAt": 1791442570337,
-  "generatedAt": "2026-10-08 13:56 WIB",
+  "generation": "4aa06dea-d11b-4570-b8a1-ba361355d233",
+  "updatedAt": 1791442870340,
+  "generatedAt": "2026-10-08 14:01 WIB",
   "usdIdr": null,
   "totalUsd": 956.9850971767949,
   "nativeSymbol": "SOL",
@@ -1146,12 +1146,12 @@
     "pnlUsd": -43.01490282320515,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791442570337,
+    "heartbeatAt": 1791442870340,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.19,
-    "lastScanAt": 1791442566986,
+    "lastScanAt": 1791442869088,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1172,7 +1172,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "110",
+        "v": "111",
         "n": "24 jam · 20 diveto LLM"
       },
       {
@@ -1188,9 +1188,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791442570337,
+      "lastDecisionAt": 1791442870340,
       "lastAction": "keputusan",
-      "lastReason": "TWEETCRAFT [degen]: Dilewati karena red flag: holder baru 15."
+      "lastReason": "STREETCRAFT [degen]: Dilewati: harga sudah -83% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1425,6 +1425,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791442615001,
+        "symbol": "STREETCRAFT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -83% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791442505456,
         "symbol": "TWEETCRAFT",
@@ -2397,39 +2407,12 @@
           }
         ],
         "reason": "Take profit bertahap (TP1): jual sebagian senilai $3,40; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791413671693,
-        "symbol": "NoahAI",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 19,
-            "note": "bundler pegang 21.1%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 12,
-            "note": "9.4% holder wallet baru"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,06, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 20,
+        "below_entry": 21,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2484,7 +2467,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791442612665,
+    "generatedAt": 1791442922015,
     "trades": {
       "count": 47,
       "wins": 18,
