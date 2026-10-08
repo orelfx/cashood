@@ -8,7 +8,7 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
  let ws;
  try{
  const address=await new Promise((resolve,reject)=>{let text='';chrome.stderr.on('data',d=>{text+=d;const m=text.match(/DevTools listening on (ws:\/\/[^\s]+)/);if(m)resolve(m[1]);});chrome.on('exit',c=>reject(Error('Chrome exited '+c)));setTimeout(()=>reject(Error('Chrome startup timeout: '+text.slice(-2000))),30000).unref();});
- ws=new WebSocket(address);await new Promise(r=>ws.onopen=r);let n=0,sid;const pending=new Map(),errors=[],counts={};let delayReborn=false,fxDelay=0,fullForecast=false;
+ ws=new WebSocket(address);await new Promise(r=>ws.onopen=r);let n=0,sid;const pending=new Map(),errors=[],counts={};let delayReborn=false,fxDelay=0,fullForecast=false;const snapshotResponses=new Map();
  const cmd=(method,params={},sessionId=sid)=>new Promise((resolve,reject)=>{const id=++n;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params,...(sessionId?{sessionId}:{})}));});
  const snapshots=Object.fromEntries(['reborn','meridian','ferari'].map((fund,i)=>[fund,{fund,schemaVersion:2,generation:'fixture',updatedAt:Date.now(),totalUsd:[14000,5000,3000][i],treasuryUsd:fund==='reborn'?1100:0,
  holdings:[{symbol:i===1?'SOL':'ETH',amount:1,price:[12900,5000,3000][i],usd:[12900,5000,3000][i]}],positions:[],history:[],quality:{complete:true},nativeSymbol:i===1?'SOL':'ETH',nativePrice:i===1?100:2500}]));
@@ -30,7 +30,14 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),asse
     else body='{}';
     const match=file?.match(/^data\/(reborn|meridian|ferari|safebox)\/(live|nav|forecast|heartbeat)\.json$/);
     if(match){const [,fund,kind]=match;
-      if(kind==='live')body=JSON.stringify(fund==='safebox'?safe:snapshots[fund]);
+      if(kind==='live'){
+       body=JSON.stringify(fund==='safebox'?safe:snapshots[fund]);
+       // Simulate a CDN retaining the response for the same request URL.
+       if(fund==='meridian'){
+         if(snapshotResponses.has(p.request.url))body=snapshotResponses.get(p.request.url);
+         else snapshotResponses.set(p.request.url,body);
+       }
+      }
       if(kind==='nav')body=JSON.stringify({generation:'fixture',points:[{t:Date.now()-600000,usd:10000},{t:Date.now(),usd:snapshots[fund].totalUsd}]});
       if(kind==='forecast')body=JSON.stringify(fullForecast?{...model,fund}:{fund,enough:false,samples:0,reason:'Sumber belum terverifikasi'});
       if(kind==='heartbeat')body=JSON.stringify({text:'SYSTEM\nAll good',updatedAt:Date.now()});
@@ -61,6 +68,13 @@ console.log('PASS initial render');
  assert.ok(home.visible,'beranda tidak tampil sendiri');assert.match(home.aum,/Total aset dikelola/);assert.match(home.aum,/\$\s?2[0-9],[0-9]{3}/);assert.ok(home.cards>=4,`kartu produk: ${home.cards}`);assert.equal(home.menu,8);
  {const k=await ev(`(async()=>{showKinerja();await renderKinerja();showPemegang();await renderPemegang();return {kin:document.querySelectorAll('#kinerjaBody .kin').length,inv:document.querySelector('#pemegangBody').textContent}})()`);assert.ok(k.kin>=3,'kartu analys: '+k.kin);assert.match(k.inv,/Stefani/);console.log('PASS global analys and investors');}
  assert.equal(await ev(`(async()=>{document.querySelector('[data-fund="reborn"]').click();await new Promise(r=>setTimeout(r,50));return !document.querySelector('#tab-home').hidden})()`),false);console.log('PASS homepage');}
+ await ev('(async()=>{showHome();await renderHome()})()');
+ snapshots.meridian.totalUsd=5500;snapshots.meridian.holdings[0].usd=5500;
+ const refreshedHome=await ev(`(async()=>{await load({force:true});await renderHome();const row=[...document.querySelectorAll('#homeAum .alloc-legend li')].find(r=>r.textContent.includes('Meridian'));return {total:(await loadFundBrief('meridian')).totalUsd,text:row.textContent}})()`);
+ assert.equal(refreshedHome.total,5500,'home refresh must update a fund other than the selected background fund');
+ assert.match(refreshedHome.text,/5,500/);console.log('PASS home refresh replaces cached non-selected fund value');
+ snapshots.meridian.totalUsd=5000;snapshots.meridian.holdings[0].usd=5000;
+ await ev(`(async()=>{await load({force:true});await renderHome();document.querySelector('[data-fund="reborn"]').click()})()`);
  delayReborn=true;
  const raced=await ev(`(async()=>{const a=load({force:true});await new Promise(r=>setTimeout(r,40));const b=switchFund('meridian');await Promise.all([a,b]);return {fund:state.fund,nav:state.nav.totalUsd,native:state.nav.nativeSymbol,cache:JSON.parse(localStorage.getItem(cacheKey('meridian'))).totalUsd}})()`);
  assert.deepEqual(raced,{fund:'meridian',nav:5000,native:'SOL',cache:5000});console.log('PASS delayed Reborn cannot overwrite Meridian');

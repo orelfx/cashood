@@ -22,7 +22,6 @@ const FUNDS_URL = 'data/funds.json';
  * ditebak dari alamat halaman hampir selalu benar; kalau meleset, permintaan
  * yang telanjur jalan cuma terbuang dan alurnya lanjut seperti biasa.
  */
-const BOOT_T = Date.now();
 const RAW_BASE = 'https://raw.githubusercontent.com/orelfx/cashood/data/';
 const inflight = new Map();
 let fundEpoch = 0, loadEpoch = 0;
@@ -56,7 +55,10 @@ function getJSON(url, { fresh = false } = {}) {
     const hit = recentJSON.get(url);
     if (hit && Date.now() - hit.at < RECENT_MS) return Promise.resolve(hit.data);
   }
-  const full = url + (url.includes('?') ? '&' : '?') + 't=' + (fresh ? Date.now() : BOOT_T);
+  // New network reads need a new URL even in fund summaries; reusing the page's
+  // startup timestamp lets a CDN return the same old balance after refresh.
+  // Inflight deduplication and the short cache above still share nearby reads.
+  const full = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
   tandaiSibuk(1);
   const job = fetch(full, { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) }).then((res) => {
     if (!res.ok) throw new Error('HTTP ' + res.status);
