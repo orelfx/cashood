@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "a11b0325-2a1c-4476-9400-867813ce36e2",
-  "updatedAt": 1791475873724,
-  "generatedAt": "2026-10-08 23:11 WIB",
+  "generation": "4c856c9c-46ef-4f39-afc4-d6fa3a83d243",
+  "updatedAt": 1791476173724,
+  "generatedAt": "2026-10-08 23:16 WIB",
   "usdIdr": null,
   "totalUsd": 953.2862519258191,
   "nativeSymbol": "SOL",
@@ -1140,12 +1140,12 @@
     "pnlUsd": -46.7137480741809,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791475873724,
+    "heartbeatAt": 1791476173724,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 5.56,
-    "lastScanAt": 1791475870627,
+    "lastScanAt": 1791476171807,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1166,8 +1166,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "158",
-        "n": "24 jam · 29 diveto LLM"
+        "v": "162",
+        "n": "24 jam · 32 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1182,9 +1182,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791475873724,
+      "lastDecisionAt": 1791476173724,
       "lastAction": "keputusan",
-      "lastReason": "QUBIT [degen]: Diveto LLM: Both wallets have negative realized PnL (-$150 and -$462) despite 60-65% winrates, meaning they win small but lose big; high churn (340+ tokens/week) with almos. Tidak dimasuki."
+      "lastReason": "QUBIT [degen]: Diveto LLM: All three wallets show negative realized PnL (-$150 to -$463) despite high churn (275-349 tokens/week), with overwhelming majority of wins being under 2x and me. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1419,6 +1419,67 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791476037154,
+        "symbol": "QUBIT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 112,
+            "note": "bundler pegang 19.3%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show negative realized PnL (-$150 to -$463) despite high churn (275-349 tokens/week), with overwhelming majority of wins being under 2x and me. Tidak dimasuki."
+      },
+      {
+        "at": 1791476016183,
+        "symbol": "fallout",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 7."
+      },
+      {
+        "at": 1791475906152,
+        "symbol": "QUBIT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 105,
+            "note": "bundler pegang 14.7%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show identical patterns (12.8 min median hold, 0.09 chunk share, similar losses), likely same operator; negative realized PnL, only 2-3 x2+ wi. Tidak dimasuki."
+      },
+      {
+        "at": 1791475886340,
+        "symbol": "QUBIT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 105,
+            "note": "bundler pegang 11.7%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets are losing money (-150 to -463 USD), have extremely high token churn (275-349 tokens/week), and 96%+ of wins are under 2x with no meaningful w. Tidak dimasuki."
+      },
       {
         "at": 1791475843026,
         "symbol": "QUBIT",
@@ -2244,69 +2305,6 @@
           }
         ],
         "reason": "Diveto LLM: Zero multi-baggers (x2+) across all four wallets, negative copy history on three with 30% losses, and smart #1797 has extreme churn (489 buys/sells/week) with $5 p. Tidak dimasuki."
-      },
-      {
-        "at": 1791462090668,
-        "symbol": "PLAGUE",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 19.5%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 12.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "7.1% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets show 0 multi-bagger wins, 100% our-copy losses (avg -22%), and excessive token churn suggesting strategy doesn't transfer to followers. Tidak dimasuki."
-      },
-      {
-        "at": 1791462059181,
-        "symbol": "XEET",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -30% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791460925546,
-        "symbol": "TOLL",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1791459904521,
-        "symbol": "b",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 40% supply."
       }
     ],
     "reasonStats": {
@@ -2317,7 +2315,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 82,
+        "red_flag": 83,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2334,7 +2332,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 29
+        "llm": 32
       },
       "test": {
         "solo": 0,
@@ -2367,7 +2365,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791475921489,
+    "generatedAt": 1791476217906,
     "trades": {
       "count": 48,
       "wins": 18,
