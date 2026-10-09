@@ -120,6 +120,14 @@
       <div class="hg-chart chart-wrap" id="hgWrap"><svg id="hgChart" viewBox="0 0 720 220" role="img" aria-label="Total dana dari waktu ke waktu"></svg>
         <div class="tip hg-tip" id="hgTip" hidden></div></div>
       <div class="hg-flows" id="hgFlows" hidden></div>
+      <section class="hg-compare" aria-label="Perubahan nilai tiap dana">
+        <h3>Dana mana yang naik atau turun?</h3>
+        <p class="hint">Arahkan kursor atau sentuh grafik untuk memilih titik. Pembanding awal mengikuti rentang grafik.</p>
+        <div class="hg-compare-actions"><button class="btn ghost" id="hgSetReference">Jadikan titik terpilih pembanding</button><button class="btn ghost" id="hgResetReference">Kembali ke awal rentang</button></div>
+        <p id="hgCompareTitle" class="hint"></p><p id="hgCompareTotal"></p>
+        <div class="table-scroll"><table><thead><tr><th>Dana</th><th>Pembanding</th><th>Titik terpilih</th><th>Naik / turun</th></tr></thead><tbody id="hgCompareRows"></tbody></table></div>
+        <p class="hint">Nominal mengikuti mata uang pilihan. Persen memakai perubahan nilai USD pada grafik; konversi memakai kurs tampilan saat ini, bukan kurs historis. Setoran dan penarikan yang tercatat sudah disesuaikan. Arus kas yang belum tercatat dapat memengaruhi perubahan.</p>
+      </section>
       <div class="hg-daily">
         <div class="hg-dhead"><h3 class="sub-h">Hasil harian</h3><span class="hint" id="hgDailyHint"></span></div>
         <div class="cal-head">
@@ -131,7 +139,7 @@
         <div class="cal-grid" id="hgCalGrid"></div>
         <div class="cal-foot" id="hgCalFoot"></div>
       </div>
-      <p class="hint">Grafik menjumlahkan nilai seluruh dana dan Safe Box (tanpa dana uji coba). Persen naik-turun dihitung tanpa setoran baru dan pembagian profit, jadi yang tampil murni kinerja bot. Hasil harian = profit posisi yang ditutup hari itu + imbal hasil Safe Box.</p>
+      <p class="hint">Grafik menjumlahkan nilai seluruh dana dan Safe Box (tanpa dana uji coba). Grafik disesuaikan untuk setoran dan penarikan yang tercatat. Perubahan nilai aset bukan hanya profit posisi yang sudah ditutup. Safe Box memakai saldo terbaru pada titik lama; perubahan historisnya belum tersedia. Hasil harian = profit posisi yang ditutup hari itu + imbal hasil Safe Box.</p>
     </section>
 
     <section class="home-block">

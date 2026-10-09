@@ -3669,7 +3669,7 @@ function quota(used, cap, paper) {
 let sbCapacity = null;
 
 /* ── perkembangan total dana (beranda) ─────────────────────────────────── */
-const homeView = { hours: 24 };
+const homeView = { hours: 24, referenceAt: null, selectedAt: null };
 const seriesCache = new Map();
 async function loadFundSeries(b) {
   const hit = seriesCache.get(b.id);
@@ -3713,35 +3713,11 @@ async function renderGrowth(g, paper = []) {
   const now = Date.now(), box = g.box;
   const boxStart = Date.parse(`${state.safebox?.startedAt || '2026-09-12'}T00:00:00+07:00`);
 
-  // Tanda naik-turun 24 jam per dana dan untuk total.
-  let totalDelta = 0, totalBase = 0;
-  const todayIso = new Date(now + 7 * 3600e3).toISOString().slice(0, 10);
-  homeChg.clear();
-  const badge = (b, pts) => {
-    // Dompet yang hanya dibaca (setoran/penarikan pemilik tidak tercatat):
-    // perubahan nilainya bisa karena uang dipindah, bukan kinerja. Untuk dana
-    // seperti itu yang dipakai profit posisi yang ditutup hari ini.
-    const external = b.cfg?.fund?.cashFlowsRecorded === false;
-    let c, label = '24 jam';
-    if (external) {
-      const today = Number((b.history || []).find((r) => r.date === todayIso)?.usd) || 0;
-      c = b.totalUsd > 0 ? { delta: today, pct: (today / b.totalUsd) * 100, base: b.totalUsd } : null;
-      label = 'hari ini';
-    } else c = fundChange(pts, b.flows, b.totalUsd, 86400e3, now);
+  paper.forEach((b, i) => {
+    const c = fundChange(paperSeries[i], b.flows, b.totalUsd, 86400e3, now);
     const el = document.querySelector(`[data-chg="${CSS.escape(b.id)}"]`);
-    if (el) setHTML(el, chgBadge(c, label));
-    if (c && !b.paper) homeChg.set(b.id, { ...c, label });
-    return c;
-  };
-  briefs.forEach((b, i) => { const c = badge(b, series[i]); if (c) { totalDelta += c.delta; totalBase += c.base; } });
-  paper.forEach((b, i) => badge(b, paperSeries[i]));
-  if (box) {
-    totalDelta += Number(box.interestTodayUsd) || 0; totalBase += Number(box.principalUsd) || 0;
-    if (box.principalUsd > 0) homeChg.set('safebox', { delta: Number(box.interestTodayUsd) || 0, pct: ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100, label: 'hari ini' });
-  }
-  paintLegendChg();
-  const tc = totalBase > 0 ? { delta: totalDelta, pct: (totalDelta / totalBase) * 100 } : null;
-  if ($('#aumChg')) setHTML($('#aumChg'), tc ? `${chgBadge(tc)} <span class="aum-chg-usd ${cls(tc.delta)}">${signed(tc.delta)}</span>` : '');
+    if (el) setHTML(el, chgBadge(c));
+  });
 
   // Grafik total: nilai tiap dana dibawa maju dari titik terakhirnya, dijumlah.
   const earliest = Math.min(...series.filter((p) => p.length).map((p) => p[0].t), box ? boxStart : now);
@@ -3753,11 +3729,25 @@ async function renderGrowth(g, paper = []) {
     // setoran tidak tergambar sebagai lonjakan untung.
     const parts = briefs.map((b, i) => {
       const at = latest ? null : valueAt(series[i], t);
-      return { name: b.label, color: b.accent, usd: latest ? b.totalUsd : (at ? at.usd + flowsAfter(b.flows, at.t) : 0) };   // arus kas sesudah titik itu diamati
+      return { id: b.id, name: b.label, color: b.accent, known: latest || Boolean(at), usd: latest ? b.totalUsd : (at ? at.usd + flowsAfter(b.flows, at.t) : 0) };   // arus kas sesudah titik itu diamati
     });
-    if (box && t >= boxStart) parts.push({ name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: Number(box.balanceUsd) || 0 });
-    return parts.filter((p) => p.usd > 0);
+    if (box && t >= boxStart) parts.push({ id: 'safebox', fixed: true, name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: Number(box.balanceUsd) || 0 });
+    return parts;
   };
+  // The same endpoints drive the 24-hour cards and the 24-hour chart.
+  // Closed-trade profit is shown only in the separate daily-results section.
+  const dailyParts = partsAt(Math.max(earliest, now - 86400e3), false);
+  const daily = CashoodCore.compareGrowth({ v: dailyParts.reduce((sum,p)=>sum+p.usd,0), parts: dailyParts },
+    { v: g.total, parts: partsAt(now, true) });
+  homeChg.clear();
+  for (const r of daily.rows) {
+    const c = r.delta != null && r.pct != null ? { delta: r.delta, pct: r.pct, label: '24 jam · perubahan nilai, arus kas tercatat disesuaikan' } : null;
+    if (c) homeChg.set(r.id, c);
+    const el = document.querySelector(`[data-chg="${CSS.escape(r.id)}"]`);
+    if (el) setHTML(el, c ? chgBadge(c) : '<span class="dim">—</span>');
+  }
+  paintLegendChg();
+  if ($('#aumChg')) setHTML($('#aumChg'), daily.pct == null ? '—' : `${chgBadge(daily)} <span class="aum-chg-usd ${cls(daily.delta)}">${signed(daily.delta)}</span>`);
   for (let t = from; t <= now; t += step) {
     const parts = partsAt(t, false);
     pts.push({ t, v: parts.reduce((a, p) => a + p.usd, 0), parts });
@@ -3765,10 +3755,9 @@ async function renderGrowth(g, paper = []) {
   pts.push({ t: now, v: g.total, parts: partsAt(now, true) });
   const flowIn = briefs.flatMap((b) => b.flows).filter((f) => f.at > from && f.at <= now).reduce((t, f) => t + f.usd, 0);
   const first = pts[0]?.v || 0;
-  // 24 jam memakai jumlah perubahan per dana (sama dengan tanda di kartu
-  // produk dan kartu total aset); rentang panjang memakai deret gabungan.
-  const rangeDelta = homeView.hours === 24 && tc ? tc.delta : g.total - first;   // titik awal sudah memuat arus kas sesudahnya
-  const rangeBase = homeView.hours === 24 && tc ? totalBase : first;
+  // The summary must describe the plotted endpoints, not realised trades.
+  const rangeDelta = g.total - first;
+  const rangeBase = first;
   setHTML($('#hgSum'), pts.length > 1 ? `<b class="num">${usd(g.total, 0)}</b>
     <span class="chg ${rangeDelta >= 0 ? 'up' : 'down'}">${rangeDelta >= 0 ? '▲' : '▼'} ${pct(Math.abs(rangeBase ? rangeDelta / rangeBase * 100 : 0), 2)}</span>
     <span class="${cls(rangeDelta)} num">${signed(rangeDelta)}</span><span class="dim">${homeView.hours === 24 ? '24 jam terakhir' : homeView.hours === 168 ? '7 hari terakhir' : 'sejak awal'}${Math.abs(flowIn) >= 1 ? ` · tanpa arus kas ${signedText(flowIn)}` : ''}</span>` : '<span class="dim">belum cukup data</span>');
@@ -3856,6 +3845,22 @@ function drawGrowth(svg, pts, up, marks = []) {
   const wrap = $('#hgWrap'), tip = $('#hgTip'), cross = svg.querySelector('#hgCross'), dot = svg.querySelector('#hgDot'), hit = svg.querySelector('#hgHit');
   if (!wrap || !tip || !hit) return;
   const when = (t) => { const d = new Date(t + 7 * 3600e3); return `${d.getUTCDate()} ${M_SHORT[d.getUTCMonth()]} · ${d.toISOString().slice(11, 16)} WIB`; };
+  const nearestTime = t => pts.reduce((a, p) => Math.abs(p.t - t) < Math.abs(a.t - t) ? p : a);
+  if (homeView.referenceAt != null && (homeView.referenceAt < t0 || homeView.referenceAt > t1)) homeView.referenceAt = null;
+  const reference = () => homeView.referenceAt == null ? pts[0] : nearestTime(homeView.referenceAt);
+  let selected = homeView.selectedAt == null ? last : nearestTime(homeView.selectedAt);
+  const changeText = r => r.delta == null ? '—' : `${signed(r.delta)} · ${r.pct == null ? '—' : (r.pct > 0 ? '+' : '') + pct(r.pct)}`;
+  const paintComparison = point => {
+    const base = reference(), c = CashoodCore.compareGrowth(base, point);
+    setHTML($('#hgCompareTitle'), `${when(base.t)} → ${when(point.t)}`);
+    setHTML($('#hgCompareTotal'), `<b class="${cls(c.delta)}">${signed(c.delta)} · ${c.pct == null ? '—' : (c.pct > 0 ? '+' : '') + pct(c.pct)}</b>`);
+    setHTML($('#hgCompareRows'), c.rows.sort((a,b)=>(a.delta ?? Infinity)-(b.delta ?? Infinity)).map(r =>
+      `<tr><th scope="row">${esc(r.name)}</th><td>${r.before == null ? '—' : usd(r.before)}</td><td>${r.after == null ? '—' : usd(r.after)}</td><td class="${r.delta == null ? 'dim' : cls(r.delta)}">${changeText(r)}${r.delta == null ? `<small>${r.fixed ? 'Riwayat saldo belum tersedia' : 'Data pembanding belum lengkap'}</small>` : ''}</td></tr>`).join(''));
+    $('#hgResetReference').disabled = homeView.referenceAt == null;
+  };
+  $('#hgSetReference').onclick = () => { homeView.referenceAt = selected.t; paintComparison(selected); tip.hidden = true; };
+  $('#hgResetReference').onclick = () => { homeView.referenceAt = null; selected = last; homeView.selectedAt = null; paintComparison(selected); tip.hidden = true; };
+  paintComparison(selected);
   const show = (ev) => {
     const box = wrap.getBoundingClientRect(), ratio = W / (box.width || W);
     const sx = (ev.clientX - box.left) * ratio;
@@ -3863,10 +3868,13 @@ function drawGrowth(svg, pts, up, marks = []) {
     for (const p of pts) if (Math.abs(x(p.t) - sx) < Math.abs(x(near.t) - sx)) near = p;
     cross.setAttribute('x1', x(near.t)); cross.setAttribute('x2', x(near.t)); cross.style.display = '';
     dot.setAttribute('cx', x(near.t)); dot.setAttribute('cy', y(near.v)); dot.style.display = '';
-    const parts = [...(near.parts || [])].sort((a, b) => b.usd - a.usd);
+    selected = near; homeView.selectedAt = near.t; paintComparison(near);
+    const comparison = CashoodCore.compareGrowth(reference(), near);
+    const parts = comparison.rows.sort((a, b) => (b.after || 0) - (a.after || 0));
     setHTML(tip, `<div class="t-d">${when(near.t)}</div><div class="t-v">${usd(near.v)}</div>`
-      + `<div class="t-n">total seluruh dana · termasuk token, LP, dan kas</div>`
-      + (parts.length ? `<div class="t-parts">${parts.map((p) => `<div class="t-row"><span><i style="background:${p.color}"></i>${esc(p.name)}</span><b>${usd(p.usd, 0)}</b></div>`).join('')}</div>` : ''));
+      + `<div class="t-n">nilai grafik · arus kas tercatat disesuaikan</div>`
+      + `<div class="t-n">Dibanding ${when(reference().t)}: <b class="${cls(comparison.delta)}">${signed(comparison.delta)} · ${comparison.pct == null ? '—' : (comparison.pct > 0 ? '+' : '') + pct(comparison.pct)}</b></div>`
+      + (parts.length ? `<div class="t-parts">${parts.map((p) => `<div class="t-row"><span><i style="background:${p.color}"></i>${esc(p.name)}</span><b>${p.after == null ? '—' : usd(p.after, 0)}<small class="${p.delta == null ? 'dim' : cls(p.delta)}">${changeText(p)}</small></b></div>`).join('')}</div>` : ''));
     tip.hidden = false;
     // Layar lebar: tooltip di SAMPING titik (kiri atau kanan, mana yang lapang),
     // menempel di atas grafik. Layar sempit: jadi panel di bawah grafik. Di
@@ -4261,6 +4269,7 @@ async function init() {
     const btn = e.target.closest('button');
     if (!btn) return;
     homeView.hours = Number(btn.getAttribute('data-h'));
+    homeView.referenceAt = null; homeView.selectedAt = null;
     $('#segHome').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === btn));
     if (lastHomeTotals) renderGrowth(lastHomeTotals, lastHomePaper).catch(() => {});
   };

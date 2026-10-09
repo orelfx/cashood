@@ -87,7 +87,45 @@ console.log('PASS initial render');
  assert.match(t,/Dividen yang terkumpul/);assert.doesNotMatch(t,/(^|[^0-9,.<])0(\.0+)?%/);}
 console.log('PASS complete forecast render');
  await ev('showTab("investor");renderAll()');assert.ok(await ev('document.querySelector("#divFlow").textContent.includes("Diterima")'));console.log('PASS dividend and insufficient-data views');
+ const chartSummary=await ev(`(async()=>{showHome();await renderHome();homeView.hours=24;const now=Date.now();
+  const b={id:'cash-flow-fixture',label:'Fixture',accent:'#14f195',totalUsd:620,flows:[{at:now-7200000,usd:500}],cfg:{fund:{cashFlowsRecorded:false}},history:[]};
+  seriesCache.set(b.id,{at:now,points:[{t:now-25*3600000,usd:100},{t:now-3600000,usd:620}]});
+  await renderGrowth({briefs:[b],box:null,total:620},[]);
+  return {card:document.querySelector('#aumChg').textContent,chart:document.querySelector('#hgSum').textContent,rows:document.querySelector('#hgCompareRows').textContent};})()`);
+ assert.match(chartSummary.card,/\+\$20/);assert.match(chartSummary.chart,/\+\$20/);assert.match(chartSummary.rows,/\+\$20/);
+ console.log('PASS chart and 24-hour summary agree; recorded deposits are not gains');
+ // Use known points to test attribution, arbitrary comparison points and units.
+ await ev(`(async()=>{showHome();await renderHome();++growthEpoch;homeView.referenceAt=null;homeView.selectedAt=null;
+   lastUsdIdr=16000;coinPrice.eth=2500;coinPrice.sol=100;
+   const t=Date.now()-3600000;globalThis.__growthFixture=[
+    {t,v:20500,parts:[{id:'r',name:'Reborn',usd:10000},{id:'m',name:'Meridian',usd:7400},{id:'o',name:'Other',usd:3100}]},
+    {t:t+1800000,v:18500,parts:[{id:'r',name:'Reborn',usd:9600},{id:'m',name:'Meridian',usd:6000},{id:'o',name:'Other',usd:2900}]},
+    {t:t+3600000,v:19000,parts:[{id:'r',name:'Reborn',usd:9800},{id:'m',name:'Meridian',usd:6300},{id:'o',name:'Other',usd:2900}]}];
+   globalThis.__point=(fraction)=>{const box=document.querySelector('#hgWrap').getBoundingClientRect();document.querySelector('#hgHit').dispatchEvent(new PointerEvent('pointermove',{clientX:box.left+box.width*fraction,pointerType:'mouse'}))};
+   currency='usd';drawGrowth(document.querySelector('#hgChart'),__growthFixture,false);__point(.46);
+ })()`);
+ let comparison=await ev('({text:document.querySelector("#hgCompareRows").textContent,total:document.querySelector("#hgCompareTotal").textContent,tip:document.querySelector("#hgTip").textContent})');
+ assert.match(comparison.total,/-\$2,000/);assert.match(comparison.total,/-9\.76%/);assert.match(comparison.text,/-18\.92%/);assert.match(comparison.tip,/-\$1,400/);
+ await ev('document.querySelector("#hgSetReference").click();__point(.9)');
+ assert.match(await ev('document.querySelector("#hgCompareTotal").textContent'),/\+\$500/);
+ for(const c of ['idr','eth','sol','usd']){
+  await ev(`(async()=>{document.querySelector('[data-c="${c}"]').click();await renderHome();++growthEpoch;drawGrowth(document.querySelector('#hgChart'),__growthFixture,false);__point(.9)})()`);
+  const actual=await ev('document.querySelector("#hgCompareTotal").textContent');
+  assert.match(actual,/2\.70%/);assert.doesNotMatch(actual,/NaN|Infinity/);
+  if(c==='idr'){assert.match(actual,/Rp/);assert.doesNotMatch(actual,/\$/);}
+  if(c==='usd')assert.match(actual,/\+\$500/);
+  if(c==='eth')assert.match(actual,/0\.200/);
+  if(c==='sol')assert.match(actual,/5\.000/);
+ }
+ await ev('document.querySelector("#hgResetReference").click()');
+ assert.match(await ev('document.querySelector("#hgCompareTotal").textContent'),/-\$1,500/);
+ console.log('PASS per-fund chart deltas, reference selection and USD/IDR/ETH/SOL switching');
  await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});const width=await ev('({width:innerWidth,scroll:document.documentElement.scrollWidth})');assert.equal(width.scroll,width.width);console.log('PASS mobile layout');
+ await ev(`drawGrowth(document.querySelector('#hgChart'),__growthFixture,false);const bounds=document.querySelector('#hgWrap').getBoundingClientRect();document.querySelector('#hgHit').dispatchEvent(new PointerEvent('pointerdown',{clientX:bounds.left+bounds.width*.46,pointerType:'touch'}));document.querySelector('#homeGrowth').scrollIntoView()`);
+ assert.equal(await ev('document.querySelector("#hgTip").classList.contains("dock")'),true);
+ assert.equal(await ev('document.documentElement.scrollWidth===innerWidth'),true);
+ if(process.env.CASHOOD_SCREENSHOT_DIR){fs.mkdirSync(process.env.CASHOOD_SCREENSHOT_DIR,{recursive:true});const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'growth-mobile.png'),Buffer.from(shot.data,'base64'));}
+ console.log('PASS touch chart comparison stays within the mobile viewport');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

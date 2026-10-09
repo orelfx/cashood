@@ -168,7 +168,26 @@
     }
     return s;
   }
-  const api = { WIB, present, number, money, cents, day, eventTime, buildLedger, allocate, monthlyCosts, dividendPlan, allocateDividend, distribution, validateSnapshot };
+  // Points are already adjusted for recorded cash flows by the chart builder.
+  // Missing history and fixed historical placeholders are not zero returns.
+  function compareGrowth(start, end) {
+    const prior = new Map((start.parts || []).map(p => [p.id, p]));
+    const current = new Map((end.parts || []).map(p => [p.id, p]));
+    const rows = [...new Set([...prior.keys(), ...current.keys()])].map(id => {
+      const a = prior.get(id), b = current.get(id), meta = b || a;
+      const comparable = a && b && a.known !== false && b.known !== false && !a.fixed && !b.fixed
+        && Number.isFinite(a.usd) && Number.isFinite(b.usd);
+      const delta = comparable ? money(b.usd - a.usd) : null;
+      return { id, name: meta.name, color: meta.color, before: a?.known === false ? null : a?.usd ?? null,
+        after: b?.known === false ? null : b?.usd ?? null, delta,
+        pct: comparable && a.usd > 0 ? delta / a.usd * 100 : null,
+        fixed: Boolean(a?.fixed || b?.fixed) };
+    });
+    const delta = money(end.v - start.v);
+    return { rows, delta, pct: start.v > 0 ? delta / start.v * 100 : null,
+      incomplete: rows.some(r => r.delta === null) };
+  }
+  const api = { compareGrowth, WIB, present, number, money, cents, day, eventTime, buildLedger, allocate, monthlyCosts, dividendPlan, allocateDividend, distribution, validateSnapshot };
   if (typeof module !== 'undefined') module.exports = api;
   root.CashoodCore = api;
 })(globalThis);
