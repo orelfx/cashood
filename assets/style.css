@@ -1441,3 +1441,10 @@ body.is-staking #lpCard, body.is-staking #closedCard, body.is-staking #profitCar
 @media(prefers-reduced-motion:reduce){.resting .spider-core,.resting .spider-eyes{animation:none}}
 
 .spider-waypoint{position:absolute;width:1px;height:1px;visibility:hidden;pointer-events:none}
+
+/* Scan overlay never receives input or changes the scanned element's layout. */
+.spider-scan{position:absolute;overflow:hidden;border:1px solid #61d6ef88;border-radius:4px;pointer-events:none;background:#61d6ef08;box-sizing:border-box}
+.spider-scan[hidden]{display:none}
+.spider-scan i{display:block;height:100%;width:2px;background:#91f8e9;box-shadow:0 0 9px #61d6ef}
+.walking.yielding .spider-caption{opacity:1}
+@media(prefers-reduced-motion:reduce){.spider-scan{display:none}}

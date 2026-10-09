@@ -10,7 +10,8 @@
   try { enabled = localStorage.getItem('cashood-spider') !== 'off'; } catch {}
   let timer, scrollIdle, motion, reveal, previous, phrase = 0, generation = 0;
   let location = { x: 20, y: 160 };
-  let explored = new WeakSet();
+  let explored = new WeakSet(), quietUntil=0, asideCount=0, scanAnimation=null;
+  const copySteps=new WeakMap();
   const headlines = ['Bot yang kerja.', 'Otomasi yang kerja.', 'Sistem yang kerja.'];
   const caption = spider.querySelector('.spider-caption');
   const rig = spider.querySelector('.spider-rig');
@@ -20,6 +21,51 @@
   let gaitFrame = 0, heading = 0, idleTimer=0, gazeFrame=0, attention=null;
   const pupils=spider.querySelector('.spider-pupils');
   const waypoint=document.createElement('span');waypoint.className='spider-waypoint';waypoint.setAttribute('aria-hidden','true');layer.append(waypoint);
+  const scan=document.createElement('div');scan.className='spider-scan';scan.hidden=true;scan.setAttribute('aria-hidden','true');
+  const sweep=document.createElement('i');scan.append(sweep);layer.append(scan);
+  // Reviewed equivalents only. Never rewrite numeric values, names, controls or warnings.
+  const copyGroups=[
+    ['Ringkasan portofolio','Portofolio dalam ringkasan','Gambaran portofolio'],
+    ['Analys seluruh bot','Analisis seluruh bot','Tinjauan kinerja seluruh bot'],
+    ['Data investor','Rincian investor','Informasi investor'],
+    ['Perkembangan total dana','Perubahan total dana','Pergerakan total dana'],
+    ['Dana mana yang naik atau turun?','Lihat kenaikan dan penurunan tiap dana'],
+    ['Ringkasan kinerja','Kinerja dalam ringkasan','Gambaran kinerja'],
+    ['Riwayat profit','Catatan profit','Perjalanan profit'],
+    ['Riwayat posisi ditutup','Catatan posisi yang ditutup'],
+    ['Cara kerjanya','Alur kerja sistem'],
+    ['Invoice','Laporan invoice'],
+    ['Estimasi dividen','Perkiraan dividen'],
+    ['Pemilik simpanan','Daftar pemilik simpanan'],
+    ['Apa itu Safe Box','Mengenal Safe Box'],
+    ['Apa itu Cashood Index','Mengenal Cashood Index'],
+    ['Menu','Jelajahi Cashood','Pilihan halaman'],
+  ];
+  function currentPage(){return document.querySelector('main > div[id^="tab-"]:not([hidden])');}
+  function copyAction(el){
+    if(!el.matches('h2,h3') || el.children.length || el.closest('a,button'))return;
+    const group=copyGroups.find(g=>g.includes(el.textContent.trim()));
+    if(!group)return;
+    return ()=>{const step=(copySteps.get(el)??group.indexOf(el.textContent.trim()))+1;copySteps.set(el,step);el.textContent=group[step%group.length];};
+  }
+  function describe(el){
+    const text=el.textContent.trim().replace(/\s+/g,' ').slice(0,90);
+    if(el.closest('a[href$=".pdf"]'))return 'Laporan PDF tersedia. Kamu bisa membukanya sendiri.';
+    const stat=el.closest('.stat');
+    if(stat){const label=stat.querySelector('.k')?.textContent.trim(),value=stat.querySelector('.v')?.textContent.trim();if(label&&value)return `${label}: ${value}. Ini nilai yang tampil.`;}
+    if(/invoice|dividen/i.test(text))return 'Bagian ini memuat laporan atau pembagian dividen.';
+    if(/pembaruan|diperbarui|sumber/i.test(text))return `Info sumber: ${text}`;
+    return `Aku sedang membaca “${text}”.`;
+  }
+  function clearScan(){scanAnimation?.cancel();scanAnimation=null;scan.hidden=true;delete spider.dataset.scanTarget;}
+  function scanTarget(target){
+    clearScan();if(reduced.matches || !visible(target))return;
+    const r=target.getBoundingClientRect();
+    Object.assign(scan.style,{left:`${r.left+scrollX-3}px`,top:`${r.top+scrollY-3}px`,width:`${r.width+6}px`,height:`${r.height+6}px`});
+    scan.hidden=false;spider.dataset.scanTarget=target.textContent.trim().slice(0,90);
+    scanAnimation=sweep.animate([{transform:'translateX(0)'},{transform:`translateX(${r.width+4}px)`}],{duration:1100,easing:'ease-in-out'});
+    scanAnimation.onfinish=()=>{scan.hidden=true;scanAnimation=null;};
+  }
   const toePositions = [];
   const silk = document.querySelector('#spiderSilk');
   const silkLine = silk.querySelector('line');
@@ -200,16 +246,16 @@
   const active = () => enabled && !document.hidden;
   const onScreen=()=>location.y+44-scrollY>115 && location.y-scrollY<innerHeight && location.x+44>scrollX && location.x<scrollX+innerWidth;
   function cancel() {
-    generation++; stopIdle(); stopGait();
+    generation++; clearScan(); stopIdle(); stopGait();
     clearTimeout(timer); clearTimeout(scrollIdle);
     reveal?.(); reveal = null;
     if (motion) { motion.cancel(); motion=null; }
     spider.dataset.locomotion='idle';
-    spider.classList.remove('walking');
+    spider.classList.remove('walking','yielding');
   }
   function schedule() {
     startIdle();clearTimeout(timer);
-    if (active() && onScreen() && !reduced.matches) timer = setTimeout(tour, 2300);
+    if (active() && onScreen() && !reduced.matches) timer = setTimeout(tour, Math.max(2300,quietUntil-performance.now()));
   }
   function visit(target, message, action, following=false) {
     if (!active() || (!onScreen() && !following) || !visible(target)) { schedule(); return; }
@@ -229,6 +275,7 @@
       spider.classList.remove('walking');
       if (target.isConnected && visible(target)) {
         action?.();
+        scanTarget(target);
         if (!reduced.matches) {
           target.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.65)', textShadow: '0 0 16px #2dd4bf' }, { filter: 'brightness(1)' }], { duration: 850 });
           inspectTarget(target);
@@ -243,6 +290,7 @@
   }
   function tour(following=false) {
     if (!active() || (!onScreen() && following!==true)) return;
+    if(performance.now()<quietUntil){schedule();return;}
     const targets = [
       [document.getElementById('spiderHeadline'), 'Ganti sudut pandang.', () => {
         const title = document.getElementById('spiderHeadline');
@@ -257,13 +305,13 @@
     ].filter(([el]) => visible(el));
     // Read only the current page, at most once per visit. No polling/fetching or
     // broad DOM observer: invoice tables can contain thousands of rows.
-    const page = document.querySelector('main > div[id^="tab-"]:not([hidden])');
+    const page = currentPage();
     if (page) {
-      const candidates = page.querySelectorAll('h2,h3,.aum-v,.hs-v,.prod-name,.menu-tile b,a[href$=".pdf"],.sub-h');
+      const candidates = page.querySelectorAll('h2,h3,.aum-v,.hs-v,.prod-name,.menu-tile b,a[href$=".pdf"],.sub-h,.stat .k,.stat .v,.stat .n,.card-head .hint,.hb-head p,.prod-desc');
       const seen = new Set(targets.map(([el]) => el));
       for (const el of Array.from(candidates).slice(0, 200)) {
         if (!seen.has(el) && visible(el)) {
-          targets.push([el, el.closest('a[href$=".pdf"]') ? 'Laporan tersedia. Klik untuk membukanya.' : 'Jelajahi rincian di halaman ini.']);
+          targets.push([el, describe(el), ()=>{copyAction(el)?.();caption.textContent=describe(el);}]);
           seen.add(el);
         }
       }
@@ -278,11 +326,37 @@
       }else schedule();
       return;
     }
+    for(const item of targets){if(!item[2])item[2]=copyAction(item[0]);}
     let fresh=targets.filter(([el])=>!explored.has(el));
     if(!fresh.length){explored=new WeakSet();fresh=targets;}
     const distanceTo=([el])=>{const r=el.getBoundingClientRect();return Math.hypot(r.right+scrollX-22-location.x,r.top+scrollY-50-location.y);};
     fresh.sort((a,b)=>distanceTo(a)-distanceTo(b));
     const chosen=fresh[0];explored.add(chosen[0]);visit(chosen[0],chosen[1],chosen[2],following===true);
+  }
+  function moveAside(){
+    if(!active())return;
+    cancel();quietUntil=performance.now()+9000;
+    const b=bounds(),origin={...location};
+    const top=Math.max(b.minY,scrollY+175),bottom=Math.max(top,Math.min(b.maxY,scrollY+innerHeight-125));
+    const obstacles=[];
+    for(const el of Array.from(currentPage()?.querySelectorAll('h2,h3,p,a,button,.stat,.prod-name,td,th,.hint')||[]).slice(0,300)){
+      const r=el.getBoundingClientRect();if(r.width&&r.height&&r.bottom>115&&r.top<innerHeight)obstacles.push(r);
+    }
+    const points=[];
+    for(let row=0;row<5;row++)for(let col=0;col<5;col++){
+      const x=b.minX+(b.maxX-b.minX)*col/4,y=top+(bottom-top)*row/4;
+      const distance=Math.hypot(x-origin.x,y-origin.y);if(distance<130)continue;
+      let overlap=0;
+      for(const r of obstacles)overlap+=Math.max(0,Math.min(x+66,r.right)-Math.max(x-22,r.left))*Math.max(0,Math.min(y-scrollY+66,r.bottom)-Math.max(y-scrollY-22,r.top));
+      points.push({x,y,score:overlap-distance*.08});
+    }
+    points.sort((a,b)=>a.score-b.score);
+    const next=points[0]||{x:origin.x<b.maxX/2?b.maxX:b.minX,y:bottom};
+    caption.textContent=['Oke, aku geser. Silakan dibaca.','Permisi, aku pindah dulu ya.','Siap, aku beri ruang buat kamu.'][asideCount++%3];
+    spider.classList.toggle('caption-left',next.x>innerWidth/2);spider.classList.add('yielding');
+    const token=generation;
+    const arrive=()=>{if(token!==generation)return;stopGait();motion=null;location={x:next.x,y:next.y};spider.style.transform=`translate(${next.x}px,${next.y}px)`;spider.classList.remove('walking');schedule();};
+    if(reduced.matches)arrive();else{spider.classList.add('walking');travel(next,arrive);}
   }
   function followReader() {
     if(!active() || reduced.matches)return;
@@ -317,8 +391,8 @@
     try { localStorage.setItem('cashood-spider', enabled ? 'on' : 'off'); } catch {}
     sync();
   });
-  spider.addEventListener('click',()=>tour());
-  spider.addEventListener('pointerenter', () => { cancel();startIdle(); });
+  spider.addEventListener('click',moveAside);
+  spider.addEventListener('pointerenter', () => { if(motion && spider.classList.contains('yielding'))return;cancel();startIdle(); });
   spider.addEventListener('pointerleave', schedule);
   document.addEventListener('cashood:home-data', ({ detail }) => {
     // Compare raw USD totals only; switching display currency is not a gain.
@@ -328,6 +402,7 @@
     const nextText = value?.textContent;
     const oldText = previous?.text;
     previous = { ...detail, text: nextText };
+    if(performance.now()<quietUntil){schedule();return;}
     cancel();
     if (changed && active() && onScreen() && visible(value) && nextText !== oldText) {
       visit(value, 'Pembaruan data masuk.', () => {
@@ -345,7 +420,7 @@
   });
   window.addEventListener('hashchange', () => {
     // A different page gets a fresh entry point; scrolling never relocates it.
-    explored=new WeakSet();location={x:100,y:180}; sync();
+    quietUntil=0;caption.textContent='Aku lihat bagian halaman ini dulu, ya.';explored=new WeakSet();location={x:100,y:180}; sync();
   });
   document.addEventListener('visibilitychange', sync);
   window.addEventListener('resize', sync);
@@ -353,7 +428,7 @@
     // Keep document coordinates. Scrolling moves the character with the content.
     // Follow only after scrolling settles; let it visibly leave the viewport first.
     if (!active()) return;
-    cancel();
+    quietUntil=0;cancel();
     if (!reduced.matches) scrollIdle=setTimeout(() => {scrollIdle=null;followReader();},850);
   }, { passive: true });
   const trackAttention=event=>{

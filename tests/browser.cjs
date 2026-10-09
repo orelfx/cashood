@@ -136,11 +136,16 @@ console.log('PASS complete forecast render');
  await new Promise(r=>setTimeout(r,100));
  assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),false);
  const beforeSpider=await ev('document.querySelector("#homeAum").textContent');
- const copyChanged=await ev(`(()=>{const title=document.querySelector('#spiderHeadline'), before=title.textContent;for(let i=0;i<30 && title.textContent===before;i++)document.querySelector('#cashoodSpider').click();return title.textContent!==before})()`);
- assert.equal(copyChanged,true);
+ const beforeAside=await ev('document.querySelector("#cashoodSpider").getBoundingClientRect().x');
+ await ev('document.querySelector("#cashoodSpider").click()');
+ assert.notEqual(await ev('document.querySelector("#cashoodSpider").getBoundingClientRect().x'),beforeAside);
+ assert.match(await ev('document.querySelector(".spider-caption").textContent'),/geser|pindah|ruang/);
  assert.equal(await ev('document.querySelector("#homeAum").textContent'),beforeSpider);
  assert.equal(await ev('document.querySelector("#cashoodSpider").getAnimations().length'),0);
- console.log('PASS spider changes approved copy without changing financial data; reduced motion respected');
+ console.log('PASS spider yields on click without changing financial data; reduced motion respected');
+ // Clear the reading pause via navigation before testing automatic source updates.
+ await ev("location.hash='#analisa'");await new Promise(r=>setTimeout(r,100));
+ await ev("location.hash='#home';window.scrollTo(0,0)");await new Promise(r=>setTimeout(r,100));
  await cmd('Emulation.setEmulatedMedia',{features:[]});
  await new Promise(r=>setTimeout(r,100));
  await ev(`document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:100,currency:'usd',complete:true}}));document.querySelector('#homeAum .aum-v').textContent='$120';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:120,currency:'usd',complete:true}}));`);
@@ -237,6 +242,35 @@ console.log('PASS complete forecast render');
  await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});await new Promise(r=>setTimeout(r,150));
  assert.equal(await ev('document.querySelector(".spider-core").getAnimations().length'),0);
  await cmd('Emulation.setEmulatedMedia',{features:[]});
+ // New routes receive context-specific scans and reviewed title variations.
+ await cmd('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+ await ev("location.hash='#analisa';window.scrollTo(0,0)");
+ await new Promise(r=>setTimeout(r,500));
+ const portfolioNumbers=await ev('document.querySelector("#portoTotals").textContent');
+ let scannedPortfolio=false;
+ for(let i=0;i<80;i++){
+   await new Promise(r=>setTimeout(r,100));
+   if(await ev('!document.querySelector(".spider-scan").hidden && document.querySelector("#cashoodSpider").dataset.scanTarget?.toLowerCase().includes("portofolio")')){scannedPortfolio=true;break;}
+ }
+ if(!scannedPortfolio)console.log(await ev(`({hash:location.hash,caption:document.querySelector('.spider-caption').textContent,title:document.querySelector('#portoCard h2').textContent,scan:document.querySelector('#cashoodSpider').dataset.scanTarget,loc:document.querySelector('#cashoodSpider').style.transform,headingRect:document.querySelector('#portoCard h2').getBoundingClientRect().toJSON(),page:document.querySelector('main > div[id^="tab-"]:not([hidden])')?.id})`));
+ assert.ok(scannedPortfolio,'new route did not scan its heading');
+ assert.notEqual(await ev('document.querySelector("#portoCard h2").textContent'),'Ringkasan portofolio');
+ assert.equal(await ev('document.querySelector("#portoTotals").textContent'),portfolioNumbers);
+ const asideOrigin=await ev('(()=>{const r=document.querySelector("#cashoodSpider").getBoundingClientRect();return [r.x,r.y]})()');
+ await ev('document.querySelector("#cashoodSpider").click()');
+ assert.equal(await ev('document.querySelector(".spider-scan").hidden'),true);
+ assert.match(await ev('document.querySelector(".spider-caption").textContent'),/geser|pindah|ruang/);
+ await new Promise(r=>setTimeout(r,3300));
+ const asideEnd=await ev('(()=>{const r=document.querySelector("#cashoodSpider").getBoundingClientRect();return [r.x,r.y]})()');
+ assert.ok(Math.hypot(asideEnd[0]-asideOrigin[0],asideEnd[1]-asideOrigin[1])>100);
+ await new Promise(r=>setTimeout(r,1000));
+ assert.equal(await ev('document.querySelector("#cashoodSpider").getBoundingClientRect().x'),asideEnd[0]);
+ assert.match(await ev('location.hash'),/^#analisa/);
+ await ev("location.hash='#kinerja';window.scrollTo(0,0)");
+ await new Promise(r=>setTimeout(r,4500));
+ assert.match(await ev('document.querySelector("#tab-kinerja h2").textContent'),/Analisis|Tinjauan/);
+ assert.doesNotMatch(await ev('document.querySelector(".spider-caption").textContent'),/geser|pindah dulu/);
+ console.log('PASS contextual scans and approved copy on portfolio and analys; click yields and pauses without changing data or route');
  console.log('PASS delayed scroll following, bottom-page roaming, mouse/touch gaze, off switch and reduced motion');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
