@@ -272,6 +272,29 @@ console.log('PASS complete forecast render');
  assert.doesNotMatch(await ev('document.querySelector(".spider-caption").textContent'),/geser|pindah dulu/);
  console.log('PASS contextual scans and approved copy on portfolio and analys; click yields and pauses without changing data or route');
  console.log('PASS delayed scroll following, bottom-page roaming, mouse/touch gaze, off switch and reduced motion');
+ // Real UI navigation uses replaceState (no hashchange); hover cannot stall exploration.
+ await ev(`document.querySelector('[data-fund="reborn"]').click();window.scrollTo(0,0)`);
+ await new Promise(r=>setTimeout(r,250));
+ await ev(`document.querySelector('#tabs [data-tab="portfolio"]').click()`);await new Promise(r=>setTimeout(r,100));
+ assert.equal(await ev('document.querySelector("#tab-portfolio").hidden'),false);
+ const fundNumbers=await ev('[...document.querySelectorAll("#tab-portfolio .kpi .big")].map(el=>el.textContent)');
+ await ev('document.querySelector("#cashoodSpider").dispatchEvent(new PointerEvent("pointerenter"))');
+ const fundScans=new Set();
+ for(let i=0;i<140;i++){
+   await new Promise(r=>setTimeout(r,100));
+   const target=await ev('document.querySelector("#cashoodSpider").dataset.scanTarget');if(target)fundScans.add(target);
+   if(fundScans.size>=2)break;
+ }
+ assert.ok(fundScans.size>=2,'fund detail did not continue scanning after real navigation and hover');
+ assert.deepEqual(await ev('[...document.querySelectorAll("#tab-portfolio .kpi .big")].map(el=>el.textContent)'),fundNumbers);
+ await ev(`document.querySelector('#tabs [data-tab="analys"]').click()`);
+ let detailScan=false;
+ for(let i=0;i<90;i++){await new Promise(r=>setTimeout(r,100));if(await ev('!!document.querySelector("#cashoodSpider").dataset.scanTarget')){detailScan=true;break;}}
+ assert.ok(detailScan,'fund analys tab never resumed scanning');
+ assert.match(await ev('location.hash'),/reborn\/analys/);
+ await ev('document.querySelector(".spider-shell").dispatchEvent(new MouseEvent("click",{bubbles:true}))');
+ assert.match(await ev('document.querySelector(".spider-caption").textContent'),/geser|pindah|ruang/);
+ console.log('PASS real fund navigation, continued scanning under hover, fund subtab exploration and body click');
  // Caption must stay below the real sticky header after scroll and resize.
  await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
  await ev("location.hash='#home';window.scrollTo(0,0)");await new Promise(r=>setTimeout(r,200));

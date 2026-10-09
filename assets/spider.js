@@ -50,6 +50,9 @@
     ['Riwayat profit','Catatan profit','Perjalanan profit'],
     ['Riwayat posisi ditutup','Catatan posisi yang ditutup'],
     ['Cara kerjanya','Alur kerja sistem'],
+    ['Pembagian saham','Rincian pembagian saham'],
+    ['Riwayat setoran & penarikan','Catatan setoran & penarikan'],
+    ['Jejak keputusan bot','Catatan keputusan bot'],
     ['Invoice','Laporan invoice'],
     ['Estimasi dividen','Perkiraan dividen'],
     ['Pemilik simpanan','Daftar pemilik simpanan'],
@@ -67,8 +70,8 @@
   function describe(el){
     const text=el.textContent.trim().replace(/\s+/g,' ').slice(0,90);
     if(el.closest('a[href$=".pdf"]'))return 'Laporan PDF tersedia. Kamu bisa membukanya sendiri.';
-    const stat=el.closest('.stat');
-    if(stat){const label=stat.querySelector('.k')?.textContent.trim(),value=stat.querySelector('.v')?.textContent.trim();if(label&&value)return `${label}: ${value}. Ini nilai yang tampil.`;}
+    const stat=el.closest('.stat,.kpi');
+    if(stat){const label=stat.querySelector('.k,.label')?.textContent.trim(),value=stat.querySelector('.v,.big')?.textContent.trim();if(label&&value)return `${label}: ${value}. Ini nilai yang tampil.`;}
     if(/invoice|dividen/i.test(text))return 'Bagian ini memuat laporan atau pembagian dividen.';
     if(/pembaruan|diperbarui|sumber/i.test(text))return `Info sumber: ${text}`;
     return `Aku sedang membaca “${text}”.`;
@@ -92,8 +95,8 @@
       const positions=Array.from(page.querySelectorAll('#homeStats .hs')).find(el=>el.querySelector('.hs-k')?.textContent.trim()==='Posisi terbuka');
       if(positions)rows.push(['posisi_terbuka',positions.querySelector('.hs-v').textContent.trim()]);
     }else{
-      for(const stat of Array.from(page.querySelectorAll('.stat')).slice(0,3)){
-        const label=stat.querySelector('.k')?.textContent.trim(),value=stat.querySelector('.v')?.textContent.trim();
+      for(const stat of Array.from(page.querySelectorAll('.stat,.kpi')).filter(el=>el.getClientRects().length).slice(0,3)){
+        const label=stat.querySelector('.k,.label')?.textContent.trim(),value=stat.querySelector('.v,.big')?.textContent.trim();
         if(label&&value)rows.push([label,value]);
       }
     }
@@ -321,7 +324,7 @@
   }
   function schedule() {
     queueCaption();startIdle();clearTimeout(timer);
-    if (active() && onScreen() && !reduced.matches) timer = setTimeout(tour, Math.max(2300,quietUntil-performance.now()));
+    if (active() && !reduced.matches) timer = setTimeout(()=>onScreen()?tour():followReader(), Math.max(2300,quietUntil-performance.now()));
   }
   function visit(target, message, action, following=false) {
     if (!active() || (!onScreen() && !following) || !visible(target)) { schedule(); return; }
@@ -373,7 +376,7 @@
     // broad DOM observer: invoice tables can contain thousands of rows.
     const page = currentPage();
     if (page) {
-      const candidates = page.querySelectorAll('h2,h3,.aum-v,.hs-v,.prod-name,.menu-tile b,a[href$=".pdf"],.sub-h,.stat .k,.stat .v,.stat .n,.card-head .hint,.hb-head p,.prod-desc');
+      const candidates = page.querySelectorAll('h2,h3,.aum-v,.hs-v,.prod-name,.menu-tile b,a[href$=".pdf"],.sub-h,.stat .k,.stat .v,.stat .n,.card-head .hint,.hb-head p,.prod-desc,.kpi .label,.kpi .big,.kpi .sub,summary,thead th,.kv td');
       const seen = new Set(targets.map(([el]) => el));
       for (const el of Array.from(candidates).slice(0, 200)) {
         if (!seen.has(el) && visible(el)) {
@@ -458,8 +461,8 @@
     sync();
   });
   spider.addEventListener('click',moveAside);
-  spider.addEventListener('pointerenter', () => { if(motion && spider.classList.contains('yielding'))return;cancel();startIdle(); });
-  spider.addEventListener('pointerleave', schedule);
+  spider.addEventListener('pointerenter', () => { if(!motion)schedule(); });
+  spider.addEventListener('pointerleave', () => { if(!motion)schedule(); });
   document.addEventListener('cashood:home-data', ({ detail }) => {
     // Compare raw USD totals only; switching display currency is not a gain.
     const changed = previous && previous.complete && detail.complete
@@ -484,10 +487,20 @@
       }
     } else schedule();
   });
-  window.addEventListener('hashchange', () => {
-    // A different page gets a fresh entry point; scrolling never relocates it.
-    quietUntil=0;caption.textContent='Aku lihat bagian halaman ini dulu, ya.';explored=new WeakSet();location={x:100,y:180}; sync();
-  });
+  let viewFrame=0,lastView='';
+  function viewChanged(){
+    if(viewFrame)return;
+    viewFrame=requestAnimationFrame(()=>{
+      viewFrame=0;
+      const key=location.hash+'|'+currentPage()?.id;
+      if(key===lastView)return;lastView=key;
+      quietUntil=0;explored=new WeakSet();
+      caption.textContent='Aku lihat bagian halaman ini dulu, ya.';
+      location={x:100,y:scrollY+180};sync();
+    });
+  }
+  window.addEventListener('hashchange',viewChanged);
+  document.addEventListener('cashood:view-change',viewChanged);
   document.addEventListener('visibilitychange', sync);
   window.addEventListener('resize', sync);
   const header=document.querySelector('header.top');

@@ -1678,6 +1678,7 @@ function showTab(name) {
   // yang dimaksud dan bukan dana bawaan.
   const want = `#${state.fund}/${tab}`;
   if (location.hash !== want) history.replaceState(null, '', want);
+  queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
   if (bot) refreshHeartbeat();
 }
 
@@ -2909,6 +2910,7 @@ function showSafebox() {
   $('#tab-safebox').hidden = false;
   renderFundBar();
   if (location.hash !== '#safebox') history.replaceState(null, '', '#safebox');
+  queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
   renderSafebox();
 }
 
@@ -3362,6 +3364,7 @@ function showUpdate() {
   $('#tab-update').hidden = false;
   renderFundBar();
   if (location.hash !== '#update') history.replaceState(null, '', '#update');
+  queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
   renderUpdates();
 }
 
@@ -3383,6 +3386,7 @@ function showAnalisa(fund) {
   if ($('#analisaBody')) $('#analisaBody').hidden = true;
   const want = `#analisa/${analisaFund}`;
   if (location.hash !== want) history.replaceState(null, '', want);
+  queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
 }
 
 /* ── beranda ─────────────────────────────────────────────────────────────
@@ -3443,6 +3447,7 @@ function showGlobal(view, title) {
   $('#tagline').textContent = 'Dana kripto yang dikelola AI';
   renderFundBar();
   if (location.hash !== '#' + view && !(view === 'home' && !location.hash)) history.replaceState(null, '', '#' + view);
+  queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
   window.scrollTo(0, 0);
 }
 /* ── Cashood Index ───────────────────────────────────────────────────────
@@ -3649,6 +3654,7 @@ function showHome() {
   $('#tagline').textContent = 'Dana kripto yang dikelola AI';
   renderFundBar();
   if (location.hash && location.hash !== '#home') history.replaceState(null, '', '#home');
+  queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
   renderHome().catch(() => {});
 }
 
