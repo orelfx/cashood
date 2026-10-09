@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d2f0b478-b521-43e5-85d2-720735101d0a",
-  "updatedAt": 1791588375990,
-  "generatedAt": "2026-10-10 06:26 WIB",
+  "generation": "dfe80b27-978f-4680-bb10-d5c5f78d5701",
+  "updatedAt": 1791588675990,
+  "generatedAt": "2026-10-10 06:31 WIB",
   "usdIdr": null,
   "totalUsd": 940.0425703310922,
   "nativeSymbol": "SOL",
@@ -1167,12 +1167,12 @@
     "pnlUsd": -59.95742966890782,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791588375990,
+    "heartbeatAt": 1791588675990,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.87,
-    "lastScanAt": 1791588375395,
+    "lastScanAt": 1791588672076,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1193,7 +1193,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "203",
+        "v": "204",
         "n": "24 jam · 51 diveto LLM"
       },
       {
@@ -1209,9 +1209,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791588375990,
+      "lastDecisionAt": 1791588675990,
       "lastAction": "keputusan",
-      "lastReason": "PROOF [low]: Diveto LLM: Weak asymmetry with few big winners, failed copy history on dolphin #1317 (-26.5%), and heavy churn indicate these are mostly scalping bots rather than skilled degen. Tidak dimasuki."
+      "lastReason": "PQLN [degen]: Dilewati: harga sudah -59% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1446,6 +1446,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791588499092,
+        "symbol": "PQLN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -59% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791588372221,
         "symbol": "PROOF",
@@ -2533,34 +2543,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 8."
-      },
-      {
-        "at": 1791574151517,
-        "symbol": "Quantcum",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 65,
-            "note": "bundler pegang 5.6%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 5.4%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets are losing money (-$307, -$487) with high token churn (329-339/week), no big winners (0 over_x5), and ultra-short median holds (16 min) suggesting . Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 29,
+        "below_entry": 30,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2615,7 +2603,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791588414400,
+    "generatedAt": 1791588714248,
     "trades": {
       "count": 63,
       "wins": 23,
