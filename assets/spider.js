@@ -181,7 +181,7 @@
     const lengths=[distance(g[0],g[1]),distance(g[1],g[2]),distance(g[2],g[3])];
     const [upper,middle,tip]=lengths,restLower=distance(g[1],g[3]);
     const bend=Math.acos(Math.max(-1,Math.min(1,(restLower**2-middle**2-tip**2)/(2*middle*tip))));
-    const lower=Math.sqrt(middle**2+tip**2+2*middle*tip*Math.cos(bend+Math.max(0,lift)*.18));
+    const lower=Math.sqrt(middle**2+tip**2+2*middle*tip*Math.cos(bend+Math.max(0,lift)*.18+Math.max(0,lift-.25)*.55));
     const axis=Math.atan2(g[3][1]-g[0][1],g[3][0]-g[0][0]);
     const wanted=Math.atan2(requested[1]-g[0][1],requested[0]-g[0][0]);
     const offset=Math.atan2(Math.sin(wanted-axis),Math.cos(wanted-axis));
@@ -221,7 +221,7 @@
       if(motion || gaitFrame || !active() || !onScreen() || reduced.matches){spider.classList.remove('resting');return;}
       const phase=performance.now()/1300;
       // Small joint flexes at 10 Hz; planted toes and document position stay fixed.
-      [0,6].forEach((i,j)=>drawLeg(i,legGeometry[i][3],.11+.1*Math.sin(phase+j*Math.PI)));
+      legGeometry.forEach((g,i)=>drawLeg(i,g[3],.1+.09*Math.sin(phase+i*.8)));
       idleTimer=setTimeout(tick,100);
     };
     idleTimer=setTimeout(tick,100);
@@ -239,7 +239,7 @@
     const walkStart={x:next.x-ux*walkDistance,y:next.y-uy*walkDistance};
     const shootMs=web?180:0, zipMs=web?650:0, walkAt=shootMs+zipMs;
     const walkMs=Math.max(450,walkDistance/170*1000), settleMs=320, endAt=walkAt+walkMs;
-    const steps=Math.max(1,Math.ceil(walkDistance/29));
+    const steps=Math.max(1,Math.ceil(walkDistance/42));
     const curve=web?0:Math.min(16,walkDistance*.06)*(dx>=0?1:-1);
     const phaseOffsets=[0,.51,.13,.64,.5,.01,.63,.14];
     const started=performance.now();let last=0,feet=null,settleFrom=null;
@@ -291,32 +291,38 @@
         legGeometry.forEach((g,i)=>drawLeg(i,[120+(g[3][0]-120)*(1-fold),120+(g[3][1]-120)*(1-fold)],fold));
       }else if(elapsed<endAt){
         silk.hidden=true;spider.dataset.locomotion='walk';
-        if(!feet)feet=legGeometry.map((g,i)=>({anchor:world(toePositions[i]||g[3],location),swing:false}));
+        if(!feet)feet=legGeometry.map((g,i)=>({anchor:world(toePositions[i]||g[3],location),swing:false,lastBeat:-1,plantedAt:-Infinity}));
         const progress=Math.min(1,(elapsed-walkAt)/walkMs), cycle=progress*steps;
         const point=pathAt(progress), ahead=pathAt(Math.min(1,progress+.015));
         face(Math.atan2(ahead.y-point.y,ahead.x-point.x)*180/Math.PI+90,dt);
         // A small lateral sway follows the support legs without scaling the body.
-        const sway=Math.sin(cycle*2*Math.PI)*1.2*Math.sin(Math.PI*progress);
+        const sway=Math.sin(cycle*2*Math.PI)*1.7*Math.sin(Math.PI*progress);
         place({x:point.x-uy*sway,y:point.y+ux*sway});
         let lifting=feet.filter(f=>f.swing).length;
         [0,5,2,7,4,1,6,3].forEach(i=>{
           const foot=feet[i];
-          const phase=(cycle+phaseOffsets[i])%1, desired=world(legGeometry[i][3],location);
+          const beat=Math.floor(cycle+phaseOffsets[i]),phase=(cycle+phaseOffsets[i])%1, desired=world(legGeometry[i][3],location);
           // Turn steps are selected by reach, not a rigid spin of all eight legs.
           const overextended=Math.hypot(desired.x-foot.anchor.x,desired.y-foot.anchor.y)>24*scale;
-          if(!foot.swing && lifting<4 && (phase>=.56 || overextended)){
+          if(!foot.swing && lifting<4 && elapsed-foot.plantedAt>85 && ((phase>=.48 && beat!==foot.lastBeat) || overextended)){
+            foot.lastBeat=beat;
             lifting++;
             foot.swing=true;foot.liftedAt=elapsed;foot.from={...foot.anchor};
-            foot.duration=Math.max(95,Math.min(180,walkMs/steps*.44));
+            foot.duration=Math.max(145,Math.min(240,walkMs/steps*.62));
             const future=pathAt(Math.min(1,progress+foot.duration/walkMs+.14/steps));
             foot.to=world(legGeometry[i][3],future,Math.atan2(dy,dx)*180/Math.PI+90);
           }
           let lift=0;
           if(foot.swing){
             const t=Math.min(1,(elapsed-foot.liftedAt)/foot.duration), p=smooth(t);
-            lift=Math.sin(t*Math.PI);
-            foot.anchor={x:foot.from.x+(foot.to.x-foot.from.x)*p,y:foot.from.y+(foot.to.y-foot.from.y)*p};
-            if(t>=1){foot.swing=false;lifting--;}
+            // Lift, carry inward in a shallow arc, then ease onto the next foothold.
+            // Only swinging feet move; the support feet stay anchored to the page.
+            lift=Math.sin(t*Math.PI)**2;
+            const x=foot.from.x+(foot.to.x-foot.from.x)*p,y=foot.from.y+(foot.to.y-foot.from.y)*p;
+            const toward={x:location.x+22-x,y:location.y+22-y},length=Math.hypot(toward.x,toward.y)||1;
+            const arc=12*scale*lift;
+            foot.anchor={x:x+toward.x/length*arc,y:y+toward.y/length*arc};
+            if(t>=1){foot.swing=false;foot.plantedAt=elapsed;lifting--;}
           }
           const grounded=drawLeg(i,local(foot.anchor),lift);
           legs[i].joints[2].dataset.planted=String(!foot.swing && grounded);
