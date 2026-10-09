@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ec8d95ec-4647-4b0c-91c6-321020d11159",
-  "updatedAt": 1791565575911,
-  "generatedAt": "2026-10-10 00:06 WIB",
+  "generation": "6e3c3f9e-f518-4ab7-9467-9da50e446498",
+  "updatedAt": 1791565875912,
+  "generatedAt": "2026-10-10 00:11 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791565575911,
+    "heartbeatAt": 1791565875912,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791565574141,
+    "lastScanAt": 1791565874776,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,13 +1202,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "199",
-        "n": "24 jam · 46 diveto LLM"
+        "v": "200",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1914",
-        "n": "159 aktif"
+        "n": "162 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791565575911,
+      "lastDecisionAt": 1791565875912,
       "lastAction": "keputusan",
-      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
+      "lastReason": "UNBOX [degen]: Dilewati karena red flag: bundler pegang 38.9% supply."
     }
   },
   "strategy": {
@@ -1239,7 +1239,7 @@
       ],
       [
         "Wallet dipantau",
-        "1914 · 159 aktif"
+        "1914 · 162 aktif"
       ],
       [
         "Cadangan kas",
@@ -1300,8 +1300,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1914,
-      "active": 159,
-      "passive": 1755,
+      "active": 162,
+      "passive": 1752,
       "trusted": 4,
       "promising": 15,
       "byLabel": [
@@ -1314,8 +1314,8 @@
         {
           "key": "smart",
           "total": 530,
-          "active": 123,
-          "passive": 407
+          "active": 127,
+          "passive": 403
         },
         {
           "key": "blacklist",
@@ -1326,8 +1326,8 @@
         {
           "key": "kol",
           "total": 111,
-          "active": 14,
-          "passive": 97
+          "active": 13,
+          "passive": 98
         },
         {
           "key": "dolphin",
@@ -1456,6 +1456,26 @@
     },
     "decisions": [
       {
+        "at": 1791565810713,
+        "symbol": "UNBOX",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 38.9% supply."
+      },
+      {
+        "at": 1791565580125,
+        "symbol": "UDR",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
+      },
+      {
         "at": 1791565414006,
         "symbol": "USDP",
         "action": "skip",
@@ -1482,16 +1502,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 55% supply."
-      },
-      {
-        "at": 1791564976302,
-        "symbol": "UDR",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
       },
       {
         "at": 1791564682521,
@@ -2692,28 +2702,6 @@
           }
         ],
         "reason": "Take profit bertahap (TP2): jual sebagian senilai $2,86; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791550638146,
-        "symbol": "YOUTUBE",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 128,
-            "note": "bundler pegang 7.8%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.2%"
-          }
-        ],
-        "reason": "Diveto LLM: All four wallets show negative realized PnL (-150 to -463 USD) despite decent win rates (60-66%), driven by extreme token churn (250-350+/week) and near-zero me. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2724,7 +2712,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 104,
+        "red_flag": 106,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2741,7 +2729,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 46
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2774,7 +2762,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791565618511,
+    "generatedAt": 1791565915473,
     "trades": {
       "count": 60,
       "wins": 23,
