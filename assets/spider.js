@@ -143,15 +143,38 @@
   // Legs attach along an elongated body, not to a radial central point.
   const legGeometry = [[[114.1,110.0],[82.7,87.2],[50.3,89.7],[22.5,90.4]],[[112.3,119.1],[85.2,115.9],[68.9,125.9],[47.1,141.3]],[[112.1,125.2],[90.6,146.7],[84.9,175.4],[80.2,200.1]],[[113.7,133.1],[103.0,161.9],[111.6,188.6],[117.5,211.6]],[[126.3,134.0],[158.2,158.7],[194.0,156.9],[225.0,156.2]],[[126.1,122.5],[149.4,123.2],[168.2,113.0],[184.0,104.4]],[[126.3,113.7],[145.1,109.8],[155.8,97.4],[166.2,86.5]],[[125.7,102.6],[132.0,77.2],[125.0,63.0],[116.6,46.5]]];
   const smooth = t => t*t*(3-2*t);
+  // Solve each leg with fixed segment lengths and a consistent bend direction.
+  // A moving foot must not stretch the middle joints or fold across the body.
+  function solveLeg(g, requested, lift=0){
+    const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+    const lengths=[distance(g[0],g[1]),distance(g[1],g[2]),distance(g[2],g[3])];
+    const [upper,middle,tip]=lengths,restLower=distance(g[1],g[3]);
+    const bend=Math.acos(Math.max(-1,Math.min(1,(restLower**2-middle**2-tip**2)/(2*middle*tip))));
+    const lower=Math.sqrt(middle**2+tip**2+2*middle*tip*Math.cos(bend+Math.max(0,lift)*.18));
+    const axis=Math.atan2(g[3][1]-g[0][1],g[3][0]-g[0][0]);
+    const wanted=Math.atan2(requested[1]-g[0][1],requested[0]-g[0][0]);
+    const offset=Math.atan2(Math.sin(wanted-axis),Math.cos(wanted-axis));
+    const angle=axis+Math.max(-Math.PI/3,Math.min(Math.PI/3,offset));
+    const reach=Math.max(Math.abs(upper-lower)+.01,(upper+lower)*.42,
+      Math.min(upper+lower-.01,distance(g[0],requested)));
+    const toe=[g[0][0]+Math.cos(angle)*reach,g[0][1]+Math.sin(angle)*reach];
+    const joint=(root,end,a,b,sign)=>{
+      const d=distance(root,end),ux=(end[0]-root[0])/d,uy=(end[1]-root[1])/d;
+      const x=(a*a-b*b+d*d)/(2*d),h=Math.sqrt(Math.max(0,a*a-x*x))*sign;
+      return [root[0]+ux*x-uy*h,root[1]+uy*x+ux*h];
+    };
+    const knee=joint(g[0],toe,upper,lower,-Math.sign(cross(g[0],g[1],g[3]))||1);
+    const ankle=joint(knee,toe,middle,tip,-Math.sign(cross(g[1],g[2],g[3]))||1);
+    return [g[0],knee,ankle,toe];
+  }
   function drawLeg(index, toe, lift = 0) {
-    toePositions[index]=[...toe];
-    const geometry = legGeometry[index], original = geometry[3];
-    const delta = [toe[0]-original[0],toe[1]-original[1]];
-    const points = geometry.map(([x,y],j) => j===3 ? toe : j===0 ? [x,y] :
-      [x+delta[0]*(j/3)+(x<120?-1:1)*lift*7,y+delta[1]*(j/3)-lift*5]);
+    const points=solveLeg(legGeometry[index],toe,lift);
+    toePositions[index]=points[3];
     const {path,joints} = legs[index];
     path.setAttribute('d','M'+points.map(p=>p.map(n=>n.toFixed(1)).join(' ')).join(' L'));
     points.slice(1).forEach((p,j)=>{joints[j].setAttribute('cx',p[0].toFixed(1));joints[j].setAttribute('cy',p[1].toFixed(1));});
+    return Math.hypot(points[3][0]-toe[0],points[3][1]-toe[1])<.1;
   }
   function updateGaze() {
     gazeFrame=0;
@@ -203,8 +226,9 @@
       return [120+x*c+y*s,120-x*s+y*c];
     };
     const face=(direction,dt)=>{
-      const change=((direction-heading+540)%360)-180;
-      heading+=change*(1-Math.exp(-dt/85));
+      const change=((direction-heading+540)%360+360)%360-180;
+      const turn=Math.max(-dt*.6,Math.min(dt*.6,change*(1-Math.exp(-dt/85))));
+      heading=((heading+turn+180)%360+360)%360-180;
       rig.setAttribute('transform',`rotate(${heading.toFixed(2)} 120 120)`);
     };
     // Smooth body speed through each step; grounded feet, not stop/start easing,
@@ -249,7 +273,7 @@
           const foot=feet[i];
           const phase=(cycle+phaseOffsets[i])%1, desired=world(legGeometry[i][3],location);
           // Turn steps are selected by reach, not a rigid spin of all eight legs.
-          const overextended=Math.hypot(desired.x-foot.anchor.x,desired.y-foot.anchor.y)>34*scale;
+          const overextended=Math.hypot(desired.x-foot.anchor.x,desired.y-foot.anchor.y)>24*scale;
           if(!foot.swing && lifting<4 && (phase>=.56 || overextended)){
             lifting++;
             foot.swing=true;foot.liftedAt=elapsed;foot.from={...foot.anchor};
@@ -264,8 +288,8 @@
             foot.anchor={x:foot.from.x+(foot.to.x-foot.from.x)*p,y:foot.from.y+(foot.to.y-foot.from.y)*p};
             if(t>=1){foot.swing=false;lifting--;}
           }
-          drawLeg(i,local(foot.anchor),lift);
-          legs[i].joints[2].dataset.planted=String(!foot.swing);
+          const grounded=drawLeg(i,local(foot.anchor),lift);
+          legs[i].joints[2].dataset.planted=String(!foot.swing && grounded);
         });
       }else if(elapsed<endAt+settleMs){
         spider.dataset.locomotion='settle';place(next);
