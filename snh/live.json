@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f00e5bb9-7812-4601-afaa-79ce37718c6f",
-  "updatedAt": 1791569175936,
-  "generatedAt": "2026-10-10 01:06 WIB",
+  "generation": "f205a05a-a62f-48cf-ade1-3c14b913e226",
+  "updatedAt": 1791569475936,
+  "generatedAt": "2026-10-10 01:11 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791569175936,
+    "heartbeatAt": 1791569475936,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791569172149,
+    "lastScanAt": 1791569473700,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,13 +1202,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "194",
+        "v": "196",
         "n": "24 jam · 41 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1915",
-        "n": "162 aktif"
+        "n": "159 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791569175936,
+      "lastDecisionAt": 1791569475936,
       "lastAction": "keputusan",
-      "lastReason": "UDR [big]: Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
+      "lastReason": "QCAT [degen]: Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1239,7 +1239,7 @@
       ],
       [
         "Wallet dipantau",
-        "1915 · 162 aktif"
+        "1915 · 159 aktif"
       ],
       [
         "Cadangan kas",
@@ -1300,8 +1300,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1915,
-      "active": 162,
-      "passive": 1753,
+      "active": 159,
+      "passive": 1756,
       "trusted": 4,
       "promising": 15,
       "byLabel": [
@@ -1314,8 +1314,8 @@
         {
           "key": "smart",
           "total": 531,
-          "active": 127,
-          "passive": 404
+          "active": 124,
+          "passive": 407
         },
         {
           "key": "blacklist",
@@ -1455,6 +1455,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791569474758,
+        "symbol": "QCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791569430759,
+        "symbol": "PCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791567383887,
         "symbol": "UDR",
@@ -2688,32 +2708,12 @@
           }
         ],
         "reason": "Keluar (trailing): Harga turun 35% dari puncak +200% setelah 31 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +40,3%."
-      },
-      {
-        "at": 1791551505111,
-        "symbol": "MOSSAD",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: holder baru 15."
-      },
-      {
-        "at": 1791551405860,
-        "symbol": "shrek",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: holder baru 17."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 27,
+        "below_entry": 29,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2768,7 +2768,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791569211347,
+    "generatedAt": 1791569512664,
     "trades": {
       "count": 60,
       "wins": 23,
