@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1fcfa8d7-c216-42de-b182-3a2b20eaadb1",
-  "updatedAt": 1791504975490,
-  "generatedAt": "2026-10-09 07:16 WIB",
+  "generation": "4e68e87d-04f1-4457-b9ad-8be93aa7f313",
+  "updatedAt": 1791505275494,
+  "generatedAt": "2026-10-09 07:21 WIB",
   "usdIdr": null,
   "totalUsd": 961.3176330018855,
   "nativeSymbol": "SOL",
@@ -1171,12 +1171,12 @@
     "pnlUsd": -38.6823669981145,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791504975490,
+    "heartbeatAt": 1791505275494,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.77,
-    "lastScanAt": 1791504975481,
+    "lastScanAt": 1791505272407,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1213,9 +1213,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791504975490,
+      "lastDecisionAt": 1791505275494,
       "lastAction": "keputusan",
-      "lastReason": "COIN [low]: Dilewati karena red flag: bundler pegang 55% supply."
+      "lastReason": "EMBERCAT [degen]: Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
     }
   },
   "strategy": {
@@ -1450,6 +1450,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791505256830,
+        "symbol": "EMBERCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
+      },
+      {
+        "at": 1791505192360,
+        "symbol": "OP_CAT",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 56% supply."
+      },
       {
         "at": 1791503899159,
         "symbol": "COIN",
@@ -2571,92 +2591,6 @@
           }
         ],
         "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $6,76, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791484680832,
-        "symbol": "INU",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 29.77% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 480,
-            "note": "bundler pegang 72.3%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 4.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 262,
-            "note": "12.8% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 17x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $4,89; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791484670843,
-        "symbol": "INU",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 29.77% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 480,
-            "note": "bundler pegang 72.3%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 4.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 262,
-            "note": "12.8% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 17x likuiditas"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2717,7 +2651,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791505012399,
+    "generatedAt": 1791505321425,
     "trades": {
       "count": 50,
       "wins": 19,
