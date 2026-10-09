@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7b871ace-3c6b-4edb-b23a-ce087d4d098b",
-  "updatedAt": 1791582375982,
-  "generatedAt": "2026-10-10 04:46 WIB",
+  "generation": "f79e90e0-2379-40fe-8aaf-909b4d29d03e",
+  "updatedAt": 1791582675982,
+  "generatedAt": "2026-10-10 04:51 WIB",
   "usdIdr": null,
   "totalUsd": 946.8397105126135,
   "nativeSymbol": "SOL",
@@ -1181,12 +1181,12 @@
     "pnlUsd": -53.160289487386535,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791582375982,
+    "heartbeatAt": 1791582675982,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.2,
-    "lastScanAt": 1791582372503,
+    "lastScanAt": 1791582673410,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1207,8 +1207,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "196",
-        "n": "24 jam · 45 diveto LLM"
+        "v": "197",
+        "n": "24 jam · 46 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1223,9 +1223,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791582375982,
+      "lastDecisionAt": 1791582675982,
       "lastAction": "keputusan",
-      "lastReason": "MARU [low]: Diveto LLM: Group carried by Wallet 2's high-volume sniping with only 35% winrate and -15.8% median exit; Wallet 3 is a weak contributor; heavy 2-min exits (43% of Wallet 2. Tidak dimasuki."
+      "lastReason": "MARU [low]: Diveto LLM: Low market cap, high churn bots with poor realized PnL per trade and -47% loss on our only copy; only 2 over_x5 wins across 4 wallets with 47% of wallets buying. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1460,6 +1460,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791582433254,
+        "symbol": "MARU",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 236,
+            "note": "bundler pegang 11.4%"
+          },
+          {
+            "type": "rat",
+            "count": 9,
+            "note": "insider/entrapment pegang 3.6%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 18.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 529,
+            "note": "8.1% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 10x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Low market cap, high churn bots with poor realized PnL per trade and -47% loss on our only copy; only 2 over_x5 wins across 4 wallets with 47% of wallets buying. Tidak dimasuki."
+      },
       {
         "at": 1791582319817,
         "symbol": "MARU",
@@ -2470,48 +2512,6 @@
           }
         ],
         "reason": "Take profit bertahap (TP1): jual sebagian senilai $1,91; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791564545851,
-        "symbol": "Spiralism",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 22.23% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 114,
-            "note": "bundler pegang 9.6%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 20.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 232,
-            "note": "11.5% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 11x likuiditas"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2539,7 +2539,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 45
+        "llm": 46
       },
       "test": {
         "solo": 0,
@@ -2572,7 +2572,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791582437563,
+    "generatedAt": 1791582714706,
     "trades": {
       "count": 61,
       "wins": 23,
