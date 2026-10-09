@@ -14,6 +14,22 @@
   const copySteps=new WeakMap();
   const headlines = ['Bot yang kerja.', 'Otomasi yang kerja.', 'Sistem yang kerja.'];
   const caption = spider.querySelector('.spider-caption');
+  let captionFrame=0;
+  function placeCaption(){
+    captionFrame=0;
+    if(!active())return;
+    const r=spider.getBoundingClientRect();
+    const headerBottom=Math.max(0,document.querySelector('header.top')?.getBoundingClientRect().bottom||0);
+    const minTop=headerBottom+8,viewWidth=document.documentElement.clientWidth;
+    const h=caption.offsetHeight,w=caption.offsetWidth;
+    const radius=parseFloat(getComputedStyle(spider).getPropertyValue('--spider-span'))/2;
+    const above=r.top+22-radius-h-10,below=r.top+22+radius+10;
+    const top=Math.max(minTop,Math.min(above>=minTop?above:below,innerHeight-h-8));
+    const left=Math.max(8,Math.min(r.left+22-w/2,viewWidth-w-8));
+    caption.style.visibility=r.bottom<=headerBottom || r.top>=innerHeight?'hidden':'visible';
+    Object.assign(caption.style,{top:`${top-r.top}px`,bottom:'auto',left:`${left-r.left}px`,right:'auto'});
+  }
+  function queueCaption(){if(!captionFrame && active())captionFrame=requestAnimationFrame(placeCaption);}
   const rig = spider.querySelector('.spider-rig');
   const legs = [...spider.querySelectorAll('.spider-leg')].map(el => ({
     path: el.querySelector('path'), joints: [...el.querySelectorAll('circle')],
@@ -122,7 +138,7 @@
     const phaseOffsets=[0,.51,.13,.64,.5,.01,.63,.14];
     const started=performance.now();let last=0,feet=null,settleFrom=null;
     const frameMs=innerWidth<=600?1000/30:1000/60;
-    const place=(point)=>{location=point;spider.style.transform=`translate(${point.x}px,${point.y}px)`;};
+    const place=(point)=>{location=point;spider.style.transform=`translate(${point.x}px,${point.y}px)`;if(spider.classList.contains('yielding'))queueCaption();};
     const world=(point,center,angle=heading)=>{
       const a=angle*Math.PI/180,c=Math.cos(a),s=Math.sin(a);
       return {x:center.x+22+((point[0]-120)*c-(point[1]-120)*s)*scale,
@@ -254,7 +270,7 @@
     spider.classList.remove('walking','yielding');
   }
   function schedule() {
-    startIdle();clearTimeout(timer);
+    queueCaption();startIdle();clearTimeout(timer);
     if (active() && onScreen() && !reduced.matches) timer = setTimeout(tour, Math.max(2300,quietUntil-performance.now()));
   }
   function visit(target, message, action, following=false) {
@@ -267,8 +283,7 @@
       y: Math.max(b.minY, Math.min(b.maxY, r.top + scrollY - 50)),
     };
     caption.textContent = message;
-    spider.classList.toggle('caption-left', next.x > innerWidth / 2);
-    spider.classList.toggle('caption-below',next.y-scrollY<260);
+    queueCaption();
     const arrive = () => {
       if (token !== generation || !active()) return;
       stopGait(); motion = null; location = next;
@@ -354,7 +369,7 @@
     points.sort((a,b)=>a.score-b.score);
     const next=points[0]||{x:origin.x<b.maxX/2?b.maxX:b.minX,y:bottom};
     caption.textContent=['Oke, aku geser. Silakan dibaca.','Permisi, aku pindah dulu ya.','Siap, aku beri ruang buat kamu.'][asideCount++%3];
-    spider.classList.toggle('caption-left',next.x>innerWidth/2);spider.classList.toggle('caption-below',next.y-scrollY<260);spider.classList.add('yielding');
+    queueCaption();spider.classList.add('yielding');
     const token=generation;
     const arrive=()=>{if(token!==generation)return;stopGait();motion=null;location={x:next.x,y:next.y};spider.style.transform=`translate(${next.x}px,${next.y}px)`;spider.classList.remove('walking');schedule();};
     if(reduced.matches)arrive();else{spider.classList.add('walking');travel(next,arrive);}
@@ -383,7 +398,7 @@
       location.x = Math.max(b.minX, Math.min(location.x, b.maxX));
       location.y = Math.max(b.minY, Math.min(location.y, b.maxY));
       spider.style.transform = `translate(${location.x}px,${location.y}px)`;
-      startIdle();
+      queueCaption();startIdle();
       if (!reduced.matches) timer = setTimeout(()=>onScreen()?tour():followReader(),1200);
     }
   }
@@ -425,11 +440,13 @@
   });
   document.addEventListener('visibilitychange', sync);
   window.addEventListener('resize', sync);
+  const header=document.querySelector('header.top');
+  if(header)new ResizeObserver(queueCaption).observe(header);
   window.addEventListener('scroll', () => {
     // Keep document coordinates. Scrolling moves the character with the content.
     // Follow only after scrolling settles; let it visibly leave the viewport first.
     if (!active()) return;
-    quietUntil=0;cancel();
+    quietUntil=0;cancel();queueCaption();
     if (!reduced.matches) scrollIdle=setTimeout(() => {scrollIdle=null;followReader();},850);
   }, { passive: true });
   const trackAttention=event=>{

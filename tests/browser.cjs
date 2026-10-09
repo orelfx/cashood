@@ -272,6 +272,19 @@ console.log('PASS complete forecast render');
  assert.doesNotMatch(await ev('document.querySelector(".spider-caption").textContent'),/geser|pindah dulu/);
  console.log('PASS contextual scans and approved copy on portfolio and analys; click yields and pauses without changing data or route');
  console.log('PASS delayed scroll following, bottom-page roaming, mouse/touch gaze, off switch and reduced motion');
+ // Caption must stay below the real sticky header after scroll and resize.
+ await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+ await ev("location.hash='#home';window.scrollTo(0,0)");await new Promise(r=>setTimeout(r,200));
+ for(const width of [1280,390]){
+   await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:width===390});
+   await ev('window.scrollTo(0,50)');await new Promise(r=>setTimeout(r,200));
+   const bubble=await ev(`(()=>{const c=document.querySelector('.spider-caption'),r=c.getBoundingClientRect(),h=document.querySelector('header.top').getBoundingClientRect(),s=getComputedStyle(c);return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,header:h.bottom,width:document.documentElement.clientWidth,color:s.color,opacity:s.opacity,font:parseFloat(s.fontSize),visibility:s.visibility}})()`);
+   assert.ok(bubble.top>=bubble.header+7 && bubble.bottom<=844-7,'caption obscured by header or viewport');
+   assert.ok(bubble.left>=7 && bubble.right<=bubble.width-7,'caption clips horizontally');
+   assert.equal(bubble.color,'rgb(255, 255, 255)');assert.equal(bubble.opacity,'1');assert.ok(bubble.font>=12);assert.equal(bubble.visibility,'visible');
+   if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'caption-'+width+'.png'),Buffer.from(shot.data,'base64'));}
+ }
+ console.log('PASS white readable captions stay clear of sticky header and viewport on desktop and mobile');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}
