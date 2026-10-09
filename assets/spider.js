@@ -496,7 +496,7 @@
     cancel();
     layer.hidden = !active();
     for (const button of toggles) {
-      button.textContent = enabled ? 'Spider aktif' : 'Spider nonaktif';
+      button.textContent = button.id==='spiderHeaderToggle' ? (enabled?'Spider on':'Spider off') : (enabled?'Spider aktif':'Spider nonaktif');
       button.setAttribute('aria-pressed', String(enabled));
     }
     if (active()) {
