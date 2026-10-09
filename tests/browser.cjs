@@ -148,10 +148,12 @@ console.log('PASS complete forecast render');
  await new Promise(r=>setTimeout(r,380));
  assert.notEqual(await ev('document.querySelector(".spider-leg path").getAttribute("d")'),legBefore);
  await new Promise(r=>setTimeout(r,2200));
- const legRest=await ev('document.querySelector(".spider-leg path").getAttribute("d")');
+ const legRest=await ev('document.querySelector(".spider-leg circle:last-child").getAttribute("cx")');
  await new Promise(r=>setTimeout(r,150));
- assert.equal(await ev('document.querySelector(".spider-leg path").getAttribute("d")'),legRest);
- console.log('PASS articulated spider legs move during travel and stop at rest');
+ assert.equal(await ev('document.querySelector(".spider-leg circle:last-child").getAttribute("cx")'),legRest);
+ assert.equal(await ev('document.querySelector("#cashoodSpider").classList.contains("resting")'),true);
+ assert.ok(await ev('document.querySelector(".spider-core").getAnimations().length>0'));
+ console.log('PASS walking feet stay planted while idle breathing animates');
  // Force a nearby source-value target and measure planted toes in screen space.
  await ev(`(()=>{const v=document.querySelector('#homeAum .aum-v'),r=document.querySelector('#cashoodSpider').getBoundingClientRect();window.__oldValueStyle=v.style.cssText;v.style.cssText='position:fixed;width:30px;height:40px;left:'+(r.left-68)+'px;top:'+(r.top+50)+'px';v.textContent='$121';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:121,currency:'usd',complete:true}}));})()`);
  await new Promise(r=>setTimeout(r,250));
@@ -213,20 +215,29 @@ console.log('PASS complete forecast render');
  await new Promise(r=>setTimeout(r,3000));
  assert.equal(await ev('document.documentElement.scrollWidth===innerWidth'),true);
  if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-mobile.png'),Buffer.from(shot.data,'base64'));}
- // A page-bound character must scroll out of sight and must not chase the viewport.
+ // Remain document-bound while scrolling, then visibly catch up after a pause.
  await ev('window.scrollTo(0,0)');await new Promise(r=>setTimeout(r,300));
- const readSpider=()=>ev(`(()=>{const r=document.querySelector('#cashoodSpider').getBoundingClientRect();return {y:r.y,docY:r.y+scrollY,bottom:r.bottom,height:document.body.offsetHeight,pose:document.querySelector('.spider-leg path').getAttribute('d')}})()`);
+ const readSpider=()=>ev(`(()=>{const r=document.querySelector('#cashoodSpider').getBoundingClientRect();return {y:r.y,docY:r.y+scrollY,bottom:r.bottom,height:document.body.offsetHeight}})()`);
  const anchored=await readSpider();
- await ev(`window.scrollTo(0,${anchored.docY}+innerHeight)`);await new Promise(r=>setTimeout(r,300));
+ await ev(`window.scrollTo(0,document.body.scrollHeight-innerHeight)`);await new Promise(r=>setTimeout(r,300));
  const offscreen=await readSpider();
- assert.ok(offscreen.bottom<0,'spider followed scrolling instead of leaving the viewport');
+ assert.ok(offscreen.bottom<0,'spider was pinned to the viewport during scroll');
  assert.ok(Math.abs(offscreen.docY-anchored.docY)<.5);
- await new Promise(r=>setTimeout(r,8000));
- const stayed=await readSpider();assert.ok(Math.abs(stayed.docY-anchored.docY)<.5);assert.equal(stayed.pose,offscreen.pose);
- assert.equal(stayed.height,anchored.height);
- await ev('window.scrollTo(0,0)');await new Promise(r=>setTimeout(r,100));
- assert.ok(Math.abs((await readSpider()).docY-anchored.docY)<.5);
- console.log('PASS spider remains anchored to the document and pauses offscreen without chasing scroll');
+ await new Promise(r=>setTimeout(r,3600));
+ const followed=await readSpider();assert.ok(followed.y>100 && followed.y<844,'spider did not catch up at the bottom');
+ assert.ok(followed.docY>anchored.docY+500);assert.equal(followed.height,anchored.height);
+ const gaze=()=>ev('document.querySelector(".spider-pupils").getAttribute("transform")');
+ await ev(`document.dispatchEvent(new PointerEvent('pointermove',{clientX:0,clientY:0,pointerType:'mouse'}))`);await new Promise(r=>setTimeout(r,70));const leftEye=await gaze();
+ await ev(`document.dispatchEvent(new PointerEvent('pointerdown',{clientX:innerWidth,clientY:innerHeight,pointerType:'touch'}))`);await new Promise(r=>setTimeout(r,70));
+ assert.notEqual(await gaze(),leftEye,'eyes did not react to mouse and touch');
+ await ev(`document.querySelector('footer [data-spider-toggle]').click()`);
+ const pausedEye=await gaze();await ev(`document.dispatchEvent(new PointerEvent('pointermove',{clientX:0,clientY:0}))`);await new Promise(r=>setTimeout(r,150));assert.equal(await gaze(),pausedEye);
+ assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),true);
+ await ev(`document.querySelector('footer [data-spider-toggle]').click()`);
+ await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});await new Promise(r=>setTimeout(r,150));
+ assert.equal(await ev('document.querySelector(".spider-core").getAnimations().length'),0);
+ await cmd('Emulation.setEmulatedMedia',{features:[]});
+ console.log('PASS delayed scroll following, bottom-page roaming, mouse/touch gaze, off switch and reduced motion');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

@@ -1432,3 +1432,12 @@ body.is-staking #lpCard, body.is-staking #closedCard, body.is-staking #profitCar
 #spiderSilk{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}#spiderSilk[hidden]{display:none}#spiderSilk line{stroke:#a6e9f4;stroke-width:1;opacity:.65;stroke-dasharray:2 3}#spiderSilk circle{fill:#f569c4;stroke:#f5b7e5;stroke-width:1}
 
 #spiderSilk svg{display:block;width:100%;height:100%}
+
+.spider-eye{fill:#0c1825;stroke:#6de4ff;stroke-width:.8}.spider-pupils{fill:#fff0fa}
+.resting .spider-core{transform-origin:120px 124px;animation:spider-breathe 3.8s ease-in-out infinite}
+.resting .spider-eyes{transform-origin:120px 109px;animation:spider-blink 5.4s linear infinite}
+@keyframes spider-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-.9px)}}
+@keyframes spider-blink{0%,26%,31%,100%{transform:scaleY(1)}28%,29%{transform:scaleY(.12)}}
+@media(prefers-reduced-motion:reduce){.resting .spider-core,.resting .spider-eyes{animation:none}}
+
+.spider-waypoint{position:absolute;width:1px;height:1px;visibility:hidden;pointer-events:none}

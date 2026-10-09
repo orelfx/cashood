@@ -17,7 +17,9 @@
   const legs = [...spider.querySelectorAll('.spider-leg')].map(el => ({
     path: el.querySelector('path'), joints: [...el.querySelectorAll('circle')],
   }));
-  let gaitFrame = 0, heading = 0;
+  let gaitFrame = 0, heading = 0, idleTimer=0, gazeFrame=0, attention=null;
+  const pupils=spider.querySelector('.spider-pupils');
+  const waypoint=document.createElement('span');waypoint.className='spider-waypoint';waypoint.setAttribute('aria-hidden','true');layer.append(waypoint);
   const toePositions = [];
   const silk = document.querySelector('#spiderSilk');
   const silkLine = silk.querySelector('line');
@@ -35,6 +37,30 @@
     const {path,joints} = legs[index];
     path.setAttribute('d','M'+points.map(p=>p.map(n=>n.toFixed(1)).join(' ')).join(' L'));
     points.slice(1).forEach((p,j)=>{joints[j].setAttribute('cx',p[0].toFixed(1));joints[j].setAttribute('cy',p[1].toFixed(1));});
+  }
+  function updateGaze() {
+    gazeFrame=0;
+    if(!attention || !active() || !onScreen())return;
+    const dx=attention.x-location.x-22,dy=attention.y-location.y-22;
+    const a=heading*Math.PI/180,c=Math.cos(a),s=Math.sin(a),length=Math.hypot(dx,dy)||1;
+    pupils.setAttribute('transform',`translate(${((dx*c+dy*s)/length*1.25).toFixed(2)} ${((-dx*s+dy*c)/length*1.25).toFixed(2)})`);
+  }
+  function startIdle() {
+    if(idleTimer || motion || gaitFrame || !active() || !onScreen() || reduced.matches)return;
+    spider.classList.add('resting');updateGaze();
+    const tick=()=>{
+      idleTimer=0;
+      if(motion || gaitFrame || !active() || !onScreen() || reduced.matches){spider.classList.remove('resting');return;}
+      const phase=performance.now()/1300;
+      // Small joint flexes at 10 Hz; planted toes and document position stay fixed.
+      [0,6].forEach((i,j)=>drawLeg(i,legGeometry[i][3],.11+.1*Math.sin(phase+j*Math.PI)));
+      idleTimer=setTimeout(tick,100);
+    };
+    idleTimer=setTimeout(tick,100);
+  }
+  function stopIdle() {
+    clearTimeout(idleTimer);idleTimer=0;cancelAnimationFrame(gazeFrame);gazeFrame=0;
+    spider.classList.remove('resting');
   }
   function stopGait() { cancelAnimationFrame(gaitFrame); gaitFrame=0; silk.hidden=true; }
   function travel(next, arrive) {
@@ -80,6 +106,7 @@
       if(last && now-last<frameMs-.5){gaitFrame=requestAnimationFrame(tick);return;}
       const dt=last?Math.min(60,now-last):frameMs;last=now;
       const elapsed=now-started;
+      if(attention)updateGaze();
       if(web && elapsed<walkAt){
         spider.dataset.locomotion='web';silk.hidden=false;
         const shot=smooth(Math.min(1,elapsed/shootMs));
@@ -156,7 +183,7 @@
       if(now-last<1000/30){gaitFrame=requestAnimationFrame(tick);return;}last=now;
       const t=Math.min(1,(now-started)/420),p=Math.sin(t*Math.PI);
       drawLeg(index,[base[0]+(aim[0]-base[0])/length*reach*p,base[1]+(aim[1]-base[1])/length*reach*p],p*.4);
-      if(t<1)gaitFrame=requestAnimationFrame(tick);else {gaitFrame=0;spider.dataset.locomotion='idle';}
+      if(t<1)gaitFrame=requestAnimationFrame(tick);else {gaitFrame=0;spider.dataset.locomotion='idle';startIdle();}
     };
     gaitFrame=requestAnimationFrame(tick);
   }
@@ -171,12 +198,9 @@
     return r.width > 0 && r.height > 0 && r.top > 115 && r.bottom < innerHeight - 8;
   };
   const active = () => enabled && !document.hidden;
-  const onScreen = () => {
-    const r=spider.getBoundingClientRect();
-    return r.bottom>115 && r.top<innerHeight && r.right>0 && r.left<innerWidth;
-  };
+  const onScreen=()=>location.y+44-scrollY>115 && location.y-scrollY<innerHeight && location.x+44>scrollX && location.x<scrollX+innerWidth;
   function cancel() {
-    generation++; stopGait();
+    generation++; stopIdle(); stopGait();
     clearTimeout(timer); clearTimeout(scrollIdle);
     reveal?.(); reveal = null;
     if (motion) { motion.cancel(); motion=null; }
@@ -184,11 +208,11 @@
     spider.classList.remove('walking');
   }
   function schedule() {
-    clearTimeout(timer);
+    startIdle();clearTimeout(timer);
     if (active() && onScreen() && !reduced.matches) timer = setTimeout(tour, 2300);
   }
-  function visit(target, message, action) {
-    if (!active() || !onScreen() || !visible(target)) { schedule(); return; }
+  function visit(target, message, action, following=false) {
+    if (!active() || (!onScreen() && !following) || !visible(target)) { schedule(); return; }
     cancel();
     const token = generation;
     const r = target.getBoundingClientRect(), b = bounds();
@@ -217,8 +241,8 @@
     spider.classList.add('walking');
     travel(next,arrive);
   }
-  function tour() {
-    if (!active() || !onScreen()) return;
+  function tour(following=false) {
+    if (!active() || (!onScreen() && following!==true)) return;
     const targets = [
       [document.getElementById('spiderHeadline'), 'Ganti sudut pandang.', () => {
         const title = document.getElementById('spiderHeadline');
@@ -246,12 +270,31 @@
     }
     const footer = document.querySelector('footer [data-spider-toggle]');
     if (visible(footer)) targets.push([footer, 'Animasi bisa dimatikan di sini.']);
-    if (!targets.length) { schedule(); return; }
+    if (!targets.length) {
+      if(following===true){
+        waypoint.style.left=`${Math.max(100,innerWidth-130)}px`;
+        waypoint.style.top=`${scrollY+Math.max(200,innerHeight*.6)}px`;
+        visit(waypoint,'Menjelajah halaman.',undefined,true);
+      }else schedule();
+      return;
+    }
     let fresh=targets.filter(([el])=>!explored.has(el));
     if(!fresh.length){explored=new WeakSet();fresh=targets;}
     const distanceTo=([el])=>{const r=el.getBoundingClientRect();return Math.hypot(r.right+scrollX-22-location.x,r.top+scrollY-50-location.y);};
     fresh.sort((a,b)=>distanceTo(a)-distanceTo(b));
-    const chosen=fresh[0];explored.add(chosen[0]);visit(...chosen);
+    const chosen=fresh[0];explored.add(chosen[0]);visit(chosen[0],chosen[1],chosen[2],following===true);
+  }
+  function followReader() {
+    if(!active() || reduced.matches)return;
+    if(onScreen()){schedule();return;}
+    const b=bounds();
+    // Skip only the invisible part of a long journey, then enter with visible silk.
+    // Coordinates remain in the document: nothing is pinned to the screen.
+    if(location.y<scrollY-160)location.y=Math.max(b.minY,scrollY-140);
+    else if(location.y>scrollY+innerHeight+160)location.y=Math.min(b.maxY,scrollY+innerHeight+140);
+    location.x=Math.max(b.minX,Math.min(location.x,b.maxX));
+    spider.style.transform=`translate(${location.x}px,${location.y}px)`;
+    tour(true);
   }
   function sync() {
     cancel();
@@ -265,7 +308,8 @@
       location.x = Math.max(b.minX, Math.min(location.x, b.maxX));
       location.y = Math.max(b.minY, Math.min(location.y, b.maxY));
       spider.style.transform = `translate(${location.x}px,${location.y}px)`;
-      if (!reduced.matches && onScreen()) timer = setTimeout(tour, 1200);
+      startIdle();
+      if (!reduced.matches) timer = setTimeout(()=>onScreen()?tour():followReader(),1200);
     }
   }
   for (const button of toggles) button.addEventListener('click', () => {
@@ -273,8 +317,8 @@
     try { localStorage.setItem('cashood-spider', enabled ? 'on' : 'off'); } catch {}
     sync();
   });
-  spider.addEventListener('click', tour);
-  spider.addEventListener('pointerenter', () => { cancel(); });
+  spider.addEventListener('click',()=>tour());
+  spider.addEventListener('pointerenter', () => { cancel();startIdle(); });
   spider.addEventListener('pointerleave', schedule);
   document.addEventListener('cashood:home-data', ({ detail }) => {
     // Compare raw USD totals only; switching display currency is not a gain.
@@ -307,11 +351,18 @@
   window.addEventListener('resize', sync);
   window.addEventListener('scroll', () => {
     // Keep document coordinates. Scrolling moves the character with the content.
-    // Pause off screen rather than seeking a new target in the viewport.
+    // Follow only after scrolling settles; let it visibly leave the viewport first.
     if (!active()) return;
     cancel();
-    if (!reduced.matches) scrollIdle=setTimeout(() => {scrollIdle=null;schedule();},200);
+    if (!reduced.matches) scrollIdle=setTimeout(() => {scrollIdle=null;followReader();},850);
   }, { passive: true });
+  const trackAttention=event=>{
+    if(!active())return;
+    attention={x:event.clientX+scrollX,y:event.clientY+scrollY};
+    if(!gazeFrame)gazeFrame=requestAnimationFrame(updateGaze);
+  };
+  document.addEventListener('pointermove',trackAttention,{passive:true});
+  document.addEventListener('pointerdown',trackAttention,{passive:true});
   reduced.addEventListener('change', sync);
   sync();
 })();
