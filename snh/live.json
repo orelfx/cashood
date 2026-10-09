@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f2afc7c5-74db-46d5-b7ba-91e9c2848cb5",
-  "updatedAt": 1791576075956,
-  "generatedAt": "2026-10-10 03:01 WIB",
+  "generation": "8c8e3850-a2c7-4ac9-b120-b3c499a09cc8",
+  "updatedAt": 1791576375956,
+  "generatedAt": "2026-10-10 03:06 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791576075956,
+    "heartbeatAt": 1791576375956,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791576075478,
+    "lastScanAt": 1791576375603,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,13 +1202,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "191",
+        "v": "192",
         "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1921",
-        "n": "162 aktif"
+        "n": "161 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791576075956,
+      "lastDecisionAt": 1791576375956,
       "lastAction": "keputusan",
-      "lastReason": "BNKR [degen]: Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Oscar [low]: Dilewati karena red flag: bundler pegang 59% supply."
     }
   },
   "strategy": {
@@ -1239,7 +1239,7 @@
       ],
       [
         "Wallet dipantau",
-        "1921 · 162 aktif"
+        "1921 · 161 aktif"
       ],
       [
         "Cadangan kas",
@@ -1251,7 +1251,7 @@
       ],
       [
         "Label wallet",
-        "smart 530 · dolphin 49 · bot 1015 · blacklist 175 · lp 2 · fresh 35 · kol 112 · whale 3"
+        "smart 529 · dolphin 49 · bot 1016 · blacklist 175 · lp 2 · fresh 35 · kol 112 · whale 3"
       ]
     ],
     "requirements": [
@@ -1300,21 +1300,21 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1921,
-      "active": 162,
-      "passive": 1759,
+      "active": 161,
+      "passive": 1760,
       "trusted": 4,
       "promising": 14,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1015,
+          "total": 1016,
           "active": 0,
-          "passive": 1015
+          "passive": 1016
         },
         {
           "key": "smart",
-          "total": 530,
-          "active": 126,
+          "total": 529,
+          "active": 125,
           "passive": 404
         },
         {
@@ -1455,6 +1455,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791576145477,
+        "symbol": "Oscar",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 59% supply."
+      },
       {
         "at": 1791575654002,
         "symbol": "BNKR",
@@ -2404,33 +2422,6 @@
           }
         ],
         "reason": "Diveto LLM: All three wallets share identical trading habits (1.8 min median hold, 50% of round trips sold within 2 min, -11 to -16% median exit) and are likely the same op. Tidak dimasuki."
-      },
-      {
-        "at": 1791560101852,
-        "symbol": "SKATE3",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 395,
-            "note": "bundler pegang 2.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: All four wallets show near-identical behavior with high churn and tiny median gains (0.05-5.8%), winning often but capturing no asymmetry—no tokens over x5 and . Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2441,7 +2432,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 107,
+        "red_flag": 108,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2491,7 +2482,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791576113266,
+    "generatedAt": 1791576414436,
     "trades": {
       "count": 60,
       "wins": 23,
