@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "632c0dac-90f1-4d51-a159-433f0076fc45",
-  "updatedAt": 1791565275911,
-  "generatedAt": "2026-10-10 00:01 WIB",
+  "generation": "ec8d95ec-4647-4b0c-91c6-321020d11159",
+  "updatedAt": 1791565575911,
+  "generatedAt": "2026-10-10 00:06 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791565275911,
+    "heartbeatAt": 1791565575911,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791565272433,
+    "lastScanAt": 1791565574141,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,13 +1202,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "197",
+        "v": "199",
         "n": "24 jam · 46 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1914",
-        "n": "157 aktif"
+        "n": "159 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791565275911,
+      "lastDecisionAt": 1791565575911,
       "lastAction": "keputusan",
-      "lastReason": "UDR [big]: Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
+      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
     }
   },
   "strategy": {
@@ -1239,7 +1239,7 @@
       ],
       [
         "Wallet dipantau",
-        "1914 · 157 aktif"
+        "1914 · 159 aktif"
       ],
       [
         "Cadangan kas",
@@ -1300,8 +1300,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1914,
-      "active": 157,
-      "passive": 1757,
+      "active": 159,
+      "passive": 1755,
       "trusted": 4,
       "promising": 15,
       "byLabel": [
@@ -1332,8 +1332,8 @@
         {
           "key": "dolphin",
           "total": 49,
-          "active": 19,
-          "passive": 30
+          "active": 21,
+          "passive": 28
         },
         {
           "key": "fresh",
@@ -1390,6 +1390,15 @@
           "trusted": false
         },
         {
+          "alias": "dolphin #1904",
+          "label": "dolphin",
+          "score": 100,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
           "alias": "dolphin #1627",
           "label": "dolphin",
           "score": 98,
@@ -1402,6 +1411,15 @@
           "alias": "smart #1662",
           "label": "smart",
           "score": 96.7,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
+          "alias": "dolphin #1913",
+          "label": "dolphin",
+          "score": 95.9,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1433,28 +1451,38 @@
           "won": 0,
           "pnlUsd": 0,
           "trusted": false
-        },
-        {
-          "alias": "smart #696",
-          "label": "smart",
-          "score": 92.8,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
-          "alias": "dolphin #798",
-          "label": "dolphin",
-          "score": 91.2,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1791565414006,
+        "symbol": "USDP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
+      },
+      {
+        "at": 1791565384983,
+        "symbol": "PAWS",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 55% supply."
+      },
       {
         "at": 1791564976302,
         "symbol": "UDR",
@@ -1464,16 +1492,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
-      },
-      {
-        "at": 1791564811867,
-        "symbol": "USDP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
       },
       {
         "at": 1791564682521,
@@ -2696,28 +2714,6 @@
           }
         ],
         "reason": "Diveto LLM: All four wallets show negative realized PnL (-150 to -463 USD) despite decent win rates (60-66%), driven by extreme token churn (250-350+/week) and near-zero me. Tidak dimasuki."
-      },
-      {
-        "at": 1791550621659,
-        "symbol": "YOUTUBE",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 128,
-            "note": "bundler pegang 6.6%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.2%"
-          }
-        ],
-        "reason": "Diveto LLM: All four wallets show negative realized PnL (-$150 to -$463) over 7 days with extremely high token churn (250-350/week), tiny median gains (0.05-6%), and zero c. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2728,7 +2724,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 102,
+        "red_flag": 104,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2778,7 +2774,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791565316753,
+    "generatedAt": 1791565618511,
     "trades": {
       "count": 60,
       "wins": 23,
