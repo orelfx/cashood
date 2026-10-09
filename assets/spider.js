@@ -17,20 +17,18 @@
     path: el.querySelector('path'), joints: [...el.querySelectorAll('circle')],
   }));
   let gaitFrame = 0, gaitLast = 0, gaitStart = 0, heading = 0;
-  // Eight articulated legs, 30 updates/second only during travel. No layout reads.
+  // Joint positions traced from the supplied reference, in body-local coordinates.
+  // Legs attach along an elongated body, not to a radial central point.
+  const legGeometry = [[[114.1,110.0],[82.7,87.2],[50.3,89.7],[22.5,90.4]],[[112.3,119.1],[85.2,115.9],[68.9,125.9],[47.1,141.3]],[[112.1,125.2],[90.6,146.7],[84.9,175.4],[80.2,200.1]],[[113.7,133.1],[103.0,161.9],[111.6,188.6],[117.5,211.6]],[[126.3,134.0],[158.2,158.7],[194.0,156.9],[225.0,156.2]],[[126.1,122.5],[149.4,123.2],[168.2,113.0],[184.0,104.4]],[[126.3,113.7],[145.1,109.8],[155.8,97.4],[166.2,86.5]],[[125.7,102.6],[132.0,77.2],[125.0,63.0],[116.6,46.5]]];
+  // Update only while travelling; alternating feet lift and extend independently.
   function pose(phase = 0) {
-    const shape = [[69,-91],[100,-42],[102,36],[62,99]];
     legs.forEach(({path,joints}, index) => {
-      const side = index < 4 ? -1 : 1, i = index % 4;
-      const [reach, spread] = shape[i];
-      const wave = Math.sin(phase + i * Math.PI / 2 + (side > 0 ? Math.PI : 0));
-      const lift = Math.max(0, wave) * 9;
-      const hip = [120 + side*5, 120+(i-1.5)*5];
-      const knee = [120+side*(reach*.46+lift),120+spread*.43-wave*8];
-      const ankle = [120+side*(reach*.77-lift*.4),120+spread*.73+wave*9];
-      const toe = [120+side*(reach-lift*.3),120+spread+wave*15];
-      path.setAttribute('d', 'M'+[hip,knee,ankle,toe].map(p=>p.map(n=>n.toFixed(1)).join(' ')).join(' L'));
-      [knee,ankle,toe].forEach((p,j)=>{joints[j].setAttribute('cx',p[0].toFixed(1));joints[j].setAttribute('cy',p[1].toFixed(1));});
+      const wave = Math.sin(phase + (index % 2) * Math.PI + Math.floor(index/2)*.35);
+      const lift = Math.max(0,wave);
+      const points = legGeometry[index].map(([x,y],joint) => joint === 0 ? [x,y] :
+        [x + (x < 120 ? -1 : 1)*lift*(joint===1 ? 5 : 2), y+wave*(joint===1 ? -3 : joint===2 ? 5 : 9)]);
+      path.setAttribute('d','M'+points.map(p=>p.map(n=>n.toFixed(1)).join(' ')).join(' L'));
+      points.slice(1).forEach((p,j)=>{joints[j].setAttribute('cx',p[0].toFixed(1));joints[j].setAttribute('cy',p[1].toFixed(1));});
     });
   }
   function stopGait() { cancelAnimationFrame(gaitFrame); gaitFrame = 0; }
