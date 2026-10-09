@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ccf4919c-1ec4-4b48-9f4d-b6a0cf5bd488",
-  "updatedAt": 1791532575704,
-  "generatedAt": "2026-10-09 14:56 WIB",
+  "generation": "90c5f9fc-98a7-4950-ae2b-27f4064cd266",
+  "updatedAt": 1791532875707,
+  "generatedAt": "2026-10-09 15:01 WIB",
   "usdIdr": null,
   "totalUsd": 961.1687074670808,
   "nativeSymbol": "SOL",
@@ -1219,12 +1219,12 @@
     "pnlUsd": -38.83129253291918,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791532575704,
+    "heartbeatAt": 1791532875707,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.78,
-    "lastScanAt": 1791532575456,
+    "lastScanAt": 1791532873453,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1245,7 +1245,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "210",
+        "v": "211",
         "n": "24 jam · 51 diveto LLM"
       },
       {
@@ -1261,9 +1261,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791532575704,
+      "lastDecisionAt": 1791532875707,
       "lastAction": "keputusan",
-      "lastReason": "QUANTITIES [degen]: Dilewati karena red flag: holder baru 10."
+      "lastReason": "PQC [degen]: Dilewati: harga sudah -43% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1498,6 +1498,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791532585406,
+        "symbol": "PQC",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati: harga sudah -43% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791532506866,
         "symbol": "QUANTITIES",
@@ -2707,22 +2717,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 22%."
-      },
-      {
-        "at": 1791513731002,
-        "symbol": "Soccar",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 42,
+        "below_entry": 43,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2777,7 +2777,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791532609358,
+    "generatedAt": 1791532913032,
     "trades": {
       "count": 54,
       "wins": 22,
