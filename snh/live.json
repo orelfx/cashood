@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "205c6bd4-3319-4350-9456-fea24e621bd0",
-  "updatedAt": 1791567075923,
-  "generatedAt": "2026-10-10 00:31 WIB",
+  "generation": "7c09516e-dc00-4de5-96a4-27f930ccb1f7",
+  "updatedAt": 1791567375924,
+  "generatedAt": "2026-10-10 00:36 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791567075923,
+    "heartbeatAt": 1791567375924,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791567074589,
+    "lastScanAt": 1791567372362,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,8 +1202,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "201",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "202",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791567075923,
+      "lastDecisionAt": 1791567375924,
       "lastAction": "keputusan",
-      "lastReason": "inu [degen]: Dilewati karena red flag: insider/entrapment pegang 16%."
+      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
     }
   },
   "strategy": {
@@ -1456,6 +1456,64 @@
     },
     "decisions": [
       {
+        "at": 1791567223670,
+        "symbol": "USDP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
+      },
+      {
+        "at": 1791567131162,
+        "symbol": "Circuit",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 16.72% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 0.5%"
+          },
+          {
+            "type": "bundler",
+            "count": 171,
+            "note": "bundler pegang 11.6%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 1.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 471,
+            "note": "7.3% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 13x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show 0% over_x5 wins, extremely short median holds (1.6-25 min) indicating scalper bots, high churn (hundreds of weekly swaps), and zero winni. Tidak dimasuki."
+      },
+      {
         "at": 1791567031186,
         "symbol": "inu",
         "action": "skip",
@@ -1474,16 +1532,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
-      },
-      {
-        "at": 1791566630421,
-        "symbol": "USDP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
       },
       {
         "at": 1791565810713,
@@ -2660,27 +2708,17 @@
           "smart": 4
         },
         "reason": "Dilewati karena red flag: holder baru 17."
-      },
-      {
-        "at": 1791550803932,
-        "symbol": "shrek",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 4."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 29,
+        "below_entry": 28,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 108,
+        "red_flag": 109,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2697,7 +2735,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 44
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2730,7 +2768,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791567115646,
+    "generatedAt": 1791567416056,
     "trades": {
       "count": 60,
       "wins": 23,
