@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d9136dbc-af97-4182-8ed4-5ca8d13441bd",
-  "updatedAt": 1791579675960,
-  "generatedAt": "2026-10-10 04:01 WIB",
+  "generation": "0f05dabd-3752-4860-9d69-a5a4365826a1",
+  "updatedAt": 1791579975961,
+  "generatedAt": "2026-10-10 04:06 WIB",
   "usdIdr": null,
   "totalUsd": 946.8397105126135,
   "nativeSymbol": "SOL",
@@ -1181,12 +1181,12 @@
     "pnlUsd": -53.160289487386535,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791579675960,
+    "heartbeatAt": 1791579975961,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.2,
-    "lastScanAt": 1791579675054,
+    "lastScanAt": 1791579975080,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1207,12 +1207,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "196",
-        "n": "24 jam · 43 diveto LLM"
+        "v": "198",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1921",
+        "v": "1934",
         "n": "162 aktif"
       },
       {
@@ -1223,9 +1223,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791579675960,
+      "lastDecisionAt": 1791579975961,
       "lastAction": "keputusan",
-      "lastReason": "QCAT [degen]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "qubit [degen]: Diveto LLM: All four wallets show consistent realized losses (avg -3% ROI), zero over-5x winners, extreme token churn (267-339/week), and no copy history to validate; win r. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1244,7 +1244,7 @@
       ],
       [
         "Wallet dipantau",
-        "1921 · 162 aktif"
+        "1934 · 162 aktif"
       ],
       [
         "Cadangan kas",
@@ -1256,7 +1256,7 @@
       ],
       [
         "Label wallet",
-        "smart 529 · dolphin 48 · bot 1016 · blacklist 177 · lp 1 · fresh 35 · kol 112 · whale 3"
+        "smart 542 · dolphin 49 · bot 1015 · blacklist 177 · lp 1 · fresh 35 · kol 112 · whale 3"
       ]
     ],
     "requirements": [
@@ -1304,23 +1304,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1921,
+      "tracked": 1934,
       "active": 162,
-      "passive": 1759,
+      "passive": 1772,
       "trusted": 4,
       "promising": 14,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1016,
+          "total": 1015,
           "active": 0,
-          "passive": 1016
+          "passive": 1015
         },
         {
           "key": "smart",
-          "total": 529,
+          "total": 542,
           "active": 126,
-          "passive": 403
+          "passive": 416
         },
         {
           "key": "blacklist",
@@ -1336,9 +1336,9 @@
         },
         {
           "key": "dolphin",
-          "total": 48,
+          "total": 49,
           "active": 21,
-          "passive": 27
+          "passive": 28
         },
         {
           "key": "fresh",
@@ -1460,6 +1460,55 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791579794059,
+        "symbol": "qubit",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 83,
+            "note": "bundler pegang 16.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 94,
+            "note": "6.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: All four wallets show consistent realized losses (avg -3% ROI), zero over-5x winners, extreme token churn (267-339/week), and no copy history to validate; win r. Tidak dimasuki."
+      },
+      {
+        "at": 1791579774952,
+        "symbol": "qubit",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 81,
+            "note": "bundler pegang 10.5%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 4.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 94,
+            "note": "6.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Negative realized PnL despite 61-65% winrate means they consistently exit before moves materialize; zero over-5x winners in 339 tokens indicates no asymmetry; e. Tidak dimasuki."
+      },
       {
         "at": 1791579602302,
         "symbol": "QCAT",
@@ -2396,28 +2445,6 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791563139341,
-        "symbol": "BIDDY",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -31% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791562924256,
-        "symbol": "BIDDY",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 32% supply."
       }
     ],
     "reasonStats": {
@@ -2445,7 +2472,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 43
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2478,7 +2505,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791579716298,
+    "generatedAt": 1791580014053,
     "trades": {
       "count": 61,
       "wins": 23,
@@ -2521,7 +2548,7 @@
       "spanDays": 4.7,
       "returnPct": -5.32,
       "maxDrawdownPct": 5.86,
-      "maxDrawdownAt": 1791579675960,
+      "maxDrawdownAt": 1791579975961,
       "maxDrawdownUsd": 58.92,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 946.84,
