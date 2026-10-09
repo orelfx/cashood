@@ -183,8 +183,9 @@
         pct: comparable && a.usd > 0 ? delta / a.usd * 100 : null,
         fixed: Boolean(a?.fixed || b?.fixed) };
     });
-    const delta = money(end.v - start.v);
-    return { rows, delta, pct: start.v > 0 ? delta / start.v * 100 : null,
+    const missingHistory = rows.some(r => r.delta === null && !r.fixed);
+    const delta = missingHistory ? null : money(end.v - start.v);
+    return { rows, delta, pct: delta != null && start.v > 0 ? delta / start.v * 100 : null,
       incomplete: rows.some(r => r.delta === null) };
   }
   const api = { compareGrowth, WIB, present, number, money, cents, day, eventTime, buildLedger, allocate, monthlyCosts, dividendPlan, allocateDividend, distribution, validateSnapshot };

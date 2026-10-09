@@ -126,6 +126,9 @@ console.log('PASS complete forecast render');
  assert.equal(await ev('document.documentElement.scrollWidth===innerWidth'),true);
  if(process.env.CASHOOD_SCREENSHOT_DIR){fs.mkdirSync(process.env.CASHOOD_SCREENSHOT_DIR,{recursive:true});const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'growth-mobile.png'),Buffer.from(shot.data,'base64'));}
  console.log('PASS touch chart comparison stays within the mobile viewport');
+ await ev(`homeView.referenceAt=null;homeView.selectedAt=null;const missing=structuredClone(__growthFixture);missing[0].parts[0].known=false;drawGrowth(document.querySelector('#hgChart'),missing,false)`);
+ assert.match(await ev('document.querySelector("#hgCompareTotal").textContent'),/data pembanding belum lengkap/i);
+ console.log('PASS missing history cannot appear as a total gain');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

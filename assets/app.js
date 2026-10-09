@@ -3756,11 +3756,13 @@ async function renderGrowth(g, paper = []) {
   const flowIn = briefs.flatMap((b) => b.flows).filter((f) => f.at > from && f.at <= now).reduce((t, f) => t + f.usd, 0);
   const first = pts[0]?.v || 0;
   // The summary must describe the plotted endpoints, not realised trades.
-  const rangeDelta = g.total - first;
+  const rangeChange = CashoodCore.compareGrowth(pts[0], pts.at(-1));
+  const rangeDelta = rangeChange.delta;
   const rangeBase = first;
   setHTML($('#hgSum'), pts.length > 1 ? `<b class="num">${usd(g.total, 0)}</b>
     <span class="chg ${rangeDelta >= 0 ? 'up' : 'down'}">${rangeDelta >= 0 ? '▲' : '▼'} ${pct(Math.abs(rangeBase ? rangeDelta / rangeBase * 100 : 0), 2)}</span>
     <span class="${cls(rangeDelta)} num">${signed(rangeDelta)}</span><span class="dim">${homeView.hours === 24 ? '24 jam terakhir' : homeView.hours === 168 ? '7 hari terakhir' : 'sejak awal'}${Math.abs(flowIn) >= 1 ? ` · tanpa arus kas ${signedText(flowIn)}` : ''}</span>` : '<span class="dim">belum cukup data</span>');
+  if (rangeDelta == null) setHTML($('#hgSum'), `<b class="num">${usd(g.total, 0)}</b><span class="dim">Perubahan total belum tersedia: data pembanding belum lengkap.</span>`);
   const marks = briefs.flatMap((b) => b.flows.map((f) => ({ ...f, fund: b.label }))).filter((f) => f.at > from && f.at <= now);
   const grouped = [];
   for (const f of marks.sort((a, b) => a.at - b.at)) {
@@ -3853,7 +3855,7 @@ function drawGrowth(svg, pts, up, marks = []) {
   const paintComparison = point => {
     const base = reference(), c = CashoodCore.compareGrowth(base, point);
     setHTML($('#hgCompareTitle'), `${when(base.t)} → ${when(point.t)}`);
-    setHTML($('#hgCompareTotal'), `<b class="${cls(c.delta)}">${signed(c.delta)} · ${c.pct == null ? '—' : (c.pct > 0 ? '+' : '') + pct(c.pct)}</b>`);
+    setHTML($('#hgCompareTotal'), c.delta == null ? '<span class="dim">Perubahan total belum tersedia: data pembanding belum lengkap.</span>' : `<b class="${cls(c.delta)}">${signed(c.delta)} · ${c.pct == null ? '—' : (c.pct > 0 ? '+' : '') + pct(c.pct)}</b>`);
     setHTML($('#hgCompareRows'), c.rows.sort((a,b)=>(a.delta ?? Infinity)-(b.delta ?? Infinity)).map(r =>
       `<tr><th scope="row">${esc(r.name)}</th><td>${r.before == null ? '—' : usd(r.before)}</td><td>${r.after == null ? '—' : usd(r.after)}</td><td class="${r.delta == null ? 'dim' : cls(r.delta)}">${changeText(r)}${r.delta == null ? `<small>${r.fixed ? 'Riwayat saldo belum tersedia' : 'Data pembanding belum lengkap'}</small>` : ''}</td></tr>`).join(''));
     $('#hgResetReference').disabled = homeView.referenceAt == null;
@@ -3873,7 +3875,7 @@ function drawGrowth(svg, pts, up, marks = []) {
     const parts = comparison.rows.sort((a, b) => (b.after || 0) - (a.after || 0));
     setHTML(tip, `<div class="t-d">${when(near.t)}</div><div class="t-v">${usd(near.v)}</div>`
       + `<div class="t-n">nilai grafik · arus kas tercatat disesuaikan</div>`
-      + `<div class="t-n">Dibanding ${when(reference().t)}: <b class="${cls(comparison.delta)}">${signed(comparison.delta)} · ${comparison.pct == null ? '—' : (comparison.pct > 0 ? '+' : '') + pct(comparison.pct)}</b></div>`
+      + `<div class="t-n">Dibanding ${when(reference().t)}: <b class="${cls(comparison.delta)}">${comparison.delta == null ? 'Data pembanding belum lengkap' : signed(comparison.delta)} · ${comparison.pct == null ? '—' : (comparison.pct > 0 ? '+' : '') + pct(comparison.pct)}</b></div>`
       + (parts.length ? `<div class="t-parts">${parts.map((p) => `<div class="t-row"><span><i style="background:${p.color}"></i>${esc(p.name)}</span><b>${p.after == null ? '—' : usd(p.after, 0)}<small class="${p.delta == null ? 'dim' : cls(p.delta)}">${changeText(p)}</small></b></div>`).join('')}</div>` : ''));
     tip.hidden = false;
     // Layar lebar: tooltip di SAMPING titik (kiri atau kanan, mana yang lapang),

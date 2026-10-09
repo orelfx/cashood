@@ -12,6 +12,6 @@ test('cash-flow-adjusted values do not count a 500 deposit as gain',()=>{
 test('zero balances remain losses; missing history and fixed placeholders are not false zero changes',()=>{
  const r=Core.compareGrowth({v:300,parts:[part('gone',100),part('new',0,{known:false}),part('box',200,{fixed:true})]},{v:250,parts:[part('gone',0),part('new',50),part('box',200,{fixed:true})]});
  assert.equal(r.rows[0].delta,-100);assert.equal(r.rows[0].pct,-100);
- assert.equal(r.rows[1].delta,null);assert.equal(r.rows[2].delta,null);assert.equal(r.incomplete,true);
+ assert.equal(r.rows[1].delta,null);assert.equal(r.rows[2].delta,null);assert.equal(r.incomplete,true);assert.equal(r.delta,null);assert.equal(r.pct,null);
  const fresh=Core.compareGrowth({v:0,parts:[part('a',0)]},{v:5,parts:[part('a',5)]});assert.equal(fresh.rows[0].pct,null);
 });
