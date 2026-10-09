@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e5b36da5-f179-467d-b7f8-655449819481",
-  "updatedAt": 1791575175955,
-  "generatedAt": "2026-10-10 02:46 WIB",
+  "generation": "8142147c-0bfd-4967-a95b-7c6fd53797bb",
+  "updatedAt": 1791575475956,
+  "generatedAt": "2026-10-10 02:51 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791575175955,
+    "heartbeatAt": 1791575475956,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791575173194,
+    "lastScanAt": 1791575473448,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1207,7 +1207,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "1919",
+        "v": "1920",
         "n": "160 aktif"
       },
       {
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791575175955,
+      "lastDecisionAt": 1791575475956,
       "lastAction": "keputusan",
-      "lastReason": "BNKR [degen]: Dilewati: harga sudah -51% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "BRAINOBOT [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1239,7 +1239,7 @@
       ],
       [
         "Wallet dipantau",
-        "1919 · 160 aktif"
+        "1920 · 160 aktif"
       ],
       [
         "Cadangan kas",
@@ -1251,7 +1251,7 @@
       ],
       [
         "Label wallet",
-        "smart 531 · dolphin 48 · bot 1015 · blacklist 173 · lp 2 · fresh 35 · kol 112 · whale 3"
+        "smart 531 · dolphin 48 · bot 1014 · blacklist 175 · lp 2 · fresh 35 · kol 112 · whale 3"
       ]
     ],
     "requirements": [
@@ -1299,17 +1299,17 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1919,
+      "tracked": 1920,
       "active": 160,
-      "passive": 1759,
+      "passive": 1760,
       "trusted": 4,
       "promising": 14,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1015,
+          "total": 1014,
           "active": 0,
-          "passive": 1015
+          "passive": 1014
         },
         {
           "key": "smart",
@@ -1319,9 +1319,9 @@
         },
         {
           "key": "blacklist",
-          "total": 173,
+          "total": 175,
           "active": 0,
-          "passive": 173
+          "passive": 175
         },
         {
           "key": "kol",
@@ -1455,6 +1455,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791575452920,
+        "symbol": "BRAINOBOT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791575359062,
+        "symbol": "NOTHING",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 16."
+      },
       {
         "at": 1791575049844,
         "symbol": "BNKR",
@@ -2440,65 +2460,6 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show negative realized PnL (-$462, -$150) despite 60-65% winrates, indicating outsized losses on losers; excessive churn (339-349 tokens/week) sign. Tidak dimasuki."
-      },
-      {
-        "at": 1791559308192,
-        "symbol": "VCAT",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 4.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 243,
-            "note": "13.1% holder wallet baru"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 32 menit. Hasil -3,5%."
-      },
-      {
-        "at": 1791558941375,
-        "symbol": "HI",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 8
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 262,
-            "note": "bundler pegang 22.5%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 0.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 270,
-            "note": "7.5% holder wallet baru"
-          },
-          {
-            "type": "top10",
-            "count": null,
-            "note": "10 holder terbesar pegang 32.5%"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2559,7 +2520,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791575210404,
+    "generatedAt": 1791575510435,
     "trades": {
       "count": 60,
       "wins": 23,
