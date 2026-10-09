@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "60456d59-5188-4dd2-8d14-e8c47805ab26",
-  "updatedAt": 1791523875697,
-  "generatedAt": "2026-10-09 12:31 WIB",
+  "generation": "b04dce15-90ce-4f5d-8758-d33fea3c20ff",
+  "updatedAt": 1791524175698,
+  "generatedAt": "2026-10-09 12:36 WIB",
   "usdIdr": null,
   "totalUsd": 960.6268697596537,
   "nativeSymbol": "SOL",
@@ -1206,12 +1206,12 @@
     "pnlUsd": -39.37313024034631,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791523875697,
+    "heartbeatAt": 1791524175698,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.83,
-    "lastScanAt": 1791523872211,
+    "lastScanAt": 1791524173151,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1232,8 +1232,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "199",
-        "n": "24 jam · 46 diveto LLM"
+        "v": "200",
+        "n": "24 jam · 47 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1248,9 +1248,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791523875697,
+      "lastDecisionAt": 1791524175698,
       "lastAction": "keputusan",
-      "lastReason": "QC [degen]: Dilewati karena red flag: holder baru 13."
+      "lastReason": "QUANTUM [low]: Diveto LLM: Dolphin wallet (dolphin #145) dominates group with 374 round trips, 40% of sells under 2min, and 0 wins/-18.9% on our actual copies—clear copy-trading liability out. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1485,6 +1485,50 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791523926066,
+        "symbol": "QUANTUM",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "kol": 1,
+          "smart": 1,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 9.48% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 226,
+            "note": "bundler pegang 36.7%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 3.5%"
+          },
+          {
+            "type": "fresh",
+            "count": 280,
+            "note": "21.2% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Dolphin wallet (dolphin #145) dominates group with 374 round trips, 40% of sells under 2min, and 0 wins/-18.9% on our actual copies—clear copy-trading liability out. Tidak dimasuki."
+      },
       {
         "at": 1791523806008,
         "symbol": "QC",
@@ -2821,53 +2865,6 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791502562389,
-        "symbol": "Animal",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 520,
-            "note": "bundler pegang 33.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 7.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "25.6% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 3,
-            "note": "akun Twitter dev pernah ganti nama 3x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 19x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: Copy history is negative (avg_pnl_pct -8.2% and -2.9% on wallets smart #923 and smart #920), indicating following these wallets has not worked for us; very low winr. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2895,7 +2892,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 46
+        "llm": 47
       },
       "test": {
         "solo": 0,
@@ -2928,7 +2925,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791523910644,
+    "generatedAt": 1791524211444,
     "trades": {
       "count": 53,
       "wins": 21,
