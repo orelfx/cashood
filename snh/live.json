@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3cf874a1-4da3-4f74-ae6a-e1009754a1c6",
-  "updatedAt": 1791574275955,
-  "generatedAt": "2026-10-10 02:31 WIB",
+  "generation": "04a229e3-8b96-4948-a93d-da93f4707bfc",
+  "updatedAt": 1791574575956,
+  "generatedAt": "2026-10-10 02:36 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791574275955,
+    "heartbeatAt": 1791574575956,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791574274641,
+    "lastScanAt": 1791574572093,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791574275955,
+      "lastDecisionAt": 1791574575956,
       "lastAction": "keputusan",
-      "lastReason": "tardigrade [degen]: Dilewati: harga sudah -45% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Quantum [degen]: Dilewati karena red flag: holder baru 18."
     }
   },
   "strategy": {
@@ -1455,6 +1455,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791574402136,
+        "symbol": "Quantum",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 18."
+      },
       {
         "at": 1791574198246,
         "symbol": "tardigrade",
@@ -2592,33 +2602,6 @@
           }
         ],
         "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
-      },
-      {
-        "at": 1791556728950,
-        "symbol": "JCAT",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 121,
-            "note": "bundler pegang 12.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 127,
-            "note": "9.5% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Low 31% winrate with median -32% exit loss shows heavy reliance on rare 5x winners to offset serial small losses; not a sustainable edge. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2679,7 +2662,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791574312617,
+    "generatedAt": 1791574611820,
     "trades": {
       "count": 60,
       "wins": 23,
