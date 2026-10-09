@@ -268,6 +268,7 @@
     };
     caption.textContent = message;
     spider.classList.toggle('caption-left', next.x > innerWidth / 2);
+    spider.classList.toggle('caption-below',next.y-scrollY<260);
     const arrive = () => {
       if (token !== generation || !active()) return;
       stopGait(); motion = null; location = next;
@@ -353,7 +354,7 @@
     points.sort((a,b)=>a.score-b.score);
     const next=points[0]||{x:origin.x<b.maxX/2?b.maxX:b.minX,y:bottom};
     caption.textContent=['Oke, aku geser. Silakan dibaca.','Permisi, aku pindah dulu ya.','Siap, aku beri ruang buat kamu.'][asideCount++%3];
-    spider.classList.toggle('caption-left',next.x>innerWidth/2);spider.classList.add('yielding');
+    spider.classList.toggle('caption-left',next.x>innerWidth/2);spider.classList.toggle('caption-below',next.y-scrollY<260);spider.classList.add('yielding');
     const token=generation;
     const arrive=()=>{if(token!==generation)return;stopGait();motion=null;location={x:next.x,y:next.y};spider.style.transform=`translate(${next.x}px,${next.y}px)`;spider.classList.remove('walking');schedule();};
     if(reduced.matches)arrive();else{spider.classList.add('walking');travel(next,arrive);}
