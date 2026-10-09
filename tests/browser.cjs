@@ -278,6 +278,7 @@ console.log('PASS complete forecast render');
  await ev(`document.querySelector('#tabs [data-tab="portfolio"]').click()`);await new Promise(r=>setTimeout(r,100));
  assert.equal(await ev('document.querySelector("#tab-portfolio").hidden'),false);
  const fundNumbers=await ev('[...document.querySelectorAll("#tab-portfolio .kpi .big")].map(el=>el.textContent)');
+ assert.ok(fundNumbers.every(value=>value.trim()!=='—'),'cached fund was shown without rendering its values');
  await ev('document.querySelector("#cashoodSpider").dispatchEvent(new PointerEvent("pointerenter"))');
  const fundScans=new Set();
  for(let i=0;i<140;i++){

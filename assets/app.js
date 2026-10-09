@@ -2646,7 +2646,7 @@ async function loadFundConfig(id, epoch = fundEpoch) {
   renderFundBar(); return true;
 }
 async function switchFund(id) {
-  if (id === state.fund && state.nav) { showTab(currentTab); return; }
+  if (id === state.fund && state.nav) { showTab(currentTab); renderAll(); return; }
   const epoch = ++fundEpoch; ++loadEpoch;
   tandaiSibuk(1);
   state.nav = null; navPoints = []; hbLoaded = false; hbLoading = null;
