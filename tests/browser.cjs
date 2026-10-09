@@ -142,8 +142,16 @@ console.log('PASS complete forecast render');
  assert.equal(await ev('document.querySelector("#cashoodSpider").getAnimations().length'),0);
  console.log('PASS spider changes approved copy without changing financial data; reduced motion respected');
  await cmd('Emulation.setEmulatedMedia',{features:[]});
+ await new Promise(r=>setTimeout(r,100));
  await ev(`document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:100,currency:'usd',complete:true}}));document.querySelector('#homeAum .aum-v').textContent='$120';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:120,currency:'usd',complete:true}}));`);
+ const legBefore=await ev('document.querySelector(".spider-leg path").getAttribute("d")');
+ await new Promise(r=>setTimeout(r,180));
+ assert.notEqual(await ev('document.querySelector(".spider-leg path").getAttribute("d")'),legBefore);
  await new Promise(r=>setTimeout(r,2200));
+ const legRest=await ev('document.querySelector(".spider-leg path").getAttribute("d")');
+ await new Promise(r=>setTimeout(r,150));
+ assert.equal(await ev('document.querySelector(".spider-leg path").getAttribute("d")'),legRest);
+ console.log('PASS articulated spider legs move during travel and stop at rest');
  assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$120');
  await ev(`document.querySelector('#homeAum .aum-v').textContent='$90';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:90,currency:'usd',complete:true}}));document.querySelector('#spiderToggle').click()`);
  assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$90');
@@ -170,6 +178,7 @@ console.log('PASS complete forecast render');
  }
  console.log('PASS spider stays on Safe Box and invoices; global controls work without navigating for the reader');
  await cmd('Emulation.setEmulatedMedia',{features:[]});
+ await new Promise(r=>setTimeout(r,100));
  await ev(`location.hash='#home'`);await ev('renderHome()');await ev('window.scrollTo(0,0)');
  await new Promise(r=>setTimeout(r,3000));
  if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-desktop.png'),Buffer.from(shot.data,'base64'));}
