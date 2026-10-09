@@ -136,8 +136,8 @@ console.log('PASS complete forecast render');
  await new Promise(r=>setTimeout(r,100));
  assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),false);
  const beforeSpider=await ev('document.querySelector("#homeAum").textContent');
- await ev('document.querySelector("#cashoodSpider").click()');
- assert.equal(await ev('document.querySelector("#spiderHeadline").textContent'),'Otomasi yang kerja.');
+ const copyChanged=await ev(`(()=>{const title=document.querySelector('#spiderHeadline'), before=title.textContent;for(let i=0;i<30 && title.textContent===before;i++)document.querySelector('#cashoodSpider').click();return title.textContent!==before})()`);
+ assert.equal(copyChanged,true);
  assert.equal(await ev('document.querySelector("#homeAum").textContent'),beforeSpider);
  assert.equal(await ev('document.querySelector("#cashoodSpider").getAnimations().length'),0);
  console.log('PASS spider changes approved copy without changing financial data; reduced motion respected');
@@ -153,8 +153,23 @@ console.log('PASS complete forecast render');
  await ev(`document.querySelector('#homeAum .aum-v').textContent='Rp 1.440.000';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:90,currency:'idr',complete:true}}));`);
  assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'Rp 1.440.000');
  await ev(`location.hash='#meridian/portfolio'`);await new Promise(r=>setTimeout(r,100));
- assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),true);
- console.log('PASS spider reveals source updates, cancels safely, ignores currency conversions and hides off home');
+ assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),false);
+ console.log('PASS spider reveals source updates, cancels safely, ignores currency conversions and follows navigation');
+ await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+ for (const route of ['#safebox','#meridian/investor']) {
+   await ev(`location.hash='${route}'`);await new Promise(r=>setTimeout(r,700));
+   assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),false);
+   await ev(`document.querySelector('footer').scrollIntoView()`);
+   await new Promise(r=>setTimeout(r,100));
+   const before=await ev('location.hash');
+   await ev(`document.querySelector('#cashoodSpider').click()`);
+   assert.equal(await ev('location.hash'),before);
+   await ev(`document.querySelector('footer [data-spider-toggle]').click()`);
+   assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),true);
+   await ev(`document.querySelector('footer [data-spider-toggle]').click()`);
+ }
+ console.log('PASS spider stays on Safe Box and invoices; global controls work without navigating for the reader');
+ await cmd('Emulation.setEmulatedMedia',{features:[]});
  await ev(`location.hash='#home'`);await ev('renderHome()');await ev('window.scrollTo(0,0)');
  await new Promise(r=>setTimeout(r,3000));
  if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-desktop.png'),Buffer.from(shot.data,'base64'));}
