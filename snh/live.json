@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "77e944a4-1d5d-47b4-a340-0882430a9b3c",
-  "updatedAt": 1791517875669,
-  "generatedAt": "2026-10-09 10:51 WIB",
+  "generation": "b1d08093-779d-4a42-8aad-b22a3b594bb4",
+  "updatedAt": 1791518175669,
+  "generatedAt": "2026-10-09 10:56 WIB",
   "usdIdr": null,
   "totalUsd": 959.8807719541888,
   "nativeSymbol": "SOL",
@@ -1186,12 +1186,12 @@
     "pnlUsd": -40.119228045811155,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791517875669,
+    "heartbeatAt": 1791518175669,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.91,
-    "lastScanAt": 1791517873680,
+    "lastScanAt": 1791518173361,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1212,8 +1212,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "184",
-        "n": "24 jam · 38 diveto LLM"
+        "v": "185",
+        "n": "24 jam · 39 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1228,9 +1228,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791517875669,
+      "lastDecisionAt": 1791518175669,
       "lastAction": "keputusan",
-      "lastReason": "WhiteWhale [mid]: Dilewati karena red flag: insider/entrapment pegang 15%."
+      "lastReason": "LUNA [low]: Diveto LLM: All three wallets show poor exit discipline (median losses -11% to -53%), wallet 1 created 6 tokens and has 46% winrate, wallet 3 has only 29% winrate with 15 t. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1465,6 +1465,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791518155817,
+        "symbol": "LUNA",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 7.26% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 178,
+            "note": "bundler pegang 26.7%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 1.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 0.8%"
+          },
+          {
+            "type": "fresh",
+            "count": 362,
+            "note": "16.5% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 11x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show poor exit discipline (median losses -11% to -53%), wallet 1 created 6 tokens and has 46% winrate, wallet 3 has only 29% winrate with 15 t. Tidak dimasuki."
+      },
       {
         "at": 1791515533380,
         "symbol": "WhiteWhale",
@@ -2626,24 +2668,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 12."
-      },
-      {
-        "at": 1791488987966,
-        "symbol": "TikTok",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 41% supply."
       }
     ],
     "reasonStats": {
@@ -2671,7 +2695,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 38
+        "llm": 39
       },
       "test": {
         "solo": 0,
@@ -2704,7 +2728,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791517913654,
+    "generatedAt": 1791518215093,
     "trades": {
       "count": 52,
       "wins": 20,
@@ -2744,7 +2768,7 @@
     },
     "equity": {
       "days": 4,
-      "spanDays": 3.9,
+      "spanDays": 4,
       "returnPct": -4.01,
       "maxDrawdownPct": 5.61,
       "maxDrawdownAt": 1791388569394,
