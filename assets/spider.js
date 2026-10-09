@@ -16,33 +16,92 @@
   const legs = [...spider.querySelectorAll('.spider-leg')].map(el => ({
     path: el.querySelector('path'), joints: [...el.querySelectorAll('circle')],
   }));
-  let gaitFrame = 0, gaitLast = 0, gaitStart = 0, heading = 0;
+  let gaitFrame = 0, heading = 0;
+  const silk = document.querySelector('#spiderSilk');
+  const silkLine = silk.querySelector('line');
+  const silkAnchor = silk.querySelector('circle');
   // Joint positions traced from the supplied reference, in body-local coordinates.
   // Legs attach along an elongated body, not to a radial central point.
   const legGeometry = [[[114.1,110.0],[82.7,87.2],[50.3,89.7],[22.5,90.4]],[[112.3,119.1],[85.2,115.9],[68.9,125.9],[47.1,141.3]],[[112.1,125.2],[90.6,146.7],[84.9,175.4],[80.2,200.1]],[[113.7,133.1],[103.0,161.9],[111.6,188.6],[117.5,211.6]],[[126.3,134.0],[158.2,158.7],[194.0,156.9],[225.0,156.2]],[[126.1,122.5],[149.4,123.2],[168.2,113.0],[184.0,104.4]],[[126.3,113.7],[145.1,109.8],[155.8,97.4],[166.2,86.5]],[[125.7,102.6],[132.0,77.2],[125.0,63.0],[116.6,46.5]]];
-  // Update only while travelling; alternating feet lift and extend independently.
-  function pose(phase = 0) {
-    legs.forEach(({path,joints}, index) => {
-      const wave = Math.sin(phase + (index % 2) * Math.PI + Math.floor(index/2)*.35);
-      const lift = Math.max(0,wave);
-      const points = legGeometry[index].map(([x,y],joint) => joint === 0 ? [x,y] :
-        [x + (x < 120 ? -1 : 1)*lift*(joint===1 ? 5 : 2), y+wave*(joint===1 ? -3 : joint===2 ? 5 : 9)]);
-      path.setAttribute('d','M'+points.map(p=>p.map(n=>n.toFixed(1)).join(' ')).join(' L'));
-      points.slice(1).forEach((p,j)=>{joints[j].setAttribute('cx',p[0].toFixed(1));joints[j].setAttribute('cy',p[1].toFixed(1));});
-    });
+  const smooth = t => t*t*(3-2*t);
+  function drawLeg(index, toe, lift = 0) {
+    const geometry = legGeometry[index], original = geometry[3];
+    const delta = [toe[0]-original[0],toe[1]-original[1]];
+    const points = geometry.map(([x,y],j) => j===3 ? toe : j===0 ? [x,y] :
+      [x+delta[0]*(j/3)+(x<120?-1:1)*lift*7,y+delta[1]*(j/3)-lift*5]);
+    const {path,joints} = legs[index];
+    path.setAttribute('d','M'+points.map(p=>p.map(n=>n.toFixed(1)).join(' ')).join(' L'));
+    points.slice(1).forEach((p,j)=>{joints[j].setAttribute('cx',p[0].toFixed(1));joints[j].setAttribute('cy',p[1].toFixed(1));});
   }
-  function stopGait() { cancelAnimationFrame(gaitFrame); gaitFrame = 0; }
-  function startGait(dx,dy) {
-    stopGait();
-    heading = Math.atan2(dy,dx)*180/Math.PI+90;
-    rig.setAttribute('transform', `rotate(${heading.toFixed(1)} 120 120)`);
-    gaitStart = performance.now(); gaitLast = 0;
-    const tick = now => {
-      if (!motion || !active() || reduced.matches) { stopGait(); return; }
-      if (now-gaitLast >= 1000/30) { pose((now-gaitStart)/115); gaitLast=now; }
-      gaitFrame = requestAnimationFrame(tick);
+  function stopGait() { cancelAnimationFrame(gaitFrame); gaitFrame=0; silk.hidden=true; }
+  function travel(next, arrive) {
+    const from={...location}, dx=next.x-from.x, dy=next.y-from.y, distance=Math.hypot(dx,dy);
+    const ux=distance?dx/distance:0, uy=distance?dy/distance:0;
+    const scale=parseFloat(getComputedStyle(spider).getPropertyValue('--spider-span'))/240;
+    const targetHeading=Math.atan2(dy,dx)*180/Math.PI+90;
+    const turn=((targetHeading-heading+540)%360)-180, oldHeading=heading;
+    const web=distance>145, walkDistance=web?Math.min(44,distance):distance;
+    const walkStart={x:next.x-ux*walkDistance,y:next.y-uy*walkDistance};
+    const turnMs=180, shootMs=web?160:0, zipMs=web?620:0;
+    const walkMs=Math.max(420,walkDistance/85*1000), settleMs=160;
+    const walkAt=turnMs+shootMs+zipMs, endAt=walkAt+walkMs;
+    const steps=Math.max(1,Math.ceil(walkDistance/24)), stride=walkDistance/steps;
+    const started=performance.now();let last=0,feet=null;
+    const angle=targetHeading*Math.PI/180, c=Math.cos(angle), s=Math.sin(angle);
+    const world=(point,center)=>({x:center.x+22+((point[0]-120)*c-(point[1]-120)*s)*scale,
+      y:center.y+22+((point[0]-120)*s+(point[1]-120)*c)*scale});
+    const local=point=>{const x=(point.x-location.x-22)/scale,y=(point.y-location.y-22)/scale;return [120+x*c+y*s,120-x*s+y*c];};
+    const place=(x,y)=>{location={x,y};spider.style.transform=`translate(${x}px,${y}px)`;};
+    const rest=()=>legGeometry.forEach((g,i)=>drawLeg(i,g[3]));
+    motion={cancel:stopGait};
+    const tick=now=>{
+      if(!motion || !active() || reduced.matches){stopGait();return;}
+      if(now-last<1000/30){gaitFrame=requestAnimationFrame(tick);return;}last=now;
+      const elapsed=now-started;
+      if(elapsed<turnMs){
+        heading=oldHeading+turn*smooth(elapsed/turnMs);
+        rig.setAttribute('transform',`rotate(${heading} 120 120)`);
+      }else{
+        heading=targetHeading;rig.setAttribute('transform',`rotate(${heading} 120 120)`);
+        if(web && elapsed<walkAt){
+          spider.dataset.locomotion='web';silk.hidden=false;
+          const shot=Math.min(1,(elapsed-turnMs)/shootMs);
+          const anchor={x:from.x+22+dx*shot,y:from.y+22+dy*shot};
+          const p=Math.max(0,Math.min(1,(elapsed-turnMs-shootMs)/zipMs));
+          place(from.x+(walkStart.x-from.x)*smooth(p),from.y+(walkStart.y-from.y)*smooth(p));
+          silkLine.setAttribute('x1',location.x+22);silkLine.setAttribute('y1',location.y+22);
+          silkLine.setAttribute('x2',anchor.x);silkLine.setAttribute('y2',anchor.y);
+          silkAnchor.setAttribute('cx',anchor.x);silkAnchor.setAttribute('cy',anchor.y);
+          // Tuck legs during a silk pull instead of pretending to walk in midair.
+          legGeometry.forEach((g,i)=>drawLeg(i,[120+(g[3][0]-120)*.73,120+(g[3][1]-120)*.73],.45));
+        }else if(elapsed<endAt){
+          silk.hidden=true;spider.dataset.locomotion='walk';
+          const progress=Math.min(1,(elapsed-walkAt)/walkMs), cycle=progress*steps;
+          const advance=(Math.floor(cycle)+smooth(cycle%1))/steps;
+          place(walkStart.x+ux*walkDistance*advance,walkStart.y+uy*walkDistance*advance);
+          if(!feet)feet=legGeometry.map(g=>({anchor:world(g[3],walkStart),swing:false}));
+          feet.forEach((foot,i)=>{
+            const phase=(cycle+(i%2)*.5)%1, swing=phase>=.58;
+            if(swing && !foot.swing){
+              foot.from={...foot.anchor};
+              const ahead=Math.min(walkDistance,walkDistance*advance+stride*.75);
+              foot.to=world(legGeometry[i][3],{x:walkStart.x+ux*ahead,y:walkStart.y+uy*ahead});
+            }
+            if(swing){const p=smooth((phase-.58)/.42);foot.anchor={x:foot.from.x+(foot.to.x-foot.from.x)*p,y:foot.from.y+(foot.to.y-foot.from.y)*p};}
+            else if(foot.swing)foot.anchor={...foot.to};
+            foot.swing=swing;
+            // Stance feet stay in screen coordinates while the body passes over them.
+            drawLeg(i,local(foot.anchor),swing?Math.sin((phase-.58)/.42*Math.PI):0);
+            legs[i].joints[2].dataset.planted=String(!swing);
+          });
+        }else if(elapsed<endAt+settleMs){
+          place(next.x,next.y);const p=smooth((elapsed-endAt)/settleMs);
+          legGeometry.forEach((g,i)=>{const start=feet?local(feet[i].anchor):g[3];drawLeg(i,[start[0]+(g[3][0]-start[0])*p,start[1]+(g[3][1]-start[1])*p]);});
+        }else{rest();spider.dataset.locomotion='idle';arrive();return;}
+      }
+      gaitFrame=requestAnimationFrame(tick);
     };
-    gaitFrame = requestAnimationFrame(tick);
+    gaitFrame=requestAnimationFrame(tick);
   }
   function bounds() {
     const radius = parseFloat(getComputedStyle(spider).getPropertyValue('--spider-span'))/2;
@@ -59,12 +118,8 @@
     generation++; stopGait();
     clearTimeout(timer); clearTimeout(scrollIdle);
     reveal?.(); reveal = null;
-    if (motion) {
-      const m = new DOMMatrixReadOnly(getComputedStyle(spider).transform);
-      location = { x: m.m41, y: m.m42 };
-      motion.cancel(); motion = null;
-      spider.style.transform = `translate(${location.x}px,${location.y}px)`;
-    }
+    if (motion) { motion.cancel(); motion=null; }
+    spider.dataset.locomotion='idle';
     spider.classList.remove('walking');
   }
   function schedule() {
@@ -98,13 +153,7 @@
     };
     if (reduced.matches) { arrive(); return; }
     spider.classList.add('walking');
-    const duration = Math.min(1800, Math.max(650, Math.hypot(next.x-location.x, next.y-location.y)*2));
-    motion = spider.animate([
-      { transform: `translate(${location.x}px,${location.y}px)` },
-      { transform: `translate(${next.x}px,${next.y}px)` },
-    ], { duration, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'forwards' });
-    startGait(next.x-location.x, next.y-location.y);
-    motion.onfinish = () => { const done = motion; arrive(); done?.cancel(); };
+    travel(next,arrive);
   }
   function tour() {
     if (!active()) return;

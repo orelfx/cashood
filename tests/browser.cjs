@@ -145,14 +145,41 @@ console.log('PASS complete forecast render');
  await new Promise(r=>setTimeout(r,100));
  await ev(`document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:100,currency:'usd',complete:true}}));document.querySelector('#homeAum .aum-v').textContent='$120';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:120,currency:'usd',complete:true}}));`);
  const legBefore=await ev('document.querySelector(".spider-leg path").getAttribute("d")');
- await new Promise(r=>setTimeout(r,180));
+ await new Promise(r=>setTimeout(r,380));
  assert.notEqual(await ev('document.querySelector(".spider-leg path").getAttribute("d")'),legBefore);
  await new Promise(r=>setTimeout(r,2200));
  const legRest=await ev('document.querySelector(".spider-leg path").getAttribute("d")');
  await new Promise(r=>setTimeout(r,150));
  assert.equal(await ev('document.querySelector(".spider-leg path").getAttribute("d")'),legRest);
  console.log('PASS articulated spider legs move during travel and stop at rest');
- assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$120');
+ // Force a nearby source-value target and measure planted toes in screen space.
+ await ev(`(()=>{const v=document.querySelector('#homeAum .aum-v'),r=document.querySelector('#cashoodSpider').getBoundingClientRect();window.__oldValueStyle=v.style.cssText;v.style.cssText='position:fixed;width:30px;height:40px;left:'+(r.left-68)+'px;top:'+(r.top+50)+'px';v.textContent='$121';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:121,currency:'usd',complete:true}}));})()`);
+ await new Promise(r=>setTimeout(r,250));
+ const feet=()=>ev(`(()=>{const spider=document.querySelector('#cashoodSpider');return {mode:spider.dataset.locomotion,x:spider.getBoundingClientRect().x,feet:[...document.querySelectorAll('.spider-leg')].map(g=>{const t=g.querySelector('circle:last-child'),p=new DOMPoint(+t.getAttribute('cx'),+t.getAttribute('cy')).matrixTransform(t.getScreenCTM());return {x:p.x,y:p.y,planted:t.dataset.planted==='true'}})}})()`);
+ let plantedVerified=false, plantedBefore=await feet();
+ for(let sample=0;sample<8 && !plantedVerified;sample++){
+   await new Promise(r=>setTimeout(r,30));const plantedAfter=await feet();
+   const pairs=plantedBefore.feet.map((f,i)=>[f,plantedAfter.feet[i]]).filter(([a,b])=>a.planted&&b.planted);
+   if(plantedAfter.mode==='walk' && Math.abs(plantedBefore.x-plantedAfter.x)>.1 && pairs.length>=2){
+     for(const [a,b] of pairs)assert.ok(Math.hypot(a.x-b.x,a.y-b.y)<.3,'stance foot slid across the page');
+     plantedVerified=true;
+   }
+   plantedBefore=plantedAfter;
+ }
+ assert.ok(plantedVerified,'walking never produced stationary stance feet');
+ await new Promise(r=>setTimeout(r,1100));
+ // A long jump must expose its silk line before pulling the body.
+ await ev(`(()=>{const v=document.querySelector('#homeAum .aum-v');v.style.left='170px';v.style.top='580px';v.textContent='$122';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:122,currency:'usd',complete:true}}));})()`);
+ await new Promise(r=>setTimeout(r,400));
+ assert.equal(await ev('document.querySelector("#cashoodSpider").dataset.locomotion'),'web');
+ assert.equal(await ev('document.querySelector("#spiderSilk").hidden'),false);
+ assert.notEqual(await ev('getComputedStyle(document.querySelector("#spiderSilk")).display'),'none');
+ if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-silk.png'),Buffer.from(shot.data,'base64'));}
+ await new Promise(r=>setTimeout(r,1900));
+ assert.equal(await ev('document.querySelector("#spiderSilk").hidden'),true);
+ await ev(`document.querySelector('#homeAum .aum-v').style.cssText=window.__oldValueStyle`);
+ console.log('PASS stance feet stay planted and long travel uses visible silk');
+ assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$122');
  await ev(`document.querySelector('#homeAum .aum-v').textContent='$90';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:90,currency:'usd',complete:true}}));document.querySelector('#spiderToggle').click()`);
  assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$90');
  assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),true);
