@@ -213,6 +213,20 @@ console.log('PASS complete forecast render');
  await new Promise(r=>setTimeout(r,3000));
  assert.equal(await ev('document.documentElement.scrollWidth===innerWidth'),true);
  if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-mobile.png'),Buffer.from(shot.data,'base64'));}
+ // A page-bound character must scroll out of sight and must not chase the viewport.
+ await ev('window.scrollTo(0,0)');await new Promise(r=>setTimeout(r,300));
+ const readSpider=()=>ev(`(()=>{const r=document.querySelector('#cashoodSpider').getBoundingClientRect();return {y:r.y,docY:r.y+scrollY,bottom:r.bottom,height:document.body.offsetHeight,pose:document.querySelector('.spider-leg path').getAttribute('d')}})()`);
+ const anchored=await readSpider();
+ await ev(`window.scrollTo(0,${anchored.docY}+innerHeight)`);await new Promise(r=>setTimeout(r,300));
+ const offscreen=await readSpider();
+ assert.ok(offscreen.bottom<0,'spider followed scrolling instead of leaving the viewport');
+ assert.ok(Math.abs(offscreen.docY-anchored.docY)<.5);
+ await new Promise(r=>setTimeout(r,8000));
+ const stayed=await readSpider();assert.ok(Math.abs(stayed.docY-anchored.docY)<.5);assert.equal(stayed.pose,offscreen.pose);
+ assert.equal(stayed.height,anchored.height);
+ await ev('window.scrollTo(0,0)');await new Promise(r=>setTimeout(r,100));
+ assert.ok(Math.abs((await readSpider()).docY-anchored.docY)<.5);
+ console.log('PASS spider remains anchored to the document and pauses offscreen without chasing scroll');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

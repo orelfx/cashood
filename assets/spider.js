@@ -105,7 +105,7 @@
   }
   function bounds() {
     const radius = parseFloat(getComputedStyle(spider).getPropertyValue('--spider-span'))/2;
-    return { minX: radius-14, maxX: innerWidth-radius-30, minY: radius+94, maxY: innerHeight-radius-30 };
+    return { minX: radius-14, maxX: innerWidth-radius-30, minY: radius+94, maxY: document.body.offsetHeight-radius-30 };
   }
 
   const visible = el => {
@@ -114,6 +114,10 @@
     return r.width > 0 && r.height > 0 && r.top > 115 && r.bottom < innerHeight - 8;
   };
   const active = () => enabled && !document.hidden;
+  const onScreen = () => {
+    const r=spider.getBoundingClientRect();
+    return r.bottom>115 && r.top<innerHeight && r.right>0 && r.left<innerWidth;
+  };
   function cancel() {
     generation++; stopGait();
     clearTimeout(timer); clearTimeout(scrollIdle);
@@ -124,16 +128,16 @@
   }
   function schedule() {
     clearTimeout(timer);
-    if (active() && !reduced.matches) timer = setTimeout(tour, 7500);
+    if (active() && onScreen() && !reduced.matches) timer = setTimeout(tour, 7500);
   }
   function visit(target, message, action) {
-    if (!active() || !visible(target)) { schedule(); return; }
+    if (!active() || !onScreen() || !visible(target)) { schedule(); return; }
     cancel();
     const token = generation;
     const r = target.getBoundingClientRect(), b = bounds();
     const next = {
-      x: Math.max(b.minX, Math.min(b.maxX, r.right - 22)),
-      y: Math.max(b.minY, Math.min(b.maxY, r.top - 50)),
+      x: Math.max(b.minX, Math.min(b.maxX, r.right + scrollX - 22)),
+      y: Math.max(b.minY, Math.min(b.maxY, r.top + scrollY - 50)),
     };
     caption.textContent = message;
     spider.classList.toggle('caption-left', next.x > innerWidth / 2);
@@ -156,7 +160,7 @@
     travel(next,arrive);
   }
   function tour() {
-    if (!active()) return;
+    if (!active() || !onScreen()) return;
     const targets = [
       [document.getElementById('spiderHeadline'), 'Ganti sudut pandang.', () => {
         const title = document.getElementById('spiderHeadline');
@@ -199,7 +203,7 @@
       location.x = Math.max(b.minX, Math.min(location.x, b.maxX));
       location.y = Math.max(b.minY, Math.min(location.y, b.maxY));
       spider.style.transform = `translate(${location.x}px,${location.y}px)`;
-      if (!reduced.matches) timer = setTimeout(tour, 1200);
+      if (!reduced.matches && onScreen()) timer = setTimeout(tour, 1200);
     }
   }
   for (const button of toggles) button.addEventListener('click', () => {
@@ -219,7 +223,7 @@
     const oldText = previous?.text;
     previous = { ...detail, text: nextText };
     cancel();
-    if (changed && active() && visible(value) && nextText !== oldText) {
+    if (changed && active() && onScreen() && visible(value) && nextText !== oldText) {
       visit(value, 'Pembaruan data masuk.', () => {
         reveal?.(); reveal = null;
         caption.textContent = 'Nilai terbaru dari sumber data.';
@@ -233,15 +237,18 @@
       }
     } else schedule();
   });
-  window.addEventListener('hashchange', sync);
+  window.addEventListener('hashchange', () => {
+    // A different page gets a fresh entry point; scrolling never relocates it.
+    location={x:100,y:180}; sync();
+  });
   document.addEventListener('visibilitychange', sync);
   window.addEventListener('resize', sync);
   window.addEventListener('scroll', () => {
-    // Stop at the viewport edge while the reader scrolls; never follow a stale target.
-    if (!active() || reduced.matches) return;
-    if (motion || reveal) cancel();
-    clearTimeout(timer); clearTimeout(scrollIdle);
-    scrollIdle = setTimeout(() => { scrollIdle = null; tour(); }, 500);
+    // Keep document coordinates. Scrolling moves the character with the content.
+    // Pause off screen rather than seeking a new target in the viewport.
+    if (!active()) return;
+    cancel();
+    if (!reduced.matches) scrollIdle=setTimeout(() => {scrollIdle=null;schedule();},200);
   }, { passive: true });
   reduced.addEventListener('change', sync);
   sync();

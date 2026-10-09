@@ -26,6 +26,7 @@
 [hidden] { display: none !important; }
 html, body { margin: 0; padding: 0; }
 body {
+  position: relative;
   background:
     radial-gradient(900px 500px at 15% -10%, #16241c 0%, transparent 60%),
     radial-gradient(800px 500px at 95% 0%, #141d2b 0%, transparent 55%),
@@ -1411,7 +1412,7 @@ body.is-staking #lpCard, body.is-staking #closedCard, body.is-staking #profitCar
 /* Spider companion: only the small button captures input, never the page. */
 .spider-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px;color:var(--muted,#94a3b8);font-size:11px}
 .spider-controls button{border:1px solid #30424a;border-radius:99px;background:#101b21;color:#74e9c3;padding:7px 11px;cursor:pointer;font:inherit}
-#spiderLayer{position:fixed;inset:0;pointer-events:none;z-index:35;overflow:hidden}
+#spiderLayer{position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden}
 #spiderLayer[hidden]{display:none}
 #cashoodSpider{--spider-span:190px;position:absolute;left:0;top:0;width:44px;height:44px;padding:0;border:0;background:none;color:#ef6abd;pointer-events:auto;cursor:pointer;touch-action:manipulation;will-change:transform}
 #cashoodSpider svg{position:absolute;width:var(--spider-span);height:var(--spider-span);left:calc(22px - var(--spider-span)/2);top:calc(22px - var(--spider-span)/2);overflow:visible;pointer-events:none}
