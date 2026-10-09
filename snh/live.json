@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4bc07e8f-30b5-49af-922c-57edb70057b5",
-  "updatedAt": 1791513675660,
-  "generatedAt": "2026-10-09 09:41 WIB",
+  "generation": "78652ddd-f692-4fe9-b4c1-08c2b74a86e2",
+  "updatedAt": 1791513975661,
+  "generatedAt": "2026-10-09 09:46 WIB",
   "usdIdr": null,
   "totalUsd": 963.6373120104738,
   "nativeSymbol": "SOL",
@@ -1180,12 +1180,12 @@
     "pnlUsd": -36.362687989526194,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791513675660,
+    "heartbeatAt": 1791513975661,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.54,
-    "lastScanAt": 1791513673429,
+    "lastScanAt": 1791513972074,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1206,13 +1206,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "189",
+        "v": "190",
         "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "1865",
-        "n": "161 aktif"
+        "n": "162 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1222,9 +1222,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791513675660,
+      "lastDecisionAt": 1791513975661,
       "lastAction": "keputusan",
-      "lastReason": "COD [degen]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "Soccar [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1243,7 +1243,7 @@
       ],
       [
         "Wallet dipantau",
-        "1865 · 161 aktif"
+        "1865 · 162 aktif"
       ],
       [
         "Cadangan kas",
@@ -1255,7 +1255,7 @@
       ],
       [
         "Label wallet",
-        "smart 519 · dolphin 48 · bot 993 · blacklist 153 · lp 2 · fresh 34 · kol 113 · whale 3"
+        "smart 520 · dolphin 48 · bot 992 · blacklist 153 · lp 2 · fresh 34 · kol 113 · whale 3"
       ]
     ],
     "requirements": [
@@ -1304,21 +1304,21 @@
   "copyTrade": {
     "wallets": {
       "tracked": 1865,
-      "active": 161,
-      "passive": 1704,
+      "active": 162,
+      "passive": 1703,
       "trusted": 4,
       "promising": 15,
       "byLabel": [
         {
           "key": "bot",
-          "total": 993,
+          "total": 992,
           "active": 0,
-          "passive": 993
+          "passive": 992
         },
         {
           "key": "smart",
-          "total": 519,
-          "active": 129,
+          "total": 520,
+          "active": 130,
           "passive": 390
         },
         {
@@ -1459,6 +1459,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791513731002,
+        "symbol": "Soccar",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791513702720,
+        "symbol": "HeeHaw",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 36%."
+      },
       {
         "at": 1791513548118,
         "symbol": "COD",
@@ -2600,43 +2627,6 @@
           }
         ],
         "reason": "Diveto LLM: High coordination signal (20.6 wallets/min) and smart #1053 (trojan tag, -$7 realized, 6400min avg hold) undermine the group; bot #1397 is strong but fomo-tagged, a. Tidak dimasuki."
-      },
-      {
-        "at": 1791486240875,
-        "symbol": "Caviar",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.3%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 7.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 307,
-            "note": "5.9% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: smart #328 has negative copy history (-4.5% avg) and heavy 2-min exits suggest bot behavior that crowds out followers; smart #272 has zero over_x5 wins, inadequate . Tidak dimasuki."
-      },
-      {
-        "at": 1791486075963,
-        "symbol": "Caviar",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
       }
     ],
     "reasonStats": {
@@ -2647,7 +2637,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 98,
+        "red_flag": 99,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2697,7 +2687,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791513713061,
+    "generatedAt": 1791514014504,
     "trades": {
       "count": 51,
       "wins": 20,
