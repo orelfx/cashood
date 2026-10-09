@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8142147c-0bfd-4967-a95b-7c6fd53797bb",
-  "updatedAt": 1791575475956,
-  "generatedAt": "2026-10-10 02:51 WIB",
+  "generation": "8e7ef7bb-5f7d-4d78-8ee3-af0431f14905",
+  "updatedAt": 1791575775955,
+  "generatedAt": "2026-10-10 02:56 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791575475956,
+    "heartbeatAt": 1791575775955,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791575473448,
+    "lastScanAt": 1791575773924,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,13 +1202,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "191",
+        "v": "192",
         "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1920",
-        "n": "160 aktif"
+        "v": "1921",
+        "n": "162 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791575475956,
+      "lastDecisionAt": 1791575775955,
       "lastAction": "keputusan",
-      "lastReason": "BRAINOBOT [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "BNKR [degen]: Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1239,7 +1239,7 @@
       ],
       [
         "Wallet dipantau",
-        "1920 · 160 aktif"
+        "1921 · 162 aktif"
       ],
       [
         "Cadangan kas",
@@ -1251,7 +1251,7 @@
       ],
       [
         "Label wallet",
-        "smart 531 · dolphin 48 · bot 1014 · blacklist 175 · lp 2 · fresh 35 · kol 112 · whale 3"
+        "smart 530 · dolphin 49 · bot 1015 · blacklist 175 · lp 2 · fresh 35 · kol 112 · whale 3"
       ]
     ],
     "requirements": [
@@ -1299,23 +1299,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1920,
-      "active": 160,
-      "passive": 1760,
+      "tracked": 1921,
+      "active": 162,
+      "passive": 1759,
       "trusted": 4,
       "promising": 14,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1014,
+          "total": 1015,
           "active": 0,
-          "passive": 1014
+          "passive": 1015
         },
         {
           "key": "smart",
-          "total": 531,
-          "active": 125,
-          "passive": 406
+          "total": 530,
+          "active": 126,
+          "passive": 404
         },
         {
           "key": "blacklist",
@@ -1331,8 +1331,8 @@
         },
         {
           "key": "dolphin",
-          "total": 48,
-          "active": 21,
+          "total": 49,
+          "active": 22,
           "passive": 27
         },
         {
@@ -1455,6 +1455,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791575654002,
+        "symbol": "BNKR",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791575609152,
+        "symbol": "Quantum",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 20."
+      },
       {
         "at": 1791575452920,
         "symbol": "BRAINOBOT",
@@ -2411,61 +2431,12 @@
           }
         ],
         "reason": "Diveto LLM: All four wallets show near-identical behavior with high churn and tiny median gains (0.05-5.8%), winning often but capturing no asymmetry—no tokens over x5 and . Tidak dimasuki."
-      },
-      {
-        "at": 1791560085750,
-        "symbol": "SKATE3",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 395,
-            "note": "bundler pegang 2.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: All four wallets show negative realized PnL (-$150 to -$643), high token churn (267-349), zero over-x5 winners across most, and no copy history—indicating these. Tidak dimasuki."
-      },
-      {
-        "at": 1791560043434,
-        "symbol": "SKATE3",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 5.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets show negative realized PnL (-$462, -$150) despite 60-65% winrates, indicating outsized losses on losers; excessive churn (339-349 tokens/week) sign. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 28,
+        "below_entry": 29,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2520,7 +2491,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791575510435,
+    "generatedAt": 1791575810889,
     "trades": {
       "count": 60,
       "wins": 23,
