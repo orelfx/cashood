@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3d6e95e0-6909-48e3-8582-bded01d3e37a",
-  "updatedAt": 1791569775936,
-  "generatedAt": "2026-10-10 01:16 WIB",
+  "generation": "3016e2fc-9a9c-4e3d-aba1-4f34c616fba8",
+  "updatedAt": 1791570075936,
+  "generatedAt": "2026-10-10 01:21 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791569775936,
+    "heartbeatAt": 1791570075936,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791569773172,
+    "lastScanAt": 1791570071854,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,8 +1202,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "195",
-        "n": "24 jam · 41 diveto LLM"
+        "v": "194",
+        "n": "24 jam · 39 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791569775936,
+      "lastDecisionAt": 1791570075936,
       "lastAction": "keputusan",
-      "lastReason": "QCAT [degen]: Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "PCAT [degen]: Dilewati: harga sudah -54% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1455,6 +1455,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791570031983,
+        "symbol": "PCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati: harga sudah -54% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791569900266,
+        "symbol": "SOUVENIR",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 20%."
+      },
       {
         "at": 1791569474758,
         "symbol": "QCAT",
@@ -2656,58 +2677,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 13."
-      },
-      {
-        "at": 1791551552462,
-        "symbol": "DEEZNUTS",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 26% supply."
-      },
-      {
-        "at": 1791551506676,
-        "symbol": "holyshit",
-        "action": "exit",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 148,
-            "note": "bundler pegang 8.8%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 2.4%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 2.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 401,
-            "note": "7.5% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.4%"
-          }
-        ],
-        "reason": "Keluar (trailing): Harga turun 35% dari puncak +200% setelah 31 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +40,3%."
       }
     ],
     "reasonStats": {
@@ -2718,7 +2687,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 105,
+        "red_flag": 106,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2735,7 +2704,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 41
+        "llm": 39
       },
       "test": {
         "solo": 0,
@@ -2768,7 +2737,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791569813856,
+    "generatedAt": 1791570120458,
     "trades": {
       "count": 60,
       "wins": 23,
@@ -2808,7 +2777,7 @@
     },
     "equity": {
       "days": 5,
-      "spanDays": 4.5,
+      "spanDays": 4.6,
       "returnPct": -5.22,
       "maxDrawdownPct": 5.78,
       "maxDrawdownAt": 1791564548873,
