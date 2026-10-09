@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e776a12c-0df0-471b-aa5a-14743d06d05a",
-  "updatedAt": 1791584175985,
-  "generatedAt": "2026-10-10 05:16 WIB",
+  "generation": "b2cfaef6-10cb-45d8-a512-9dfbfddde1f8",
+  "updatedAt": 1791584475986,
+  "generatedAt": "2026-10-10 05:21 WIB",
   "usdIdr": null,
   "totalUsd": 946.8397105126135,
   "nativeSymbol": "SOL",
@@ -1181,12 +1181,12 @@
     "pnlUsd": -53.160289487386535,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791584175985,
+    "heartbeatAt": 1791584475986,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.2,
-    "lastScanAt": 1791584173515,
+    "lastScanAt": 1791584471867,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1207,7 +1207,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "194",
+        "v": "195",
         "n": "24 jam · 46 diveto LLM"
       },
       {
@@ -1223,9 +1223,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791584175985,
+      "lastDecisionAt": 1791584475986,
       "lastAction": "keputusan",
-      "lastReason": "MARU [low]: Diveto LLM: Low market cap, high churn bots with poor realized PnL per trade and -47% loss on our only copy; only 2 over_x5 wins across 4 wallets with 47% of wallets buying. Tidak dimasuki."
+      "lastReason": "PQLN [degen]: Dilewati: harga sudah -61% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1460,6 +1460,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791584438224,
+        "symbol": "PQLN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -61% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791582433254,
         "symbol": "MARU",
@@ -2471,54 +2481,12 @@
           }
         ],
         "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 2 menit. Hasil -3,5%."
-      },
-      {
-        "at": 1791564666923,
-        "symbol": "Spiralism",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 22.23% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 114,
-            "note": "bundler pegang 9.6%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 20.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 232,
-            "note": "11.5% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 11x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $1,91; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 29,
+        "below_entry": 30,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2573,7 +2541,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791584215155,
+    "generatedAt": 1791584521475,
     "trades": {
       "count": 61,
       "wins": 23,
