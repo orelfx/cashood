@@ -328,6 +328,24 @@ console.log('PASS complete forecast render');
  assert.equal(await ev('[...document.querySelectorAll("#tab-kinerja h2")].every(el=>getComputedStyle(el).color==="rgb(240, 240, 240)")'),true);
  assert.equal(await ev('document.querySelector("#tab-kinerja .stat .v").textContent'),'-Rp 120.000');
  console.log('PASS temporary text colors, bounded thrown words, truthful currency readout and cleanup on click');
+ // Mobile calendar: regenerated date nodes must not starve month, totals and notes.
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:1100,deviceScaleFactor:1,mobile:true});
+ await ev("location.hash='#home'");await new Promise(r=>setTimeout(r,500));
+ await ev(`homeCal.month='2026-10';homeCal.rows=[{date:'2026-10-01',usd:-10,closes:2},{date:'2026-10-02',usd:20,closes:3},{date:'2026-10-03',usd:30,closes:4}];renderHomeCalendar();document.querySelector('.hg-daily').scrollIntoView();window.scrollBy(0,-160)`);
+ const datesBefore=await ev('document.querySelector("#hgCalGrid").textContent');
+ const calendarScans=new Set();let lastScan='';
+ for(let i=0;i<300;i++){
+   await new Promise(r=>setTimeout(r,100));
+   const target=await ev('document.querySelector("#cashoodSpider").dataset.scanTarget');
+   if(target && target!==lastScan){calendarScans.add(target);lastScan=target;await ev('renderHomeCalendar()');}
+   if(calendarScans.size>=5)break;
+ }
+ assert.ok(calendarScans.size>=5,'calendar kept repeating one heading');
+ assert.ok([...calendarScans].some(t=>t.includes('Okt 2026')),'month was never inspected');
+ assert.ok([...calendarScans].some(t=>/tutup|bunga/.test(t)),'dated profit/loss cells were never inspected');
+ assert.equal(await ev('document.querySelector("#hgCalGrid").textContent'),datesBefore);
+ assert.equal(await ev('homeCal.month'),'2026-10','spider changed calendar month');
+ console.log('PASS mobile calendar scans dates and month across DOM refreshes without changing data');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

@@ -10,7 +10,7 @@
   try { enabled = localStorage.getItem('cashood-spider') !== 'off'; } catch {}
   let timer, scrollIdle, motion, reveal, previous, phrase = 0, generation = 0;
   let location = { x: 20, y: 160 };
-  let explored = new WeakSet(), quietUntil=0, asideCount=0, scanAnimation=null;
+  let explored = new Map(),visitOrder=0, quietUntil=0, asideCount=0, scanAnimation=null;
   const copySteps=new WeakMap();
   const headlines = ['Bot yang kerja.', 'Otomasi yang kerja.', 'Sistem yang kerja.'];
   const caption = spider.querySelector('.spider-caption');
@@ -61,6 +61,34 @@
     ['Menu','Jelajahi Cashood','Pilihan halaman'],
   ];
   function currentPage(){return document.querySelector('main > div[id^="tab-"]:not([hidden])');}
+  function targetKey(el){
+    const parts=[],page=currentPage();
+    for(let node=el;node && node!==page;node=node.parentElement){
+      if(node.id){parts.unshift('#'+node.id);break;}
+      parts.unshift(node.tagName+':'+Array.prototype.indexOf.call(node.parentElement?.children||[],node));
+    }
+    if(el.matches('.cell'))parts.push(document.querySelector('#hgCalTitle')?.textContent||'');
+    return parts.join('/');
+  }
+  function readingTargets(page,already){
+    const targets=[],headerBottom=document.querySelector('header.top')?.getBoundingClientRect().bottom||115;
+    const selector='h2,h3,p,summary,td,th,button,a,strong,time,.hint,.sub,.label,.big,.num,.aum-v,.aum-foot,.hs-v,.hs-k,.hs-n,.prod-name,.prod-desc,.menu-tile b,.stat .k,.stat .v,.stat .n,.kpi .sub,.cal-grid .cell:not(.void),.cal-foot span';
+    const visitNode=el=>{
+      if(targets.length>=100 || el.matches('[hidden],[aria-hidden="true"],script,style,svg,canvas,input,select,textarea,.cal-dow,.cell.void'))return;
+      const r=el.getBoundingClientRect();
+      // Prune whole offscreen sections, rather than limiting discovery to the first
+      // 200 elements of the document. Long tables stay cheap to inspect at the bottom.
+      if(!r.width || !r.height || r.bottom<=headerBottom || r.top>=innerHeight-8 || r.right<=0 || r.left>=innerWidth)return;
+      if(already.has(el))return;
+      const containsKnown=[...already].some(known=>el.contains(known));
+      if(!containsKnown && el.matches(selector) && !el.matches(':disabled') && visible(el) && el.textContent.trim() && !/^[‹›←→—]+$/.test(el.textContent.trim())){
+        targets.push(el);return; // One semantic unit: never scan both a cell and its children.
+      }
+      for(const child of el.children)visitNode(child);
+    };
+    for(const child of page.children)visitNode(child);
+    return targets;
+  }
   function copyAction(el){
     if(!el.matches('h2,h3') || el.children.length || el.closest('a,button'))return;
     const group=copyGroups.find(g=>g.includes(el.textContent.trim()));
@@ -68,7 +96,9 @@
     return ()=>{const step=(copySteps.get(el)??group.indexOf(el.textContent.trim()))+1;copySteps.set(el,step);el.textContent=group[step%group.length];};
   }
   function describe(el){
-    const text=el.textContent.trim().replace(/\s+/g,' ').slice(0,90);
+    const text=el.textContent.trim().replace(/\s+/g,' ').slice(0,150);
+    if(el.matches('.cell')){const day=el.querySelector('.d')?.textContent.trim(),amount=el.querySelector('.a')?.textContent.trim(),count=el.querySelector('.c')?.textContent.trim();return `Tanggal ${day}, ${document.querySelector('#hgCalTitle')?.textContent.trim()}: ${amount||'data belum tersedia'}${count?' · '+count:''}.`;}
+    if(el.id==='hgCalTitle')return `Kalender hasil untuk ${text}.`;
     if(el.closest('a[href$=".pdf"]'))return 'Laporan PDF tersedia. Kamu bisa membukanya sendiri.';
     const stat=el.closest('.stat,.kpi');
     if(stat){const label=stat.querySelector('.k,.label')?.textContent.trim(),value=stat.querySelector('.v,.big')?.textContent.trim();if(label&&value)return `${label}: ${value}. Ini nilai yang tampil.`;}
@@ -334,7 +364,7 @@
   const visible = el => {
     if (!el || !el.isConnected) return false;
     const r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0 && r.top > 115 && r.bottom < innerHeight - 8;
+    return r.width > 0 && r.height > 0 && r.top > (document.querySelector('header.top')?.getBoundingClientRect().bottom||115) && r.bottom < innerHeight - 8 && r.right>0 && r.left<innerWidth;
   };
   const active = () => enabled && !document.hidden;
   const onScreen=()=>location.y+44-scrollY>115 && location.y-scrollY<innerHeight && location.x+44>scrollX && location.x<scrollX+innerWidth;
@@ -400,13 +430,9 @@
     // broad DOM observer: invoice tables can contain thousands of rows.
     const page = currentPage();
     if (page) {
-      const candidates = page.querySelectorAll('h2,h3,.aum-v,.hs-v,.prod-name,.menu-tile b,a[href$=".pdf"],.sub-h,.stat .k,.stat .v,.stat .n,.card-head .hint,.hb-head p,.prod-desc,.kpi .label,.kpi .big,.kpi .sub,summary,thead th,.kv td');
       const seen = new Set(targets.map(([el]) => el));
-      for (const el of Array.from(candidates).slice(0, 200)) {
-        if (!seen.has(el) && visible(el)) {
-          targets.push([el, describe(el), ()=>{copyAction(el)?.();caption.textContent=describe(el);}]);
-          seen.add(el);
-        }
+      for (const el of readingTargets(page,seen)) {
+        targets.push([el, describe(el), ()=>{copyAction(el)?.();caption.textContent=describe(el);}]);
       }
     }
     const footer = document.querySelector('footer [data-spider-toggle]');
@@ -420,11 +446,14 @@
       return;
     }
     for(const item of targets){if(!item[2])item[2]=copyAction(item[0]);}
-    let fresh=targets.filter(([el])=>!explored.has(el));
-    if(!fresh.length){explored=new WeakSet();fresh=targets;}
     const distanceTo=([el])=>{const r=el.getBoundingClientRect();return Math.hypot(r.right+scrollX-22-location.x,r.top+scrollY-50-location.y);};
-    fresh.sort((a,b)=>distanceTo(a)-distanceTo(b));
-    const chosen=fresh[0];explored.add(chosen[0]);visit(chosen[0],chosen[1],chosen[2],following===true);
+    // Least recently visited wins; proximity only breaks ties. Stable keys survive
+    // DOM refreshes and headings being rewritten, so one nearby label cannot monopolize scans.
+    const ranked=targets.map(entry=>{const key=targetKey(entry[0]);return {entry,key,order:explored.get(key)||0,distance:distanceTo(entry)};});
+    ranked.sort((a,b)=>a.order-b.order||a.distance-b.distance);
+    const {entry:chosen,key}=ranked[0];explored.set(key,++visitOrder);
+    if(explored.size>512)explored.delete(explored.keys().next().value);
+    visit(chosen[0],chosen[1],chosen[2],following===true);
   }
   function moveAside(){
     if(!active())return;
@@ -518,7 +547,7 @@
       viewFrame=0;
       const key=location.hash+'|'+currentPage()?.id;
       if(key===lastView)return;lastView=key;
-      quietUntil=0;explored=new WeakSet();
+      quietUntil=0;explored=new Map();visitOrder=0;
       caption.textContent='Aku lihat bagian halaman ini dulu, ya.';
       location={x:100,y:scrollY+180};sync();
     });
