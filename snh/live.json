@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "02c9c3ae-da5d-4b2a-b1b7-eef12e5ca608",
-  "updatedAt": 1791574875956,
-  "generatedAt": "2026-10-10 02:41 WIB",
+  "generation": "e5b36da5-f179-467d-b7f8-655449819481",
+  "updatedAt": 1791575175955,
+  "generatedAt": "2026-10-10 02:46 WIB",
   "usdIdr": null,
   "totalUsd": 947.8307581621145,
   "nativeSymbol": "SOL",
@@ -1176,12 +1176,12 @@
     "pnlUsd": -52.169241837885465,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791574875956,
+    "heartbeatAt": 1791575175955,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.1,
-    "lastScanAt": 1791574873164,
+    "lastScanAt": 1791575173194,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,7 +1202,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "188",
+        "v": "191",
         "n": "24 jam · 40 diveto LLM"
       },
       {
@@ -1218,9 +1218,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791574875956,
+      "lastDecisionAt": 1791575175955,
       "lastAction": "keputusan",
-      "lastReason": "tardigrade [degen]: Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "BNKR [degen]: Dilewati: harga sudah -51% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1455,6 +1455,36 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791575049844,
+        "symbol": "BNKR",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -51% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791575004065,
+        "symbol": "Quantum",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati karena red flag: holder baru 10."
+      },
+      {
+        "at": 1791574964208,
+        "symbol": "QCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 28% supply."
+      },
       {
         "at": 1791574803249,
         "symbol": "tardigrade",
@@ -2469,103 +2499,17 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791558818320,
-        "symbol": "HI",
-        "action": "wait",
-        "basket": "degen",
-        "wallets": {
-          "smart": 8
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 262,
-            "note": "bundler pegang 22.5%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 0.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 270,
-            "note": "7.5% holder wallet baru"
-          },
-          {
-            "type": "top10",
-            "count": null,
-            "note": "10 holder terbesar pegang 32.5%"
-          }
-        ],
-        "reason": "Menunggu pullback: harga sudah +34% di atas harga beli wallet yang diikuti (zona masuk sampai +20%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 15 menit."
-      },
-      {
-        "at": 1791558801026,
-        "symbol": "VCAT",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 4.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 243,
-            "note": "13.1% holder wallet baru"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,33, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791557395767,
-        "symbol": "VCAT",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 4.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 243,
-            "note": "13.1% holder wallet baru"
-          }
-        ],
-        "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 27,
+        "below_entry": 28,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 105,
+        "red_flag": 107,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2615,7 +2559,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791574911744,
+    "generatedAt": 1791575210404,
     "trades": {
       "count": 60,
       "wins": 23,
