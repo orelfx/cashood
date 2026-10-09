@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "93c738ce-e0ed-41c2-8ba4-74209cc708be",
-  "updatedAt": 1791542175779,
-  "generatedAt": "2026-10-09 17:36 WIB",
+  "generation": "84fbac2a-162b-4e72-8368-d3a4fde45071",
+  "updatedAt": 1791542475780,
+  "generatedAt": "2026-10-09 17:41 WIB",
   "usdIdr": null,
   "totalUsd": 961.1687074670808,
   "nativeSymbol": "SOL",
@@ -1219,12 +1219,12 @@
     "pnlUsd": -38.83129253291918,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791542175779,
+    "heartbeatAt": 1791542475780,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 4.78,
-    "lastScanAt": 1791542171940,
+    "lastScanAt": 1791542475232,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1245,7 +1245,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "200",
+        "v": "201",
         "n": "24 jam · 50 diveto LLM"
       },
       {
@@ -1261,9 +1261,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791542175779,
+      "lastDecisionAt": 1791542475780,
       "lastAction": "keputusan",
-      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 0.7% dari market cap."
+      "lastReason": "DOTF [big]: Dilewati karena red flag: likuiditas cuma 0.7% dari market cap."
     }
   },
   "strategy": {
@@ -1498,6 +1498,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791542181822,
+        "symbol": "DOTF",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.7% dari market cap."
+      },
       {
         "at": 1791542164783,
         "symbol": "USDP",
@@ -2628,48 +2638,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -34% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791518155817,
-        "symbol": "LUNA",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 7.26% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 178,
-            "note": "bundler pegang 26.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.5%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 362,
-            "note": "16.5% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 11x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets show poor exit discipline (median losses -11% to -53%), wallet 1 created 6 tokens and has 46% winrate, wallet 3 has only 29% winrate with 15 t. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2680,7 +2648,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 102,
+        "red_flag": 103,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2730,7 +2698,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791542209048,
+    "generatedAt": 1791542509366,
     "trades": {
       "count": 54,
       "wins": 22,
