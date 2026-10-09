@@ -22,6 +22,7 @@
 <script defer src="assets/vendor/purify.min.js?v=__BUILD__"></script>
 <script defer src="assets/security.js?v=__BUILD__"></script>
 <script defer src="assets/core.js?v=__BUILD__"></script>
+<script defer src="assets/spider.js?v=__BUILD__"></script>
 <script defer src="assets/app.js?v=__BUILD__"></script>
 </head>
 <body>
@@ -93,12 +94,13 @@
     <section class="home-hero">
       <div class="hh-copy">
         <span class="eyebrow"><span class="live-dot"></span>Bot aktif 24/7 · data diperbarui tiap 5 menit</span>
-        <h2 class="hh-title">Bot yang kerja.<br><span class="grad">Kamu tinggal pantau hasilnya.</span></h2>
+        <h2 class="hh-title"><span id="spiderHeadline">Bot yang kerja.</span><br><span class="grad">Kamu tinggal pantau hasilnya.</span></h2>
         <p class="hh-sub">Setiap posisi dibuka, dijaga, dan ditutup oleh bot, siang dan malam, tanpa ada yang menekan tombol. Profitnya dibagikan tiap tanggal 1, dan semua angkanya bisa kamu cek sendiri di sini.</p>
         <div class="hh-cta">
           <a class="cta primary" href="#analisa">Lihat portofolio</a>
           <a class="cta ghost" href="#safebox">Buka Safe Box</a>
         </div>
+        <div class="spider-controls"><button type="button" id="spiderToggle" aria-pressed="true">Spider aktif</button><span>Maskot visual · mengikuti data asli</span></div>
       </div>
       <div class="hh-aum" id="homeAum">
         <div class="aum-k">Total aset dikelola</div>
@@ -762,5 +764,22 @@
 
 </main>
 
+<div id="spiderLayer" hidden>
+  <button type="button" id="cashoodSpider" aria-label="Spider: jelajahi data dan ganti kalimat beranda" title="Klik untuk menjelajah · maskot visual">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <g class="spider-legs" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M43 43 29 26 14 22 7 10"/><path d="M42 48 23 39 12 43 3 33"/>
+        <path d="M42 54 24 59 15 72 4 76"/><path d="M44 59 34 77 36 89 25 97"/>
+        <path d="M57 43 71 26 86 22 93 10"/><path d="M58 48 77 39 88 43 97 33"/>
+        <path d="M58 54 76 59 85 72 96 76"/><path d="M56 59 66 77 64 89 75 97"/>
+      </g>
+      <ellipse cx="50" cy="56" rx="11" ry="16" fill="#121e29" stroke="currentColor" stroke-width="2"/>
+      <path d="M50 44V66M44 50L56 60M56 50L44 60" stroke="currentColor" opacity=".55"/>
+      <circle cx="50" cy="38" r="9" fill="#121e29" stroke="currentColor" stroke-width="2"/>
+      <circle cx="46" cy="36" r="2" fill="#5fffd1"/><circle cx="54" cy="36" r="2" fill="#5fffd1"/>
+    </svg>
+    <span class="spider-caption">Suatu angka, satu cerita.</span>
+  </button>
+</div>
 </body>
 </html>

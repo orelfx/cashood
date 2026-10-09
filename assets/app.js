@@ -3932,6 +3932,8 @@ async function renderHome() {
       <span class="leg-r"><span class="v">${usd(p.usd, 0)}</span><span class="leg-chg" data-leg="${esc(p.id)}"></span></span></li>`).join('')}</ul>
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
 
+  document.dispatchEvent(new CustomEvent('cashood:home-data', { detail: { total: g.total, currency, complete: !g.missing.length } }));
+
   // ── angka singkat ──
   const tile = (k, v, n) => `<div class="hs"><div class="hs-v">${v}</div><div class="hs-k">${k}</div><div class="hs-n">${n}</div></div>`;
   const posisi = g.briefs.reduce((s, b) => s + b.openCount, 0);

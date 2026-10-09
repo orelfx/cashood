@@ -129,6 +129,39 @@ console.log('PASS complete forecast render');
  await ev(`homeView.referenceAt=null;homeView.selectedAt=null;const missing=structuredClone(__growthFixture);missing[0].parts[0].known=false;drawGrowth(document.querySelector('#hgChart'),missing,false)`);
  assert.match(await ev('document.querySelector("#hgCompareTotal").textContent'),/data pembanding belum lengkap/i);
  console.log('PASS missing history cannot appear as a total gain');
+ await cmd('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+ await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+ await ev(`location.hash='#home';window.scrollTo(0,0);`);
+ await ev('renderHome()');
+ await new Promise(r=>setTimeout(r,100));
+ assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),false);
+ const beforeSpider=await ev('document.querySelector("#homeAum").textContent');
+ await ev('document.querySelector("#cashoodSpider").click()');
+ assert.equal(await ev('document.querySelector("#spiderHeadline").textContent'),'Otomasi yang kerja.');
+ assert.equal(await ev('document.querySelector("#homeAum").textContent'),beforeSpider);
+ assert.equal(await ev('document.querySelector("#cashoodSpider").getAnimations().length'),0);
+ console.log('PASS spider changes approved copy without changing financial data; reduced motion respected');
+ await cmd('Emulation.setEmulatedMedia',{features:[]});
+ await ev(`document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:100,currency:'usd',complete:true}}));document.querySelector('#homeAum .aum-v').textContent='$120';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:120,currency:'usd',complete:true}}));`);
+ await new Promise(r=>setTimeout(r,2200));
+ assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$120');
+ await ev(`document.querySelector('#homeAum .aum-v').textContent='$90';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:90,currency:'usd',complete:true}}));document.querySelector('#spiderToggle').click()`);
+ assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'$90');
+ assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),true);
+ assert.equal(await ev('localStorage.getItem("cashood-spider")'),'off');
+ await ev('document.querySelector("#spiderToggle").click()');
+ await ev(`document.querySelector('#homeAum .aum-v').textContent='Rp 1.440.000';document.dispatchEvent(new CustomEvent('cashood:home-data',{detail:{total:90,currency:'idr',complete:true}}));`);
+ assert.equal(await ev('document.querySelector("#homeAum .aum-v").textContent'),'Rp 1.440.000');
+ await ev(`location.hash='#meridian/portfolio'`);await new Promise(r=>setTimeout(r,100));
+ assert.equal(await ev('document.querySelector("#spiderLayer").hidden'),true);
+ console.log('PASS spider reveals source updates, cancels safely, ignores currency conversions and hides off home');
+ await ev(`location.hash='#home'`);await ev('renderHome()');await ev('window.scrollTo(0,0)');
+ await new Promise(r=>setTimeout(r,3000));
+ if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-desktop.png'),Buffer.from(shot.data,'base64'));}
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ await new Promise(r=>setTimeout(r,3000));
+ assert.equal(await ev('document.documentElement.scrollWidth===innerWidth'),true);
+ if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'spider-mobile.png'),Buffer.from(shot.data,'base64'));}
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

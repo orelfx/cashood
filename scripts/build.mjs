@@ -10,7 +10,7 @@ rmSync(out,{recursive:true,force:true});mkdirSync(out,{recursive:true});
 for(const file of ['CNAME','.nojekyll'])cpSync(resolve(root,file),resolve(out,file));
 let html=readFileSync(resolve(root,'index.html'),'utf8');
 // Content-addressed filenames retain a consistent HTML/JS pair across deployments.
-for(const file of ['assets/style.css','assets/vendor/purify.min.js','assets/security.js','assets/core.js','assets/app.js']){
+for(const file of ['assets/style.css','assets/vendor/purify.min.js','assets/security.js','assets/core.js','assets/spider.js','assets/app.js']){
  const content=readFileSync(resolve(root,file));const hash=createHash('sha256').update(content).digest('hex').slice(0,16);
  const name=file.replace(/\.(js|css)$/,'-'+hash+'.$1');mkdirSync(dirname(resolve(out,name)),{recursive:true});writeFileSync(resolve(out,name),content);html=html.replace(`${file}?v=__BUILD__`,name);
 }

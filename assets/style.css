@@ -1407,3 +1407,19 @@ body.is-staking #lpCard, body.is-staking #closedCard, body.is-staking #profitCar
 .hg-compare td small, .hg-tip .t-row b small { display: block; margin-top: 3px; font-size: 10px; }
 .hg-tip .t-row b { text-align: right; }
 .hg-tip { max-width: min(390px, 100%); }
+
+/* Spider companion: only the small button captures input, never the page. */
+.spider-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px;color:var(--muted,#94a3b8);font-size:11px}
+.spider-controls button{border:1px solid #30424a;border-radius:99px;background:#101b21;color:#74e9c3;padding:7px 11px;cursor:pointer;font:inherit}
+#spiderLayer{position:fixed;inset:0;pointer-events:none;z-index:35;overflow:hidden}
+#spiderLayer[hidden]{display:none}
+#cashoodSpider{position:absolute;left:0;top:0;width:76px;height:76px;padding:0;border:0;background:none;color:#ee83be;pointer-events:auto;cursor:pointer;touch-action:manipulation;filter:drop-shadow(0 0 6px #ee83be55);will-change:transform}
+#cashoodSpider svg{display:block;width:100%;height:100%;overflow:visible}
+#cashoodSpider:focus-visible{outline:2px solid #5fffd1;outline-offset:3px;border-radius:50%}
+.spider-caption{position:absolute;bottom:calc(100% + 5px);left:0;width:max-content;max-width:min(215px,65vw);padding:6px 9px;border:1px solid #ee83be44;border-radius:6px;background:#0c1219ed;color:#cdd8e2;font:10px/1.4 ui-monospace,monospace;pointer-events:none;text-align:left}
+.caption-left .spider-caption{left:auto;right:0}
+.walking .spider-legs path{transform-origin:50px 50px;animation:spider-step .3s ease-in-out infinite alternate}
+.walking .spider-legs path:nth-child(even){animation-direction:alternate-reverse}
+@keyframes spider-step{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@media(max-width:600px){#cashoodSpider{width:62px;height:62px}.spider-caption{font-size:9px;max-width:180px}}
+@media(prefers-reduced-motion:reduce){.walking .spider-legs path{animation:none}#cashoodSpider{will-change:auto}}
