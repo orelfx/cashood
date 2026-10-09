@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8d489be1-5694-4ad0-89d2-fc1580f7876a",
-  "updatedAt": 1791582075982,
-  "generatedAt": "2026-10-10 04:41 WIB",
+  "generation": "7b871ace-3c6b-4edb-b23a-ce087d4d098b",
+  "updatedAt": 1791582375982,
+  "generatedAt": "2026-10-10 04:46 WIB",
   "usdIdr": null,
   "totalUsd": 946.8397105126135,
   "nativeSymbol": "SOL",
@@ -1181,12 +1181,12 @@
     "pnlUsd": -53.160289487386535,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791582075982,
+    "heartbeatAt": 1791582375982,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.2,
-    "lastScanAt": 1791582074154,
+    "lastScanAt": 1791582372503,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1207,8 +1207,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "195",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "196",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1223,9 +1223,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791582075982,
+      "lastDecisionAt": 1791582375982,
       "lastAction": "keputusan",
-      "lastReason": "QF [degen]: Diveto LLM: Zero over-5x wins, low winrates, and our_copies show -30% and -17% PnL on single copies—strong evidence these wallets don't transfer well to followers. Tidak dimasuki."
+      "lastReason": "MARU [low]: Diveto LLM: Group carried by Wallet 2's high-volume sniping with only 35% winrate and -15.8% median exit; Wallet 3 is a weak contributor; heavy 2-min exits (43% of Wallet 2. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1460,6 +1460,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791582319817,
+        "symbol": "MARU",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 235,
+            "note": "bundler pegang 12.2%"
+          },
+          {
+            "type": "rat",
+            "count": 9,
+            "note": "insider/entrapment pegang 3.2%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 18.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 526,
+            "note": "7.5% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 11x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Group carried by Wallet 2's high-volume sniping with only 35% winrate and -15.8% median exit; Wallet 3 is a weak contributor; heavy 2-min exits (43% of Wallet 2. Tidak dimasuki."
+      },
       {
         "at": 1791581400950,
         "symbol": "QF",
@@ -2470,17 +2512,6 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791564435577,
-        "symbol": "SARP",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 2,
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 86%."
       }
     ],
     "reasonStats": {
@@ -2508,7 +2539,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 44
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2541,7 +2572,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791582135133,
+    "generatedAt": 1791582437563,
     "trades": {
       "count": 61,
       "wins": 23,
