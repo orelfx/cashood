@@ -285,6 +285,25 @@ console.log('PASS complete forecast render');
    if(process.env.CASHOOD_SCREENSHOT_DIR){const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'caption-'+width+'.png'),Buffer.from(shot.data,'base64'));}
  }
  console.log('PASS white readable captions stay clear of sticky header and viewport on desktop and mobile');
+ // An isolated reading area exercises decorative effects without altering source values.
+ await cmd('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+ await ev("location.hash='#kinerja';window.scrollTo(0,0)");await new Promise(r=>setTimeout(r,150));
+ await ev(`(()=>{const page=document.querySelector('#tab-kinerja');page.replaceChildren();for(const title of ['Ringkasan kinerja','Data investor','Menu']){const h=document.createElement('h2');h.textContent=title;h.style.cssText='width:240px;margin:45px 20px;color:rgb(240,240,240)';page.append(h);}const stat=document.createElement('div');stat.className='stat';for(const [cls,txt] of [['k','Perubahan 24 jam'],['v','-Rp 120.000']]){const span=document.createElement('span');span.className=cls;span.textContent=txt;stat.append(span);}stat.style.marginTop='300px';page.append(stat);})()`);
+ await cmd('Emulation.setEmulatedMedia',{features:[]});
+ let inkSeen=false,tossSeen=false,codeSeen=false;
+ for(let i=0;i<220;i++){
+   await new Promise(r=>setTimeout(r,100));
+   const effects=await ev(`({ink:[...document.querySelectorAll('#tab-kinerja h2')].some(el=>getComputedStyle(el).color!=='rgb(240, 240, 240)'),toss:!!document.querySelector('.spider-toss'),code:document.querySelector('.spider-code pre')?.textContent})`);
+   inkSeen ||= effects.ink;tossSeen ||= effects.toss;
+   if(effects.code){assert.match(effects.code,/-Rp 120.000/);codeSeen=true;}
+   if(inkSeen && tossSeen && codeSeen)break;
+ }
+ assert.ok(inkSeen && tossSeen && codeSeen,'missing injected color, thrown word, or real-value code panel');
+ await ev('document.querySelector("#cashoodSpider").click()');await new Promise(r=>setTimeout(r,100));
+ assert.equal(await ev('document.querySelectorAll(".spider-toss,.spider-code").length'),0);
+ assert.equal(await ev('[...document.querySelectorAll("#tab-kinerja h2")].every(el=>getComputedStyle(el).color==="rgb(240, 240, 240)")'),true);
+ assert.equal(await ev('document.querySelector("#tab-kinerja .stat .v").textContent'),'-Rp 120.000');
+ console.log('PASS temporary text colors, bounded thrown words, truthful currency readout and cleanup on click');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

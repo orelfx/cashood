@@ -73,6 +73,56 @@
     if(/pembaruan|diperbarui|sumber/i.test(text))return `Info sumber: ${text}`;
     return `Aku sedang membaca “${text}”.`;
   }
+  let scanCount=0,inkAnimation=null;
+  const tossed=new Set();
+  function clearEffects(){
+    inkAnimation?.cancel();inkAnimation=null;
+    for(const item of tossed){item.animation.cancel();item.el.remove();}tossed.clear();
+    if(caption.classList.contains('spider-code'))caption.textContent='Aku lanjut membaca halaman ini.';
+    caption.classList.remove('spider-code');
+  }
+  function showReadout(){
+    const page=currentPage();if(!page)return;
+    const rows=[];
+    const read=selector=>page.querySelector(selector)?.textContent.trim().replace(/\s+/g,' ');
+    if(page.id==='tab-home'){
+      const total=read('#homeAum .aum-v'),change=read('#aumChg');
+      if(total)rows.push([read('#homeAum .aum-k')?.includes('(sebagian)')?'total_aset_sebagian':'total_aset',total]);
+      if(change)rows.push(['perubahan_24_jam',change]);
+      const positions=Array.from(page.querySelectorAll('#homeStats .hs')).find(el=>el.querySelector('.hs-k')?.textContent.trim()==='Posisi terbuka');
+      if(positions)rows.push(['posisi_terbuka',positions.querySelector('.hs-v').textContent.trim()]);
+    }else{
+      for(const stat of Array.from(page.querySelectorAll('.stat')).slice(0,3)){
+        const label=stat.querySelector('.k')?.textContent.trim(),value=stat.querySelector('.v')?.textContent.trim();
+        if(label&&value)rows.push([label,value]);
+      }
+    }
+    if(!rows.length)return;
+    // A labelled snapshot of rendered values, preserving currency, signs and missing-data states.
+    const pre=document.createElement('pre');pre.textContent='{\n'+rows.map(([k,v])=>'  '+JSON.stringify(k)+': '+JSON.stringify(v)).join(',\n')+'\n}';
+    const note=document.createElement('small');note.textContent=read('#homeAum .aum-foot')||read('#portoHint')||'Sesuai tampilan saat dipindai.';
+    caption.classList.add('spider-code');caption.replaceChildren(document.createTextNode('Cuplikan data halaman'),pre,note);queueCaption();
+  }
+  function injectText(target){
+    scanCount++;
+    // Preserve the semantic red/green of all financial values. Ink is for copy only.
+    if(!target.children.length && target.matches('h2,h3,#spiderHeadline,.prod-name,.menu-tile b,.hb-head p')){
+      const original=getComputedStyle(target).color;
+      inkAnimation=target.animate([{color:original,backgroundColor:'transparent'},{color:'#ff80cf',backgroundColor:'#60234b',offset:.12},{color:'#83ffe0',backgroundColor:'#174d43',offset:.78},{color:original,backgroundColor:'transparent'}],{duration:3200});
+      inkAnimation.onfinish=()=>{inkAnimation?.cancel();inkAnimation=null;};
+      if(scanCount%2===0){
+        const r=target.getBoundingClientRect(),words=target.textContent.trim().split(/\s+/).filter(Boolean).slice(0,2);
+        words.forEach((word,i)=>{
+          const el=document.createElement('span');el.className='spider-toss';el.setAttribute('aria-hidden','true');el.textContent=word;
+          el.style.left=`${Math.max(8,Math.min(innerWidth-120,r.left+scrollX+i*32))}px`;el.style.top=`${r.top+scrollY}px`;layer.append(el);
+          const direction=r.left>innerWidth/2?-1:1;
+          const animation=el.animate([{transform:'translate(0,0) rotate(0deg)',opacity:0},{transform:`translate(${direction*35}px,-35px) rotate(${direction*12}deg)`,opacity:1,offset:.35},{transform:`translate(${direction*(70+i*20)}px,25px) rotate(${direction*25}deg)`,opacity:0}],{duration:1400,delay:i*100,easing:'ease-out'});
+          const item={el,animation};tossed.add(item);animation.onfinish=()=>{el.remove();tossed.delete(item);};
+        });
+      }
+    }
+    if(scanCount%3===0)showReadout();
+  }
   function clearScan(){scanAnimation?.cancel();scanAnimation=null;scan.hidden=true;delete spider.dataset.scanTarget;}
   function scanTarget(target){
     clearScan();if(reduced.matches || !visible(target))return;
@@ -262,7 +312,7 @@
   const active = () => enabled && !document.hidden;
   const onScreen=()=>location.y+44-scrollY>115 && location.y-scrollY<innerHeight && location.x+44>scrollX && location.x<scrollX+innerWidth;
   function cancel() {
-    generation++; clearScan(); stopIdle(); stopGait();
+    generation++; clearEffects(); clearScan(); stopIdle(); stopGait();
     clearTimeout(timer); clearTimeout(scrollIdle);
     reveal?.(); reveal = null;
     if (motion) { motion.cancel(); motion=null; }
@@ -293,7 +343,7 @@
         action?.();
         scanTarget(target);
         if (!reduced.matches) {
-          target.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.65)', textShadow: '0 0 16px #2dd4bf' }, { filter: 'brightness(1)' }], { duration: 850 });
+          injectText(target);
           inspectTarget(target);
           spider.querySelector('.spider-heart').animate([{opacity:1},{opacity:.35},{opacity:1}],{duration:450});
         }
