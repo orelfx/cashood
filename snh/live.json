@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "568ab48d-6ef2-4076-974b-4435d2a0356d",
-  "updatedAt": 1791633076263,
-  "generatedAt": "2026-10-10 18:51 WIB",
+  "generation": "cac621c0-f9fc-47ab-9793-f956bf739d40",
+  "updatedAt": 1791633376263,
+  "generatedAt": "2026-10-10 18:56 WIB",
   "usdIdr": null,
-  "totalUsd": 940.1031945635701,
+  "totalUsd": 940.2021911363851,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 940.1031945635701,
+  "botWalletUsd": 940.2021911363851,
   "walletUsd": 934.7252356400248,
-  "lpUsd": 5.37795892,
+  "lpUsd": 5.4769555,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 4.332582043723255,
       "investedUsd": 4.332582043723255,
-      "principalUsd": 5.37795892,
-      "valueUsd": 5.37795892,
+      "principalUsd": 5.4769555,
+      "valueUsd": 5.4769555,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 1.0453768798220668,
-      "pnlPct": 24.13,
+      "pnlUsd": 1.1443734526369358,
+      "pnlPct": 26.41,
       "entryPriceUsd": 0.00019062702,
-      "priceUsd": 0.00024659637,
-      "ageMinutes": 250,
+      "priceUsd": 0.00025113698,
+      "ageMinutes": 255,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1213,18 +1213,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 934.7252356400248,
-    "positionsUsd": 5.37795892,
-    "realizedUsd": -60.94218232,
-    "unrealizedUsd": 1.04537688,
-    "pnlUsd": -59.89680543642987,
+    "positionsUsd": 5.4769555,
+    "realizedUsd": -60.94218231,
+    "unrealizedUsd": 1.14437345,
+    "pnlUsd": -59.79780886361493,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791633076263,
+    "heartbeatAt": 1791633376263,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 6.87,
-    "lastScanAt": 1791633072522,
+    "drawdownPct": 6.86,
+    "lastScanAt": 1791633375399,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1239,13 +1239,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$1.0454",
+        "v": "+$1.1444",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "196",
+        "v": "198",
         "n": "24 jam · 49 diveto LLM"
       },
       {
@@ -1261,9 +1261,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791633076263,
+      "lastDecisionAt": 1791633376263,
       "lastAction": "keputusan",
-      "lastReason": "RICK [degen]: Dilewati karena red flag: bundler pegang 26% supply."
+      "lastReason": "TELG [degen]: Dilewati karena red flag: holder baru 5."
     }
   },
   "strategy": {
@@ -1498,6 +1498,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791633248669,
+        "symbol": "TELG",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 5."
+      },
+      {
+        "at": 1791633161179,
+        "symbol": "ROSE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
+      },
       {
         "at": 1791633023691,
         "symbol": "RICK",
@@ -2403,48 +2423,6 @@
           "kol": 1
         },
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1791607430333,
-        "symbol": "SUPER",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 19,
-            "note": "bundler pegang 24.5%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 51,
-            "note": "17.1% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets show weak asymmetric upside (no winners over 2x, smart #1053 has sniper behavior with 12 rapid exits and 184 tokens churn) and neither has proven copy. Tidak dimasuki."
-      },
-      {
-        "at": 1791605839413,
-        "symbol": "Samurai",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 17.96%."
       }
     ],
     "reasonStats": {
@@ -2455,7 +2433,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 105,
+        "red_flag": 107,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2505,7 +2483,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791633116164,
+    "generatedAt": 1791633415821,
     "trades": {
       "count": 65,
       "wins": 23,
@@ -2546,14 +2524,14 @@
     "equity": {
       "days": 5,
       "spanDays": 5.3,
-      "returnPct": -5.99,
+      "returnPct": -5.98,
       "maxDrawdownPct": 6.61,
       "maxDrawdownAt": 1791596176065,
       "maxDrawdownUsd": 66.45,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 939.31,
-      "currentDrawdownPct": 6.53,
-      "currentDrawdownUsd": 65.66,
+      "currentDrawdownPct": 6.52,
+      "currentDrawdownUsd": 65.56,
       "positiveDaysPct": 20,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2562,8 +2540,8 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -59.9,
-    "profitPct": -5.99,
+    "profitUsd": -59.8,
+    "profitPct": -5.98,
     "recoveryFactor": -0.9,
     "score": {
       "axes": {
