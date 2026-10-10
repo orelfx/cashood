@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5c63cd92-23f9-4086-9fa8-539978e6f178",
-  "updatedAt": 1791593776055,
-  "generatedAt": "2026-10-10 07:56 WIB",
+  "generation": "f08c6fe9-d160-48f6-87df-c056aa52710b",
+  "updatedAt": 1791594076054,
+  "generatedAt": "2026-10-10 08:01 WIB",
   "usdIdr": null,
   "totalUsd": 940.0425703310922,
   "nativeSymbol": "SOL",
@@ -1167,12 +1167,12 @@
     "pnlUsd": -59.95742966890782,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791593776055,
+    "heartbeatAt": 1791594076054,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.87,
-    "lastScanAt": 1791593775911,
+    "lastScanAt": 1791594074089,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1193,8 +1193,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "198",
-        "n": "24 jam · 50 diveto LLM"
+        "v": "199",
+        "n": "24 jam · 51 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1209,9 +1209,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791593776055,
+      "lastDecisionAt": 1791594076054,
       "lastAction": "keputusan",
-      "lastReason": "PQLN [degen]: Dilewati: harga sudah -59% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Mouse [low]: Diveto LLM: Dolphin wallet has -18.9% avg PnL across our actual copies (0 wins), other two wallets show bot-like churn with tiny gains, and group is dominated by 2-min snip. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1446,6 +1446,50 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791593806958,
+        "symbol": "Mouse",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 1,
+          "dolphin": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 17.94% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 293,
+            "note": "bundler pegang 37.1%"
+          },
+          {
+            "type": "rat",
+            "count": 2,
+            "note": "insider/entrapment pegang 2.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 542,
+            "note": "19.3% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 34x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Dolphin wallet has -18.9% avg PnL across our actual copies (0 wins), other two wallets show bot-like churn with tiny gains, and group is dominated by 2-min snip. Tidak dimasuki."
+      },
       {
         "at": 1791588499092,
         "symbol": "PQLN",
@@ -2533,16 +2577,6 @@
           }
         ],
         "reason": "Diveto LLM: All four wallets have negative realized PnL despite 61-66% win rates, indicating they win small and lose big—high-churn scalpers with no asymmetric upside and o. Tidak dimasuki."
-      },
-      {
-        "at": 1791574156128,
-        "symbol": "NOTHING",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 8."
       }
     ],
     "reasonStats": {
@@ -2570,7 +2604,7 @@
         "jumlah": 2
       },
       "veto": {
-        "llm": 50
+        "llm": 51
       },
       "test": {
         "solo": 0,
@@ -2603,7 +2637,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791593845292,
+    "generatedAt": 1791594108036,
     "trades": {
       "count": 63,
       "wins": 23,
