@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "a97e97eb-98d0-468e-8281-27863f5b75b1",
-  "updatedAt": 1791612676168,
-  "generatedAt": "2026-10-10 13:11 WIB",
+  "generation": "25c29a9e-20ee-4e84-bd42-bc8d7b9dfe19",
+  "updatedAt": 1791612976169,
+  "generatedAt": "2026-10-10 13:16 WIB",
   "usdIdr": null,
   "totalUsd": 939.3131802110038,
   "nativeSymbol": "SOL",
@@ -1160,12 +1160,12 @@
     "pnlUsd": -60.68681978899622,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791612676168,
+    "heartbeatAt": 1791612976169,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.95,
-    "lastScanAt": 1791612674689,
+    "lastScanAt": 1791612975706,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1202,9 +1202,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791612676168,
+      "lastDecisionAt": 1791612976169,
       "lastAction": "keputusan",
-      "lastReason": "CODEC [mid]: Dilewati karena red flag: insider/entrapment pegang 33%."
+      "lastReason": "TM [degen]: Dilewati karena red flag: bundler pegang 34.96% supply."
     }
   },
   "strategy": {
@@ -1439,6 +1439,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791612756190,
+        "symbol": "TM",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 7
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 34.96% supply."
+      },
       {
         "at": 1791610858632,
         "symbol": "CODEC",
@@ -2600,16 +2617,6 @@
           }
         ],
         "reason": "Diveto LLM: Wallet smart #1310 is losing $850 real money (-12.9% ROI) with no x5+ winners, and both wallets show bot-like churn with very short median holds (~11-19 min), sugg. Tidak dimasuki."
-      },
-      {
-        "at": 1791578567780,
-        "symbol": "Tardigrade",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati: harga sudah -49% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2670,7 +2677,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791612709006,
+    "generatedAt": 1791613011271,
     "trades": {
       "count": 64,
       "wins": 23,
