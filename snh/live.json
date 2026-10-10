@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7226b1e9-ea03-4550-ad9a-ef81f089b274",
-  "updatedAt": 1791670576451,
-  "generatedAt": "2026-10-11 05:16 WIB",
+  "generation": "6fa11bb7-4870-4b51-83d1-696347e61d29",
+  "updatedAt": 1791670876451,
+  "generatedAt": "2026-10-11 05:21 WIB",
   "usdIdr": null,
-  "totalUsd": 938.5096028645414,
+  "totalUsd": 938.4743401287922,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 938.5096028645414,
+  "botWalletUsd": 938.4743401287922,
   "walletUsd": 932.7119769882378,
-  "lpUsd": 5.79762588,
+  "lpUsd": 5.76236314,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 4.332582043723255,
       "investedUsd": 4.332582043723255,
-      "principalUsd": 5.79762588,
-      "valueUsd": 5.79762588,
+      "principalUsd": 5.76236314,
+      "valueUsd": 5.76236314,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 1.465043832580382,
-      "pnlPct": 33.81,
+      "pnlUsd": 1.42978109683109,
+      "pnlPct": 33,
       "entryPriceUsd": 0.00019062702,
-      "priceUsd": 0.00026583228,
-      "ageMinutes": 875,
+      "priceUsd": 0.00026421429,
+      "ageMinutes": 880,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1137,18 +1137,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 932.7119769882378,
-    "positionsUsd": 5.79762588,
+    "positionsUsd": 5.76236314,
     "realizedUsd": -62.95544097,
-    "unrealizedUsd": 1.46504383,
-    "pnlUsd": -61.49039713545858,
+    "unrealizedUsd": 1.4297811,
+    "pnlUsd": -61.525659871207836,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791670576451,
+    "heartbeatAt": 1791670876451,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 7.02,
-    "lastScanAt": 1791670575900,
+    "drawdownPct": 7.03,
+    "lastScanAt": 1791670875562,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1163,13 +1163,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$1.4650",
+        "v": "+$1.4298",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "196",
+        "v": "197",
         "n": "24 jam · 43 diveto LLM"
       },
       {
@@ -1185,9 +1185,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791670576451,
+      "lastDecisionAt": 1791670876451,
       "lastAction": "keputusan",
-      "lastReason": "MOTHRADAR [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "CTS [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1422,6 +1422,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791670800329,
+        "symbol": "CTS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791670747967,
+        "symbol": "AnyPS5",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah -36% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791669396618,
         "symbol": "MOTHRADAR",
@@ -2329,48 +2350,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
-      },
-      {
-        "at": 1791652616048,
-        "symbol": "AT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati: harga sudah -57% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791652467830,
-        "symbol": "TPA",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 142,
-            "note": "bundler pegang 3.3%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.5%"
-          },
-          {
-            "type": "sniper",
-            "count": 20,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 4.9%"
-          }
-        ],
-        "reason": "Keluar (stale price): Harga token tidak bisa diambil lebih dari 15 menit, posisi ditutup demi keamanan. Hasil -5,6%."
       }
     ],
     "reasonStats": {
@@ -2381,7 +2360,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 108,
+        "red_flag": 109,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2431,7 +2410,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791670614296,
+    "generatedAt": 1791670921684,
     "trades": {
       "count": 75,
       "wins": 27,
@@ -2479,7 +2458,7 @@
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 938.13,
       "currentDrawdownPct": 6.69,
-      "currentDrawdownUsd": 67.25,
+      "currentDrawdownUsd": 67.29,
       "positiveDaysPct": 16.67,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2488,7 +2467,7 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -61.49,
+    "profitUsd": -61.53,
     "profitPct": -6.15,
     "recoveryFactor": -0.91,
     "score": {
