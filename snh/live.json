@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "93f20c77-22b5-4bcf-9f6f-325951d21aa6",
-  "updatedAt": 1791625276246,
-  "generatedAt": "2026-10-10 16:41 WIB",
+  "generation": "a49fd5ec-7f5e-4e74-8f92-92ca2d276b79",
+  "updatedAt": 1791625576246,
+  "generatedAt": "2026-10-10 16:46 WIB",
   "usdIdr": null,
-  "totalUsd": 941.6970872094848,
+  "totalUsd": 942.003528479468,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 941.6970872094848,
+  "botWalletUsd": 942.003528479468,
   "walletUsd": 935.2421180416587,
-  "lpUsd": 6.45496917,
+  "lpUsd": 6.76141044,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 4.332582043723255,
       "investedUsd": 4.332582043723255,
-      "principalUsd": 6.45496917,
-      "valueUsd": 6.45496917,
+      "principalUsd": 6.76141044,
+      "valueUsd": 6.76141044,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 2.122387124102909,
-      "pnlPct": 48.99,
+      "pnlUsd": 2.4288283940859428,
+      "pnlPct": 56.06,
       "entryPriceUsd": 0.00019062702,
-      "priceUsd": 0.00029598832,
-      "ageMinutes": 120,
+      "priceUsd": 0.00031004475,
+      "ageMinutes": 125,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1209,18 +1209,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 935.2421180416587,
-    "positionsUsd": 6.45496917,
+    "positionsUsd": 6.76141044,
     "realizedUsd": -60.42529991,
-    "unrealizedUsd": 2.12238712,
-    "pnlUsd": -58.302912790515165,
+    "unrealizedUsd": 2.42882839,
+    "pnlUsd": -57.996471520532054,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791625276246,
+    "heartbeatAt": 1791625576246,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 6.71,
-    "lastScanAt": 1791625272995,
+    "drawdownPct": 6.68,
+    "lastScanAt": 1791625575612,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1235,14 +1235,14 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$2.1224",
+        "v": "+$2.4288",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "192",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "194",
+        "n": "24 jam · 46 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1257,9 +1257,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791625276246,
+      "lastDecisionAt": 1791625576246,
       "lastAction": "keputusan",
-      "lastReason": "REDO [degen]: Diveto LLM: Both wallets show negative realized PnL (-$487, -$307) despite ~62% win rate, zero over-5x winners, and 300+ tokens/week churn—classic degen pattern of winning . Tidak dimasuki."
+      "lastReason": "Jef [degen]: Diveto LLM: smart #299 has a losing copy history (-8.7% avg) and both wallets show high churn with most wins under 2x; lacks copy validation and over-x5 winners needed for co. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1494,6 +1494,100 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791625519451,
+        "symbol": "Jef",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 20.23% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 296,
+            "note": "bundler pegang 29.9%"
+          },
+          {
+            "type": "rat",
+            "count": 4,
+            "note": "insider/entrapment pegang 0.1%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 2.8%"
+          },
+          {
+            "type": "fresh",
+            "count": 352,
+            "note": "17.7% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 12x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: smart #299 has a losing copy history (-8.7% avg) and both wallets show high churn with most wins under 2x; lacks copy validation and over-x5 winners needed for co. Tidak dimasuki."
+      },
+      {
+        "at": 1791625373496,
+        "symbol": "Jef",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 20.23% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 276,
+            "note": "bundler pegang 30.9%"
+          },
+          {
+            "type": "rat",
+            "count": 4,
+            "note": "insider/entrapment pegang 1.5%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 2.8%"
+          },
+          {
+            "type": "fresh",
+            "count": 303,
+            "note": "17.1% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 12x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets share 'axiom' tag suggesting same operator, smart #299 has negative copy history (-8.7%), both show heavy churn with ~40% winrate and dominant loss o. Tidak dimasuki."
+      },
       {
         "at": 1791625115817,
         "symbol": "REDO",
@@ -2377,66 +2471,6 @@
           }
         ],
         "reason": "Diveto LLM: dolphin #1317 has failed copy history (-26.5% avg PnL, 0/2 wins), all wallets show high token churn with minimal x5+ winners, and the axiom tag suggests possible coo. Tidak dimasuki."
-      },
-      {
-        "at": 1791587703328,
-        "symbol": "BUNKER",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 31.12% supply."
-      },
-      {
-        "at": 1791587472782,
-        "symbol": "WHOP",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 132,
-            "note": "bundler pegang 24.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 170,
-            "note": "14.7% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: dolphin #1934 is strong but smart #913 drags the basket down with poor 31% winrate, heavy churn, and our_copies showing -8.5% avg loss—past copy history failing this w. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2464,7 +2498,7 @@
         "jumlah": 2
       },
       "veto": {
-        "llm": 44
+        "llm": 46
       },
       "test": {
         "solo": 0,
@@ -2497,7 +2531,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791625313479,
+    "generatedAt": 1791625612788,
     "trades": {
       "count": 64,
       "wins": 23,
@@ -2538,14 +2572,14 @@
     "equity": {
       "days": 5,
       "spanDays": 5.2,
-      "returnPct": -5.83,
+      "returnPct": -5.8,
       "maxDrawdownPct": 6.61,
       "maxDrawdownAt": 1791596176065,
       "maxDrawdownUsd": 66.45,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 939.31,
-      "currentDrawdownPct": 6.37,
-      "currentDrawdownUsd": 64.06,
+      "currentDrawdownPct": 6.34,
+      "currentDrawdownUsd": 63.76,
       "positiveDaysPct": 20,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2554,9 +2588,9 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -58.3,
-    "profitPct": -5.83,
-    "recoveryFactor": -0.88,
+    "profitUsd": -58,
+    "profitPct": -5.8,
+    "recoveryFactor": -0.87,
     "score": {
       "axes": {
         "winRate": 35.94,
