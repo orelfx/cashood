@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c821cdc1-e6ce-4bb4-b44a-ac48e53b7b86",
-  "updatedAt": 1791613876191,
-  "generatedAt": "2026-10-10 13:31 WIB",
+  "generation": "15810da1-44ed-41b0-b08b-de7d960adb13",
+  "updatedAt": 1791614176191,
+  "generatedAt": "2026-10-10 13:36 WIB",
   "usdIdr": null,
   "totalUsd": 939.3131802110038,
   "nativeSymbol": "SOL",
@@ -1160,12 +1160,12 @@
     "pnlUsd": -60.68681978899622,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791613876191,
+    "heartbeatAt": 1791614176191,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.95,
-    "lastScanAt": 1791613875697,
+    "lastScanAt": 1791614175455,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1186,12 +1186,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "186",
+        "v": "187",
         "n": "24 jam · 42 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "1954",
+        "v": "1955",
         "n": "170 aktif"
       },
       {
@@ -1202,9 +1202,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791613876191,
+      "lastDecisionAt": 1791614176191,
       "lastAction": "keputusan",
-      "lastReason": "QTC [degen]: Dilewati karena red flag: bundler pegang 64.31% supply."
+      "lastReason": "REELS [low]: Dilewati karena red flag: 41% holder wallet baru (sybil)."
     }
   },
   "strategy": {
@@ -1223,7 +1223,7 @@
       ],
       [
         "Wallet dipantau",
-        "1954 · 170 aktif"
+        "1955 · 170 aktif"
       ],
       [
         "Cadangan kas",
@@ -1235,7 +1235,7 @@
       ],
       [
         "Label wallet",
-        "smart 544 · dolphin 50 · bot 1020 · blacklist 184 · lp 1 · fresh 35 · kol 117 · whale 3"
+        "smart 544 · dolphin 50 · bot 1020 · blacklist 184 · lp 1 · fresh 35 · kol 118 · whale 3"
       ]
     ],
     "requirements": [
@@ -1283,9 +1283,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 1954,
+      "tracked": 1955,
       "active": 170,
-      "passive": 1784,
+      "passive": 1785,
       "trusted": 4,
       "promising": 13,
       "byLabel": [
@@ -1309,9 +1309,9 @@
         },
         {
           "key": "kol",
-          "total": 117,
+          "total": 118,
           "active": 15,
-          "passive": 102
+          "passive": 103
         },
         {
           "key": "dolphin",
@@ -1439,6 +1439,25 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791614036953,
+        "symbol": "REELS",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "kol": 1,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: 41% holder wallet baru (sybil)."
+      },
       {
         "at": 1791613713096,
         "symbol": "QTC",
@@ -2573,33 +2592,6 @@
           }
         ],
         "reason": "Keluar (follow exit): 1 dari 2 wallet yang diikuti sudah menjual setelah 1 menit, jadi posisi ikut ditutup. Hasil -17,4%."
-      },
-      {
-        "at": 1791579523392,
-        "symbol": "QCAT",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 21,
-            "note": "bundler pegang 6.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 18,
-            "note": "6.9% holder wallet baru"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2610,7 +2602,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 101,
+        "red_flag": 102,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2660,7 +2652,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791613909864,
+    "generatedAt": 1791614210075,
     "trades": {
       "count": 64,
       "wins": 23,
