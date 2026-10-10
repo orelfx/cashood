@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1c29391a-f3be-474f-84a7-88c80b1bcdd3",
-  "updatedAt": 1791632776262,
-  "generatedAt": "2026-10-10 18:46 WIB",
+  "generation": "568ab48d-6ef2-4076-974b-4435d2a0356d",
+  "updatedAt": 1791633076263,
+  "generatedAt": "2026-10-10 18:51 WIB",
   "usdIdr": null,
-  "totalUsd": 940.2057219163125,
+  "totalUsd": 940.1031945635701,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 940.2057219163125,
+  "botWalletUsd": 940.1031945635701,
   "walletUsd": 934.7252356400248,
-  "lpUsd": 5.48048628,
+  "lpUsd": 5.37795892,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 4.332582043723255,
       "investedUsd": 4.332582043723255,
-      "principalUsd": 5.48048628,
-      "valueUsd": 5.48048628,
+      "principalUsd": 5.37795892,
+      "valueUsd": 5.37795892,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 1.1479042325644615,
-      "pnlPct": 26.49,
+      "pnlUsd": 1.0453768798220668,
+      "pnlPct": 24.13,
       "entryPriceUsd": 0.00019062702,
-      "priceUsd": 0.00025129935,
-      "ageMinutes": 245,
+      "priceUsd": 0.00024659637,
+      "ageMinutes": 250,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1213,18 +1213,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 934.7252356400248,
-    "positionsUsd": 5.48048628,
-    "realizedUsd": -60.94218231,
-    "unrealizedUsd": 1.14790423,
-    "pnlUsd": -59.79427808368746,
+    "positionsUsd": 5.37795892,
+    "realizedUsd": -60.94218232,
+    "unrealizedUsd": 1.04537688,
+    "pnlUsd": -59.89680543642987,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791632776262,
+    "heartbeatAt": 1791633076263,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 6.86,
-    "lastScanAt": 1791632773329,
+    "drawdownPct": 6.87,
+    "lastScanAt": 1791633072522,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1239,14 +1239,14 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$1.1479",
+        "v": "+$1.0454",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "193",
-        "n": "24 jam · 48 diveto LLM"
+        "v": "196",
+        "n": "24 jam · 49 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1261,9 +1261,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791632776262,
+      "lastDecisionAt": 1791633076263,
       "lastAction": "keputusan",
-      "lastReason": "TELG [degen]: Dilewati karena red flag: holder baru 6."
+      "lastReason": "RICK [degen]: Dilewati karena red flag: bundler pegang 26% supply."
     }
   },
   "strategy": {
@@ -1294,7 +1294,7 @@
       ],
       [
         "Label wallet",
-        "smart 553 · dolphin 52 · bot 1020 · blacklist 188 · lp 1 · fresh 36 · kol 117 · whale 3"
+        "smart 553 · dolphin 52 · bot 1020 · blacklist 189 · lp 1 · fresh 36 · kol 116 · whale 3"
       ]
     ],
     "requirements": [
@@ -1362,15 +1362,15 @@
         },
         {
           "key": "blacklist",
-          "total": 188,
+          "total": 189,
           "active": 0,
-          "passive": 188
+          "passive": 189
         },
         {
           "key": "kol",
-          "total": 117,
+          "total": 116,
           "active": 15,
-          "passive": 102
+          "passive": 101
         },
         {
           "key": "dolphin",
@@ -1498,6 +1498,68 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791633023691,
+        "symbol": "RICK",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 26% supply."
+      },
+      {
+        "at": 1791633022300,
+        "symbol": "RICK",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 99,
+            "note": "bundler pegang 22.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 3.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 1.3%"
+          },
+          {
+            "type": "fresh",
+            "count": 59,
+            "note": "7.4% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets lack any over-5x winners and two have negative realized PnL despite high winrate (squeezing pennies, bleeding on losses); our single copy on w. Tidak dimasuki."
+      },
+      {
+        "at": 1791632969591,
+        "symbol": "DUREV",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 13."
+      },
+      {
+        "at": 1791632803625,
+        "symbol": "BLUE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 6."
+      },
       {
         "at": 1791632646890,
         "symbol": "TELG",
@@ -2383,47 +2445,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: dev masih pegang 17.96%."
-      },
-      {
-        "at": 1791605140329,
-        "symbol": "GPU",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -72% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791604957104,
-        "symbol": "Samurai",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 19.03%."
-      },
-      {
-        "at": 1791604537243,
-        "symbol": "GPU",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -39% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791602662230,
-        "symbol": "PW",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 45% supply."
       }
     ],
     "reasonStats": {
@@ -2434,7 +2455,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 103,
+        "red_flag": 105,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2451,7 +2472,7 @@
         "jumlah": 2
       },
       "veto": {
-        "llm": 48
+        "llm": 49
       },
       "test": {
         "solo": 0,
@@ -2484,7 +2505,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791632816124,
+    "generatedAt": 1791633116164,
     "trades": {
       "count": 65,
       "wins": 23,
@@ -2525,14 +2546,14 @@
     "equity": {
       "days": 5,
       "spanDays": 5.3,
-      "returnPct": -5.98,
+      "returnPct": -5.99,
       "maxDrawdownPct": 6.61,
       "maxDrawdownAt": 1791596176065,
       "maxDrawdownUsd": 66.45,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 939.31,
-      "currentDrawdownPct": 6.52,
-      "currentDrawdownUsd": 65.55,
+      "currentDrawdownPct": 6.53,
+      "currentDrawdownUsd": 65.66,
       "positiveDaysPct": 20,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2541,8 +2562,8 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -59.79,
-    "profitPct": -5.98,
+    "profitUsd": -59.9,
+    "profitPct": -5.99,
     "recoveryFactor": -0.9,
     "score": {
       "axes": {
