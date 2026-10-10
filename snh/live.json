@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f2a48162-b162-4343-b504-76247d5e95c3",
-  "updatedAt": 1791635176266,
-  "generatedAt": "2026-10-10 19:26 WIB",
+  "generation": "e10afb8d-2799-400f-8d40-5e28cba1e288",
+  "updatedAt": 1791635476267,
+  "generatedAt": "2026-10-10 19:31 WIB",
   "usdIdr": null,
   "totalUsd": 939.1051209999447,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": 29.28,
       "entryPriceUsd": 0.00019062702,
       "priceUsd": 0.00025682686,
-      "ageMinutes": 285,
+      "ageMinutes": 290,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1220,12 +1220,12 @@
     "pnlUsd": -60.89487900005531,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791635176266,
+    "heartbeatAt": 1791635476267,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.97,
-    "lastScanAt": 1791635174999,
+    "lastScanAt": 1791635475423,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1246,8 +1246,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "198",
-        "n": "24 jam · 49 diveto LLM"
+        "v": "199",
+        "n": "24 jam · 50 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1262,9 +1262,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791635176266,
+      "lastDecisionAt": 1791635476267,
       "lastAction": "keputusan",
-      "lastReason": "BATON [degen]: Dilewati karena red flag: holder baru 7."
+      "lastReason": "ROSE [degen]: Diveto LLM: Both wallets show negative realized PnL (-$487, -$307) with high churn (~330 tokens/week) and zero over-5x wins in the last 7 days—scapling losers that lose mon. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1499,6 +1499,38 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791635200973,
+        "symbol": "ROSE",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 12.37% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 181,
+            "note": "bundler pegang 24.9%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 7.9%"
+          },
+          {
+            "type": "fresh",
+            "count": 117,
+            "note": "8.7% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show negative realized PnL (-$487, -$307) with high churn (~330 tokens/week) and zero over-5x wins in the last 7 days—scapling losers that lose mon. Tidak dimasuki."
+      },
       {
         "at": 1791634274087,
         "symbol": "BATON",
@@ -2383,17 +2415,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 34.96% supply."
-      },
-      {
-        "at": 1791610858632,
-        "symbol": "CODEC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 33%."
       }
     ],
     "reasonStats": {
@@ -2421,7 +2442,7 @@
         "jumlah": 2
       },
       "veto": {
-        "llm": 49
+        "llm": 50
       },
       "test": {
         "solo": 0,
@@ -2454,7 +2475,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791635214898,
+    "generatedAt": 1791635517061,
     "trades": {
       "count": 66,
       "wins": 23,
