@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5365a8b1-d291-4148-8346-f71d48bec2ea",
-  "updatedAt": 1791607276134,
-  "generatedAt": "2026-10-10 11:41 WIB",
+  "generation": "dee7d5ca-1c9a-4328-a812-231255af67d2",
+  "updatedAt": 1791607576134,
+  "generatedAt": "2026-10-10 11:46 WIB",
   "usdIdr": null,
   "totalUsd": 939.3131802110038,
   "nativeSymbol": "SOL",
@@ -1160,12 +1160,12 @@
     "pnlUsd": -60.68681978899622,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791607276134,
+    "heartbeatAt": 1791607576134,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.95,
-    "lastScanAt": 1791607274621,
+    "lastScanAt": 1791607575530,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1187,7 +1187,7 @@
       {
         "k": "Sinyal wallet",
         "v": "190",
-        "n": "24 jam · 48 diveto LLM"
+        "n": "24 jam · 49 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1202,9 +1202,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791607276134,
+      "lastDecisionAt": 1791607576134,
       "lastAction": "keputusan",
-      "lastReason": "DOTF [big]: Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
+      "lastReason": "SUPER [degen]: Diveto LLM: Both wallets show weak asymmetric upside (no winners over 2x, smart #1053 has sniper behavior with 12 rapid exits and 184 tokens churn) and neither has proven copy. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1440,7 +1440,39 @@
     },
     "decisions": [
       {
-        "at": 1791606766702,
+        "at": 1791607430333,
+        "symbol": "SUPER",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 19,
+            "note": "bundler pegang 24.5%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 2.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 51,
+            "note": "17.1% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 7x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show weak asymmetric upside (no winners over 2x, smart #1053 has sniper behavior with 12 rapid exits and 184 tokens churn) and neither has proven copy. Tidak dimasuki."
+      },
+      {
+        "at": 1791607367160,
         "symbol": "DOTF",
         "action": "skip",
         "basket": "big",
@@ -2592,54 +2624,17 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show severe red flags: Nova has a 30% winrate with zero over_x5 wins and 70k followers creating crowding risk; smart #1365 has 17.5% sniper trades and. Tidak dimasuki."
-      },
-      {
-        "at": 1791577675559,
-        "symbol": "BUTT",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 98,
-            "note": "bundler pegang 18.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 8.2%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 21.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 122,
-            "note": "9.2% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Diveto LLM: smart #1365 has a -47.2% avg PnL on our sole copy and 274 round trips with 48 sub-2min exits indicating bot/sniper behavior; smart #1891 lacks copy history to validat. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 30,
+        "below_entry": 28,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 98,
+        "red_flag": 99,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2656,7 +2651,7 @@
         "jumlah": 2
       },
       "veto": {
-        "llm": 48
+        "llm": 49
       },
       "test": {
         "solo": 0,
@@ -2689,7 +2684,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791607312756,
+    "generatedAt": 1791607611557,
     "trades": {
       "count": 64,
       "wins": 23,
