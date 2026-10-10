@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d9e73257-aa9e-4875-8f5d-af10e5d09135",
-  "updatedAt": 1791637876279,
-  "generatedAt": "2026-10-10 20:11 WIB",
+  "generation": "943d1716-abee-4533-90fe-b4726259d6c7",
+  "updatedAt": 1791638176280,
+  "generatedAt": "2026-10-10 20:16 WIB",
   "usdIdr": null,
-  "totalUsd": 939.1524950017204,
+  "totalUsd": 939.1544569464855,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 939.1524950017204,
+  "botWalletUsd": 939.1544569464855,
   "walletUsd": 933.5040697526025,
-  "lpUsd": 5.64842525,
+  "lpUsd": 5.65038719,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 4.332582043723255,
       "investedUsd": 4.332582043723255,
-      "principalUsd": 5.64842525,
-      "valueUsd": 5.64842525,
+      "principalUsd": 5.65038719,
+      "valueUsd": 5.65038719,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 1.3158432053945726,
-      "pnlPct": 30.37,
+      "pnlUsd": 1.3178051501597983,
+      "pnlPct": 30.42,
       "entryPriceUsd": 0.00019062702,
-      "priceUsd": 0.000259,
-      "ageMinutes": 330,
+      "priceUsd": 0.00025909101,
+      "ageMinutes": 335,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1214,18 +1214,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 933.5040697526025,
-    "positionsUsd": 5.64842525,
-    "realizedUsd": -62.16334821,
-    "unrealizedUsd": 1.31584321,
-    "pnlUsd": -60.847504998279646,
+    "positionsUsd": 5.65038719,
+    "realizedUsd": -62.1633482,
+    "unrealizedUsd": 1.31780515,
+    "pnlUsd": -60.84554305351446,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791637876279,
+    "heartbeatAt": 1791638176280,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.96,
-    "lastScanAt": 1791637851360,
+    "lastScanAt": 1791638172280,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1240,14 +1240,14 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$1.3158",
+        "v": "+$1.3178",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "193",
-        "n": "24 jam · 47 diveto LLM"
+        "v": "192",
+        "n": "24 jam · 48 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1256,15 +1256,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "12 · 12",
+        "v": "12 · 11",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791637876279,
+      "lastDecisionAt": 1791638176280,
       "lastAction": "keputusan",
-      "lastReason": "HOTBOT [mid]: Dilewati karena red flag: insider/entrapment pegang 21%."
+      "lastReason": "Pepper [low]: Diveto LLM: Mixed signals: one wallet (dolphin #257) has positive copy history but high churn and low winrate, another (smart #1858) shows bot/sniper behavior with 26/53 trades so. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1499,6 +1499,29 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791638009290,
+        "symbol": "Pepper",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "no_data",
+            "count": null,
+            "note": "data holder/bundler/dev dari GMGN tidak tersedia; harga dari DexScreener"
+          }
+        ],
+        "reason": "Diveto LLM: Mixed signals: one wallet (dolphin #257) has positive copy history but high churn and low winrate, another (smart #1858) shows bot/sniper behavior with 26/53 trades so. Tidak dimasuki."
+      },
       {
         "at": 1791637327396,
         "symbol": "HOTBOT",
@@ -2405,25 +2428,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 23%."
-      },
-      {
-        "at": 1791614036953,
-        "symbol": "REELS",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "kol": 1,
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: 41% holder wallet baru (sybil)."
       }
     ],
     "reasonStats": {
@@ -2434,7 +2438,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 104,
+        "red_flag": 102,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2451,7 +2455,7 @@
         "jumlah": 2
       },
       "veto": {
-        "llm": 47
+        "llm": 48
       },
       "test": {
         "solo": 0,
@@ -2470,7 +2474,7 @@
         "follow exit": 5,
         "take profit": 0,
         "stop": 6,
-        "trailing": 1,
+        "trailing": 0,
         "time limit": 0,
         "rug": 0,
         "stale price": 0,
@@ -2484,7 +2488,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791637917072,
+    "generatedAt": 1791638235543,
     "trades": {
       "count": 66,
       "wins": 23,
