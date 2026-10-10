@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "72a46a85-b966-43d6-9cf0-e488131f88e2",
-  "updatedAt": 1791599176067,
-  "generatedAt": "2026-10-10 09:26 WIB",
+  "generation": "3991dfc7-7617-459b-9152-e5bf3f66db48",
+  "updatedAt": 1791599476084,
+  "generatedAt": "2026-10-10 09:31 WIB",
   "usdIdr": null,
   "totalUsd": 939.3131802110038,
   "nativeSymbol": "SOL",
@@ -1160,12 +1160,12 @@
     "pnlUsd": -60.68681978899622,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791599176067,
+    "heartbeatAt": 1791599476084,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.95,
-    "lastScanAt": 1791599175298,
+    "lastScanAt": 1791599471904,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1186,7 +1186,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "195",
+        "v": "196",
         "n": "24 jam · 50 diveto LLM"
       },
       {
@@ -1202,9 +1202,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791599176067,
+      "lastDecisionAt": 1791599476084,
       "lastAction": "keputusan",
-      "lastReason": "BNKR [degen]: Masuk: konsensus wallet terpenuhi dan semua cek lolos."
+      "lastReason": "SIB [low]: Dilewati karena red flag: sniper awal masih pegang 35%."
     }
   },
   "strategy": {
@@ -1439,6 +1439,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791599197967,
+        "symbol": "SIB",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: sniper awal masih pegang 35%."
+      },
       {
         "at": 1791596065057,
         "symbol": "BNKR",
@@ -2591,16 +2608,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791574402136,
-        "symbol": "Quantum",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 18."
       }
     ],
     "reasonStats": {
@@ -2611,7 +2618,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 97,
+        "red_flag": 98,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 2,
@@ -2661,7 +2668,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791599218913,
+    "generatedAt": 1791599525152,
     "trades": {
       "count": 64,
       "wins": 23,
