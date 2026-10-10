@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1bae18ab-535b-4203-b0f3-0996986c3bcf",
-  "updatedAt": 1791640576306,
-  "generatedAt": "2026-10-10 20:56 WIB",
+  "generation": "a70133ed-d41c-4845-b965-2a4219957646",
+  "updatedAt": 1791640876306,
+  "generatedAt": "2026-10-10 21:01 WIB",
   "usdIdr": null,
   "totalUsd": 940.2725748277056,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": 34.43,
       "entryPriceUsd": 0.00019062702,
       "priceUsd": 0.00026706962,
-      "ageMinutes": 375,
+      "ageMinutes": 380,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1245,12 +1245,12 @@
     "pnlUsd": -59.727425172294375,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791640576306,
+    "heartbeatAt": 1791640876306,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.85,
-    "lastScanAt": 1791640574510,
+    "lastScanAt": 1791640874571,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1271,7 +1271,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "207",
+        "v": "208",
         "n": "24 jam · 57 diveto LLM"
       },
       {
@@ -1287,9 +1287,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791640576306,
+      "lastDecisionAt": 1791640876306,
       "lastAction": "keputusan",
-      "lastReason": "patryczek [degen]: Dilewati: harga sudah -46% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "BLUE [degen]: Dilewati karena red flag: holder baru 9."
     }
   },
   "strategy": {
@@ -1524,6 +1524,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791640859986,
+        "symbol": "BLUE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 9."
+      },
       {
         "at": 1791640497099,
         "symbol": "patryczek",
@@ -2674,54 +2684,6 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show negative ROI this week with tiny median gains (3-6%), extremely high token churn (330+/week) with zero over-5x winners, suggesting scalping st. Tidak dimasuki."
-      },
-      {
-        "at": 1791625519451,
-        "symbol": "Jef",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "bot": 1,
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 20.23% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 296,
-            "note": "bundler pegang 29.9%"
-          },
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 0.1%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 2.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 352,
-            "note": "17.7% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 12x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: smart #299 has a losing copy history (-8.7% avg) and both wallets show high churn with most wins under 2x; lacks copy validation and over-x5 winners needed for co. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2732,7 +2694,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 107,
+        "red_flag": 108,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2782,7 +2744,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791640618584,
+    "generatedAt": 1791640918424,
     "trades": {
       "count": 67,
       "wins": 24,
