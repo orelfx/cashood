@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ac07fa8d-abc8-4871-a0fd-b60691498759",
-  "updatedAt": 1791711976599,
-  "generatedAt": "2026-10-11 16:46 WIB",
+  "generation": "7b6256f4-d143-4f1b-bb35-71192bacc8e2",
+  "updatedAt": 1791712276601,
+  "generatedAt": "2026-10-11 16:51 WIB",
   "usdIdr": null,
   "totalUsd": 937.4341914849538,
   "nativeSymbol": "SOL",
@@ -977,12 +977,12 @@
     "pnlUsd": -62.56580851504623,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791711976599,
+    "heartbeatAt": 1791712276601,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.13,
-    "lastScanAt": 1791711973000,
+    "lastScanAt": 1791712273358,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1003,7 +1003,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "185",
+        "v": "186",
         "n": "24 jam · 36 diveto LLM"
       },
       {
@@ -1019,9 +1019,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791711976599,
+      "lastDecisionAt": 1791712276601,
       "lastAction": "keputusan",
-      "lastReason": "Claudia [degen]: Dilewati: harga sudah -36% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Normie [low]: Menunggu pullback: harga sudah +68% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
     }
   },
   "strategy": {
@@ -1256,6 +1256,55 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791712234732,
+        "symbol": "Normie",
+        "action": "wait",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 1,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 278,
+            "note": "bundler pegang 28.4%"
+          },
+          {
+            "type": "rat",
+            "count": 7,
+            "note": "insider/entrapment pegang 7.6%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 10.9%"
+          },
+          {
+            "type": "fresh",
+            "count": 494,
+            "note": "9.9% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 14x likuiditas"
+          }
+        ],
+        "reason": "Menunggu pullback: harga sudah +68% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
+      },
       {
         "at": 1791710314760,
         "symbol": "Claudia",
@@ -2304,23 +2353,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 1."
-      },
-      {
-        "at": 1791679050691,
-        "symbol": "b",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 87,
-            "note": "bundler pegang 7.5%"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2342,7 +2374,7 @@
         "reserve": 0
       },
       "wait": {
-        "jumlah": 1
+        "jumlah": 2
       },
       "add": {
         "jumlah": 1
@@ -2381,7 +2413,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791712009444,
+    "generatedAt": 1791712309363,
     "trades": {
       "count": 87,
       "wins": 30,
