@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c573cfa0-22d6-4e1c-9e5a-714761f93da0",
-  "updatedAt": 1791726076690,
-  "generatedAt": "2026-10-11 20:41 WIB",
+  "generation": "945f7b53-bced-4035-81b4-e510f30ec1e0",
+  "updatedAt": 1791726376696,
+  "generatedAt": "2026-10-11 20:46 WIB",
   "usdIdr": null,
-  "totalUsd": 936.2121393294461,
+  "totalUsd": 936.354957010789,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 936.2121393294461,
+  "botWalletUsd": 936.354957010789,
   "walletUsd": 926.1223982372532,
-  "lpUsd": 10.08974109,
+  "lpUsd": 10.23255877,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "degen",
       "costUsd": 10.87086181662499,
       "investedUsd": 10.87086181662499,
-      "principalUsd": 10.08974109,
-      "valueUsd": 10.08974109,
+      "principalUsd": 10.23255877,
+      "valueUsd": 10.23255877,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -0.781120724431986,
-      "pnlPct": -7.19,
+      "pnlUsd": -0.6383030430891754,
+      "pnlPct": -5.87,
       "entryPriceUsd": 0.000046000751,
-      "priceUsd": 0.000044554213,
-      "ageMinutes": 4,
+      "priceUsd": 0.00004518506,
+      "ageMinutes": 9,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1090,18 +1090,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 926.1223982372532,
-    "positionsUsd": 10.08974109,
+    "positionsUsd": 10.23255877,
     "realizedUsd": -63.00673995,
-    "unrealizedUsd": -0.78112072,
-    "pnlUsd": -63.78786067055387,
+    "unrealizedUsd": -0.63830304,
+    "pnlUsd": -63.64504298921099,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791726076690,
+    "heartbeatAt": 1791726376696,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 7.25,
-    "lastScanAt": 1791726076503,
+    "drawdownPct": 7.24,
+    "lastScanAt": 1791726373226,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1116,14 +1116,14 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$0.7811",
+        "v": "−$0.6383",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "204",
-        "n": "24 jam · 34 diveto LLM"
+        "v": "199",
+        "n": "24 jam · 32 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1138,9 +1138,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791726076690,
+      "lastDecisionAt": 1791726376696,
       "lastAction": "keputusan",
-      "lastReason": "CYBERLEEK [mid]: Dilewati: harga sudah -16% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "DOPE [degen]: Dilewati karena red flag: holder baru 12."
     }
   },
   "strategy": {
@@ -1375,6 +1375,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791726265296,
+        "symbol": "DOPE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 12."
+      },
+      {
+        "at": 1791726185976,
+        "symbol": "DOPE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 26x."
+      },
       {
         "at": 1791726050887,
         "symbol": "CYBERLEEK",
@@ -2205,100 +2232,6 @@
           }
         ],
         "reason": "Diveto LLM: One wallet is a losing degen (38% winrate, -$215 PnL, 292 tokens, 26 dumps >50%) and the other, while profitable, carries a 'trojan' tag with only 1 observed ro. Tidak dimasuki."
-      },
-      {
-        "at": 1791716883749,
-        "symbol": "NICKIMINAJ",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 13.9% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 271,
-            "note": "bundler pegang 23.2%"
-          },
-          {
-            "type": "rat",
-            "count": 9,
-            "note": "insider/entrapment pegang 3.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 322,
-            "note": "6.2% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 6x likuiditas"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 2 menit. Hasil +1,6%."
-      },
-      {
-        "at": 1791716860714,
-        "symbol": "NICKIMINAJ",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 13.9% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 271,
-            "note": "bundler pegang 23.2%"
-          },
-          {
-            "type": "rat",
-            "count": 9,
-            "note": "insider/entrapment pegang 3.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 322,
-            "note": "6.2% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 6x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $3,16; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
@@ -2309,7 +2242,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 108,
+        "red_flag": 105,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2326,7 +2259,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 34
+        "llm": 32
       },
       "test": {
         "solo": 0,
@@ -2359,7 +2292,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791726109562,
+    "generatedAt": 1791726409387,
     "trades": {
       "count": 92,
       "wins": 32,
@@ -2400,14 +2333,14 @@
     "equity": {
       "days": 6,
       "spanDays": 6.4,
-      "returnPct": -6.38,
+      "returnPct": -6.36,
       "maxDrawdownPct": 7.1,
       "maxDrawdownAt": 1791684976542,
       "maxDrawdownUsd": 71.43,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 934.33,
-      "currentDrawdownPct": 6.91,
-      "currentDrawdownUsd": 69.55,
+      "currentDrawdownPct": 6.9,
+      "currentDrawdownUsd": 69.4,
       "positiveDaysPct": 16.67,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2416,8 +2349,8 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -63.79,
-    "profitPct": -6.38,
+    "profitUsd": -63.65,
+    "profitPct": -6.36,
     "recoveryFactor": -0.89,
     "score": {
       "axes": {
