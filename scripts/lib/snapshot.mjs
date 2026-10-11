@@ -3,7 +3,7 @@ import { atomicJSON, downsample, generation, publicSnapshot, readJSON } from './
 import { resolve, dirname } from 'node:path';
 import { buildPerformance } from './performance.mjs';
 import { groupTradeDays, writeTradeDays } from './trades.mjs';
-export function reconcile(snapshot, cfg, previous = null) {
+export function reconcile(snapshot, cfg, previous = null, { acceptJump = false } = {}) {
   snapshot.schemaVersion = 2;
   snapshot.generation ||= generation();
   snapshot.holdings = snapshot.holdings.map(h => ({ ...h, price: h.price ?? h.priceUsd ?? null, usd: Core.money(Core.number(h.usd, 'Saldo token', 0)) }));
@@ -32,7 +32,7 @@ export function reconcile(snapshot, cfg, previous = null) {
     // itu dalam satu siklus (token di pool anjlok), jadi batasnya boleh diatur
     // per dana lewat fund.navGuardPct — tetap ada pagar untuk salah baca total.
     const guard=Number(cfg.fund?.navGuardPct)>0?Number(cfg.fund.navGuardPct)/100:0.30;
-    if (expected>0 && Math.abs(snapshot.totalUsd-expected)/expected>guard) throw new Error(`Perubahan NAV >${Math.round(guard*100)}% tanpa arus kas setara: perlu rekonsiliasi sumber`);
+    if (!acceptJump && expected>0 && Math.abs(snapshot.totalUsd-expected)/expected>guard) { const e=new Error(`Perubahan NAV >${Math.round(guard*100)}% tanpa arus kas setara: perlu rekonsiliasi sumber`); e.navJump=true; throw e; }
   }
   Core.validateSnapshot(snapshot);
   return snapshot;
@@ -40,7 +40,25 @@ export function reconcile(snapshot, cfg, previous = null) {
 export function saveSnapshot(out, snapshot, cfg) {
   const dir=dirname(out), local=resolve(dir,'snapshot.local.json');
   const previous=readJSON(local);
-  reconcile(snapshot,cfg,previous);
+  // Pemulihan: kalau snapshot terakhir yang terbit ternyata salah baca, guard
+  // menolak SEMUA pembacaan benar sesudahnya dan dana macet selamanya. Pembacaan
+  // yang ditolak dicatat; begitu ≥3 pembacaan berturut-turut selama ≥10 menit
+  // saling cocok (±15%), nilai baru diterima sebagai patokan baru.
+  const qPath=resolve(dir,'nav-quarantine.local.json');
+  try { reconcile(snapshot,cfg,previous); atomicJSON(qPath,{rejected:[]}); }
+  catch (err) {
+    if (!err.navJump) throw err;
+    const q=readJSON(qPath,{rejected:[]});
+    const rejected=[...(q.rejected||[]),{t:snapshot.updatedAt,usd:snapshot.totalUsd}].filter((r)=>snapshot.updatedAt-r.t<3*3600e3).slice(-12);
+    atomicJSON(qPath,{rejected});
+    const tail=rejected.slice(-3), lo=Math.min(...tail.map((r)=>r.usd)), hi=Math.max(...tail.map((r)=>r.usd));
+    const steady=tail.length>=3 && tail[2].t-tail[0].t>=10*60e3 && lo>0 && (hi-lo)/lo<=0.15;
+    if (!steady) throw err;
+    reconcile(snapshot,cfg,previous,{acceptJump:true});
+    snapshot.quality.reasons=[...(snapshot.quality.reasons||[]),'nilai berubah besar dan konsisten di beberapa pembacaan; diterima sebagai patokan baru'];
+    atomicJSON(qPath,{rejected:[],acceptedAt:snapshot.updatedAt,from:previous?.totalUsd??null,to:snapshot.totalUsd});
+    console.warn(`[nav] lonjakan ${previous?.totalUsd} → ${snapshot.totalUsd} diterima setelah ${tail.length} pembacaan konsisten`);
+  }
   const navPath=resolve(dir,'nav.json'), nav=readJSON(navPath,{points:[]});
   const points=snapshot.quality.complete ? downsample([...nav.points,{t:snapshot.updatedAt,usd:snapshot.totalUsd,lp:snapshot.lpUsd,quality:'complete',outflowTotalUsd:snapshot.outflowTotalUsd||0,generation:snapshot.generation}],snapshot.updatedAt) : nav.points;
   // Kinerja nyata dihitung SETELAH rekonsiliasi, dari nilai akhir dan deret

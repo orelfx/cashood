@@ -109,6 +109,10 @@ const positions = openRows.map((r) => {
   const fees = num(r.unCollectedFee ?? r.uncollectedFee);
   const collected = num(r.collectedFee);
   const basis = num(r.inputValue);
+  // Posisi yang sedang ditutup kadang terbaca hampir $0 sesaat (9 Okt: CAPYBARA
+  // $219 → $0,01 lalu dananya muncul di posisi baru). Itu salah baca, bukan
+  // rugi: snapshot lama dipertahankan sampai pembacaan berikutnya.
+  if (basis >= 20 && value < Math.max(0.5, basis * 0.01)) throw new Error(`nilai posisi ${r.pairName || ''} tidak wajar ($${value} dari modal $${basis.toFixed(0)}); kemungkinan sedang ditutup`);
   return {
     tokenId: String(r.position ?? r.tokenId ?? r.id ?? ''),
     symbol: r.pairName ?? null,
