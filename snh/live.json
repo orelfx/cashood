@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bda890b1-0813-4c20-8b42-ae731b456ecb",
-  "updatedAt": 1791755176876,
-  "generatedAt": "2026-10-12 04:46 WIB",
+  "generation": "529afebd-8390-4886-8e74-35dfe50c8548",
+  "updatedAt": 1791755476876,
+  "generatedAt": "2026-10-12 04:51 WIB",
   "usdIdr": null,
   "totalUsd": 942.7578376878681,
   "nativeSymbol": "SOL",
@@ -1208,12 +1208,12 @@
     "pnlUsd": -57.24216231213188,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791755176876,
+    "heartbeatAt": 1791755476876,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.6,
-    "lastScanAt": 1791755176228,
+    "lastScanAt": 1791755475756,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1234,13 +1234,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "203",
-        "n": "24 jam · 45 diveto LLM"
+        "v": "204",
+        "n": "24 jam · 46 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "2055",
-        "n": "160 aktif"
+        "n": "158 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1250,9 +1250,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791755176876,
+      "lastDecisionAt": 1791755476876,
       "lastAction": "keputusan",
-      "lastReason": "FARM [low]: Diveto LLM: High-churn bots/scalpers with low conviction wins; smart #1272 has 15/38 snipes under 2min, no real winners over x5, and crowding risk from rapid exits would hurt . Tidak dimasuki."
+      "lastReason": "trenchcat [low]: Diveto LLM: All three wallets show zero over-5x wins, median exits at loss (wallets 1&2) or marginal gain, extreme token churn (453 total), and are likely fast-scalping bot. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1271,7 +1271,7 @@
       ],
       [
         "Wallet dipantau",
-        "2055 · 160 aktif"
+        "2055 · 158 aktif"
       ],
       [
         "Cadangan kas",
@@ -1283,7 +1283,7 @@
       ],
       [
         "Label wallet",
-        "smart 557 · dolphin 50 · bot 1052 · blacklist 237 · lp 1 · fresh 45 · kol 111 · whale 2"
+        "smart 556 · dolphin 50 · bot 1052 · blacklist 239 · lp 1 · fresh 45 · kol 110 · whale 2"
       ]
     ],
     "requirements": [
@@ -1332,8 +1332,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2055,
-      "active": 160,
-      "passive": 1895,
+      "active": 158,
+      "passive": 1897,
       "trusted": 5,
       "promising": 18,
       "byLabel": [
@@ -1345,20 +1345,20 @@
         },
         {
           "key": "smart",
-          "total": 557,
-          "active": 125,
+          "total": 556,
+          "active": 124,
           "passive": 432
         },
         {
           "key": "blacklist",
-          "total": 237,
+          "total": 239,
           "active": 0,
-          "passive": 237
+          "passive": 239
         },
         {
           "key": "kol",
-          "total": 111,
-          "active": 14,
+          "total": 110,
+          "active": 13,
           "passive": 97
         },
         {
@@ -1487,6 +1487,59 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791755312226,
+        "symbol": "trenchcat",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 26.46% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 301,
+            "note": "bundler pegang 24.4%"
+          },
+          {
+            "type": "rat",
+            "count": 3,
+            "note": "insider/entrapment pegang 6.2%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 10.2%"
+          },
+          {
+            "type": "fresh",
+            "count": 401,
+            "note": "10.7% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 10x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show zero over-5x wins, median exits at loss (wallets 1&2) or marginal gain, extreme token churn (453 total), and are likely fast-scalping bot. Tidak dimasuki."
+      },
       {
         "at": 1791754978091,
         "symbol": "FARM",
@@ -2498,16 +2551,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 32.95% supply."
-      },
-      {
-        "at": 1791739170394,
-        "symbol": "AUCTION",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah -65% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2535,7 +2578,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 45
+        "llm": 46
       },
       "test": {
         "solo": 0,
@@ -2568,7 +2611,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791755208771,
+    "generatedAt": 1791755508204,
     "trades": {
       "count": 102,
       "wins": 38,
