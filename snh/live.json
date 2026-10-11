@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0cb30c63-f6de-43d8-96f0-18429fcd9789",
-  "updatedAt": 1791719776624,
-  "generatedAt": "2026-10-11 18:56 WIB",
+  "generation": "987a4410-d979-43df-baa4-ec7beb24d433",
+  "updatedAt": 1791720076624,
+  "generatedAt": "2026-10-11 19:01 WIB",
   "usdIdr": null,
   "totalUsd": 939.906982176095,
   "nativeSymbol": "SOL",
@@ -1038,12 +1038,12 @@
     "pnlUsd": -60.09301782390503,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791719776624,
+    "heartbeatAt": 1791720076624,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.89,
-    "lastScanAt": 1791719773471,
+    "lastScanAt": 1791720075068,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1074,15 +1074,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "23 · 24",
+        "v": "22 · 24",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791719776624,
+      "lastDecisionAt": 1791720076624,
       "lastAction": "keputusan",
-      "lastReason": "REDO [degen]: Dilewati karena red flag: holder baru 24."
+      "lastReason": "UTYA [degen]: Dilewati: harga sudah -44% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1317,6 +1317,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791719934276,
+        "symbol": "UTYA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati: harga sudah -44% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791719925658,
+        "symbol": "Bubblegum",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 5x."
+      },
       {
         "at": 1791719664895,
         "symbol": "REDO",
@@ -2734,44 +2755,12 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791684901564,
-        "symbol": "AION",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 127,
-            "note": "bundler pegang 21.9%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.5%"
-          }
-        ],
-        "reason": "Keluar (stale price): Harga token tidak bisa diambil lebih dari 15 menit, posisi ditutup demi keamanan. Hasil -10,2%."
-      },
-      {
-        "at": 1791684032661,
-        "symbol": "AION",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 16."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 29,
+        "below_entry": 30,
         "no_pullback": 1,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2797,7 +2786,7 @@
       },
       "test": {
         "solo": 0,
-        "explore": 19,
+        "explore": 18,
         "chase": 0
       },
       "solo_entries": {
@@ -2826,7 +2815,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791719810605,
+    "generatedAt": 1791720114104,
     "trades": {
       "count": 89,
       "wins": 32,
