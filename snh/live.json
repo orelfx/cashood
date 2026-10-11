@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "34ab71da-639c-42a9-8a53-ad207b37ad6f",
-  "updatedAt": 1791714376607,
-  "generatedAt": "2026-10-11 17:26 WIB",
+  "generation": "653b7abe-adcc-450e-8869-e9d5ab5e3425",
+  "updatedAt": 1791714676607,
+  "generatedAt": "2026-10-11 17:31 WIB",
   "usdIdr": null,
   "totalUsd": 939.7633990896314,
   "nativeSymbol": "SOL",
@@ -1009,12 +1009,12 @@
     "pnlUsd": -60.236600910368566,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791714376607,
+    "heartbeatAt": 1791714676607,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.9,
-    "lastScanAt": 1791714375309,
+    "lastScanAt": 1791714675145,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1035,8 +1035,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "189",
-        "n": "24 jam · 36 diveto LLM"
+        "v": "191",
+        "n": "24 jam · 38 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1051,9 +1051,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791714376607,
+      "lastDecisionAt": 1791714676607,
       "lastAction": "keputusan",
-      "lastReason": "Markodex [degen]: Menunggu pullback: harga sudah +184% di atas harga beli wallet yang diikuti (zona masuk sampai +20%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 15 menit."
+      "lastReason": "slopcannon [low]: Diveto LLM: All wallets show near-identical metrics and behaviors suggesting same operator or bot; our copy history is negative (-18.6% to -39.2% avg Pnl), indicating these. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1288,6 +1288,70 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791714537123,
+        "symbol": "slopcannon",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 8
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 26.0%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 14.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 30,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "6.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: All wallets show near-identical metrics and behaviors suggesting same operator or bot; our copy history is negative (-18.6% to -39.2% avg Pnl), indicating these. Tidak dimasuki."
+      },
+      {
+        "at": 1791714521556,
+        "symbol": "slopcannon",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 8
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 25.3%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 14.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 30,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "6.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Six of eight wallets share identical habit profiles (13 round trips, 18.5 min median hold, same onchain samples, matching copy history of n=2/avg=-18.6%), stron. Tidak dimasuki."
+      },
       {
         "at": 1791714124733,
         "symbol": "Markodex",
@@ -2542,40 +2606,6 @@
           }
         ],
         "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 1 menit. Hasil -6,3%."
-      },
-      {
-        "at": 1791681039615,
-        "symbol": "ALON",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 5.5%"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $1,83, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791681029741,
-        "symbol": "ALON",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 5.5%"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
@@ -2603,7 +2633,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 36
+        "llm": 38
       },
       "test": {
         "solo": 0,
@@ -2636,7 +2666,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791714409167,
+    "generatedAt": 1791714710597,
     "trades": {
       "count": 88,
       "wins": 31,
