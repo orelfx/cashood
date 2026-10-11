@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d7868719-1348-456b-b5b8-5e92e301a0c2",
-  "updatedAt": 1791717376609,
-  "generatedAt": "2026-10-11 18:16 WIB",
+  "generation": "b6fc011e-b3f7-4a3f-b1d9-149ef2cbfa05",
+  "updatedAt": 1791717676610,
+  "generatedAt": "2026-10-11 18:21 WIB",
   "usdIdr": null,
   "totalUsd": 939.906982176095,
   "nativeSymbol": "SOL",
@@ -1038,12 +1038,12 @@
     "pnlUsd": -60.09301782390503,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791717376609,
+    "heartbeatAt": 1791717676610,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.89,
-    "lastScanAt": 1791717375743,
+    "lastScanAt": 1791717675621,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1064,13 +1064,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "194",
+        "v": "196",
         "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "2012",
-        "n": "157 aktif"
+        "n": "158 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1080,9 +1080,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791717376609,
+      "lastDecisionAt": 1791717676610,
       "lastAction": "keputusan",
-      "lastReason": "Q [degen]: Diveto LLM: One wallet is a losing degen (38% winrate, -$215 PnL, 292 tokens, 26 dumps >50%) and the other, while profitable, carries a 'trojan' tag with only 1 observed ro. Tidak dimasuki."
+      "lastReason": "Dacity [low]: Dilewati karena red flag: bundler pegang 60% supply."
     }
   },
   "strategy": {
@@ -1101,7 +1101,7 @@
       ],
       [
         "Wallet dipantau",
-        "2012 · 157 aktif"
+        "2012 · 158 aktif"
       ],
       [
         "Cadangan kas",
@@ -1162,8 +1162,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2012,
-      "active": 157,
-      "passive": 1855,
+      "active": 158,
+      "passive": 1854,
       "trusted": 6,
       "promising": 12,
       "byLabel": [
@@ -1176,8 +1176,8 @@
         {
           "key": "smart",
           "total": 560,
-          "active": 126,
-          "passive": 434
+          "active": 127,
+          "passive": 433
         },
         {
           "key": "blacklist",
@@ -1270,15 +1270,6 @@
           "trusted": false
         },
         {
-          "alias": "smart #1662",
-          "label": "smart",
-          "score": 97,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
           "alias": "dolphin #1949",
           "label": "dolphin",
           "score": 96,
@@ -1291,6 +1282,15 @@
           "alias": "dolphin #1913",
           "label": "dolphin",
           "score": 95.9,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
+          "alias": "smart #1662",
+          "label": "smart",
+          "score": 95.7,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1317,6 +1317,34 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791717580482,
+        "symbol": "Dacity",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 60% supply."
+      },
+      {
+        "at": 1791717578448,
+        "symbol": "CYBERLEEK",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 8
+        },
+        "reason": "Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791717308591,
         "symbol": "Q",
@@ -2739,54 +2767,17 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $2786."
-      },
-      {
-        "at": 1791682821952,
-        "symbol": "AION",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 8."
-      },
-      {
-        "at": 1791682735259,
-        "symbol": "Archer",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 161,
-            "note": "bundler pegang 6.5%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 5.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 19,
-            "note": "sniper awal masih pegang 1.3%"
-          }
-        ],
-        "reason": "Keluar (stale price): Harga token tidak bisa diambil lebih dari 15 menit, posisi ditutup demi keamanan. Hasil -21,4%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 27,
+        "below_entry": 28,
         "no_pullback": 1,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 98,
+        "red_flag": 99,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2836,7 +2827,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791717410815,
+    "generatedAt": 1791717718738,
     "trades": {
       "count": 89,
       "wins": 32,
