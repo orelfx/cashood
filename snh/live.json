@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ed8450dd-bb1f-404d-a76d-af11fbf346df",
-  "updatedAt": 1791750676854,
-  "generatedAt": "2026-10-12 03:31 WIB",
+  "generation": "35a58872-d12f-48dd-a197-67c51fac26d3",
+  "updatedAt": 1791750976855,
+  "generatedAt": "2026-10-12 03:36 WIB",
   "usdIdr": null,
   "totalUsd": 942.7578376878681,
   "nativeSymbol": "SOL",
@@ -1208,12 +1208,12 @@
     "pnlUsd": -57.24216231213188,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791750676854,
+    "heartbeatAt": 1791750976855,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.6,
-    "lastScanAt": 1791750676833,
+    "lastScanAt": 1791750972652,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1234,13 +1234,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "197",
+        "v": "198",
         "n": "24 jam · 40 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "2052",
-        "n": "159 aktif"
+        "n": "157 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1250,9 +1250,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791750676854,
+      "lastDecisionAt": 1791750976855,
       "lastAction": "keputusan",
-      "lastReason": "UNCC [low]: Diveto LLM: All three wallets lack over_x5 winners despite 163/81/74 tokens respectively; smart #158 sells at -25.8% median gain, smart #2020 shows sniper behavior with 32 two-m. Tidak dimasuki."
+      "lastReason": "SON [degen]: Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
     }
   },
   "strategy": {
@@ -1271,7 +1271,7 @@
       ],
       [
         "Wallet dipantau",
-        "2052 · 159 aktif"
+        "2052 · 157 aktif"
       ],
       [
         "Cadangan kas",
@@ -1283,7 +1283,7 @@
       ],
       [
         "Label wallet",
-        "smart 560 · dolphin 50 · bot 1048 · blacklist 236 · lp 1 · fresh 46 · kol 109 · whale 2"
+        "smart 557 · dolphin 50 · bot 1051 · blacklist 236 · lp 1 · fresh 46 · kol 109 · whale 2"
       ]
     ],
     "requirements": [
@@ -1332,22 +1332,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2052,
-      "active": 159,
-      "passive": 1893,
+      "active": 157,
+      "passive": 1895,
       "trusted": 5,
       "promising": 18,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1048,
+          "total": 1051,
           "active": 0,
-          "passive": 1048
+          "passive": 1051
         },
         {
           "key": "smart",
-          "total": 560,
-          "active": 125,
-          "passive": 435
+          "total": 557,
+          "active": 123,
+          "passive": 434
         },
         {
           "key": "blacklist",
@@ -1488,12 +1488,23 @@
     },
     "decisions": [
       {
+        "at": 1791750820100,
+        "symbol": "SON",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
+      },
+      {
         "at": 1791749490702,
         "symbol": "UNCC",
         "action": "veto",
         "basket": "low",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -2388,48 +2399,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: data token belum tersedia."
-      },
-      {
-        "at": 1791734637600,
-        "symbol": "ALZ",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 1.84% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.5%"
-          },
-          {
-            "type": "bundler",
-            "count": 120,
-            "note": "bundler pegang 26.9%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.6%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 2.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 86,
-            "note": "11.9% holder wallet baru"
-          }
-        ],
-        "reason": "Keluar (trailing): Harga turun 30% dari puncak +69% setelah 7 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +12,0%."
       }
     ],
     "reasonStats": {
@@ -2440,7 +2409,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 94,
+        "red_flag": 95,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2490,7 +2459,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791750710627,
+    "generatedAt": 1791751011473,
     "trades": {
       "count": 102,
       "wins": 38,
