@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8f80017b-a0fc-4f12-ac35-506d97c346b6",
-  "updatedAt": 1791702676579,
-  "generatedAt": "2026-10-11 14:11 WIB",
+  "generation": "e1253a11-72d9-41bd-89c1-af6d02721890",
+  "updatedAt": 1791702976580,
+  "generatedAt": "2026-10-11 14:16 WIB",
   "usdIdr": null,
-  "totalUsd": 937.020430864253,
+  "totalUsd": 937.1892362172042,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 937.020430864253,
+  "botWalletUsd": 937.1892362172042,
   "walletUsd": 931.9232371947272,
-  "lpUsd": 5.09719367,
+  "lpUsd": 5.26599902,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 4.332582043723255,
       "investedUsd": 4.332582043723255,
-      "principalUsd": 5.09719367,
-      "valueUsd": 5.09719367,
+      "principalUsd": 5.26599902,
+      "valueUsd": 5.26599902,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 0.7646116258024538,
-      "pnlPct": 17.65,
+      "pnlUsd": 0.9334169787537308,
+      "pnlPct": 21.54,
       "entryPriceUsd": 0.00019062702,
-      "priceUsd": 0.00023371186,
-      "ageMinutes": 1410,
+      "priceUsd": 0.00024145306,
+      "ageMinutes": 1415,
       "stopPct": 32,
       "targetPct": 80,
       "maxHoldHours": 24,
@@ -1047,18 +1047,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 931.9232371947272,
-    "positionsUsd": 5.09719367,
-    "realizedUsd": -63.74418077,
-    "unrealizedUsd": 0.76461163,
-    "pnlUsd": -62.979569135747056,
+    "positionsUsd": 5.26599902,
+    "realizedUsd": -63.74418076,
+    "unrealizedUsd": 0.93341698,
+    "pnlUsd": -62.81076378279579,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791702676579,
+    "heartbeatAt": 1791702976580,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 7.17,
-    "lastScanAt": 1791702675541,
+    "drawdownPct": 7.16,
+    "lastScanAt": 1791702973468,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1073,13 +1073,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$0.7646",
+        "v": "+$0.9334",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
       {
         "k": "Sinyal wallet",
-        "v": "197",
+        "v": "198",
         "n": "24 jam · 42 diveto LLM"
       },
       {
@@ -1095,9 +1095,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791702676579,
+      "lastDecisionAt": 1791702976580,
       "lastAction": "keputusan",
-      "lastReason": "69420 [degen]: Dilewati: harga sudah -70% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Loop [degen]: Dilewati karena red flag: bundler pegang 37% supply."
     }
   },
   "strategy": {
@@ -1332,6 +1332,17 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791702807009,
+        "symbol": "Loop",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 37% supply."
+      },
       {
         "at": 1791699597788,
         "symbol": "69420",
@@ -2390,49 +2401,6 @@
           }
         ],
         "reason": "Take profit bertahap (TP1): jual sebagian senilai $1,97; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791674970420,
-        "symbol": "Ollie",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 600,
-            "note": "bundler pegang 16.8%"
-          },
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 8.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "13.8% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 27x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: No wallet shows x5+ winners; dolphin #1317 (44% winrate, -27.85% median exit, -26.5% our copy) and smart #1365 (318 round trips, 0 big winners, -47.2% our copy) have po. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2443,7 +2411,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 104,
+        "red_flag": 105,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2493,7 +2461,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791702708790,
+    "generatedAt": 1791703012232,
     "trades": {
       "count": 86,
       "wins": 29,
@@ -2534,14 +2502,14 @@
     "equity": {
       "days": 6,
       "spanDays": 6.1,
-      "returnPct": -6.3,
+      "returnPct": -6.28,
       "maxDrawdownPct": 7.1,
       "maxDrawdownAt": 1791684976542,
       "maxDrawdownUsd": 71.43,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 934.33,
-      "currentDrawdownPct": 6.83,
-      "currentDrawdownUsd": 68.74,
+      "currentDrawdownPct": 6.82,
+      "currentDrawdownUsd": 68.57,
       "positiveDaysPct": 16.67,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2550,8 +2518,8 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -62.98,
-    "profitPct": -6.3,
+    "profitUsd": -62.81,
+    "profitPct": -6.28,
     "recoveryFactor": -0.88,
     "score": {
       "axes": {
