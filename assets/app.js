@@ -3734,7 +3734,11 @@ async function renderGrowth(g, paper = []) {
     // Titik lama digeser sebesar setoran/penarikan sesudahnya (lihat cashFlows):
     // setoran tidak tergambar sebagai lonjakan untung.
     const parts = briefs.map((b, i) => {
-      const at = latest ? null : valueAt(series[i], t);
+      // Dana yang baru mulai tercatat sesudah titik ini (mis. Staking sejak
+      // 7 Okt): sebelum titik pertamanya dianggap datar di nilai titik pertama,
+      // supaya perubahan total tetap terhitung dan dana itu hanya menyumbang
+      // perubahan sejak mulai dipantau — bukan membuat total "belum tersedia".
+      const at = latest ? null : (valueAt(series[i], t) || (series[i]?.length && t < series[i][0].t ? series[i][0] : null));
       return { id: b.id, name: b.label, color: b.accent, known: latest || Boolean(at), usd: latest ? b.totalUsd : (at ? at.usd + flowsAfter(b.flows, at.t) : 0) };   // arus kas sesudah titik itu diamati
     });
     if (box && t >= boxStart) parts.push({ id: 'safebox', fixed: true, name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: Number(box.balanceUsd) || 0 });
