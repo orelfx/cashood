@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b94a7978-4ace-427f-8f56-5e35cdf2f3bb",
-  "updatedAt": 1791754276876,
-  "generatedAt": "2026-10-12 04:31 WIB",
+  "generation": "f7fdf5f7-910a-4dd1-8600-bc1bd8fc68ec",
+  "updatedAt": 1791754576875,
+  "generatedAt": "2026-10-12 04:36 WIB",
   "usdIdr": null,
   "totalUsd": 942.7578376878681,
   "nativeSymbol": "SOL",
@@ -1208,12 +1208,12 @@
     "pnlUsd": -57.24216231213188,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791754276876,
+    "heartbeatAt": 1791754576875,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.6,
-    "lastScanAt": 1791754274145,
+    "lastScanAt": 1791754575378,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1234,7 +1234,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "204",
+        "v": "202",
         "n": "24 jam · 44 diveto LLM"
       },
       {
@@ -1244,15 +1244,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "27 · 28",
+        "v": "26 · 28",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791754276876,
+      "lastDecisionAt": 1791754576875,
       "lastAction": "keputusan",
-      "lastReason": "OTC [mid]: Dilewati karena red flag: insider/entrapment pegang 45%."
+      "lastReason": "FARM [low]: Dilewati karena red flag: holder baru 120."
     }
   },
   "strategy": {
@@ -1283,7 +1283,7 @@
       ],
       [
         "Label wallet",
-        "smart 557 · dolphin 50 · bot 1051 · blacklist 237 · lp 1 · fresh 46 · kol 111 · whale 2"
+        "smart 556 · dolphin 50 · bot 1052 · blacklist 237 · lp 1 · fresh 46 · kol 111 · whale 2"
       ]
     ],
     "requirements": [
@@ -1339,15 +1339,15 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 1051,
+          "total": 1052,
           "active": 0,
-          "passive": 1051
+          "passive": 1052
         },
         {
           "key": "smart",
-          "total": 557,
+          "total": 556,
           "active": 124,
-          "passive": 433
+          "passive": 432
         },
         {
           "key": "blacklist",
@@ -1487,6 +1487,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791754362684,
+        "symbol": "FARM",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: holder baru 120."
+      },
       {
         "at": 1791753916191,
         "symbol": "OTC",
@@ -1687,7 +1704,8 @@
         "action": "veto",
         "basket": "low",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -2452,17 +2470,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791738549596,
-        "symbol": "COCKROACH",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "kol": 1,
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 32%."
       }
     ],
     "reasonStats": {
@@ -2487,7 +2494,7 @@
         "jumlah": 4
       },
       "add": {
-        "jumlah": 2
+        "jumlah": 1
       },
       "veto": {
         "llm": 44
@@ -2498,10 +2505,10 @@
         "chase": 0
       },
       "solo_entries": {
-        "jumlah": 10
+        "jumlah": 9
       },
       "partial": {
-        "take profit": 18,
+        "take profit": 17,
         "anticipate": 6,
         "early follow": 1
       },
@@ -2523,7 +2530,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791754308511,
+    "generatedAt": 1791754607234,
     "trades": {
       "count": 102,
       "wins": 38,
