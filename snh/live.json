@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "305187bc-5fc7-4cfb-9a6c-0f463e1f1f00",
-  "updatedAt": 1791754876876,
-  "generatedAt": "2026-10-12 04:41 WIB",
+  "generation": "bda890b1-0813-4c20-8b42-ae731b456ecb",
+  "updatedAt": 1791755176876,
+  "generatedAt": "2026-10-12 04:46 WIB",
   "usdIdr": null,
   "totalUsd": 942.7578376878681,
   "nativeSymbol": "SOL",
@@ -1208,12 +1208,12 @@
     "pnlUsd": -57.24216231213188,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791754876876,
+    "heartbeatAt": 1791755176876,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.6,
-    "lastScanAt": 1791754875758,
+    "lastScanAt": 1791755176228,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1234,8 +1234,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "202",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "203",
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1250,9 +1250,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791754876876,
+      "lastDecisionAt": 1791755176876,
       "lastAction": "keputusan",
-      "lastReason": "FARM [low]: Dilewati karena red flag: holder baru 120."
+      "lastReason": "FARM [low]: Diveto LLM: High-churn bots/scalpers with low conviction wins; smart #1272 has 15/38 snipes under 2min, no real winners over x5, and crowding risk from rapid exits would hurt . Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1487,6 +1487,54 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791754978091,
+        "symbol": "FARM",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 461,
+            "note": "bundler pegang 35.4%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 4.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 15.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 297,
+            "note": "22.5% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 12.1%"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 10x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: High-churn bots/scalpers with low conviction wins; smart #1272 has 15/38 snipes under 2min, no real winners over x5, and crowding risk from rapid exits would hurt . Tidak dimasuki."
+      },
       {
         "at": 1791754362684,
         "symbol": "FARM",
@@ -2460,16 +2508,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati: harga sudah -65% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791738556352,
-        "symbol": "AUCTION",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2497,7 +2535,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 44
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2530,7 +2568,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791754906113,
+    "generatedAt": 1791755208771,
     "trades": {
       "count": 102,
       "wins": 38,
