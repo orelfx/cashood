@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "03f954ed-ca55-4d14-91ca-6190cbffb9bc",
-  "updatedAt": 1791722176680,
-  "generatedAt": "2026-10-11 19:36 WIB",
+  "generation": "dc5959f4-c7e6-416c-88b3-d8fb6efa0ed0",
+  "updatedAt": 1791722476680,
+  "generatedAt": "2026-10-11 19:41 WIB",
   "usdIdr": null,
-  "totalUsd": 938.6292618415449,
+  "totalUsd": 938.5558051077054,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 938.6292618415449,
+  "botWalletUsd": 938.5558051077054,
   "walletUsd": 929.1469180106743,
-  "lpUsd": 9.48234383,
+  "lpUsd": 9.4088871,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 10.335961676559574,
       "investedUsd": 10.335961676559574,
-      "principalUsd": 9.48234383,
-      "valueUsd": 9.48234383,
+      "principalUsd": 9.4088871,
+      "valueUsd": 9.4088871,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -0.8536178456889694,
-      "pnlPct": -8.26,
+      "pnlUsd": -0.9270745795284583,
+      "pnlPct": -8.97,
       "entryPriceUsd": 0.00030652445,
-      "priceUsd": 0.00029298882,
-      "ageMinutes": 3,
+      "priceUsd": 0.00029071892,
+      "ageMinutes": 8,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -65,8 +65,8 @@
       ],
       "firstWallet": "smart #158",
       "llmScore": 58,
-      "peakPct": 0,
-      "ddPct": -4.42,
+      "peakPct": 5.22,
+      "ddPct": -5.16,
       "stale": false
     }
   ],
@@ -1081,18 +1081,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 929.1469180106743,
-    "positionsUsd": 9.48234383,
+    "positionsUsd": 9.4088871,
     "realizedUsd": -60.51712031,
-    "unrealizedUsd": -0.85361785,
-    "pnlUsd": -61.37073815845508,
+    "unrealizedUsd": -0.92707458,
+    "pnlUsd": -61.444194892294604,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791722176680,
+    "heartbeatAt": 1791722476680,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 7.01,
-    "lastScanAt": 1791722176515,
+    "drawdownPct": 7.02,
+    "lastScanAt": 1791722476381,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1107,13 +1107,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$0.8536",
+        "v": "−$0.9271",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "207",
+        "v": "208",
         "n": "24 jam · 38 diveto LLM"
       },
       {
@@ -1129,9 +1129,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791722176680,
+      "lastDecisionAt": 1791722476680,
       "lastAction": "keputusan",
-      "lastReason": "Jarvis [low]: Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
+      "lastReason": "ROSE [degen]: Dilewati karena red flag: holder baru 4."
     }
   },
   "strategy": {
@@ -1366,6 +1366,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791722202832,
+        "symbol": "ROSE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 4."
+      },
       {
         "at": 1791722016437,
         "symbol": "Jarvis",
@@ -2521,16 +2531,6 @@
           }
         ],
         "reason": "Menunggu pullback: harga sudah +68% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
-      },
-      {
-        "at": 1791710314760,
-        "symbol": "Claudia",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -36% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2541,7 +2541,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 109,
+        "red_flag": 110,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2591,7 +2591,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791722215332,
+    "generatedAt": 1791722511638,
     "trades": {
       "count": 90,
       "wins": 32,
@@ -2638,8 +2638,8 @@
       "maxDrawdownUsd": 71.43,
       "maxDrawdownPeakUsd": 1005.76,
       "maxDrawdownTroughUsd": 934.33,
-      "currentDrawdownPct": 6.67,
-      "currentDrawdownUsd": 67.13,
+      "currentDrawdownPct": 6.68,
+      "currentDrawdownUsd": 67.2,
       "positiveDaysPct": 16.67,
       "bestDayPct": 0.17,
       "worstDayPct": -2.32,
@@ -2648,7 +2648,7 @@
       "calmar": null,
       "since": 1791176825000
     },
-    "profitUsd": -61.37,
+    "profitUsd": -61.44,
     "profitPct": -6.14,
     "recoveryFactor": -0.86,
     "score": {
