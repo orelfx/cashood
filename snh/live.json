@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b6497815-40ed-41ab-8c49-7555b888d19a",
-  "updatedAt": 1791799577124,
-  "generatedAt": "2026-10-12 17:06 WIB",
+  "generation": "21783aa8-3038-47e0-922c-0ebc391f498a",
+  "updatedAt": 1791799877124,
+  "generatedAt": "2026-10-12 17:11 WIB",
   "usdIdr": null,
   "totalUsd": 941.3499384251963,
   "nativeSymbol": "SOL",
@@ -1261,12 +1261,12 @@
     "pnlUsd": -58.65006157480366,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791799577124,
+    "heartbeatAt": 1791799877124,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.74,
-    "lastScanAt": 1791799577119,
+    "lastScanAt": 1791799873633,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1287,8 +1287,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "210",
-        "n": "24 jam · 49 diveto LLM"
+        "v": "211",
+        "n": "24 jam · 50 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1303,9 +1303,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791799577124,
+      "lastDecisionAt": 1791799877124,
       "lastAction": "keputusan",
-      "lastReason": "nigr [low]: Diveto LLM: All three wallets show zero big winners (0 over_x5 across all), poor copy history with avg_pnl_pct of -29%, -3.9%, and -18.9%, and dolphin #145 exhibits heavy snipe. Tidak dimasuki."
+      "lastReason": "OVERDRIVE [low]: Diveto LLM: smart #1858 (highest scorer, best PnL) created 6 tokens - creators often dump on copy-traders; combined with 42 of 85 round trips under 2 min indicating sniper/mak. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1336,7 +1336,7 @@
       ],
       [
         "Label wallet",
-        "smart 554 · dolphin 51 · bot 1059 · blacklist 250 · lp 1 · fresh 47 · kol 111 · whale 3"
+        "smart 554 · dolphin 51 · bot 1059 · blacklist 251 · lp 1 · fresh 47 · kol 110 · whale 3"
       ]
     ],
     "requirements": [
@@ -1404,15 +1404,15 @@
         },
         {
           "key": "blacklist",
-          "total": 250,
+          "total": 251,
           "active": 0,
-          "passive": 250
+          "passive": 251
         },
         {
           "key": "kol",
-          "total": 111,
+          "total": 110,
           "active": 12,
-          "passive": 99
+          "passive": 98
         },
         {
           "key": "dolphin",
@@ -1540,6 +1540,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791799859933,
+        "symbol": "OVERDRIVE",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 28.94% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 428,
+            "note": "bundler pegang 43.3%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 1.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 408,
+            "note": "14.4% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 13x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: smart #1858 (highest scorer, best PnL) created 6 tokens - creators often dump on copy-traders; combined with 42 of 85 round trips under 2 min indicating sniper/mak. Tidak dimasuki."
+      },
       {
         "at": 1791798956946,
         "symbol": "nigr",
@@ -2781,28 +2828,6 @@
           }
         ],
         "reason": "Diveto LLM: Zero over_x5 winners across all four wallets despite high token churn (120-150/week) and negative copy history (-6.4% to -9.5% avg PnL) make these high-churn gr. Tidak dimasuki."
-      },
-      {
-        "at": 1791775413397,
-        "symbol": "STABLE",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 0.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 57,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Our copy history shows -6.4% avg PnL despite modest realized gains, suggesting these are likely bots with edge that doesn't transfer to followers, plus high chu. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2830,7 +2855,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 49
+        "llm": 50
       },
       "test": {
         "solo": 0,
@@ -2863,7 +2888,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791799615083,
+    "generatedAt": 1791799920316,
     "trades": {
       "count": 112,
       "wins": 43,
