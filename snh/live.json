@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f9add792-b18f-4750-abbf-184befe91c6c",
-  "updatedAt": 1791804677131,
-  "generatedAt": "2026-10-12 18:31 WIB",
+  "generation": "d057305d-feb4-4c67-9f64-78b200847966",
+  "updatedAt": 1791804977131,
+  "generatedAt": "2026-10-12 18:36 WIB",
   "usdIdr": null,
   "totalUsd": 940.5151091453815,
   "nativeSymbol": "SOL",
@@ -1264,12 +1264,12 @@
     "pnlUsd": -59.48489085461847,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791804677131,
+    "heartbeatAt": 1791804977131,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.83,
-    "lastScanAt": 1791804676125,
+    "lastScanAt": 1791804976886,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1290,8 +1290,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "214",
-        "n": "24 jam · 49 diveto LLM"
+        "v": "217",
+        "n": "24 jam · 50 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1306,9 +1306,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791804677131,
+      "lastDecisionAt": 1791804977131,
       "lastAction": "keputusan",
-      "lastReason": "DANCEDOG [degen]: Dilewati karena red flag: holder baru 5."
+      "lastReason": "DUROV [degen]: Dilewati karena red flag: bundler pegang 34% supply."
     }
   },
   "strategy": {
@@ -1525,7 +1525,7 @@
         {
           "alias": "dolphin #1969",
           "label": "dolphin",
-          "score": 92.8,
+          "score": 91.6,
           "copied": 2,
           "won": 2,
           "pnlUsd": 3.9533719767215874,
@@ -1543,6 +1543,81 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791804930966,
+        "symbol": "DUROV",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 34% supply."
+      },
+      {
+        "at": 1791804796834,
+        "symbol": "STARTUP",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 28.05% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 294,
+            "note": "bundler pegang 36.9%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 4.2%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 1.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 372,
+            "note": "14.1% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 11x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: High consensus speed (7.9 wallets in 1 min) signals coordination risk; all wallets show extreme churn (163-603 tokens/week) with zero x5+ winners in 3 of 4; our. Tidak dimasuki."
+      },
+      {
+        "at": 1791804721727,
+        "symbol": "Pumpkin",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791803855461,
         "symbol": "DANCEDOG",
@@ -2876,72 +2951,17 @@
           }
         ],
         "reason": "Dilewati karena red flag: insider/entrapment pegang 33%."
-      },
-      {
-        "at": 1791777437901,
-        "symbol": "LOOP",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
-      },
-      {
-        "at": 1791777000726,
-        "symbol": "eHOME",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 29,
-            "note": "bundler pegang 8.9%"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 0 menit. Hasil -5,1%."
-      },
-      {
-        "at": 1791776997829,
-        "symbol": "eHOME",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 29,
-            "note": "bundler pegang 8.9%"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $1,89, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 35,
+        "below_entry": 36,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 99,
+        "red_flag": 100,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2958,7 +2978,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 49
+        "llm": 50
       },
       "test": {
         "solo": 0,
@@ -2991,7 +3011,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791804714142,
+    "generatedAt": 1791805014192,
     "trades": {
       "count": 113,
       "wins": 43,
