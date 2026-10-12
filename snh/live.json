@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3d4808a2-8812-41a7-95c3-6d1a77f95a87",
-  "updatedAt": 1791831077685,
-  "generatedAt": "2026-10-13 01:51 WIB",
+  "generation": "820688b7-f953-4c3b-b805-2a59b19b18f7",
+  "updatedAt": 1791831377737,
+  "generatedAt": "2026-10-13 01:56 WIB",
   "usdIdr": null,
   "totalUsd": 937.0710203831723,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": -7.27,
       "entryPriceUsd": 0.0000048665366,
       "priceUsd": 0.000004714551,
-      "ageMinutes": 56,
+      "ageMinutes": 61,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1356,12 +1356,12 @@
     "pnlUsd": -62.928979616827746,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791831077685,
+    "heartbeatAt": 1791831377737,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.17,
-    "lastScanAt": 1791831074430,
+    "lastScanAt": 1791831377336,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1382,8 +1382,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "198",
-        "n": "24 jam · 44 diveto LLM"
+        "v": "206",
+        "n": "24 jam · 51 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1398,9 +1398,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791831077685,
+      "lastDecisionAt": 1791831377737,
       "lastAction": "keputusan",
-      "lastReason": "GROKBIT [low]: Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
+      "lastReason": "Catcoin [degen]: Dilewati karena red flag: bundler pegang 27% supply."
     }
   },
   "strategy": {
@@ -1635,6 +1635,175 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791831323700,
+        "symbol": "Catcoin",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 27% supply."
+      },
+      {
+        "at": 1791831271723,
+        "symbol": "Doggos",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 202,
+            "note": "bundler pegang 10.2%"
+          }
+        ],
+        "reason": "Diveto LLM: All four wallets show nearly identical outcome distributions (1 x2-5x, zero over-5x, rest losses/small wins) and nearly identical metrics across 140-170 tokens—. Tidak dimasuki."
+      },
+      {
+        "at": 1791831251230,
+        "symbol": "Doggos",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 202,
+            "note": "bundler pegang 2.4%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show nearly identical metrics and likely same operator/bots; our copies lost 9.5% avg and neither has any big winners over x5, suggesting their hig. Tidak dimasuki."
+      },
+      {
+        "at": 1791831202997,
+        "symbol": "SEED",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 140,
+            "note": "bundler pegang 3.7%"
+          },
+          {
+            "type": "rat",
+            "count": 6,
+            "note": "insider/entrapment pegang 0.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 15,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets have low winrates (37-38%), few big winners, and our actual copy history shows -6.3% avg PnL with zero wins—do not follow. Tidak dimasuki."
+      },
+      {
+        "at": 1791831195712,
+        "symbol": "GREPE",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 185,
+            "note": "bundler pegang 8.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 17,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show very low win rates (~37-38%) with few big winners, have created tokens (conflict risk), flip rapidly suggesting bots, and our single copy atte. Tidak dimasuki."
+      },
+      {
+        "at": 1791831182479,
+        "symbol": "Elfa",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 133,
+            "note": "bundler pegang 4.0%"
+          },
+          {
+            "type": "sniper",
+            "count": 10,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Identical copy history (-6.3% avg, 0 wins), very low winrate (37-38%) with 96%+ wins under 2x, and sub-15-min median holds signal scalper/arbitrage strategy unl. Tidak dimasuki."
+      },
+      {
+        "at": 1791831179052,
+        "symbol": "Ouroboros",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 426,
+            "note": "bundler pegang 5.3%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 17,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Our copy history shows -6.3% losses and both wallets are near-identical profil es suggesting same bot operator; these are high-frequency scalpers with ~37% winr. Tidak dimasuki."
+      },
+      {
+        "at": 1791831177164,
+        "symbol": "PythCat",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 12,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "top10",
+            "count": null,
+            "note": "10 holder terbesar pegang 33.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show identical outcome distributions, suspiciously low 37-38% winrates with heavy token churn, and our single copy attempt already failed at -6.3% . Tidak dimasuki."
+      },
       {
         "at": 1791831050727,
         "symbol": "GROKBIT",
@@ -2368,152 +2537,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: sniper awal masih pegang 27%."
-      },
-      {
-        "at": 1791824163316,
-        "symbol": "SOLAMIANS",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 54,
-            "note": "bundler pegang 8.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 8,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: All four wallets exhibit nearly identical behavior (same outcomes: ~90 win_under_2x, 1 x2-x5, 0 over_x5 across ~140 tokens) suggesting a shared source or bot, a. Tidak dimasuki."
-      },
-      {
-        "at": 1791824141041,
-        "symbol": "SOLAMIANS",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 54,
-            "note": "bundler pegang 8.1%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 8,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: All 4 wallets show near-identical metrics, zero over-x5 wins, and our actual copy history is negative (-9.5% to -6.4% avg PnL), suggesting they are likely one e. Tidak dimasuki."
-      },
-      {
-        "at": 1791824067851,
-        "symbol": "DOC",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 279,
-            "note": "bundler pegang 7.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Our copies across all four wallets show consistent losses (-6.4% to -9.5% avg), near-identical metrics suggest same operator, and zero over-5x wins in outcomes . Tidak dimasuki."
-      },
-      {
-        "at": 1791823815518,
-        "symbol": "SLOPCORE",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 15%."
-      },
-      {
-        "at": 1791823749771,
-        "symbol": "SOLAMIANS",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 54,
-            "note": "bundler pegang 8.1%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 8,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets show near-identical outcome distributions with zero big winners and negative copy history (-9.5% avg), suggesting same operator or coordinated stra. Tidak dimasuki."
-      },
-      {
-        "at": 1791823452515,
-        "symbol": "DOC",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $0."
-      },
-      {
-        "at": 1791823403661,
-        "symbol": "FARMCADE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 59.45% supply."
-      },
-      {
-        "at": 1791822856646,
-        "symbol": "casino",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 5,
-            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 83% supply."
       }
     ],
     "reasonStats": {
@@ -2524,7 +2547,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 97,
+        "red_flag": 98,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2541,7 +2564,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 44
+        "llm": 51
       },
       "test": {
         "solo": 0,
@@ -2574,7 +2597,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791831125488,
+    "generatedAt": 1791831422621,
     "trades": {
       "count": 118,
       "wins": 45,
@@ -2615,7 +2638,7 @@
     "equity": {
       "days": 7,
       "spanDays": 7,
-      "returnPct": -5.08,
+      "returnPct": -4.96,
       "maxDrawdownPct": 5.57,
       "maxDrawdownAt": 1791727018711,
       "maxDrawdownUsd": 55.12,
@@ -2629,7 +2652,7 @@
       "sharpe": null,
       "sortino": null,
       "calmar": null,
-      "since": 1791223007349
+      "since": 1791226607441
     },
     "profitUsd": -62.93,
     "profitPct": -6.29,
