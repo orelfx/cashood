@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9f775bee-85e1-4b0c-9e57-8bf709caee60",
-  "updatedAt": 1791818177242,
-  "generatedAt": "2026-10-12 22:16 WIB",
+  "generation": "2f452064-ee20-4052-b01a-076145c6895b",
+  "updatedAt": 1791818477242,
+  "generatedAt": "2026-10-12 22:21 WIB",
   "usdIdr": null,
   "totalUsd": 939.4630745525656,
   "nativeSymbol": "SOL",
@@ -1282,12 +1282,12 @@
     "pnlUsd": -60.53692544743444,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791818177242,
+    "heartbeatAt": 1791818477242,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.93,
-    "lastScanAt": 1791818177103,
+    "lastScanAt": 1791818473516,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1308,7 +1308,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "181",
+        "v": "182",
         "n": "24 jam · 43 diveto LLM"
       },
       {
@@ -1318,15 +1318,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "19 · 20",
+        "v": "19 · 19",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791818177242,
+      "lastDecisionAt": 1791818477242,
       "lastAction": "keputusan",
-      "lastReason": "TPA [degen]: Diveto LLM: Both wallets show identical our_copies stats (3 copies, 1 win, avg_pnl_pct=-9.5) and near-identical patterns suggesting same operator; terrible copy history wit. Tidak dimasuki."
+      "lastReason": "STUDIO [low]: Dilewati karena red flag: bundler pegang 41.56% supply."
     }
   },
   "strategy": {
@@ -1561,6 +1561,25 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791818432803,
+        "symbol": "STUDIO",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "kol": 1,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 41.56% supply."
+      },
       {
         "at": 1791816724677,
         "symbol": "TPA",
@@ -2767,58 +2786,6 @@
           }
         ],
         "reason": "Keluar (stop): Harga turun sampai batas stop 32% setelah 3 menit; puncak sempat +2%. Hasil -37,6%."
-      },
-      {
-        "at": 1791794963305,
-        "symbol": "Ploy",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 20.18% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 346,
-            "note": "bundler pegang 24.4%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 3.6%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 6.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 399,
-            "note": "16.3% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 16x likuiditas"
-          }
-        ],
-        "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
       }
     ],
     "reasonStats": {
@@ -2829,7 +2796,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 82,
+        "red_flag": 83,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2864,7 +2831,7 @@
       "exit": {
         "follow exit": 6,
         "take profit": 0,
-        "stop": 11,
+        "stop": 10,
         "trailing": 3,
         "time limit": 0,
         "rug": 0,
@@ -2879,7 +2846,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791818230865,
+    "generatedAt": 1791818549972,
     "trades": {
       "count": 115,
       "wins": 44,
