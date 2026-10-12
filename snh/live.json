@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ad5f39b1-879a-439f-8a46-c89a3f246af7",
-  "updatedAt": 1791835877755,
-  "generatedAt": "2026-10-13 03:11 WIB",
+  "generation": "d6ed52a0-4c73-4d83-964d-4dcfd3731d63",
+  "updatedAt": 1791836177755,
+  "generatedAt": "2026-10-13 03:16 WIB",
   "usdIdr": null,
-  "totalUsd": 937.8409445021978,
+  "totalUsd": 937.7718028697548,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 937.8409445021978,
+  "botWalletUsd": 937.7718028697548,
   "walletUsd": 928.0470323984022,
-  "lpUsd": 9.79391211,
+  "lpUsd": 9.72477048,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -34,7 +34,7 @@
       "pnlPct": 4.26,
       "entryPriceUsd": 0.0000048665366,
       "priceUsd": 0.000005295533,
-      "ageMinutes": 136,
+      "ageMinutes": 141,
       "stopPct": 35,
       "targetPct": 80,
       "maxHoldHours": 4,
@@ -76,15 +76,15 @@
       "bookLabel": "low",
       "costUsd": 7.219751230584418,
       "investedUsd": 7.219751230584418,
-      "principalUsd": 7.4470959,
-      "valueUsd": 7.4470959,
+      "principalUsd": 7.37795427,
+      "valueUsd": 7.37795427,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 0.22734466758195637,
-      "pnlPct": 3.15,
+      "pnlUsd": 0.15820303513901113,
+      "pnlPct": 2.19,
       "entryPriceUsd": 0.00087861692,
-      "priceUsd": 0.0009441032,
-      "ageMinutes": 54,
+      "priceUsd": 0.00093533653,
+      "ageMinutes": 59,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1399,18 +1399,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 928.0470323984022,
-    "positionsUsd": 9.79391211,
+    "positionsUsd": 9.72477048,
     "realizedUsd": -62.48224739,
-    "unrealizedUsd": 0.32319189,
-    "pnlUsd": -62.15905549780223,
+    "unrealizedUsd": 0.25405026,
+    "pnlUsd": -62.228197130245235,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791835877755,
+    "heartbeatAt": 1791836177755,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 7.09,
-    "lastScanAt": 1791835874121,
+    "drawdownPct": 7.1,
+    "lastScanAt": 1791836174233,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1425,7 +1425,7 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$0.3232",
+        "v": "+$0.2541",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
@@ -1447,9 +1447,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791835877755,
+      "lastDecisionAt": 1791836177755,
       "lastAction": "keputusan",
-      "lastReason": "Macca [degen]: Dilewati karena red flag: insider/entrapment pegang 29%."
+      "lastReason": "Jandi [degen]: Diveto LLM: Both wallets have low winrates (37-38%), high churn (194-226 tokens/week), and our single copy attempt on each resulted in identical -6.3% losses—concrete evide. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1684,6 +1684,38 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791835894446,
+        "symbol": "Jandi",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 145,
+            "note": "bundler pegang 9.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.2%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 5.6%"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets have low winrates (37-38%), high churn (194-226 tokens/week), and our single copy attempt on each resulted in identical -6.3% losses—concrete evide. Tidak dimasuki."
+      },
       {
         "at": 1791835053225,
         "symbol": "Macca",
@@ -2598,16 +2630,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $2217."
-      },
-      {
-        "at": 1791830290408,
-        "symbol": "DOGCOIN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2668,7 +2690,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791835915088,
+    "generatedAt": 1791836214284,
     "trades": {
       "count": 118,
       "wins": 45,
@@ -2715,8 +2737,8 @@
       "maxDrawdownUsd": 55.12,
       "maxDrawdownPeakUsd": 989.63,
       "maxDrawdownTroughUsd": 934.51,
-      "currentDrawdownPct": 5.23,
-      "currentDrawdownUsd": 51.79,
+      "currentDrawdownPct": 5.24,
+      "currentDrawdownUsd": 51.86,
       "positiveDaysPct": 28.57,
       "bestDayPct": 0.92,
       "worstDayPct": -1.34,
@@ -2725,7 +2747,7 @@
       "calmar": null,
       "since": 1791230207493
     },
-    "profitUsd": -62.16,
+    "profitUsd": -62.23,
     "profitPct": -6.22,
     "recoveryFactor": -1.13,
     "score": {
