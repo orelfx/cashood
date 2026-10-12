@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ced2e2d6-4a6c-4a98-aeae-bd8a3ac1f8fc",
-  "updatedAt": 1791803477126,
-  "generatedAt": "2026-10-12 18:11 WIB",
+  "generation": "e559f865-009f-4b2f-9d19-5772e59b67f8",
+  "updatedAt": 1791803777130,
+  "generatedAt": "2026-10-12 18:16 WIB",
   "usdIdr": null,
   "totalUsd": 940.5151091453815,
   "nativeSymbol": "SOL",
@@ -1264,12 +1264,12 @@
     "pnlUsd": -59.48489085461847,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791803477126,
+    "heartbeatAt": 1791803777130,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.83,
-    "lastScanAt": 1791803474059,
+    "lastScanAt": 1791803775421,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1290,7 +1290,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "214",
+        "v": "215",
         "n": "24 jam · 48 diveto LLM"
       },
       {
@@ -1306,9 +1306,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791803477126,
+      "lastDecisionAt": 1791803777130,
       "lastAction": "keputusan",
-      "lastReason": "DOGGO [degen]: Dilewati karena red flag: holder baru 14."
+      "lastReason": "PSYCH [degen]: Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1543,6 +1543,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791803620706,
+        "symbol": "PSYCH",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791803492643,
+        "symbol": "AIXBT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "sniper",
+            "count": 43,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets have negative copy history (-9.5% avg PnL), extreme churn (~150 tokens/week), near-zero over-5x wins, and one is a token creator—all strong negativ. Tidak dimasuki."
+      },
       {
         "at": 1791803360344,
         "symbol": "DOGGO",
@@ -2899,40 +2926,12 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1791776886141,
-        "symbol": "W",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "kol": 2,
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 38%."
-      },
-      {
-        "at": 1791776591462,
-        "symbol": "TOMI",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -56% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 35,
+        "below_entry": 36,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2987,7 +2986,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791803510936,
+    "generatedAt": 1791803814263,
     "trades": {
       "count": 113,
       "wins": 43,
