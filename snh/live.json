@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "31e16bfb-08bf-40a4-976f-3bb8e1f0b31e",
-  "updatedAt": 1791823577251,
-  "generatedAt": "2026-10-12 23:46 WIB",
+  "generation": "c2546290-cb56-419e-8487-10b621386660",
+  "updatedAt": 1791823877252,
+  "generatedAt": "2026-10-12 23:51 WIB",
   "usdIdr": null,
   "totalUsd": 937.9037417407618,
   "nativeSymbol": "SOL",
@@ -1305,12 +1305,12 @@
     "pnlUsd": -62.0962582592382,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791823577251,
+    "heartbeatAt": 1791823877252,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.08,
-    "lastScanAt": 1791823576139,
+    "lastScanAt": 1791823876659,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1332,7 +1332,7 @@
       {
         "k": "Sinyal wallet",
         "v": "175",
-        "n": "24 jam · 44 diveto LLM"
+        "n": "24 jam · 45 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1347,9 +1347,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791823577251,
+      "lastDecisionAt": 1791823877252,
       "lastAction": "keputusan",
-      "lastReason": "DOC [degen]: Dilewati karena red flag: likuiditas cuma $0."
+      "lastReason": "SLOPCORE [low]: Dilewati karena red flag: insider/entrapment pegang 15%."
     }
   },
   "strategy": {
@@ -1584,6 +1584,44 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791823815518,
+        "symbol": "SLOPCORE",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 15%."
+      },
+      {
+        "at": 1791823749771,
+        "symbol": "SOLAMIANS",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 54,
+            "note": "bundler pegang 8.1%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 2.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 8,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show near-identical outcome distributions with zero big winners and negative copy history (-9.5% avg), suggesting same operator or coordinated stra. Tidak dimasuki."
+      },
       {
         "at": 1791823452515,
         "symbol": "DOC",
@@ -2764,61 +2802,6 @@
           }
         ],
         "reason": "Diveto LLM: smart #1858 (highest scorer, best PnL) created 6 tokens - creators often dump on copy-traders; combined with 42 of 85 round trips under 2 min indicating sniper/mak. Tidak dimasuki."
-      },
-      {
-        "at": 1791798956946,
-        "symbol": "nigr",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 210,
-            "note": "bundler pegang 35.4%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 0.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 3.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 237,
-            "note": "8.5% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.4%"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets show zero big winners (0 over_x5 across all), poor copy history with avg_pnl_pct of -29%, -3.9%, and -18.9%, and dolphin #145 exhibits heavy snipe. Tidak dimasuki."
-      },
-      {
-        "at": 1791796721230,
-        "symbol": "SAI",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 6x."
       }
     ],
     "reasonStats": {
@@ -2829,7 +2812,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 81,
+        "red_flag": 80,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2846,7 +2829,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 44
+        "llm": 45
       },
       "test": {
         "solo": 0,
@@ -2879,7 +2862,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791823616653,
+    "generatedAt": 1791823919070,
     "trades": {
       "count": 116,
       "wins": 44,
