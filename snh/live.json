@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e559f865-009f-4b2f-9d19-5772e59b67f8",
-  "updatedAt": 1791803777130,
-  "generatedAt": "2026-10-12 18:16 WIB",
+  "generation": "c333ea23-4a52-4378-ae04-9b99532e49eb",
+  "updatedAt": 1791804077131,
+  "generatedAt": "2026-10-12 18:21 WIB",
   "usdIdr": null,
   "totalUsd": 940.5151091453815,
   "nativeSymbol": "SOL",
@@ -1264,12 +1264,12 @@
     "pnlUsd": -59.48489085461847,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791803777130,
+    "heartbeatAt": 1791804077131,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.83,
-    "lastScanAt": 1791803775421,
+    "lastScanAt": 1791804073128,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1291,7 +1291,7 @@
       {
         "k": "Sinyal wallet",
         "v": "215",
-        "n": "24 jam · 48 diveto LLM"
+        "n": "24 jam · 49 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1306,9 +1306,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791803777130,
+      "lastDecisionAt": 1791804077131,
       "lastAction": "keputusan",
-      "lastReason": "PSYCH [degen]: Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "DANCEDOG [degen]: Dilewati karena red flag: holder baru 5."
     }
   },
   "strategy": {
@@ -1339,7 +1339,7 @@
       ],
       [
         "Label wallet",
-        "smart 553 · dolphin 51 · bot 1058 · blacklist 252 · lp 1 · fresh 48 · kol 110 · whale 3"
+        "smart 553 · dolphin 51 · bot 1059 · blacklist 252 · lp 1 · fresh 47 · kol 110 · whale 3"
       ]
     ],
     "requirements": [
@@ -1395,9 +1395,9 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 1058,
+          "total": 1059,
           "active": 0,
-          "passive": 1058
+          "passive": 1059
         },
         {
           "key": "smart",
@@ -1425,9 +1425,9 @@
         },
         {
           "key": "fresh",
-          "total": 48,
+          "total": 47,
           "active": 0,
-          "passive": 48
+          "passive": 47
         },
         {
           "key": "whale",
@@ -1544,6 +1544,43 @@
     },
     "decisions": [
       {
+        "at": 1791803855461,
+        "symbol": "DANCEDOG",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 5."
+      },
+      {
+        "at": 1791803801046,
+        "symbol": "TAMA",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 218,
+            "note": "bundler pegang 6.5%"
+          },
+          {
+            "type": "rat",
+            "count": 3,
+            "note": "insider/entrapment pegang 7.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 4,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: All three wallets show identical outcome distributions, zero over-5x wins, and negative avg_pnl_pct on our actual copies (-6.4% to -9.5%), indicating these are . Tidak dimasuki."
+      },
+      {
         "at": 1791803620706,
         "symbol": "PSYCH",
         "action": "skip",
@@ -1579,16 +1616,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: holder baru 14."
-      },
-      {
-        "at": 1791803250301,
-        "symbol": "DANCEDOG",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: holder baru 5."
       },
       {
         "at": 1791803184463,
@@ -2904,34 +2931,12 @@
           }
         ],
         "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $1,89, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791776991178,
-        "symbol": "eHOME",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 29,
-            "note": "bundler pegang 8.9%"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 36,
+        "below_entry": 35,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2953,7 +2958,7 @@
         "jumlah": 1
       },
       "veto": {
-        "llm": 48
+        "llm": 49
       },
       "test": {
         "solo": 0,
@@ -2986,7 +2991,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791803814263,
+    "generatedAt": 1791804124872,
     "trades": {
       "count": 113,
       "wins": 43,
