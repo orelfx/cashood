@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "223ea8f0-6d25-428a-9830-d30ee65c0825",
-  "updatedAt": 1791906678050,
-  "generatedAt": "2026-10-13 22:51 WIB",
+  "generation": "2ecdc0a9-089f-47fa-addd-987e3a29ec21",
+  "updatedAt": 1791906978050,
+  "generatedAt": "2026-10-13 22:56 WIB",
   "usdIdr": null,
   "totalUsd": 939.5408233158364,
   "nativeSymbol": "SOL",
@@ -1331,12 +1331,12 @@
     "pnlUsd": -60.459176684163594,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791906678050,
+    "heartbeatAt": 1791906978050,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.92,
-    "lastScanAt": 1791906676654,
+    "lastScanAt": 1791906976494,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1357,13 +1357,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "205",
+        "v": "208",
         "n": "24 jam · 35 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "2132",
-        "n": "150 aktif"
+        "n": "149 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1373,9 +1373,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791906678050,
+      "lastDecisionAt": 1791906978050,
       "lastAction": "keputusan",
-      "lastReason": "UTYA [degen]: Dilewati karena red flag: holder baru 12."
+      "lastReason": "Rickbot [degen]: Dilewati: harga sudah -42% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1394,7 +1394,7 @@
       ],
       [
         "Wallet dipantau",
-        "2132 · 150 aktif"
+        "2132 · 149 aktif"
       ],
       [
         "Cadangan kas",
@@ -1402,7 +1402,7 @@
       ],
       [
         "Wallet tepercaya",
-        "5 · menjanjikan 18"
+        "5 · menjanjikan 17"
       ],
       [
         "Label wallet",
@@ -1455,10 +1455,10 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2132,
-      "active": 150,
-      "passive": 1982,
+      "active": 149,
+      "passive": 1983,
       "trusted": 5,
-      "promising": 18,
+      "promising": 17,
       "byLabel": [
         {
           "key": "bot",
@@ -1469,8 +1469,8 @@
         {
           "key": "smart",
           "total": 578,
-          "active": 124,
-          "passive": 454
+          "active": 123,
+          "passive": 455
         },
         {
           "key": "blacklist",
@@ -1610,6 +1610,36 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791906916606,
+        "symbol": "Rickbot",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -42% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791906878649,
+        "symbol": "HYPERLEV",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791906799687,
+        "symbol": "UNIPCS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati karena red flag: holder baru 9."
+      },
       {
         "at": 1791906628151,
         "symbol": "UTYA",
@@ -2561,55 +2591,17 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 6."
-      },
-      {
-        "at": 1791884896016,
-        "symbol": "WoW",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 12."
-      },
-      {
-        "at": 1791884642739,
-        "symbol": "QI",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 31%."
-      },
-      {
-        "at": 1791884309348,
-        "symbol": "shrek",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 7."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 43,
+        "below_entry": 45,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 116,
+        "red_flag": 117,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2659,7 +2651,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791906708969,
+    "generatedAt": 1791907012430,
     "trades": {
       "count": 127,
       "wins": 50,
