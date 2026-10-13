@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "15f5f42d-2282-4b3f-8366-2947c83e82e7",
-  "updatedAt": 1791877277915,
-  "generatedAt": "2026-10-13 14:41 WIB",
+  "generation": "0038772c-12c8-4ca0-9129-47aca5b69aa7",
+  "updatedAt": 1791877577914,
+  "generatedAt": "2026-10-13 14:46 WIB",
   "usdIdr": null,
   "totalUsd": 936.3081931921824,
   "nativeSymbol": "SOL",
@@ -1295,12 +1295,12 @@
     "pnlUsd": -63.69180680781756,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791877277915,
+    "heartbeatAt": 1791877577914,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.24,
-    "lastScanAt": 1791877274277,
+    "lastScanAt": 1791877577290,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1321,7 +1321,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "202",
+        "v": "203",
         "n": "24 jam · 37 diveto LLM"
       },
       {
@@ -1337,9 +1337,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791877277915,
+      "lastDecisionAt": 1791877577914,
       "lastAction": "keputusan",
-      "lastReason": "USDF [low]: Dilewati karena red flag: holder baru 99."
+      "lastReason": "CRAWL [mid]: Dilewati karena red flag: insider/entrapment pegang 16%."
     }
   },
   "strategy": {
@@ -1574,6 +1574,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791877396423,
+        "symbol": "CRAWL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 16%."
+      },
       {
         "at": 1791877001069,
         "symbol": "USDF",
@@ -2433,33 +2443,6 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets share near-identical metrics and onchain samples, strongly suggesting same operator, and our actual copy history shows -9.5% avg PnL despite their . Tidak dimasuki."
-      },
-      {
-        "at": 1791840205132,
-        "symbol": "RICK",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 294,
-            "note": "bundler pegang 18.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets show near-identical metrics (169 tokens, $1224/$1218 PnL, same outcome distributions) suggesting they are the same entity or one mirrors the other,. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2470,7 +2453,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 113,
+        "red_flag": 114,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2520,7 +2503,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791877313768,
+    "generatedAt": 1791877613078,
     "trades": {
       "count": 124,
       "wins": 48,
