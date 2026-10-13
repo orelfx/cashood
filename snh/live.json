@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f397cbee-4072-4a0d-bbe5-377e59774a7d",
-  "updatedAt": 1791911778068,
-  "generatedAt": "2026-10-14 00:16 WIB",
+  "generation": "4565e81f-122c-4aab-81f1-d4b82d2983a3",
+  "updatedAt": 1791912078069,
+  "generatedAt": "2026-10-14 00:21 WIB",
   "usdIdr": null,
   "totalUsd": 936.1494557734309,
   "nativeSymbol": "SOL",
@@ -1312,12 +1312,12 @@
     "pnlUsd": -63.85054422656913,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791911778068,
+    "heartbeatAt": 1791912078069,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.26,
-    "lastScanAt": 1791911777803,
+    "lastScanAt": 1791912073912,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1338,7 +1338,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "219",
+        "v": "222",
         "n": "24 jam · 34 diveto LLM"
       },
       {
@@ -1354,9 +1354,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791911778068,
+      "lastDecisionAt": 1791912078069,
       "lastAction": "keputusan",
-      "lastReason": "POOR [degen]: Dilewati karena red flag: likuiditas cuma $1582."
+      "lastReason": "XBT [degen]: Dilewati karena red flag: bundler pegang 26% supply."
     }
   },
   "strategy": {
@@ -1591,6 +1591,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791912017151,
+        "symbol": "XBT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 26% supply."
+      },
+      {
+        "at": 1791911911099,
+        "symbol": "MEOW",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -44% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791911876811,
+        "symbol": "BITCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $2476."
+      },
       {
         "at": 1791911774758,
         "symbol": "POOR",
@@ -2366,64 +2403,17 @@
           }
         ],
         "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
-      },
-      {
-        "at": 1791904430055,
-        "symbol": "NAAP",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
-      },
-      {
-        "at": 1791903914532,
-        "symbol": "GHOSTI",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 142,
-            "note": "bundler pegang 3.4%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 4.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 4,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets have low winrates (37-38%), heavy token churn (200+/week), significant sniper behavior (16-18% sold within 2min), and our past copies on them lost . Tidak dimasuki."
-      },
-      {
-        "at": 1791903291863,
-        "symbol": "TOWER",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 41% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 46,
+        "below_entry": 47,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 127,
+        "red_flag": 129,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2473,7 +2463,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791911815644,
+    "generatedAt": 1791912125152,
     "trades": {
       "count": 128,
       "wins": 50,
