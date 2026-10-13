@@ -1,57 +1,24 @@
 {
   "fund": "charon",
-  "updatedAt": 1791874886916,
-  "generatedAt": "2026-10-13 14:01 WIB",
+  "updatedAt": 1791875184525,
+  "generatedAt": "2026-10-13 14:06 WIB",
   "usdIdr": null,
   "nativeSymbol": "ETH",
   "nativePrice": 2533.81,
   "ethPrice": 2533.81,
-  "totalUsd": 1139.8,
-  "botWalletUsd": 1139.8,
-  "walletUsd": 997.48,
-  "lpUsd": 142.32,
+  "totalUsd": 1139.78,
+  "botWalletUsd": 1139.78,
+  "walletUsd": 1139.78,
+  "lpUsd": 0,
   "holdings": [
     {
       "symbol": "USDG",
-      "amount": 997.48,
+      "amount": 1139.78,
       "price": 1,
-      "usd": 997.48
+      "usd": 1139.78
     }
   ],
-  "positions": [
-    {
-      "symbol": "DELTA",
-      "band": "mid",
-      "horizon": "intraday",
-      "bookLabel": "intraday · mid cap",
-      "strategy": "llm",
-      "experimental": false,
-      "principalUsd": 142.32,
-      "feesUsd": 0,
-      "investedUsd": 142.48,
-      "collectedFeesUsd": 0,
-      "costUsd": 142.48,
-      "realizedUsd": 0,
-      "pnlPct": -0.11,
-      "stopPct": 8,
-      "targetPct": 18,
-      "maxHoldHours": 24,
-      "ageMinutes": 103,
-      "amount": 10333.804668355742,
-      "priceUsd": 0.013772171316199669,
-      "entryPriceUsd": 0.013787776783347179,
-      "partialDone": false,
-      "bestPct": 4.99,
-      "worstPct": -3.71,
-      "markedAt": 1791874878539,
-      "stale": false,
-      "thesis": "Multi-window bullish alignment with accelerating volume and broadening buyer participation (3.2x buy/sell ratio) supports trend continuation; intraday horizon provides time budget for trend to develop beyond 3.79% friction.",
-      "valueUsd": 142.32,
-      "pnlUsd": -0.16,
-      "totalFeesUsd": 0,
-      "tokenId": "pos-89f727fc286ea2d6645c"
-    }
-  ],
+  "positions": [],
   "history": [
     {
       "date": "2026-09-27",
@@ -151,20 +118,29 @@
       "losses": 1,
       "winUsd": 0,
       "lossUsd": -3.72
+    },
+    {
+      "date": "2026-10-13",
+      "usd": -0.18,
+      "closes": 1,
+      "wins": 0,
+      "losses": 0,
+      "winUsd": 0,
+      "lossUsd": 0
     }
   ],
   "historyNote": "hasil trade simulasi yang sudah ditutup, bersih setelah biaya swap dan jaringan yang dimodelkan",
   "stats": {
-    "closedCount": 268,
-    "openCount": 1,
+    "closedCount": 269,
+    "openCount": 0,
     "graded": 261,
     "wins": 48,
     "losses": 213,
     "winRate": 18.39,
-    "realisedUsd": -360.04,
+    "realisedUsd": -360.22,
     "bestDay": {
-      "date": "2026-09-27",
-      "usd": -1.97
+      "date": "2026-10-13",
+      "usd": -0.18
     },
     "worstDay": {
       "date": "2026-10-01",
@@ -174,6 +150,17 @@
     "timezone": "Asia/Jakarta (UTC+7)"
   },
   "closedRecent": [
+    {
+      "symbol": "DELTA",
+      "closedAt": 1791874936327,
+      "investedUsd": 142.48,
+      "netUsd": -0.18,
+      "netPct": -0.13,
+      "holdMinutes": 104,
+      "strategy": "intraday · mid cap",
+      "reason": "alasan masuk batal",
+      "reasonDetail": "THESIS_INVALIDATED: DELTA momentum invalid: h1 -2.10% negative with price above entry, volumeAccelH1 0.77x < 0.8x threshold, unique buyers h1 12 < 20 threshold; price rolled -4.1% from 0.01471 peak; 3.79% friction."
+    },
     {
       "symbol": "ORBIO",
       "closedAt": 1791699803681,
@@ -382,28 +369,17 @@
       "strategy": "scalp · degen",
       "reason": "lainnya",
       "reasonDetail": "FOLLOW_EXIT: 1/2 followed wallets sold"
-    },
-    {
-      "symbol": "0x…",
-      "closedAt": 1791232634381,
-      "investedUsd": 6.15,
-      "netUsd": -1.48,
-      "netPct": -24.06,
-      "holdMinutes": 1,
-      "strategy": "scalp · degen",
-      "reason": "lainnya",
-      "reasonDetail": "RUG_EXIT: exit impact 19.7% vs 0.0% at entry"
     }
   ],
   "trading": {
     "paper": true,
     "mode": "dry_run",
     "initialUsd": 1500,
-    "cashUsd": 997.48,
-    "positionsUsd": 142.32,
-    "realizedUsd": -360.04,
-    "unrealizedUsd": -0.16,
-    "modeledFeesUsd": 146.03,
+    "cashUsd": 1139.78,
+    "positionsUsd": 0,
+    "realizedUsd": -360.22,
+    "unrealizedUsd": 0,
+    "modeledFeesUsd": 146.07,
     "peakUsd": 1183.97,
     "drawdownPct": 3.73,
     "dayStartUsd": 1139.96,
@@ -411,28 +387,28 @@
     "startedAt": 1790405776427,
     "status": "attention",
     "processStatus": "online",
-    "heartbeatAt": 1791874878539,
+    "heartbeatAt": 1791875181553,
     "lastScanAt": 1791874828014,
     "cashPeg": 1.0009855047,
     "llm": {
       "model": "MiniMax-M3",
-      "calls24h": 104,
+      "calls24h": 103,
       "dailyBudget": 96,
-      "lastDecisionAt": 1791874270068,
+      "lastDecisionAt": 1791874935159,
       "lastAction": "WAIT",
-      "lastReason": "No candidates supplied. Managing open DELTA position only. h1 has flipped negative (-4.25%) and participation is collapsing (buyersAccel 0.75x, uniqueBuyersGrowth -67%, h1 14 buyers vs 26 sellers), but h6 trend remains intact (+29.3%) and price is still well above entry. HOLD while trend structure holds; thesis-invalidation is closer but not yet breached (p…"
+      "lastReason": "ORBIO shows sustained -22.3% h24 decline with h1 -1.35%, weak volume/buyer acceleration (0.43x/0.50x), score 1. Same token that failed a recovery play recently; no defensible setup."
     },
     "activity24h": {
-      "scans": 143,
-      "decisions": 98,
+      "scans": 142,
+      "decisions": 99,
       "quotesRejected": 18,
       "entriesRejected": 1,
       "buys": 1,
-      "sells": 0
+      "sells": 1
     }
   },
   "schemaVersion": 2,
-  "generation": "b5d41512-86ef-444a-b2dc-ba5ffe2090ca",
+  "generation": "141543ef-b24e-45ba-9720-0b4b91ddb580",
   "treasuryUsd": 0,
   "quality": {
     "complete": true,
@@ -440,21 +416,21 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791874887392,
+    "generatedAt": 1791875184918,
     "trades": {
-      "count": 268,
+      "count": 269,
       "wins": 48,
       "losses": 213,
-      "flat": 7,
+      "flat": 8,
       "winRate": 18.39,
       "usdComplete": true,
-      "netUsd": -360.04,
+      "netUsd": -360.22,
       "grossProfitUsd": 140.83,
-      "grossLossUsd": -500.87,
+      "grossLossUsd": -501.05,
       "profitFactor": 0.28,
       "profitFactorBasis": "usd",
       "expectancyUsd": -1.34,
-      "expectancyPct": -7.04,
+      "expectancyPct": -7.02,
       "avgWinUsd": 2.93,
       "avgLossUsd": -2.35,
       "avgWinPct": 15.34,
@@ -474,9 +450,9 @@
       "longestWinStreak": 3,
       "longestLossStreak": 18,
       "avgHoldMinutes": 140,
-      "tradesPerDay": 19.5,
+      "tradesPerDay": 17,
       "firstAt": 1790510820968,
-      "lastAt": 1791699803681
+      "lastAt": 1791874936327
     },
     "equity": {
       "days": 16,
@@ -488,7 +464,7 @@
       "maxDrawdownPeakUsd": 500,
       "maxDrawdownTroughUsd": 1135.71,
       "currentDrawdownPct": 69.13,
-      "currentDrawdownUsd": 2552.44,
+      "currentDrawdownUsd": 2552.46,
       "positiveDaysPct": 0,
       "bestDayPct": 0,
       "worstDayPct": -27.69,
@@ -497,7 +473,7 @@
       "calmar": null,
       "since": 1790467193741
     },
-    "profitUsd": -360.2,
+    "profitUsd": -360.22,
     "profitPct": -24.01,
     "recoveryFactor": -1.04,
     "score": {
@@ -589,6 +565,13 @@
       "usd": -3.72,
       "w": 0,
       "l": 1
+    },
+    {
+      "d": "2026-10-13",
+      "n": 1,
+      "usd": -0.18,
+      "w": 0,
+      "l": 0
     }
   ]
 }
