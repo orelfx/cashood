@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bb930e40-593d-42cc-bee2-cb9f2674a554",
-  "updatedAt": 1791918378079,
-  "generatedAt": "2026-10-14 02:06 WIB",
+  "generation": "270b78aa-238a-4642-9ae3-e199e0845cc3",
+  "updatedAt": 1791918678079,
+  "generatedAt": "2026-10-14 02:11 WIB",
   "usdIdr": null,
   "totalUsd": 934.1480112731265,
   "nativeSymbol": "SOL",
@@ -1329,12 +1329,12 @@
     "pnlUsd": -65.85198872687351,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791918378079,
+    "heartbeatAt": 1791918678079,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.46,
-    "lastScanAt": 1791918374349,
+    "lastScanAt": 1791918675813,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1356,12 +1356,12 @@
       {
         "k": "Sinyal wallet",
         "v": "191",
-        "n": "24 jam · 24 diveto LLM"
+        "n": "24 jam · 25 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "2139",
-        "n": "149 aktif"
+        "n": "148 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1371,9 +1371,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791918378079,
+      "lastDecisionAt": 1791918678079,
       "lastAction": "keputusan",
-      "lastReason": "MissRose [degen]: Dilewati karena red flag: holder baru 9."
+      "lastReason": "fishy [degen]: Diveto LLM: Neither wallet shows big winners (over x5=0 for both) and wallet smart #76 has failed our copies (-21.4% avg) plus excessive churn (369 tokens/week) with no asym. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1392,7 +1392,7 @@
       ],
       [
         "Wallet dipantau",
-        "2139 · 149 aktif"
+        "2139 · 148 aktif"
       ],
       [
         "Cadangan kas",
@@ -1453,8 +1453,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2139,
-      "active": 149,
-      "passive": 1990,
+      "active": 148,
+      "passive": 1991,
       "trusted": 5,
       "promising": 17,
       "byLabel": [
@@ -1467,8 +1467,8 @@
         {
           "key": "smart",
           "total": 575,
-          "active": 124,
-          "passive": 451
+          "active": 123,
+          "passive": 452
         },
         {
           "key": "blacklist",
@@ -1570,15 +1570,6 @@
           "trusted": false
         },
         {
-          "alias": "smart #1759",
-          "label": "smart",
-          "score": 89.1,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
           "alias": "smart #1920",
           "label": "smart",
           "score": 89.1,
@@ -1604,10 +1595,51 @@
           "won": 0,
           "pnlUsd": 0,
           "trusted": false
+        },
+        {
+          "alias": "smart #342",
+          "label": "smart",
+          "score": 87.9,
+          "copied": 1,
+          "won": 1,
+          "pnlUsd": 0.9440884047415121,
+          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1791918561069,
+        "symbol": "fishy",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 292,
+            "note": "bundler pegang 12.0%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 0.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 7,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 516,
+            "note": "6.6% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Neither wallet shows big winners (over x5=0 for both) and wallet smart #76 has failed our copies (-21.4% avg) plus excessive churn (369 tokens/week) with no asym. Tidak dimasuki."
+      },
       {
         "at": 1791918313822,
         "symbol": "MissRose",
@@ -2407,16 +2439,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -42% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791906878649,
-        "symbol": "HYPERLEV",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2427,7 +2449,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 107,
+        "red_flag": 106,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2444,7 +2466,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 24
+        "llm": 25
       },
       "test": {
         "solo": 0,
@@ -2477,7 +2499,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791918414972,
+    "generatedAt": 1791918714547,
     "trades": {
       "count": 130,
       "wins": 51,
