@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "401b4f2c-63d7-42cf-adf2-1eb5d3517bfa",
-  "updatedAt": 1791868577867,
-  "generatedAt": "2026-10-13 12:16 WIB",
+  "generation": "40341762-7887-427f-83fc-570524540dd5",
+  "updatedAt": 1791868877868,
+  "generatedAt": "2026-10-13 12:21 WIB",
   "usdIdr": null,
   "totalUsd": 935.4431754587303,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -64.55682454126975,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791868577867,
+    "heartbeatAt": 1791868877868,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.33,
-    "lastScanAt": 1791868576554,
+    "lastScanAt": 1791868874096,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,8 +1316,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "201",
-        "n": "24 jam · 35 diveto LLM"
+        "v": "202",
+        "n": "24 jam · 36 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791868577867,
+      "lastDecisionAt": 1791868877868,
       "lastAction": "keputusan",
-      "lastReason": "LEAN [degen]: Dilewati karena red flag: bundler pegang 26.37% supply."
+      "lastReason": "ss [degen]: Diveto LLM: Wallet 1 carries 'trojan' tag (potential dump risk) and Wallet 2 shows bot/sniper behavior with poor 48% winrate and 51 losses; group quality is weak despite Wa. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1569,6 +1569,39 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791868608388,
+        "symbol": "ss",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 625,
+            "note": "bundler pegang 4.5%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 4.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "12.5% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Wallet 1 carries 'trojan' tag (potential dump risk) and Wallet 2 shows bot/sniper behavior with poor 48% winrate and 51 losses; group quality is weak despite Wa. Tidak dimasuki."
+      },
       {
         "at": 1791868470683,
         "symbol": "LEAN",
@@ -2373,63 +2406,6 @@
           }
         ],
         "reason": "Take profit bertahap (TP1): jual sebagian senilai $4,10; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791839296348,
-        "symbol": "KIT",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 11.88% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 1%"
-          },
-          {
-            "type": "bundler",
-            "count": 194,
-            "note": "bundler pegang 3.9%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 2.4%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 6.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 102,
-            "note": "9.1% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 6x likuiditas"
-          },
-          {
-            "type": "top10",
-            "count": null,
-            "note": "10 holder terbesar pegang 30.8%"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $3,45, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
@@ -2457,7 +2433,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 35
+        "llm": 36
       },
       "test": {
         "solo": 0,
@@ -2490,7 +2466,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791868617551,
+    "generatedAt": 1791868927214,
     "trades": {
       "count": 123,
       "wins": 47,
