@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4565e81f-122c-4aab-81f1-d4b82d2983a3",
-  "updatedAt": 1791912078069,
-  "generatedAt": "2026-10-14 00:21 WIB",
+  "generation": "2beecbce-6df3-481d-98f3-c864d38d14ba",
+  "updatedAt": 1791912378072,
+  "generatedAt": "2026-10-14 00:26 WIB",
   "usdIdr": null,
   "totalUsd": 936.1494557734309,
   "nativeSymbol": "SOL",
@@ -1312,12 +1312,12 @@
     "pnlUsd": -63.85054422656913,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791912078069,
+    "heartbeatAt": 1791912378072,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.26,
-    "lastScanAt": 1791912073912,
+    "lastScanAt": 1791912375109,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1338,7 +1338,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "222",
+        "v": "225",
         "n": "24 jam · 34 diveto LLM"
       },
       {
@@ -1354,9 +1354,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791912078069,
+      "lastDecisionAt": 1791912378072,
       "lastAction": "keputusan",
-      "lastReason": "XBT [degen]: Dilewati karena red flag: bundler pegang 26% supply."
+      "lastReason": "BITTY [degen]: Dilewati karena red flag: likuiditas cuma $1489."
     }
   },
   "strategy": {
@@ -1591,6 +1591,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791912232762,
+        "symbol": "BITTY",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $1489."
+      },
+      {
+        "at": 1791912211441,
+        "symbol": "BOB",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791912161190,
+        "symbol": "funnel",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
       {
         "at": 1791912017151,
         "symbol": "XBT",
@@ -2262,158 +2299,17 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -47% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791904739419,
-        "symbol": "SIM",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 11.35% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 210,
-            "note": "bundler pegang 11.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 6.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 310,
-            "note": "14.6% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 12x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $3,05; sisanya jalan terus dengan stop di titik impas."
-      },
-      {
-        "at": 1791904734723,
-        "symbol": "SIM",
-        "action": "partial",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 11.35% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 210,
-            "note": "bundler pegang 11.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 6.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 310,
-            "note": "14.6% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 12x likuiditas"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $2,45, sisanya dijaga stop titik impas."
-      },
-      {
-        "at": 1791904479438,
-        "symbol": "SIM",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 11.35% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 210,
-            "note": "bundler pegang 11.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 6.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 310,
-            "note": "14.6% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 12x likuiditas"
-          }
-        ],
-        "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 47,
+        "below_entry": 48,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 129,
+        "red_flag": 131,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2463,7 +2359,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791912125152,
+    "generatedAt": 1791912424129,
     "trades": {
       "count": 128,
       "wins": 50,
