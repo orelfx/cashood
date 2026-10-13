@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0222f712-813f-486d-a8e0-7470b181dde0",
-  "updatedAt": 1791927078133,
-  "generatedAt": "2026-10-14 04:31 WIB",
+  "generation": "e8b292f1-1970-4d2c-9cae-963f1551412c",
+  "updatedAt": 1791927378132,
+  "generatedAt": "2026-10-14 04:36 WIB",
   "usdIdr": null,
   "totalUsd": 928.9978479928287,
   "nativeSymbol": "SOL",
@@ -1310,12 +1310,12 @@
     "pnlUsd": -71.00215200717128,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791927078133,
+    "heartbeatAt": 1791927378132,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.97,
-    "lastScanAt": 1791927074128,
+    "lastScanAt": 1791927375477,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1352,9 +1352,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791927078133,
+      "lastDecisionAt": 1791927378132,
       "lastAction": "keputusan",
-      "lastReason": "MIKAN [low]: Dilewati karena red flag: bundler pegang 62% supply."
+      "lastReason": "BIBI [degen]: Dilewati karena red flag: holder baru 18."
     }
   },
   "strategy": {
@@ -1589,6 +1589,36 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791927321422,
+        "symbol": "BIBI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 18."
+      },
+      {
+        "at": 1791927318046,
+        "symbol": "BIBI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $0."
+      },
+      {
+        "at": 1791927200259,
+        "symbol": "UNITS",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791926847501,
         "symbol": "MIKAN",
@@ -2331,69 +2361,17 @@
           "smart": 4
         },
         "reason": "Dilewati karena red flag: holder baru 12."
-      },
-      {
-        "at": 1791918839561,
-        "symbol": "AUC",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -40% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791918561069,
-        "symbol": "fishy",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 292,
-            "note": "bundler pegang 12.0%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 0.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 7,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 516,
-            "note": "6.6% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: Neither wallet shows big winners (over x5=0 for both) and wallet smart #76 has failed our copies (-21.4% avg) plus excessive churn (369 tokens/week) with no asym. Tidak dimasuki."
-      },
-      {
-        "at": 1791918313822,
-        "symbol": "MissRose",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 9."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 53,
+        "below_entry": 52,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 101,
+        "red_flag": 102,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2443,7 +2421,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791927116049,
+    "generatedAt": 1791927414673,
     "trades": {
       "count": 132,
       "wins": 51,
