@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9c550bee-aaca-42b6-87f6-6176470deae5",
-  "updatedAt": 1791909678062,
-  "generatedAt": "2026-10-13 23:41 WIB",
+  "generation": "9dc89a54-4bf6-4cef-a4a0-1130c282c57c",
+  "updatedAt": 1791909978062,
+  "generatedAt": "2026-10-13 23:46 WIB",
   "usdIdr": null,
   "totalUsd": 936.1494557734309,
   "nativeSymbol": "SOL",
@@ -1312,12 +1312,12 @@
     "pnlUsd": -63.85054422656913,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791909678062,
+    "heartbeatAt": 1791909978062,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.26,
-    "lastScanAt": 1791909677749,
+    "lastScanAt": 1791909976736,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1338,12 +1338,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "212",
+        "v": "211",
         "n": "24 jam · 36 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "2137",
+        "v": "2138",
         "n": "150 aktif"
       },
       {
@@ -1354,9 +1354,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791909678062,
+      "lastDecisionAt": 1791909978062,
       "lastAction": "keputusan",
-      "lastReason": "UTYA [degen]: Dilewati karena red flag: akun Twitter dev sudah ganti nama 6x."
+      "lastReason": "Rickbot [degen]: Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1375,7 +1375,7 @@
       ],
       [
         "Wallet dipantau",
-        "2137 · 150 aktif"
+        "2138 · 150 aktif"
       ],
       [
         "Cadangan kas",
@@ -1387,7 +1387,7 @@
       ],
       [
         "Label wallet",
-        "smart 580 · bot 1068 · blacklist 284 · lp 1 · fresh 49 · kol 109 · dolphin 44 · whale 2"
+        "smart 580 · bot 1068 · blacklist 284 · lp 1 · fresh 50 · kol 109 · dolphin 44 · whale 2"
       ]
     ],
     "requirements": [
@@ -1435,9 +1435,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 2137,
+      "tracked": 2138,
       "active": 150,
-      "passive": 1987,
+      "passive": 1988,
       "trusted": 5,
       "promising": 18,
       "byLabel": [
@@ -1467,9 +1467,9 @@
         },
         {
           "key": "fresh",
-          "total": 49,
+          "total": 50,
           "active": 0,
-          "passive": 49
+          "passive": 50
         },
         {
           "key": "dolphin",
@@ -1591,6 +1591,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791909765353,
+        "symbol": "Rickbot",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791908427879,
         "symbol": "UTYA",
@@ -2597,39 +2607,17 @@
           }
         ],
         "reason": "Diveto LLM: All three wallets lack x2-x5/over-x5 winners, heavy churn in wallet3 suggests bot behavior, and our_copies on wallets 1 and 2 show 0 wins with -16.9% avg PnL—co. Tidak dimasuki."
-      },
-      {
-        "at": 1791894561669,
-        "symbol": "POGE",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 100,
-            "note": "bundler pegang 10.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets appear to be same operator (identical tags, nearly identical metrics) with low 37-38% winrate, minimal big winners (1 over_x5 each), and our actual. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 45,
+        "below_entry": 46,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 119,
+        "red_flag": 117,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2679,7 +2667,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791909714798,
+    "generatedAt": 1791910009844,
     "trades": {
       "count": 128,
       "wins": 50,
