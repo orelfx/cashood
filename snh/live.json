@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9dc89a54-4bf6-4cef-a4a0-1130c282c57c",
-  "updatedAt": 1791909978062,
-  "generatedAt": "2026-10-13 23:46 WIB",
+  "generation": "d0ae9dd5-0f4a-48d8-850c-c0770a174baf",
+  "updatedAt": 1791910278062,
+  "generatedAt": "2026-10-13 23:51 WIB",
   "usdIdr": null,
   "totalUsd": 936.1494557734309,
   "nativeSymbol": "SOL",
@@ -1312,12 +1312,12 @@
     "pnlUsd": -63.85054422656913,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791909978062,
+    "heartbeatAt": 1791910278062,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.26,
-    "lastScanAt": 1791909976736,
+    "lastScanAt": 1791910275121,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1338,7 +1338,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "211",
+        "v": "210",
         "n": "24 jam · 36 diveto LLM"
       },
       {
@@ -1354,9 +1354,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791909978062,
+      "lastDecisionAt": 1791910278062,
       "lastAction": "keputusan",
-      "lastReason": "Rickbot [degen]: Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "T [degen]: Diveto LLM: Both wallets show extreme token churn (194-226/week) with bot-like scalping patterns (median hold ~6-8 min), near-identical outcomes suggesting same operator, n. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1387,7 +1387,7 @@
       ],
       [
         "Label wallet",
-        "smart 580 · bot 1068 · blacklist 284 · lp 1 · fresh 50 · kol 109 · dolphin 44 · whale 2"
+        "smart 580 · bot 1068 · blacklist 285 · lp 1 · fresh 50 · kol 108 · dolphin 44 · whale 2"
       ]
     ],
     "requirements": [
@@ -1450,20 +1450,20 @@
         {
           "key": "smart",
           "total": 580,
-          "active": 124,
-          "passive": 456
+          "active": 125,
+          "passive": 455
         },
         {
           "key": "blacklist",
-          "total": 284,
+          "total": 285,
           "active": 0,
-          "passive": 284
+          "passive": 285
         },
         {
           "key": "kol",
-          "total": 109,
+          "total": 108,
           "active": 10,
-          "passive": 99
+          "passive": 98
         },
         {
           "key": "fresh",
@@ -1474,8 +1474,8 @@
         {
           "key": "dolphin",
           "total": 44,
-          "active": 16,
-          "passive": 28
+          "active": 15,
+          "passive": 29
         },
         {
           "key": "whale",
@@ -1526,6 +1526,15 @@
           "trusted": false
         },
         {
+          "alias": "dolphin #1309",
+          "label": "dolphin",
+          "score": 96.3,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
           "alias": "dolphin #1913",
           "label": "dolphin",
           "score": 96,
@@ -1547,15 +1556,6 @@
           "alias": "smart #1662",
           "label": "smart",
           "score": 94.2,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
-          "alias": "dolphin #1309",
-          "label": "dolphin",
-          "score": 91.3,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1591,6 +1591,28 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791910134432,
+        "symbol": "T",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 15.19% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 109,
+            "note": "bundler pegang 6.4%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show extreme token churn (194-226/week) with bot-like scalping patterns (median hold ~6-8 min), near-identical outcomes suggesting same operator, n. Tidak dimasuki."
+      },
       {
         "at": 1791909765353,
         "symbol": "Rickbot",
@@ -2580,33 +2602,6 @@
           }
         ],
         "reason": "Diveto LLM: Both top wallets show strong realized returns but ZERO x2-x5 or over-x5 winners, indicating a micro-profit strategy that failed badly for us (avg -16.9% on 4 co. Tidak dimasuki."
-      },
-      {
-        "at": 1791895257644,
-        "symbol": "PQC",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 13.8%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 11.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "11.1% holder wallet baru"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets lack x2-x5/over-x5 winners, heavy churn in wallet3 suggests bot behavior, and our_copies on wallets 1 and 2 show 0 wins with -16.9% avg PnL—co. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2617,7 +2612,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 117,
+        "red_flag": 116,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2667,7 +2662,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791910009844,
+    "generatedAt": 1791910310852,
     "trades": {
       "count": 128,
       "wins": 50,
