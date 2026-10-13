@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "329dc4c1-f2c6-45be-8c89-fba72dddf683",
-  "updatedAt": 1791929778154,
-  "generatedAt": "2026-10-14 05:16 WIB",
+  "generation": "32609f37-6585-4a8a-815c-8820f9dadb51",
+  "updatedAt": 1791930078154,
+  "generatedAt": "2026-10-14 05:21 WIB",
   "usdIdr": null,
   "totalUsd": 928.9978479928287,
   "nativeSymbol": "SOL",
@@ -1309,12 +1309,12 @@
     "pnlUsd": -71.00215200717128,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791929778154,
+    "heartbeatAt": 1791930078154,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.97,
-    "lastScanAt": 1791929777442,
+    "lastScanAt": 1791930074007,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1351,9 +1351,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791929778154,
+      "lastDecisionAt": 1791930078154,
       "lastAction": "keputusan",
-      "lastReason": "PEDRO [degen]: Dilewati karena red flag: holder baru 18."
+      "lastReason": "KOL [degen]: Dilewati karena red flag: bundler pegang 77.31% supply."
     }
   },
   "strategy": {
@@ -1588,6 +1588,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791930050207,
+        "symbol": "KOL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 77.31% supply."
+      },
+      {
+        "at": 1791929969143,
+        "symbol": "Starcat",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 7."
+      },
       {
         "at": 1791929585394,
         "symbol": "PEDRO",
@@ -2294,33 +2321,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 17%."
-      },
-      {
-        "at": 1791923290017,
-        "symbol": "QCAT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 17."
-      },
-      {
-        "at": 1791923277548,
-        "symbol": "QEPE",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 167,
-            "note": "bundler pegang 5.5%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets are nearly identical in every metric (49% winrate, 0.19 ROI, same outcome distribution, same habits) suggesting same operator/bots, and our copy hi. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2381,7 +2381,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791929845736,
+    "generatedAt": 1791930118842,
     "trades": {
       "count": 132,
       "wins": 51,
