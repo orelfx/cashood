@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bf18d79f-522b-4a00-81af-86bdc8bdca18",
-  "updatedAt": 1791905778048,
-  "generatedAt": "2026-10-13 22:36 WIB",
+  "generation": "96f2ff8d-eb12-4863-8e69-5a381d3e7f0e",
+  "updatedAt": 1791906078049,
+  "generatedAt": "2026-10-13 22:41 WIB",
   "usdIdr": null,
   "totalUsd": 939.5408233158364,
   "nativeSymbol": "SOL",
@@ -1331,12 +1331,12 @@
     "pnlUsd": -60.459176684163594,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791905778048,
+    "heartbeatAt": 1791906078049,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.92,
-    "lastScanAt": 1791905774501,
+    "lastScanAt": 1791906076174,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1357,7 +1357,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "197",
+        "v": "198",
         "n": "24 jam · 34 diveto LLM"
       },
       {
@@ -1373,9 +1373,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791905778048,
+      "lastDecisionAt": 1791906078049,
       "lastAction": "keputusan",
-      "lastReason": "OTC [degen]: Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "GCAT [degen]: Dilewati karena red flag: holder baru 22."
     }
   },
   "strategy": {
@@ -1610,6 +1610,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791905827244,
+        "symbol": "GCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 22."
+      },
       {
         "at": 1791905646832,
         "symbol": "OTC",
@@ -2553,58 +2563,6 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: holder baru 81."
-      },
-      {
-        "at": 1791876287071,
-        "symbol": "PinkWall",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 14.1% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 283,
-            "note": "bundler pegang 20.3%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 13.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 393,
-            "note": "13.3% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 12x likuiditas"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 1 menit. Hasil +8,5%."
       }
     ],
     "reasonStats": {
@@ -2615,7 +2573,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 111,
+        "red_flag": 112,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2665,7 +2623,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791905812605,
+    "generatedAt": 1791906112790,
     "trades": {
       "count": 127,
       "wins": 50,
