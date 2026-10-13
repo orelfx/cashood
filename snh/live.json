@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "40676dc4-d472-4c70-a476-fa46823c9256",
-  "updatedAt": 1791901578018,
-  "generatedAt": "2026-10-13 21:26 WIB",
+  "generation": "d75f2c00-816f-4c49-8754-18654280d8af",
+  "updatedAt": 1791901878017,
+  "generatedAt": "2026-10-13 21:31 WIB",
   "usdIdr": null,
   "totalUsd": 938.8792894152177,
   "nativeSymbol": "SOL",
@@ -1305,12 +1305,12 @@
     "pnlUsd": -61.12071058478227,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791901578018,
+    "heartbeatAt": 1791901878017,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.99,
-    "lastScanAt": 1791901577405,
+    "lastScanAt": 1791901877196,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1337,7 +1337,7 @@
       {
         "k": "Wallet dipantau",
         "v": "2122",
-        "n": "151 aktif"
+        "n": "150 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1347,9 +1347,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791901578018,
+      "lastDecisionAt": 1791901878017,
       "lastAction": "keputusan",
-      "lastReason": "p-P [degen]: Dilewati karena red flag: bundler pegang 58.79% supply."
+      "lastReason": "NAAP [degen]: Dilewati karena red flag: dev masih pegang 79.31%."
     }
   },
   "strategy": {
@@ -1368,7 +1368,7 @@
       ],
       [
         "Wallet dipantau",
-        "2122 · 151 aktif"
+        "2122 · 150 aktif"
       ],
       [
         "Cadangan kas",
@@ -1429,8 +1429,8 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2122,
-      "active": 151,
-      "passive": 1971,
+      "active": 150,
+      "passive": 1972,
       "trusted": 5,
       "promising": 18,
       "byLabel": [
@@ -1467,8 +1467,8 @@
         {
           "key": "dolphin",
           "total": 46,
-          "active": 18,
-          "passive": 28
+          "active": 17,
+          "passive": 29
         },
         {
           "key": "whale",
@@ -1537,15 +1537,6 @@
           "trusted": false
         },
         {
-          "alias": "dolphin #1904",
-          "label": "dolphin",
-          "score": 95.9,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
           "alias": "smart #1662",
           "label": "smart",
           "score": 94.2,
@@ -1580,10 +1571,39 @@
           "won": 0,
           "pnlUsd": 0,
           "trusted": false
+        },
+        {
+          "alias": "smart #2086",
+          "label": "smart",
+          "score": 88.6,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1791901800921,
+        "symbol": "NAAP",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
+      },
+      {
+        "at": 1791901778528,
+        "symbol": "opc",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791900180290,
         "symbol": "p-P",
@@ -2513,71 +2533,17 @@
           }
         ],
         "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791850940704,
-        "symbol": "STONKINU",
-        "action": "exit",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 280,
-            "note": "bundler pegang 3.4%"
-          },
-          {
-            "type": "rat",
-            "count": 8,
-            "note": "insider/entrapment pegang 7.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 26,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Keluar (stop): Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 5,1 jam. Hasil -3,9%."
-      },
-      {
-        "at": 1791850885602,
-        "symbol": "STONKINU",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 280,
-            "note": "bundler pegang 3.4%"
-          },
-          {
-            "type": "rat",
-            "count": 8,
-            "note": "insider/entrapment pegang 7.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 26,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Ambil profit lebih awal: posisi sudah untung dan mendekati waktu/level jual kebiasaan wallet yang diikuti; jual sebagian senilai $2,29, sisanya dijaga stop titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 31,
+        "below_entry": 32,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 108,
+        "red_flag": 107,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2627,7 +2593,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791901623158,
+    "generatedAt": 1791901918424,
     "trades": {
       "count": 126,
       "wins": 49,
