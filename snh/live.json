@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "15dffd93-bdaf-45a2-adae-cc98fd881efb",
-  "updatedAt": 1791889877957,
-  "generatedAt": "2026-10-13 18:11 WIB",
+  "generation": "f38b4cd7-a8cb-47b9-9d7f-6ba072e203a4",
+  "updatedAt": 1791890177960,
+  "generatedAt": "2026-10-13 18:16 WIB",
   "usdIdr": null,
   "totalUsd": 936.3081931921824,
   "nativeSymbol": "SOL",
@@ -1295,12 +1295,12 @@
     "pnlUsd": -63.69180680781756,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791889877957,
+    "heartbeatAt": 1791890177960,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.24,
-    "lastScanAt": 1791889877946,
+    "lastScanAt": 1791890176937,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1321,7 +1321,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "194",
+        "v": "193",
         "n": "24 jam · 33 diveto LLM"
       },
       {
@@ -1337,9 +1337,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791889877957,
+      "lastDecisionAt": 1791890177960,
       "lastAction": "keputusan",
-      "lastReason": "Dirac Quantum [degen]: Dilewati karena red flag: 50% holder wallet baru (sybil)."
+      "lastReason": "afk [degen]: Diveto LLM: Both wallets show poor copy-trading history (-5% avg PnL on 3 copies each) and mostly sell at losses (median exit -2.9% for wallet 2), despite modest realized g. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1574,6 +1574,28 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791890034299,
+        "symbol": "afk",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 6.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 12,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets show poor copy-trading history (-5% avg PnL on 3 copies each) and mostly sell at losses (median exit -2.9% for wallet 2), despite modest realized g. Tidak dimasuki."
+      },
       {
         "at": 1791888498588,
         "symbol": "Dirac Quantum",
@@ -2394,39 +2416,12 @@
           }
         ],
         "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 34x."
-      },
-      {
-        "at": 1791842138337,
-        "symbol": "BuckMe",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 266,
-            "note": "bundler pegang 12.1%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 2.3%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Keluar (time limit): Batas waktu tahan 4 jam tercapai. TP1 sudah kena di +20%. Hasil +7,1%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 34,
+        "below_entry": 33,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2481,7 +2476,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791889916685,
+    "generatedAt": 1791890217659,
     "trades": {
       "count": 124,
       "wins": 48,
