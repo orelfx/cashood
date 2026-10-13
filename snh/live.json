@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "50992fe3-1158-4c6d-a074-eab605e75c49",
-  "updatedAt": 1791902178018,
-  "generatedAt": "2026-10-13 21:36 WIB",
+  "generation": "47610546-7572-471a-aaec-26df9ec9f0a9",
+  "updatedAt": 1791902478018,
+  "generatedAt": "2026-10-13 21:41 WIB",
   "usdIdr": null,
   "totalUsd": 938.8792894152177,
   "nativeSymbol": "SOL",
@@ -1305,12 +1305,12 @@
     "pnlUsd": -61.12071058478227,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791902178018,
+    "heartbeatAt": 1791902478018,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 6.99,
-    "lastScanAt": 1791902175324,
+    "lastScanAt": 1791902477745,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1331,7 +1331,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "184",
+        "v": "186",
         "n": "24 jam · 33 diveto LLM"
       },
       {
@@ -1347,9 +1347,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791902178018,
+      "lastDecisionAt": 1791902478018,
       "lastAction": "keputusan",
-      "lastReason": "SEALS [low]: Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "NAAP [degen]: Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1380,7 +1380,7 @@
       ],
       [
         "Label wallet",
-        "smart 576 · bot 1061 · blacklist 281 · lp 1 · fresh 47 · kol 109 · dolphin 46 · whale 2"
+        "smart 576 · bot 1062 · blacklist 281 · lp 1 · fresh 46 · kol 109 · dolphin 46 · whale 2"
       ]
     ],
     "requirements": [
@@ -1436,9 +1436,9 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 1061,
+          "total": 1062,
           "active": 0,
-          "passive": 1061
+          "passive": 1062
         },
         {
           "key": "smart",
@@ -1460,9 +1460,9 @@
         },
         {
           "key": "fresh",
-          "total": 47,
+          "total": 46,
           "active": 0,
-          "passive": 47
+          "passive": 46
         },
         {
           "key": "dolphin",
@@ -1584,6 +1584,36 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791902400929,
+        "symbol": "NAAP",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791902380485,
+        "symbol": "opc",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1
+        },
+        "reason": "Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791902227747,
+        "symbol": "SEALS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791901973660,
         "symbol": "SEALS",
@@ -2503,47 +2533,17 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 26% supply."
-      },
-      {
-        "at": 1791854649779,
-        "symbol": "STREAM",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791854047307,
-        "symbol": "STREAM",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791851417142,
-        "symbol": "BUBBLE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 18%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 33,
+        "below_entry": 36,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 107,
+        "red_flag": 106,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2593,7 +2593,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791902211003,
+    "generatedAt": 1791902510450,
     "trades": {
       "count": 126,
       "wins": 49,
