@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9d88f37d-60e6-4f07-91cc-0323e6020164",
-  "updatedAt": 1791921378102,
-  "generatedAt": "2026-10-14 02:56 WIB",
+  "generation": "d6fc058c-06da-4452-9a02-e3383a3ea595",
+  "updatedAt": 1791921678102,
+  "generatedAt": "2026-10-14 03:01 WIB",
   "usdIdr": null,
   "totalUsd": 934.1480112731265,
   "nativeSymbol": "SOL",
@@ -1329,12 +1329,12 @@
     "pnlUsd": -65.85198872687351,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791921378102,
+    "heartbeatAt": 1791921678102,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.46,
-    "lastScanAt": 1791921376387,
+    "lastScanAt": 1791921677675,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1355,7 +1355,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "173",
+        "v": "176",
         "n": "24 jam · 22 diveto LLM"
       },
       {
@@ -1371,9 +1371,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791921378102,
+      "lastDecisionAt": 1791921678102,
       "lastAction": "keputusan",
-      "lastReason": "si.gov [degen]: Dilewati: harga sudah -42% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "QHARVEST [degen]: Dilewati: likuiditas anjlok saat menunggu pullback."
     }
   },
   "strategy": {
@@ -1609,17 +1609,7 @@
     },
     "decisions": [
       {
-        "at": 1791921145899,
-        "symbol": "si.gov",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -42% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791920955737,
+        "at": 1791921576136,
         "symbol": "QHARVEST",
         "action": "skip",
         "basket": "degen",
@@ -1628,27 +1618,90 @@
         },
         "flags": [
           {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
             "type": "bundler",
-            "count": 21,
-            "note": "bundler pegang 7.8%"
+            "count": 27,
+            "note": "bundler pegang 12.1%"
           },
           {
             "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 2.6%"
+            "count": 1,
+            "note": "sniper awal masih pegang 2.1%"
           },
           {
             "type": "fresh",
-            "count": 15,
-            "note": "5.9% holder wallet baru"
-          },
-          {
-            "type": "top10",
-            "count": null,
-            "note": "10 holder terbesar pegang 31.4%"
+            "count": 17,
+            "note": "6.5% holder wallet baru"
           }
         ],
         "reason": "Dilewati: likuiditas anjlok saat menunggu pullback."
+      },
+      {
+        "at": 1791921573786,
+        "symbol": "QHARVEST",
+        "action": "wait",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 27,
+            "note": "bundler pegang 12.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 2.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 17,
+            "note": "6.5% holder wallet baru"
+          }
+        ],
+        "reason": "Menunggu pullback: harga sudah +41% di atas harga beli wallet yang diikuti (zona masuk sampai +20%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 15 menit."
+      },
+      {
+        "at": 1791921541090,
+        "symbol": "ELON",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 24."
+      },
+      {
+        "at": 1791921476109,
+        "symbol": "SEREIN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1,
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1791921145899,
+        "symbol": "si.gov",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -42% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
         "at": 1791920950946,
@@ -2387,63 +2440,6 @@
           }
         ],
         "reason": "Diveto LLM: Both wallets show extreme token churn (194-226/week) with bot-like scalping patterns (median hold ~6-8 min), near-identical outcomes suggesting same operator, n. Tidak dimasuki."
-      },
-      {
-        "at": 1791909765353,
-        "symbol": "Rickbot",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791908427879,
-        "symbol": "UTYA",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 6x."
-      },
-      {
-        "at": 1791907522009,
-        "symbol": "RICK",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 414,
-            "note": "bundler pegang 10.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 328,
-            "note": "7.7% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 14x likuiditas"
-          }
-        ],
-        "reason": "Keluar (stop): Harga turun sampai batas stop 35% setelah 1 menit; puncak sempat +1%. Hasil -43,0%."
       }
     ],
     "reasonStats": {
@@ -2453,8 +2449,8 @@
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
-        "liq_drop": 1,
-        "red_flag": 88,
+        "liq_drop": 2,
+        "red_flag": 89,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2465,7 +2461,7 @@
         "reserve": 0
       },
       "wait": {
-        "jumlah": 1
+        "jumlah": 2
       },
       "add": {
         "jumlah": 0
@@ -2504,7 +2500,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791921417815,
+    "generatedAt": 1791921719002,
     "trades": {
       "count": 130,
       "wins": 51,
