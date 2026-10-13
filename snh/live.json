@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c329109e-437e-4dd2-b15c-55d9bba93e60",
-  "updatedAt": 1791916878075,
-  "generatedAt": "2026-10-14 01:41 WIB",
+  "generation": "1f86834c-14b5-4e54-8977-adb12c354c9d",
+  "updatedAt": 1791917178075,
+  "generatedAt": "2026-10-14 01:46 WIB",
   "usdIdr": null,
   "totalUsd": 934.1480112731265,
   "nativeSymbol": "SOL",
@@ -1329,12 +1329,12 @@
     "pnlUsd": -65.85198872687351,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791916878075,
+    "heartbeatAt": 1791917178075,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.46,
-    "lastScanAt": 1791916876409,
+    "lastScanAt": 1791917177064,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1355,7 +1355,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "195",
+        "v": "194",
         "n": "24 jam · 30 diveto LLM"
       },
       {
@@ -1365,15 +1365,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "12 · 14",
+        "v": "12 · 13",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791916878075,
+      "lastDecisionAt": 1791917178075,
       "lastAction": "keputusan",
-      "lastReason": "WORM [degen]: Dilewati karena red flag: bundler pegang 46% supply."
+      "lastReason": "DUROV [degen]: Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1608,6 +1608,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791917076679,
+        "symbol": "DUROV",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791914699673,
         "symbol": "WORM",
@@ -2419,16 +2436,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791905629746,
-        "symbol": "REDO",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 20."
       }
     ],
     "reasonStats": {
@@ -2439,7 +2446,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 109,
+        "red_flag": 108,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2468,13 +2475,13 @@
       },
       "partial": {
         "take profit": 7,
-        "anticipate": 6,
+        "anticipate": 5,
         "early follow": 0
       },
       "exit": {
         "follow exit": 4,
         "take profit": 0,
-        "stop": 7,
+        "stop": 6,
         "trailing": 1,
         "time limit": 2,
         "rug": 0,
@@ -2489,7 +2496,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791916920419,
+    "generatedAt": 1791917217906,
     "trades": {
       "count": 130,
       "wins": 51,
