@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "6a9337bf-cddf-49ba-87ba-c45583c174ff",
-  "updatedAt": 1791995028742,
-  "generatedAt": "2026-10-14 23:23 WIB",
+  "generation": "2cff359f-71c6-44e8-86d8-8458c186e300",
+  "updatedAt": 1791995329382,
+  "generatedAt": "2026-10-14 23:28 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791995028742,
+    "heartbeatAt": 1791995329382,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791995028402,
+    "lastScanAt": 1791995324373,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,7 +1316,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "432",
+        "v": "434",
         "n": "24 jam · 20 diveto LLM"
       },
       {
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791995028742,
+      "lastDecisionAt": 1791995329382,
       "lastAction": "keputusan",
-      "lastReason": "THEZIS [degen]: Dilewati karena red flag: bundler pegang 75.6% supply."
+      "lastReason": "SYDNEYCAT [degen]: Dilewati karena red flag: bundler pegang 32% supply."
     }
   },
   "strategy": {
@@ -1365,7 +1365,7 @@
       ],
       [
         "Label wallet",
-        "smart 1487 · bot 1205 · blacklist 312 · lp 1 · fresh 150 · kol 105 · dolphin 187 · whale 2 · unknown 46"
+        "smart 1517 · bot 1207 · blacklist 312 · lp 1 · fresh 153 · kol 105 · dolphin 191 · whale 2 · unknown 7"
       ]
     ],
     "requirements": [
@@ -1421,15 +1421,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 1487,
+          "total": 1517,
           "active": 123,
-          "passive": 1364
+          "passive": 1394
         },
         {
           "key": "bot",
-          "total": 1205,
+          "total": 1207,
           "active": 0,
-          "passive": 1205
+          "passive": 1207
         },
         {
           "key": "blacklist",
@@ -1439,15 +1439,15 @@
         },
         {
           "key": "dolphin",
-          "total": 187,
+          "total": 191,
           "active": 20,
-          "passive": 167
+          "passive": 171
         },
         {
           "key": "fresh",
-          "total": 150,
+          "total": 153,
           "active": 0,
-          "passive": 150
+          "passive": 153
         },
         {
           "key": "kol",
@@ -1457,9 +1457,9 @@
         },
         {
           "key": "unknown",
-          "total": 46,
+          "total": 7,
           "active": 0,
-          "passive": 46
+          "passive": 7
         },
         {
           "key": "whale",
@@ -1575,6 +1575,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791995254528,
+        "symbol": "SYDNEYCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 32% supply."
+      },
+      {
+        "at": 1791995120065,
+        "symbol": "LAND",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 6.24% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 9.81%"
+          },
+          {
+            "type": "bundler",
+            "count": 99,
+            "note": "bundler pegang 37.1%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.3%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1791994522451,
         "symbol": "THEZIS",
@@ -2371,43 +2418,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1791984728148,
-        "symbol": "CLAUDEPLNT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 114,
-            "note": "bundler pegang 1.1%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: explore: isolated virtual capital."
-      },
-      {
-        "at": 1791984645189,
-        "symbol": "HW2",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 45.53% supply."
       }
     ],
     "reasonStats": {
@@ -2418,7 +2428,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 300,
+        "red_flag": 302,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2468,7 +2478,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791995213023,
+    "generatedAt": 1791995510699,
     "trades": {
       "count": 134,
       "wins": 52,
