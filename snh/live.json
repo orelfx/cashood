@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "effe372f-9f6a-4e93-b8c0-f336906b9926",
-  "updatedAt": 1791979126976,
-  "generatedAt": "2026-10-14 18:58 WIB",
+  "generation": "3e16ed2f-883c-411a-a737-ddcf7ec78ff6",
+  "updatedAt": 1791979426976,
+  "generatedAt": "2026-10-14 19:03 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1291,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791979126976,
+    "heartbeatAt": 1791979426976,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791979126257,
+    "lastScanAt": 1791979424205,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,7 +1317,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "382",
+        "v": "384",
         "n": "24 jam · 28 diveto LLM"
       },
       {
@@ -1333,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791979126976,
+      "lastDecisionAt": 1791979426976,
       "lastAction": "keputusan",
-      "lastReason": "Neighmar [degen]: Dilewati karena red flag: holder baru 3."
+      "lastReason": "Neighmar [degen]: Dilewati karena red flag: holder baru 8."
     }
   },
   "strategy": {
@@ -1570,6 +1570,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791979259165,
+        "symbol": "Neighmar",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 8."
+      },
+      {
+        "at": 1791979214016,
+        "symbol": "VEIL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -17% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791978656536,
         "symbol": "Neighmar",
@@ -2277,60 +2304,17 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 25.02% supply."
-      },
-      {
-        "at": 1791970561299,
-        "symbol": "Altai",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 14.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "9.6% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 3,
-            "note": "akun Twitter dev pernah ganti nama 3x"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1791970550275,
-        "symbol": "ACTII",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 99,
+        "below_entry": 100,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 238,
+        "red_flag": 239,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2380,7 +2364,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791979311918,
+    "generatedAt": 1791979611960,
     "trades": {
       "count": 134,
       "wins": 52,
