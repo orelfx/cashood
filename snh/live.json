@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ff1f7560-04d3-48b0-ad56-1ce7fe97298e",
-  "updatedAt": 1791949878348,
-  "generatedAt": "2026-10-14 10:51 WIB",
+  "generation": "1682a6a4-8067-4ef6-a42e-87d8d2264732",
+  "updatedAt": 1791950178348,
+  "generatedAt": "2026-10-14 10:56 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791949878348,
+    "heartbeatAt": 1791950178348,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791949874098,
+    "lastScanAt": 1791950175296,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,8 +1316,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "262",
-        "n": "24 jam · 26 diveto LLM"
+        "v": "266",
+        "n": "24 jam · 27 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791949878348,
+      "lastDecisionAt": 1791950178348,
       "lastAction": "keputusan",
-      "lastReason": "PT [degen]: Dilewati karena red flag: insider/entrapment pegang 32%."
+      "lastReason": "TPA [degen]: Diveto LLM: Both wallets are near-identical in behavior (same habits, outcomes, our_copies -6.4% avg) suggesting same operator or bot farm; negative copy history, low 43-48. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1569,6 +1569,70 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791950089200,
+        "symbol": "TPA",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.5%"
+          },
+          {
+            "type": "sniper",
+            "count": 20,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 6.7%"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets are near-identical in behavior (same habits, outcomes, our_copies -6.4% avg) suggesting same operator or bot farm; negative copy history, low 43-48. Tidak dimasuki."
+      },
+      {
+        "at": 1791950081675,
+        "symbol": "MIND",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -64% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791950064234,
+        "symbol": "SI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791949883812,
+        "symbol": "Altai",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791949841263,
         "symbol": "PT",
@@ -2371,54 +2435,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 21."
-      },
-      {
-        "at": 1791933620733,
-        "symbol": "CTOWN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 33.26% supply."
-      },
-      {
-        "at": 1791933558172,
-        "symbol": "FNEY",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $0."
-      },
-      {
-        "at": 1791933502010,
-        "symbol": "Nuymar",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 8."
-      },
-      {
-        "at": 1791933067601,
-        "symbol": "FLOYD",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "kol": 1,
-          "bot": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 31%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 72,
+        "below_entry": 75,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2440,7 +2462,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 26
+        "llm": 27
       },
       "test": {
         "solo": 0,
@@ -2473,7 +2495,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791949912291,
+    "generatedAt": 1791950211743,
     "trades": {
       "count": 134,
       "wins": 52,
