@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c30fd363-a4ee-4274-8768-c4b197f52006",
-  "updatedAt": 1791966524061,
-  "generatedAt": "2026-10-14 15:28 WIB",
+  "generation": "dfcdbc57-0c70-40a1-bb5d-8e04128c4c6a",
+  "updatedAt": 1791966824403,
+  "generatedAt": "2026-10-14 15:33 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1291,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791966524061,
+    "heartbeatAt": 1791966824403,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791966505521,
+    "lastScanAt": 1791966823527,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,7 +1317,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "314",
+        "v": "318",
         "n": "24 jam · 29 diveto LLM"
       },
       {
@@ -1333,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791966524061,
+      "lastDecisionAt": 1791966824403,
       "lastAction": "keputusan",
-      "lastReason": "XTO [big]: Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
+      "lastReason": "CHONK [degen]: Dilewati: harga sudah -46% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1571,7 +1571,17 @@
     },
     "decisions": [
       {
-        "at": 1791966005409,
+        "at": 1791966665373,
+        "symbol": "CHONK",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -46% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791966610461,
         "symbol": "XTO",
         "action": "skip",
         "basket": "big",
@@ -1586,6 +1596,26 @@
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
+      },
+      {
+        "at": 1791966540553,
+        "symbol": "VEIL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 2.7% dari market cap."
+      },
+      {
+        "at": 1791966526475,
+        "symbol": "LURK",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
         "at": 1791965999335,
@@ -2551,66 +2581,17 @@
           }
         ],
         "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791945181572,
-        "symbol": "WCAT",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 5.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Diveto LLM: Identical copy history (n=3, avg_pnl_pct=-5%), very high churn (~40 tokens/day), median exit gains near zero, and only 1 over-x5 winner in 7 days for two wallet. Tidak dimasuki."
-      },
-      {
-        "at": 1791944685750,
-        "symbol": "Catnip",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -37% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791941946870,
-        "symbol": "bul",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 12%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 85,
+        "below_entry": 87,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 183,
+        "red_flag": 185,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2660,7 +2641,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791966717369,
+    "generatedAt": 1791967013612,
     "trades": {
       "count": 134,
       "wins": 52,
