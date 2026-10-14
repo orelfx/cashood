@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4983722b-5712-48d8-9d89-0689a99d6dda",
-  "updatedAt": 1791967724408,
-  "generatedAt": "2026-10-14 15:48 WIB",
+  "generation": "dd42ff54-83ad-476e-8276-4404aa5e3c5d",
+  "updatedAt": 1791968024408,
+  "generatedAt": "2026-10-14 15:53 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1291,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791967724408,
+    "heartbeatAt": 1791968024408,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791967719767,
+    "lastScanAt": 1791968023959,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,12 +1317,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "324",
+        "v": "326",
         "n": "24 jam · 29 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "2231",
+        "v": "2272",
         "n": "141 aktif"
       },
       {
@@ -1333,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791967724408,
+      "lastDecisionAt": 1791968024408,
       "lastAction": "keputusan",
-      "lastReason": "rubic [degen]: Dilewati karena red flag: holder baru 10."
+      "lastReason": "XTO [big]: Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
     }
   },
   "strategy": {
@@ -1354,7 +1354,7 @@
       ],
       [
         "Wallet dipantau",
-        "2231 · 141 aktif"
+        "2272 · 141 aktif"
       ],
       [
         "Cadangan kas",
@@ -1366,7 +1366,7 @@
       ],
       [
         "Label wallet",
-        "smart 615 · bot 1088 · blacklist 305 · lp 1 · fresh 57 · kol 100 · dolphin 63 · whale 2"
+        "smart 616 · bot 1088 · blacklist 305 · lp 1 · fresh 57 · kol 100 · dolphin 63 · whale 2 · unknown 40"
       ]
     ],
     "requirements": [
@@ -1414,9 +1414,9 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 2231,
+      "tracked": 2272,
       "active": 141,
-      "passive": 2090,
+      "passive": 2131,
       "trusted": 0,
       "promising": 20,
       "byLabel": [
@@ -1428,9 +1428,9 @@
         },
         {
           "key": "smart",
-          "total": 615,
+          "total": 616,
           "active": 118,
-          "passive": 497
+          "passive": 498
         },
         {
           "key": "blacklist",
@@ -1455,6 +1455,12 @@
           "total": 57,
           "active": 0,
           "passive": 57
+        },
+        {
+          "key": "unknown",
+          "total": 40,
+          "active": 0,
+          "passive": 40
         },
         {
           "key": "whale",
@@ -1571,6 +1577,33 @@
     },
     "decisions": [
       {
+        "at": 1791967820964,
+        "symbol": "XTO",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
+      },
+      {
+        "at": 1791967750829,
+        "symbol": "VEIL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 2.6% dari market cap."
+      },
+      {
         "at": 1791967597380,
         "symbol": "rubic",
         "action": "skip",
@@ -1609,40 +1642,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 56.43% supply."
-      },
-      {
-        "at": 1791967216023,
-        "symbol": "XTO",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
-      },
-      {
-        "at": 1791967146073,
-        "symbol": "VEIL",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 2.6% dari market cap."
       },
       {
         "at": 1791966665373,
@@ -2559,7 +2558,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 191,
+        "red_flag": 193,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2609,7 +2608,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791967915446,
+    "generatedAt": 1791968212352,
     "trades": {
       "count": 134,
       "wins": 52,
