@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c24e911f-92c8-42e9-acdb-e4b5d1210bb2",
-  "updatedAt": 1791947478222,
-  "generatedAt": "2026-10-14 10:11 WIB",
+  "generation": "932ac74a-8328-45a3-bc88-1aa3d4e83f5d",
+  "updatedAt": 1791947778223,
+  "generatedAt": "2026-10-14 10:16 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791947478222,
+    "heartbeatAt": 1791947778223,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791947478123,
+    "lastScanAt": 1791947775722,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,7 +1317,7 @@
       {
         "k": "Sinyal wallet",
         "v": "260",
-        "n": "24 jam · 25 diveto LLM"
+        "n": "24 jam · 26 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791947478222,
+      "lastDecisionAt": 1791947778223,
       "lastAction": "keputusan",
-      "lastReason": "SI [degen]: Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "SI [low]: Diveto LLM: No wallet delivers big winners (all win distributions are under 2x), smart #1891 has a -17.4% copy history and 7 tokens created, and the group lacks edge despite m. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1365,7 +1365,7 @@
       ],
       [
         "Label wallet",
-        "smart 572 · bot 1077 · blacklist 301 · lp 1 · fresh 49 · kol 102 · dolphin 44 · whale 2"
+        "smart 572 · bot 1076 · blacklist 301 · lp 1 · fresh 50 · kol 102 · dolphin 44 · whale 2"
       ]
     ],
     "requirements": [
@@ -1421,9 +1421,9 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 1077,
+          "total": 1076,
           "active": 0,
-          "passive": 1077
+          "passive": 1076
         },
         {
           "key": "smart",
@@ -1445,9 +1445,9 @@
         },
         {
           "key": "fresh",
-          "total": 49,
+          "total": 50,
           "active": 0,
-          "passive": 49
+          "passive": 50
         },
         {
           "key": "dolphin",
@@ -1569,6 +1569,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791947517544,
+        "symbol": "SI",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 508,
+            "note": "bundler pegang 6.4%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 1.7%"
+          },
+          {
+            "type": "sniper",
+            "count": 14,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 643,
+            "note": "16.2% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 20x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: No wallet delivers big winners (all win distributions are under 2x), smart #1891 has a -17.4% copy history and 7 tokens created, and the group lacks edge despite m. Tidak dimasuki."
+      },
       {
         "at": 1791946901401,
         "symbol": "SI",
@@ -2371,16 +2413,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -39% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791932880539,
-        "symbol": "DEBT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -44% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2391,7 +2423,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 145,
+        "red_flag": 144,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2408,7 +2440,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 25
+        "llm": 26
       },
       "test": {
         "solo": 0,
@@ -2441,7 +2473,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791947516344,
+    "generatedAt": 1791947818139,
     "trades": {
       "count": 134,
       "wins": 52,
