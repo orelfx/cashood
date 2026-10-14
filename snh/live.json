@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ba95a8b6-e577-42d1-ab56-1cd316a46747",
-  "updatedAt": 1791965623545,
-  "generatedAt": "2026-10-14 15:13 WIB",
+  "generation": "e266d06f-1f7f-474f-aa8b-ecd9f12d8961",
+  "updatedAt": 1791965923722,
+  "generatedAt": "2026-10-14 15:18 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -224,14 +224,15 @@
       "reason": "stop loss",
       "reasonDetail": "Stop di titik impas setelah profit sebagian diamankan. · ikut 2 wallet",
       "feesUsd": 0.6,
-      "entry": "Uji coba: 2 wallet (2 smart) membeli, tapi konsensus baru cukup kalau wallet berlabel 'avoid' dari LLM ikut dihitung; dicatat sebagai posisi bayangan. Masuk di -11% dari harga beli wallet yang diikuti (di dalam zona beli), semua cek red flag lolos; tanda kecil (bundler, rat, sniper, dev) masih di ba",
+      "entry": "Uji coba: 2 wallet (1 bot · 1 smart) membeli, tapi konsensus baru cukup kalau wallet berlabel 'avoid' dari LLM ikut dihitung; dicatat sebagai posisi bayangan. Masuk di -11% dari harga beli wallet yang diikuti (di dalam zona beli), semua cek red flag lolos; tanda kecil (bundler, rat, sniper, dev) mas",
       "exitDetail": "Profit sebagian sudah diamankan; sisa posisi ditutup di titik impas karena harga kembali ke harga masuk setelah 42 menit.",
       "walletsSold": {},
       "modeLabel": "uji wallet 'avoid'",
       "mode": "explore",
       "test": true,
       "wallets": {
-        "smart": 2
+        "bot": 1,
+        "smart": 1
       },
       "flags": [
         {
@@ -255,7 +256,7 @@
           "note": "akun Twitter dev pernah ganti nama 2x"
         }
       ],
-      "firstWallet": "smart #1797",
+      "firstWallet": "bot #1797",
       "llmScore": 52,
       "peakPct": 25.24,
       "ddPct": -18.3,
@@ -1290,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791965623545,
+    "heartbeatAt": 1791965923722,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791965623154,
+    "lastScanAt": 1791965920569,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,13 +1317,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "310",
+        "v": "311",
         "n": "24 jam · 29 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "2151",
-        "n": "140 aktif"
+        "n": "139 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1332,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791965623545,
+      "lastDecisionAt": 1791965923722,
       "lastAction": "keputusan",
-      "lastReason": "DOREL [degen]: Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "AnyPS5 [low]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1353,7 +1354,7 @@
       ],
       [
         "Wallet dipantau",
-        "2151 · 140 aktif"
+        "2151 · 139 aktif"
       ],
       [
         "Cadangan kas",
@@ -1361,11 +1362,11 @@
       ],
       [
         "Wallet tepercaya",
-        "0 · menjanjikan 21"
+        "0 · menjanjikan 20"
       ],
       [
         "Label wallet",
-        "smart 572 · bot 1080 · blacklist 305 · lp 1 · fresh 48 · kol 100 · dolphin 43 · whale 2"
+        "smart 571 · bot 1081 · blacklist 305 · lp 1 · fresh 48 · kol 100 · dolphin 43 · whale 2"
       ]
     ],
     "requirements": [
@@ -1414,21 +1415,21 @@
   "copyTrade": {
     "wallets": {
       "tracked": 2151,
-      "active": 140,
-      "passive": 2011,
+      "active": 139,
+      "passive": 2012,
       "trusted": 0,
-      "promising": 21,
+      "promising": 20,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1080,
+          "total": 1081,
           "active": 0,
-          "passive": 1080
+          "passive": 1081
         },
         {
           "key": "smart",
-          "total": 572,
-          "active": 117,
+          "total": 571,
+          "active": 116,
           "passive": 455
         },
         {
@@ -1570,6 +1571,43 @@
     },
     "decisions": [
       {
+        "at": 1791965684405,
+        "symbol": "AnyPS5",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "bot": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 8.5%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 6.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 4,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "8.8% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
         "at": 1791965614192,
         "symbol": "DOREL",
         "action": "skip",
@@ -1622,7 +1660,7 @@
         "action": "skip",
         "basket": "low",
         "wallets": {
-          "smart": 1
+          "bot": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 27%."
       },
@@ -1708,7 +1746,7 @@
         "action": "skip",
         "basket": "mid",
         "wallets": {
-          "smart": 1
+          "bot": 1
         },
         "flags": [
           {
@@ -1772,7 +1810,7 @@
         "action": "skip",
         "basket": "low",
         "wallets": {
-          "smart": 1
+          "bot": 1
         },
         "flags": [
           {
@@ -1888,7 +1926,7 @@
         "action": "skip",
         "basket": "low",
         "wallets": {
-          "smart": 1
+          "bot": 1
         },
         "flags": [
           {
@@ -2295,7 +2333,8 @@
         "action": "skip",
         "basket": "mid",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -2586,48 +2625,6 @@
           }
         ],
         "reason": "Keluar (stop): Harga turun sampai batas stop 32% setelah 0 menit; puncak sempat +0%. Hasil -49,5%."
-      },
-      {
-        "at": 1791940517314,
-        "symbol": "SPOOKY",
-        "action": "enter",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 116,
-            "note": "bundler pegang 17.3%"
-          },
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 0.5%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 1.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 331,
-            "note": "11.0% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 1.0%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 8x likuiditas"
-          }
-        ],
-        "reason": "Masuk (solo): satu wallet tepercaya membeli. Wallet ini sudah beberapa kali terbukti menguntungkan saat kita ikuti, dan semua cek coin lolos."
       }
     ],
     "reasonStats": {
@@ -2638,7 +2635,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 179,
+        "red_flag": 180,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2688,7 +2685,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791965814999,
+    "generatedAt": 1791966132844,
     "trades": {
       "count": 134,
       "wins": 52,
