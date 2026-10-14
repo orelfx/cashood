@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "a5dedbdf-c05b-43b9-9bcd-5517789cb735",
-  "updatedAt": 1792010934455,
-  "generatedAt": "2026-10-15 03:48 WIB",
+  "generation": "76f2575f-5a0d-4956-8199-dc4206c13955",
+  "updatedAt": 1792011234455,
+  "generatedAt": "2026-10-15 03:53 WIB",
   "usdIdr": null,
   "totalUsd": 918.8503451083589,
   "nativeSymbol": "SOL",
@@ -1309,12 +1309,12 @@
     "pnlUsd": -81.14965489164115,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792010934455,
+    "heartbeatAt": 1792011234455,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.97,
-    "lastScanAt": 1792010933710,
+    "lastScanAt": 1792011233833,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1340,20 +1340,20 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "4183",
-        "n": "203 aktif"
+        "v": "4223",
+        "n": "204 aktif"
       },
       {
         "k": "Buka · tutup",
-        "v": "3 · 5",
+        "v": "3 · 4",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792010934455,
+      "lastDecisionAt": 1792011234455,
       "lastAction": "keputusan",
-      "lastReason": "jensen [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "AI [degen]: Dilewati: harga sudah -48% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1372,7 +1372,7 @@
       ],
       [
         "Wallet dipantau",
-        "4183 · 203 aktif"
+        "4223 · 204 aktif"
       ],
       [
         "Cadangan kas",
@@ -1384,7 +1384,7 @@
       ],
       [
         "Label wallet",
-        "smart 2035 · bot 1273 · blacklist 319 · lp 1 · fresh 196 · kol 107 · dolphin 241 · whale 4 · unknown 7"
+        "smart 2038 · bot 1273 · blacklist 320 · lp 1 · fresh 196 · kol 107 · dolphin 243 · whale 4 · unknown 41"
       ]
     ],
     "requirements": [
@@ -1432,17 +1432,17 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 4183,
-      "active": 203,
-      "passive": 3980,
+      "tracked": 4223,
+      "active": 204,
+      "passive": 4019,
       "trusted": 0,
       "promising": 21,
       "byLabel": [
         {
           "key": "smart",
-          "total": 2035,
-          "active": 165,
-          "passive": 1870
+          "total": 2038,
+          "active": 166,
+          "passive": 1872
         },
         {
           "key": "bot",
@@ -1452,15 +1452,15 @@
         },
         {
           "key": "blacklist",
-          "total": 319,
+          "total": 320,
           "active": 0,
-          "passive": 319
+          "passive": 320
         },
         {
           "key": "dolphin",
-          "total": 241,
+          "total": 243,
           "active": 26,
-          "passive": 215
+          "passive": 217
         },
         {
           "key": "fresh",
@@ -1476,9 +1476,9 @@
         },
         {
           "key": "unknown",
-          "total": 7,
+          "total": 41,
           "active": 0,
-          "passive": 7
+          "passive": 41
         },
         {
           "key": "whale",
@@ -1594,6 +1594,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792011169099,
+        "symbol": "AI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -48% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792011002987,
+        "symbol": "CS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
       {
         "at": 1792010883522,
         "symbol": "jensen",
@@ -2264,54 +2284,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
-      },
-      {
-        "at": 1792003958312,
-        "symbol": "REVERSO",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 4,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 212,
-            "note": "bundler pegang 25.4%"
-          },
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 7.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 1.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 223,
-            "note": "16.7% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 8x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792003913748,
-        "symbol": "GOLDENCLAW",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 12."
       }
     ],
     "reasonStats": {
@@ -2357,7 +2329,7 @@
       "exit": {
         "follow exit": 0,
         "take profit": 0,
-        "stop": 5,
+        "stop": 4,
         "trailing": 0,
         "time limit": 0,
         "rug": 0,
@@ -2372,7 +2344,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792011116116,
+    "generatedAt": 1792011425542,
     "trades": {
       "count": 135,
       "wins": 52,
