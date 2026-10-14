@@ -138,6 +138,9 @@ const snapshot = {
 };
 // Alamat Solana tidak tertangkap pemeriksa rahasia umum (yang mencari 0x…).
 for (const a of [local.address, local.stakeAccount, local.globalAccount]) if (a && JSON.stringify(snapshot).includes(a)) throw new Error('alamat bocor ke snapshot; dibatalkan');
+// Staking tidak punya posisi yang ditutup; kinerja (penurunan dari puncak,
+// konsistensi, dll.) dihitung dari deret nilai dana di saveSnapshot.
+snapshot.performanceInput = { closes: [], flatBand: 0.5 };
 saveSnapshot(OUT, snapshot, cfg);
 console.log(`[staking] total=$${snapshot.totalUsd} MET=${stakedMet.toFixed(2)} @ $${price.toFixed(4)} rewards=$${rewardsUsd}`);
 release();
