@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ab9a10ec-3a96-4f73-891b-8b26c6ac48aa",
-  "updatedAt": 1791999829853,
-  "generatedAt": "2026-10-15 00:43 WIB",
+  "generation": "aaf02d18-3134-4a25-b2d1-02fbbb6db0c8",
+  "updatedAt": 1792000129867,
+  "generatedAt": "2026-10-15 00:48 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791999829853,
+    "heartbeatAt": 1792000129867,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791999828865,
+    "lastScanAt": 1792000128955,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,7 +1316,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "461",
+        "v": "464",
         "n": "24 jam · 18 diveto LLM"
       },
       {
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791999829853,
+      "lastDecisionAt": 1792000129867,
       "lastAction": "keputusan",
-      "lastReason": "Altai [low]: Dilewati: harga sudah -30% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "SPAX [degen]: Dilewati karena red flag: likuiditas cuma $897."
     }
   },
   "strategy": {
@@ -1575,6 +1575,70 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792000072950,
+        "symbol": "SPAX",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $897."
+      },
+      {
+        "at": 1792000023226,
+        "symbol": "Crime",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 296,
+            "note": "bundler pegang 2.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 2.9%"
+          },
+          {
+            "type": "fresh",
+            "count": 757,
+            "note": "8.4% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
+      {
+        "at": 1792000001809,
+        "symbol": "Crime",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 296,
+            "note": "bundler pegang 2.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 2.9%"
+          },
+          {
+            "type": "fresh",
+            "count": 757,
+            "note": "7.4% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: explore: isolated virtual capital."
+      },
       {
         "at": 1791999811983,
         "symbol": "Altai",
@@ -2270,38 +2334,6 @@
           }
         ],
         "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1791996982755,
-        "symbol": "PEDRO",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -49% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791996798020,
-        "symbol": "Altai",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791996772233,
-        "symbol": "HOOKED",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -18% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2312,7 +2344,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 321,
+        "red_flag": 324,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2362,7 +2394,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792000007991,
+    "generatedAt": 1792000308787,
     "trades": {
       "count": 134,
       "wins": 52,
