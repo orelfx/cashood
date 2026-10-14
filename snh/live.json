@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "057a605e-ad82-4ee5-b1e2-f31a81b223c4",
-  "updatedAt": 1791972525222,
-  "generatedAt": "2026-10-14 17:08 WIB",
+  "generation": "b49afcb5-c3ee-4de4-9464-82c5671024a5",
+  "updatedAt": 1791972825222,
+  "generatedAt": "2026-10-14 17:13 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1291,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791972525222,
+    "heartbeatAt": 1791972825222,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791972519296,
+    "lastScanAt": 1791972821836,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,7 +1317,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "337",
+        "v": "339",
         "n": "24 jam · 29 diveto LLM"
       },
       {
@@ -1333,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791972525222,
+      "lastDecisionAt": 1791972825222,
       "lastAction": "keputusan",
-      "lastReason": "TESLA SI [low]: Dilewati karena red flag: insider/entrapment pegang 83%."
+      "lastReason": "VEIL [mid]: Dilewati karena red flag: likuiditas cuma 2.8% dari market cap."
     }
   },
   "strategy": {
@@ -1366,7 +1366,7 @@
       ],
       [
         "Label wallet",
-        "smart 739 · bot 1107 · blacklist 308 · lp 1 · fresh 87 · kol 101 · dolphin 87 · whale 2 · unknown 40"
+        "smart 762 · bot 1113 · blacklist 308 · lp 1 · fresh 95 · kol 101 · dolphin 90 · whale 2"
       ]
     ],
     "requirements": [
@@ -1422,15 +1422,15 @@
       "byLabel": [
         {
           "key": "bot",
-          "total": 1107,
+          "total": 1113,
           "active": 0,
-          "passive": 1107
+          "passive": 1113
         },
         {
           "key": "smart",
-          "total": 739,
+          "total": 762,
           "active": 124,
-          "passive": 615
+          "passive": 638
         },
         {
           "key": "blacklist",
@@ -1446,21 +1446,15 @@
         },
         {
           "key": "fresh",
-          "total": 87,
+          "total": 95,
           "active": 0,
-          "passive": 87
+          "passive": 95
         },
         {
           "key": "dolphin",
-          "total": 87,
+          "total": 90,
           "active": 15,
-          "passive": 72
-        },
-        {
-          "key": "unknown",
-          "total": 40,
-          "active": 0,
-          "passive": 40
+          "passive": 75
         },
         {
           "key": "whale",
@@ -1556,9 +1550,9 @@
           "trusted": false
         },
         {
-          "alias": "smart #2397",
+          "alias": "smart #2460",
           "label": "smart",
-          "score": 96.3,
+          "score": 95.5,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1577,17 +1571,7 @@
     },
     "decisions": [
       {
-        "at": 1791972194242,
-        "symbol": "TESLA SI",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 83%."
-      },
-      {
-        "at": 1791971977398,
+        "at": 1791972582543,
         "symbol": "VEIL",
         "action": "skip",
         "basket": "mid",
@@ -1602,6 +1586,43 @@
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma 2.8% dari market cap."
+      },
+      {
+        "at": 1791972566438,
+        "symbol": "IXC",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 188,
+            "note": "bundler pegang 4.6%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.1%"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1791972194242,
+        "symbol": "TESLA SI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 83%."
       },
       {
         "at": 1791971373093,
@@ -2500,48 +2521,6 @@
           }
         ],
         "reason": "Diveto LLM: Wallets 1-4 show nearly identical patterns (240-254 round trips, 115-125 sold within 2min, 7-10min median hold, 41-44% winrate) suggesting same operator or coor. Tidak dimasuki."
-      },
-      {
-        "at": 1791953246748,
-        "symbol": "UNICORN",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 926,
-            "note": "bundler pegang 14.4%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 14.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "10.2% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 17x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: All 4 wallets show nearly identical metrics (41-44% winrate, ~240 round trips, ~116 sells within 2min) suggesting same operator/bot strategy; high churn (140-17. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2552,7 +2531,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 204,
+        "red_flag": 206,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2602,7 +2581,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791972716633,
+    "generatedAt": 1791973011955,
     "trades": {
       "count": 134,
       "wins": 52,
