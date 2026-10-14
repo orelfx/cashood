@@ -18,6 +18,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { atomicJSON, assertPublic, lock } from './lib/io.mjs';
+import { assertHeartbeatText, publicHeartbeatRow } from './lib/heartbeat-public.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = process.argv[2] ? resolve(process.argv[2]) : resolve(HERE, '..', 'data', 'reborn', 'heartbeat.json');
 const release = lock(resolve(dirname(OUT), 'heartbeat.lock.local'));
@@ -84,20 +85,10 @@ try {
   walletAddress = getWallet('multi')?.address?.toLowerCase() || null;
 } catch { /* tanpa wallet, pemeriksaan ini dilewati */ }
 
-if (walletAddress && text.toLowerCase().includes(walletAddress)) {
-  throw new Error('laporan memuat alamat wallet — tidak diterbitkan');
-}
-
-const LEAKS = [
-  [/\b(0x)?[0-9a-fA-F]{64}\b/, 'sesuatu sepanjang private key'],
-  [/\b([a-z]+\s+){11,}[a-z]+\b/, 'sesuatu berbentuk seed phrase'],
-  [/(PRIVATE_KEY|MNEMONIC|SEED_PHRASE|BOT_TOKEN|api[_-]?key)\s*[:=]/i, 'nama variabel rahasia'],
-  [/\b\d{6,}:[A-Za-z0-9_-]{30,}\b/, 'token bot Telegram'],
-];
-for (const [pattern, what] of LEAKS) {
-  const hit = text.match(pattern);
-  if (hit) throw new Error(`laporan memuat ${what} (${hit[0].slice(0, 12)}…) — tidak diterbitkan`);
-}
+const secretOptions = {walletAddress, secrets:Object.entries(process.env)
+  .filter(([key])=>/(?:KEY|TOKEN|SECRET|PASSWORD|MNEMONIC|SEED)/i.test(key))
+  .map(([,value])=>value)};
+assertHeartbeatText(text, secretOptions);
 
 // Simpan juga laporan-laporan sebelumnya, sepuluh terakhir. Satu laporan itu
 // potret satu jam: tanpa arsip, alasan bot menutup sesuatu tadi malam hilang
@@ -114,14 +105,10 @@ if (existsSync(OUT)) {
   } catch { archive = []; }
 }
 
-const redactPublic = text => String(text).replace(/0x[0-9a-fA-F]{40,64}\b/g, '[identitas disembunyikan]').replace(/\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g, '[identitas disembunyikan]');
 mkdirSync(dirname(OUT), { recursive: true });
 const published = {
-  updatedAt: Date.now(),
-  generatedAt,
-  source,
-  text: redactPublic(text),
-  archive: archive.map(r=>({...r,text:redactPublic(r.text)})),
+  ...publicHeartbeatRow({updatedAt:Date.now(),generatedAt,source,text},secretOptions),
+  archive: archive.map(row=>publicHeartbeatRow(row,secretOptions)),
 };
 assertPublic(published);
 atomicJSON(OUT, published);

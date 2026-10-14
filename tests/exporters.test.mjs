@@ -49,6 +49,10 @@ test('all exporters produce coherent public snapshots; failed reads retain prior
  }
  // Bunga Safe Box mengikuti index; sumber nilai penempatan hanya catatan internal.
  // Kalau sumber itu gagal, bunga tetap terbit dan catatan internal tidak disentuh.
+ const stamp=Date.now(),q={complete:true,estimated:false};
+ const points=Array.from({length:193},(_,i)=>({t:stamp-(192-i)*3600e3,sourceAt:stamp-(192-i)*3600e3,usd:100,quality:q}));
+ write(f.data,'index/live.json',JSON.stringify({updatedAt:stamp,generation:'test',level:100,quality:q}));
+ write(f.data,'index/nav.local.json',JSON.stringify({updatedAt:stamp,generation:'test',points,quality:q}));
  const good=f.run('sync-safebox.mjs',['--now']);assert.equal(good.status,0,good.stderr);const internal=join(f.data,'safebox/internal.json'),inBefore=readFileSync(internal,'utf8');
  const bad=f.run('sync-safebox.mjs',['--now'],'source');assert.equal(bad.status,0,bad.stderr);assert.equal(readFileSync(internal,'utf8'),inBefore);
  const sb=JSON.parse(readFileSync(join(f.data,'safebox/live.json'),'utf8'));assert.equal(sb.principalUsd,3000);assert.equal(sb.measure.maxMonthlyPct,3);

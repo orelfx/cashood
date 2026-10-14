@@ -2675,7 +2675,7 @@ async function loadSafebox() {
   for (const url of [...new Set(urls)]) {
     try {
       const j = await getJSON(url);
-      if (j && j.valueUsd != null && Number.isFinite(Number(j.valueUsd))) { safeboxData = j; safeboxAt = Date.now(); return j; }
+      if (j && (j.quality?.calculationDeferred || (j.valueUsd != null && Number.isFinite(Number(j.valueUsd))))) { safeboxData = j; safeboxAt = Date.now(); return j; }
     } catch { /* sumber berikutnya */ }
   }
   return null;
@@ -2692,6 +2692,7 @@ function renderSafebox() {
       return;
     }
 
+    if (d.quality?.calculationDeferred && !d.measure) { setHTML(body, `<section class="card"><p class="miss" role="status">${esc(d.dataNotice)}</p></section>`); return; }
     const rate = d.measure || {};
     // 0,1% tidak boleh dibulatkan jadi "0%" — itu justru batas bawahnya.
     const pctRate = (v) => pct(v, Number.isInteger(Number(v)) ? 0 : 1);
@@ -2721,6 +2722,7 @@ function renderSafebox() {
       }).join('');
 
     setHTML(body, `
+      ${d.dataNotice ? `<section class="card"><p class="miss" role="status">${esc(d.dataNotice)}</p></section>` : ''}
       <section class="card">
         <div class="card-head">
           <h2>Safe Box</h2>
@@ -3456,7 +3458,7 @@ function showGlobal(view, title) {
  */
 async function loadIndex() {
   for (const url of [(rawDataBase('index') || RAW_BASE + 'index/') + 'live.json', 'data/index/live.json']) {
-    try { const j = await getJSON(url); if (j?.fund === 'index' && Number.isFinite(j.level)) return j; } catch { /* sumber berikutnya */ }
+    try { const j = await getJSON(url); if (j?.fund === 'index' && (j.quality?.calculationDeferred || Number.isFinite(j.level))) return j; } catch { /* sumber berikutnya */ }
   }
   return null;
 }
@@ -3477,10 +3479,12 @@ async function renderIndex() {
   const [d, pts] = await Promise.all([loadIndex(), loadIndexSeries()]);
   if (epoch !== indexEpoch || state.view !== 'index') return;
   if (!d) { setHTML(body, '<section class="card"><p class="miss">Data index belum tersedia.</p></section>'); return; }
+  if (d.quality?.calculationDeferred && d.level == null) { setHTML(body, `<section class="card"><p class="miss">${esc(d.dataNotice)}</p></section>`); return; }
   const sign = (v, dp = 2) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${pct(v, dp)}`);
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   const lvl = (v) => Number(v).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   setHTML(body, `
+    ${d.dataNotice ? `<section class="card"><p class="miss" role="status">${esc(d.dataNotice)}</p></section>` : ''}
     <section class="card idx-hero">
       <div class="card-head"><h2>Cashood Index</h2><span class="pill sim">${esc(d.status || 'belum dibuka')}</span></div>
       <div class="idx-top">

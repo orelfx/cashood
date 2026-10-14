@@ -346,6 +346,17 @@ console.log('PASS complete forecast render');
  assert.equal(await ev('document.querySelector("#hgCalGrid").textContent'),datesBefore);
  assert.equal(await ev('homeCal.month'),'2026-10','spider changed calendar month');
  console.log('PASS mobile calendar scans dates and month across DOM refreshes without changing data');
+ await ev(`(async()=>{
+   safeboxData={...safeboxData,quality:{complete:false,calculationDeferred:true},dataNotice:'Perhitungan ditunda: meridian kedaluwarsa'};safeboxAt=Date.now();
+   showGlobal('safebox','Safe Box');renderSafebox();await new Promise(r=>setTimeout(r,50));
+ })()`);
+ assert.match(await ev('document.querySelector("#tab-safebox").textContent'),/Perhitungan ditunda: meridian kedaluwarsa/);
+ await ev(`(async()=>{safeboxData={quality:{complete:false,calculationDeferred:true},dataNotice:'Belum ada saldo terverifikasi'};safeboxAt=Date.now();renderSafebox();await new Promise(r=>setTimeout(r,50));})()`);
+ assert.equal(await ev('document.querySelectorAll("#tab-safebox [role=status]").length'),1);
+ assert.match(await ev('document.querySelector("#tab-safebox").textContent'),/Belum ada saldo terverifikasi/);
+ await ev(`(async()=>{const old=loadIndex;loadIndex=async()=>({fund:'index',quality:{complete:false,calculationDeferred:true},dataNotice:'Index ditunda: sumber tidak lengkap'});showGlobal('index','Index');await renderIndex();loadIndex=old;})()`);
+ assert.match(await ev('document.querySelector("#indexBody").textContent'),/Index ditunda: sumber tidak lengkap/);
+ console.log('PASS deferred Index and Safe Box display warnings without fabricating initial balances');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

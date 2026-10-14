@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Core from '../assets/core.js';
 import { atomicJSON, readJSON, lock, downsample, generation, assertPublic } from './lib/io.mjs';
+import { sourceProblems, heldSnapshot } from './lib/source-quality.mjs';
 import { accrue, weekOf } from './lib/accrual.mjs';
 import { parseTransfers } from './lib/treasury.mjs';
 const DIR=resolve(process.env.CASHOOD_DATA_DIR || resolve(dirname(fileURLToPath(import.meta.url)),'..','data'),'safebox');
@@ -24,11 +25,30 @@ const now=Date.now();
 // Bunga mengikuti gerak harian Cashood Index (lib/accrual.mjs). Deret lengkap
 // index ada di nav.local.json; nav.json publik dipakai kalau berkas lokal belum ada.
 const IDX=resolve(DIR,'..','index');
-const points=(readJSON(resolve(IDX,'nav.local.json'))||readJSON(resolve(IDX,'nav.json'),{points:[]})).points||[];
+let index, series;
+const problems=[];
+try { index=readJSON(resolve(IDX,'live.json')); series=readJSON(resolve(IDX,'nav.local.json'))||readJSON(resolve(IDX,'nav.json')); }
+catch { problems.push({id:'index',reason:'berkas sumber tidak terbaca'}); }
+problems.push(...sourceProblems('index',index,now),...sourceProblems('index-series',series,now));
+if (!index?.generation || index.generation!==series?.generation) problems.push({id:'index',reason:'snapshot dan deret berbeda generasi'});
+const points=Array.isArray(series?.points)?series.points:[];
+if (!points.length || points.some((p,i)=>!p || !Number.isFinite(p.t) || !Number.isFinite(p.usd) || p.usd<=0 || (i>0 && p.t<points[i-1].t))) problems.push({id:'index-series',reason:'deret tidak valid atau tidak berurutan'});
+if (Array.isArray(index?.quality?.problems)) problems.push(...index.quality.problems.map(p=>({id:'index/'+p.id,reason:p.reason})));
+const last=points.at(-1);
+if (!Number.isFinite(index?.level) || !last || !Number.isFinite(last.usd) || last.usd<=0 || Math.abs(last.usd-index?.level)>0.0001 || !Number.isFinite(last.t) || last.t>now+60_000 || now-last.t>30*60_000) problems.push({id:'index',reason:'titik terakhir tidak cocok atau kedaluwarsa'});
 const stateFile=resolve(DIR,'accrual-v3.local.json');
 const payoutFile=resolve(DIR,'payouts.jsonl');
 const payouts=existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[];
-const state=accrue(cfg,readJSON(stateFile),{at:now,points},payouts);
+let state;
+if (!problems.length) {
+ try { state=accrue(cfg,readJSON(stateFile),{at:now,points,requireQuality:true},payouts); }
+ catch (error) { if (error.code!=='INDEX_QUALITY') throw error; problems.push({id:'index',reason:error.message}); }
+}
+if (problems.length) {
+ const held=heldSnapshot(prev,'safebox',now,problems);
+ assertPublic(held); atomicJSON(resolve(DIR,'live.json'),held);
+ console.warn('[safebox] akrual ditunda:',problems); release(); process.exit(0);
+}
 const principal=state.owners.reduce((t,o)=>t+o.principalUsd,0);
 const today=state.today;
 // Pemilik yang sudah keluar tetap tampil selama masih ada bunga yang belum dibayar.
@@ -42,12 +62,12 @@ const interest=Core.money(rows.reduce((t,o)=>t+o.interestUsd,0));
 const dailyPct=today?today.ratePct:0, maxM=Number(cfg.rate?.maxMonthlyPct??3);
 const done=state.days.filter(d=>d.date>=Core.day(state.from));
 const avgDaily=done.length?done.reduce((t,d)=>t+d.ratePct,0)/done.length:dailyPct;
-const snapshot={schemaVersion:2,generation:generation(),updatedAt:now,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
+const snapshot={schemaVersion:2,generation:generation(),updatedAt:index.updatedAt,checkedAt:now,sourceGeneration:index.generation,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
  principalUsd:principal,interestUsd:interest,paidUsd:Core.money(Object.values(state.balances).reduce((t,b)=>t+(Number(b.paid)||0),0)),   // termasuk pemilik yang sudah keluar
  lastPayout:(()=>{const p=payouts.filter(x=>x.type==='interest');if(!p.length)return null;const at=Math.max(...p.map(x=>Date.parse(x.at)));const same=p.filter(x=>Date.parse(x.at)===at);return {at,period:same[0].period||null,usd:Core.money(same.reduce((t,x)=>t+Number(x.usd),0))};})(),
  interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
  interestDay:Core.day(now),days:[...state.days,...(today?[today]:[])].slice(-30).map(d=>({date:d.date,usd:d.usd,ratePct:d.ratePct??null,fromReserve:d.fromReserve?Core.money(Object.values(d.fromReserve).reduce((t,v)=>t+v,0)):0,capped:Boolean(d.capped),estimated:d.estimated})),earning:dailyPct>0,
- quality:{complete:true,estimated:false,allocationEstimated:false},
+ quality:{complete:true,estimated:false,degraded:false,allocationEstimated:false,problems:[]},
  measure:{monthlyPct:Number((dailyPct*30).toFixed(3)),dailyPct:Number(dailyPct.toFixed(4)),windowDays:Number(cfg.rate?.windowDays??7),
   windowMovePct:today?.windowMovePct??null,capped:Boolean(today?.capped),
   monthUsedPct:principal?Number((([...state.days,...(today?[today]:[])].filter(d=>d.date.startsWith(Core.day(now).slice(0,7))).reduce((t,d)=>t+state.owners.reduce((u,o)=>u+(d.owners?.[o.id]||0),0),0))/principal*100).toFixed(3)):0,

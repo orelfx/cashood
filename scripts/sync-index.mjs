@@ -25,6 +25,8 @@ import { fileURLToPath } from 'node:url';
 import Core from '../assets/core.js';
 import { atomicJSON, assertPublic, downsample, generation, lock, readJSON } from './lib/io.mjs';
 
+import { sourceProblems, heldSnapshot } from './lib/source-quality.mjs';
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = process.env.CASHOOD_DATA_DIR || resolve(ROOT, 'data');
 const DIR = resolve(DATA, 'index');
@@ -59,12 +61,24 @@ function step(prev, quotes) {
   return weightSum > 0 ? prev.level * (1 + move / weightSum) : prev.level;
 }
 
+const problems = [];
 const loaded = members.map((f) => {
-  const cfg = readJSON(resolve(DATA, f.id, 'config.json'));
-  const live = readJSON(resolve(DATA, f.id, 'live.json'));
-  return cfg && live ? { ...f, cfg, live } : null;
-}).filter(Boolean);
-if (!loaded.length) throw new Error('belum ada dana untuk index');
+  let cfg, live;
+  try { cfg=readJSON(resolve(DATA,f.id,'config.json')); live=readJSON(resolve(DATA,f.id,'live.json')); }
+  catch { problems.push({id:f.id,reason:'berkas sumber tidak terbaca'}); }
+  problems.push(...sourceProblems(f.id,live,now));
+  if (!cfg) problems.push({id:f.id,reason:'konfigurasi tidak tersedia'});
+  try { if (cfg && (!Number.isFinite(live?.totalUsd) || !quote(cfg,live.totalUsd,live.updatedAt))) problems.push({id:f.id,reason:'nilai atau unit dana tidak valid'}); }
+  catch { problems.push({id:f.id,reason:'ledger dana tidak valid'}); }
+  return {...f,cfg,live};
+});
+if (!members.length) problems.push({id:'index',reason:'tidak ada komponen'});
+if (problems.length) {
+  const held=heldSnapshot(readJSON(resolve(DIR,'live.json')),'index',now,problems);
+  assertPublic(held); atomicJSON(resolve(DIR,'live.json'),held);
+  console.warn('[index] perhitungan ditunda:',problems); release(); process.exit(0);
+}
+const sourceAt=Math.min(...loaded.map(f=>f.live.updatedAt));
 
 const stateFile = resolve(DIR, 'state.local.json');
 let state = process.argv.includes('--backfill') ? null : readJSON(stateFile);
@@ -80,20 +94,20 @@ if (!state) {
   const quotesAt = (t) => Object.fromEntries(loaded.map((f) => { const p = at(f.id, t); const q = p ? quote(f.cfg, p.usd, t) : null; return [f.id, q]; }).filter(([, q]) => q));
   state = { baseAt: start, level: BASE, quotes: quotesAt(start), joined: {} };
   for (const [id, q] of Object.entries(state.quotes)) state.joined[id] = { at: start, price: q.price };
-  points = [{ t: start, usd: BASE }];
+  points = [{ t: start, usd: BASE, quality:{complete:false,estimated:true} }];
   for (let t = start + 3600e3; t < now - 600e3; t += 3600e3) {
     const q = quotesAt(t);
     state.level = step(state, q); state.quotes = { ...state.quotes, ...q };
-    points.push({ t, usd: r(state.level) });
+    points.push({ t, usd: r(state.level), quality:{complete:false,estimated:true} });
   }
 }
 
 // Langkah sekarang, dari snapshot terbaru tiap dana.
-const quotes = Object.fromEntries(loaded.map((f) => [f.id, quote(f.cfg, Number(f.live.totalUsd), now)]).filter(([, q]) => q));
+const quotes = Object.fromEntries(loaded.map((f) => [f.id, quote(f.cfg, Number(f.live.totalUsd), f.live.updatedAt)]).filter(([, q]) => q));
 const level = step(state, quotes);
 for (const [id, q] of Object.entries(quotes)) if (!state.joined[id]) state.joined[id] = { at: now, price: q.price };
 state = { ...state, level, quotes: { ...state.quotes, ...quotes }, at: now };
-points = downsample([...points, { t: now, usd: r(level) }], now);
+points = downsample([...points, { t: now, usd: r(level), sourceAt, quality: { complete:true, estimated:false } }], now);
 
 const total = Object.values(quotes).reduce((t, q) => t + q.value, 0);
 
@@ -134,7 +148,9 @@ const snapshot = {
   fund: 'index',
   schemaVersion: 2,
   generation: gen,
-  updatedAt: now,
+  updatedAt: sourceAt,
+  checkedAt: now,
+  quality: { complete:true, estimated:false, degraded:false, problems:[] },
   generatedAt: new Date(now + WIB).toISOString().replace('T', ' ').slice(0, 16) + ' WIB',
   level: r(level),
   baseLevel: BASE,
@@ -160,8 +176,8 @@ const snapshot = {
 };
 assertPublic(snapshot);
 atomicJSON(stateFile, state);
-atomicJSON(resolve(DIR, 'nav.local.json'), { updatedAt: now, points });
-atomicJSON(resolve(DIR, 'nav.json'), { updatedAt: now, generation: gen, points });
+atomicJSON(resolve(DIR, 'nav.local.json'), { updatedAt: sourceAt, generation: gen, quality: snapshot.quality, points });
+atomicJSON(resolve(DIR, 'nav.json'), { updatedAt: sourceAt, generation: gen, quality: snapshot.quality, points });
 atomicJSON(resolve(DIR, 'live.json'), snapshot);
 console.log(`[index] level=${snapshot.level} (${snapshot.changePct >= 0 ? '+' : ''}${snapshot.changePct}%) anggota=${snapshot.components.length} titik=${points.length}`);
 release();

@@ -207,3 +207,32 @@ bersaldo positif tanpa harga. Exporter menolak memperbarui NAV daripada mengangg
 bernilai nol. Lengkapi harga atau rekonsiliasi klasifikasi aset pada sumber bot
 sebelum mengaktifkan exporter baru di produksi. Jangan memakai saldo token yang
 belum dinilai sebagai bukti bahwa NAV sudah lengkap.
+
+## Kualitas sumber Cashood Index dan akrual Safe Box
+
+Index mensyaratkan setiap anggota non-paper yang tidak memiliki `index:false`
+tersedia, bernilai valid, memiliki `quality.complete:true`, tidak estimasi/degraded,
+dan berumur paling lama 30 menit. Toleransi jam sumber ke depan adalah satu menit.
+`updatedAt` agregat mengikuti waktu sumber tertua; `checkedAt` menunjukkan waktu
+pemeriksaan. Timestamp masing-masing komponen tetap dipublikasikan.
+
+Jika pemeriksaan gagal, exporter hanya menerbitkan snapshot terakhir dengan
+`quality.calculationDeferred:true`, `degraded:true`, `complete:false`, daftar
+`problems`, dan pesan penundaan. Timestamp nilai tidak diperbarui. State Index,
+riwayat NAV, unit investor, dan state akrual tidak dimajukan. Tanpa snapshot lama,
+hasil berstatus tidak tersedia dan tidak membuat saldo nol pengganti.
+
+Safe Box juga memeriksa kecocokan generasi live/deret Index, urutan dan nilai titik,
+serta kualitas kedua titik pembanding setiap hari yang belum dibekukan. Sumber
+buruk tidak boleh membayar bunga minimum atau memakai cadangan secara otomatis.
+Seluruh siklus ditunda jika salah satu hari belum layak; bunga yang sudah dibekukan
+tidak dihitung ulang. Kegagalan penempatan privat tetap terpisah dari kualitas Index.
+
+**Migrasi riwayat:** titik lama tanpa metadata kualitas dan hasil `--backfill`
+yang belum diverifikasi tidak dianggap layak untuk akrual. Karena itu pemasangan
+pengaman ini dapat menunda akrual meskipun snapshot komponen saat ini segar.
+Pemulihan memerlukan rekonsiliasi titik pembanding terhadap arsip sumber yang
+lengkap beserta timestamp aslinya; jangan sekadar menambahkan `complete:true` atau
+menghapus state akrual. Pemulihan snapshot saat ini saja tidak menyelesaikan celah
+riwayat. Pengujian exporter menggunakan direktori sementara dan tidak memperbaiki
+atau menulis ulang riwayat produksi.

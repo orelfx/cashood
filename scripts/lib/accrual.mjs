@@ -72,10 +72,25 @@ export function accrue(cfg,previous,observation,payouts=[]){
  let today=null;
  for(let start=Math.max(lastFrozen,state.from);start<=now;start+=DAY){
   const end=start+DAY,closeAt=Math.min(end-1,now),done=end<=now;
-  const r=windowRate(points,closeAt,limits);
+  let qualityHeld=false;
+  if(observation.requireQuality){
+   const from=closeAt-limits.windowDays*DAY;
+   let first=null,last=null;
+   for(const p of points){if(p.t>closeAt)break;last=p;if(p.t<=from||!first)first=p;}
+   // Historical exports may be daily after downsampling; current closes must
+   // still be within the normal source freshness limit.
+   const tolerance=now-closeAt>7*DAY?26*3600e3:now-closeAt>DAY?2*3600e3:30*60e3;
+   const valid=p=>p&&p.quality?.complete===true&&!p.quality?.estimated&&!p.quality?.degraded&&Number.isFinite(p.sourceAt)&&p.sourceAt>0&&p.sourceAt<=p.t+60e3&&p.t-p.sourceAt<=30*60e3;
+   // Riwayat Index belum terverifikasi: bagian yang ikut kinerja bot ditahan
+   // (dianggap 0), tapi lantai minimum tetap dibayar — lantai tidak bergantung
+   // pada Index (aturan pemilik 2026-10-07). Dulu seluruh akrual berhenti dan
+   // Safe Box beku berhari-hari setelah riwayat Index dibangun ulang.
+   if(!valid(first)||!valid(last)||closeAt-last.t>tolerance||last.t-first.t<DAY)qualityHeld=true;
+  }
+  const r=qualityHeld?{rate:0,move:null,spanDays:0,missing:true}:windowRate(points,closeAt,limits);
   const active=ownersAt(cfg,closeAt);
   const date=Core.day(start),month=date.slice(0,7),week=weekOf(date);
-  const entry={date,ratePct:Number((Math.max(r.rate,floorDaily)*100).toFixed(4)),botRatePct:Number((r.rate*100).toFixed(4)),floorPct:Number((floorDaily*100).toFixed(4)),windowMovePct:r.missing?null:Number((r.move*100).toFixed(4)),windowDays:Number(r.spanDays.toFixed(2)),usd:0,owners:{},estimated:r.missing};
+  const entry={date,ratePct:Number((Math.max(r.rate,floorDaily)*100).toFixed(4)),botRatePct:Number((r.rate*100).toFixed(4)),floorPct:Number((floorDaily*100).toFixed(4)),windowMovePct:r.missing?null:Number((r.move*100).toFixed(4)),windowDays:Number(r.spanDays.toFixed(2)),usd:0,owners:{},estimated:r.missing,...(qualityHeld?{botRateHeld:true}:{})};
   for(const o of active){
    const b=(state.balances[o.id] ||= {id:o.id,name:o.name,color:o.color,accrued:0,paid:0});
    const P=o.principalUsd,sum=(keep)=>state.days.filter(d=>keep(d.date)).reduce((t,d)=>t+(d.owners?.[o.id]||0),0);
