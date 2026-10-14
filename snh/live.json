@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "da5d838f-b533-4960-99a3-7005f70cac16",
-  "updatedAt": 1792004333022,
-  "generatedAt": "2026-10-15 01:58 WIB",
+  "generation": "d0e16b6c-64a7-495c-9be3-593762fca00c",
+  "updatedAt": 1792004633049,
+  "generatedAt": "2026-10-15 02:03 WIB",
   "usdIdr": null,
   "totalUsd": 918.8503451083589,
   "nativeSymbol": "SOL",
@@ -1309,12 +1309,12 @@
     "pnlUsd": -81.14965489164115,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792004333022,
+    "heartbeatAt": 1792004633049,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.97,
-    "lastScanAt": 1792004332176,
+    "lastScanAt": 1792004630058,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1336,12 +1336,12 @@
       {
         "k": "Sinyal wallet",
         "v": "501",
-        "n": "24 jam · 18 diveto LLM"
+        "n": "24 jam · 17 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "3898",
-        "n": "194 aktif"
+        "n": "193 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1351,9 +1351,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792004333022,
+      "lastDecisionAt": 1792004633049,
       "lastAction": "keputusan",
-      "lastReason": "REVERSO [low]: Dilewati: explore: zone/cooldown/budget."
+      "lastReason": "D-Crawler [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1372,7 +1372,7 @@
       ],
       [
         "Wallet dipantau",
-        "3898 · 194 aktif"
+        "3898 · 193 aktif"
       ],
       [
         "Cadangan kas",
@@ -1433,16 +1433,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 3898,
-      "active": 194,
-      "passive": 3704,
+      "active": 193,
+      "passive": 3705,
       "trusted": 0,
       "promising": 21,
       "byLabel": [
         {
           "key": "smart",
           "total": 1825,
-          "active": 159,
-          "passive": 1666
+          "active": 158,
+          "passive": 1667
         },
         {
           "key": "bot",
@@ -1594,6 +1594,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792004545462,
+        "symbol": "D-Crawler",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "whale": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1792004452152,
+        "symbol": "LOAD",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 2.3% dari market cap."
+      },
+      {
+        "at": 1792004346446,
+        "symbol": "WAP",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
+      },
       {
         "at": 1792003958312,
         "symbol": "REVERSO",
@@ -2462,91 +2499,17 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: 48% holder wallet baru (sybil)."
-      },
-      {
-        "at": 1791999657799,
-        "symbol": "MEGAMIND",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 21."
-      },
-      {
-        "at": 1791999629709,
-        "symbol": "SNAPE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 68,
-            "note": "bundler pegang 13.1%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 2.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 46,
-            "note": "8.1% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: explore: isolated virtual capital."
-      },
-      {
-        "at": 1791999542472,
-        "symbol": "Dogcoin",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 609,
-            "note": "bundler pegang 14.5%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 8.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "9.9% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: explore: isolated virtual capital."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 113,
+        "below_entry": 111,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 358,
+        "red_flag": 361,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2563,7 +2526,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 18
+        "llm": 17
       },
       "test": {
         "solo": 0,
@@ -2596,7 +2559,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792004516142,
+    "generatedAt": 1792004809472,
     "trades": {
       "count": 135,
       "wins": 52,
