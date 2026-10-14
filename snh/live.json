@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "0a3e9575-44d7-4704-8a36-4def0c92c118",
-  "updatedAt": 1791945078218,
-  "generatedAt": "2026-10-14 09:31 WIB",
+  "generation": "397daa1c-cbce-4ca7-bf3b-f4e602f0da2b",
+  "updatedAt": 1791945378218,
+  "generatedAt": "2026-10-14 09:36 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791945078218,
+    "heartbeatAt": 1791945378218,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791945077071,
+    "lastScanAt": 1791945374363,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,8 +1316,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "259",
-        "n": "24 jam · 24 diveto LLM"
+        "v": "260",
+        "n": "24 jam · 25 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791945078218,
+      "lastDecisionAt": 1791945378218,
       "lastAction": "keputusan",
-      "lastReason": "Catnip [low]: Dilewati: harga sudah -37% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "WCAT [degen]: Diveto LLM: Identical copy history (n=3, avg_pnl_pct=-5%), very high churn (~40 tokens/day), median exit gains near zero, and only 1 over-x5 winner in 7 days for two wallet. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1569,6 +1569,28 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791945181572,
+        "symbol": "WCAT",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 5.9%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Diveto LLM: Identical copy history (n=3, avg_pnl_pct=-5%), very high churn (~40 tokens/day), median exit gains near zero, and only 1 over-x5 winner in 7 days for two wallet. Tidak dimasuki."
+      },
       {
         "at": 1791944685750,
         "symbol": "Catnip",
@@ -2352,16 +2374,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -57% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1791932790521,
-        "symbol": "CUMINU",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -46% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2389,7 +2401,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 24
+        "llm": 25
       },
       "test": {
         "solo": 0,
@@ -2422,7 +2434,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791945116957,
+    "generatedAt": 1791945422557,
     "trades": {
       "count": 134,
       "wins": 52,
