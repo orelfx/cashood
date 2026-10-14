@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e09ca1df-36b1-4b0f-b845-55af9ec3a0ec",
-  "updatedAt": 1791980026975,
-  "generatedAt": "2026-10-14 19:13 WIB",
+  "generation": "1313474d-9ce8-4d11-8935-d02992a52809",
+  "updatedAt": 1791980326975,
+  "generatedAt": "2026-10-14 19:18 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1291,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791980026975,
+    "heartbeatAt": 1791980326975,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791980026696,
+    "lastScanAt": 1791980326411,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,7 +1317,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "387",
+        "v": "391",
         "n": "24 jam · 28 diveto LLM"
       },
       {
@@ -1333,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791980026975,
+      "lastDecisionAt": 1791980326975,
       "lastAction": "keputusan",
-      "lastReason": "VEIL [mid]: Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
+      "lastReason": "KEEPHOST [degen]: Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1570,6 +1570,68 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791980169707,
+        "symbol": "KEEPHOST",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1791980161242,
+        "symbol": "GTA6 Coin",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
+      },
+      {
+        "at": 1791980140474,
+        "symbol": "HIVE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $1722."
+      },
+      {
+        "at": 1791980109789,
+        "symbol": "CHAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 299,
+            "note": "bundler pegang 7.4%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 7,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 460,
+            "note": "10.9% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
       {
         "at": 1791979815413,
         "symbol": "VEIL",
@@ -2257,74 +2319,17 @@
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma 2.8% dari market cap."
-      },
-      {
-        "at": 1791973537938,
-        "symbol": "TikTok US",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
-      },
-      {
-        "at": 1791973441388,
-        "symbol": "SpaceX AI",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 78%."
-      },
-      {
-        "at": 1791972566438,
-        "symbol": "IXC",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 188,
-            "note": "bundler pegang 4.6%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.1%"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1791972194242,
-        "symbol": "TESLA SI",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 83%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 101,
+        "below_entry": 102,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 241,
+        "red_flag": 244,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2374,7 +2379,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791980211773,
+    "generatedAt": 1791980528531,
     "trades": {
       "count": 134,
       "wins": 52,
