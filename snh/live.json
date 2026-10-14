@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "a46f3b75-3f98-47f1-9ebd-be7162da158e",
-  "updatedAt": 1791953178349,
-  "generatedAt": "2026-10-14 11:46 WIB",
+  "generation": "fdc18293-e17c-420e-9d08-a5efde5f41d0",
+  "updatedAt": 1791953478349,
+  "generatedAt": "2026-10-14 11:51 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1290,12 +1290,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791953178349,
+    "heartbeatAt": 1791953478349,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791953176946,
+    "lastScanAt": 1791953476989,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1316,8 +1316,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "274",
-        "n": "24 jam · 27 diveto LLM"
+        "v": "275",
+        "n": "24 jam · 28 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1332,9 +1332,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791953178349,
+      "lastDecisionAt": 1791953478349,
       "lastAction": "keputusan",
-      "lastReason": "UNICORN [low]: Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "UNICORN [low]: Diveto LLM: All 4 wallets show nearly identical metrics (41-44% winrate, ~240 round trips, ~116 sells within 2min) suggesting same operator/bot strategy; high churn (140-17. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1569,6 +1569,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791953246748,
+        "symbol": "UNICORN",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 926,
+            "note": "bundler pegang 14.4%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 14.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "10.2% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 17x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: All 4 wallets show nearly identical metrics (41-44% winrate, ~240 round trips, ~116 sells within 2min) suggesting same operator/bot strategy; high churn (140-17. Tidak dimasuki."
+      },
       {
         "at": 1791952626332,
         "symbol": "UNICORN",
@@ -2425,16 +2467,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 5."
-      },
-      {
-        "at": 1791934282157,
-        "symbol": "NOYMARJR",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 6."
       }
     ],
     "reasonStats": {
@@ -2462,7 +2494,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 27
+        "llm": 28
       },
       "test": {
         "solo": 0,
@@ -2495,7 +2527,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791953212428,
+    "generatedAt": 1791953512045,
     "trades": {
       "count": 134,
       "wins": 52,
