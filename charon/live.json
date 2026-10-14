@@ -1,57 +1,24 @@
 {
   "fund": "charon",
-  "updatedAt": 1791955580905,
-  "generatedAt": "2026-10-14 12:26 WIB",
+  "updatedAt": 1791955881216,
+  "generatedAt": "2026-10-14 12:31 WIB",
   "usdIdr": null,
   "nativeSymbol": "ETH",
   "nativePrice": 2505.11,
   "ethPrice": 2505.11,
-  "totalUsd": 1137.08,
-  "botWalletUsd": 1137.08,
-  "walletUsd": 987.81,
-  "lpUsd": 149.27,
+  "totalUsd": 1137.27,
+  "botWalletUsd": 1137.27,
+  "walletUsd": 1137.27,
+  "lpUsd": 0,
   "holdings": [
     {
       "symbol": "USDG",
-      "amount": 987.81,
+      "amount": 1137.27,
       "price": 1,
-      "usd": 987.81
+      "usd": 1137.27
     }
   ],
-  "positions": [
-    {
-      "symbol": "PONS",
-      "band": "large",
-      "horizon": "intraday",
-      "bookLabel": "intraday · large cap",
-      "strategy": "llm",
-      "experimental": false,
-      "principalUsd": 149.27,
-      "feesUsd": 0,
-      "investedUsd": 151.97,
-      "collectedFeesUsd": 0,
-      "costUsd": 151.97,
-      "realizedUsd": 0,
-      "pnlPct": -1.78,
-      "stopPct": 7.5,
-      "targetPct": 18,
-      "maxHoldHours": 24,
-      "ageMinutes": 71,
-      "amount": 452.2529194529415,
-      "priceUsd": 0.33005035014856565,
-      "entryPriceUsd": 0.3360291548450977,
-      "partialDone": false,
-      "bestPct": 0.62,
-      "worstPct": -3.51,
-      "markedAt": 1791955562139,
-      "stale": false,
-      "thesis": "Healthy pullback within multi-hour uptrend on PONS: short-window weakness (m15 -0.81%, m30 -1.18%) within strong h6/h24 gains; volume and buyer count both strongly accelerating (3.5x and 3x respectively); participation broadening rather th…",
-      "valueUsd": 149.27,
-      "pnlUsd": -2.7,
-      "totalFeesUsd": 0,
-      "tokenId": "pos-b7f6c4e7b67c9b17c0bf"
-    }
-  ],
+  "positions": [],
   "history": [
     {
       "date": "2026-09-27",
@@ -160,17 +127,26 @@
       "losses": 0,
       "winUsd": 0,
       "lossUsd": 0
+    },
+    {
+      "date": "2026-10-14",
+      "usd": -2.5,
+      "closes": 1,
+      "wins": 0,
+      "losses": 1,
+      "winUsd": 0,
+      "lossUsd": -2.5
     }
   ],
   "historyNote": "hasil trade simulasi yang sudah ditutup, bersih setelah biaya swap dan jaringan yang dimodelkan",
   "stats": {
-    "closedCount": 269,
-    "openCount": 1,
-    "graded": 261,
+    "closedCount": 270,
+    "openCount": 0,
+    "graded": 262,
     "wins": 48,
-    "losses": 213,
-    "winRate": 18.39,
-    "realisedUsd": -360.22,
+    "losses": 214,
+    "winRate": 18.32,
+    "realisedUsd": -362.72,
     "bestDay": {
       "date": "2026-10-13",
       "usd": -0.18
@@ -183,6 +159,17 @@
     "timezone": "Asia/Jakarta (UTC+7)"
   },
   "closedRecent": [
+    {
+      "symbol": "PONS",
+      "closedAt": 1791955633733,
+      "investedUsd": 151.97,
+      "netUsd": -2.5,
+      "netPct": -1.65,
+      "holdMinutes": 72,
+      "strategy": "intraday · large cap",
+      "reason": "alasan masuk batal",
+      "reasonDetail": "THESIS_INVALIDATED: Thesis invalidated: volumeAccelH1 0.53x < 1x rule triggered; volumeH1GrowthVs1hAgoPct -81.84%; uniqueBuyersGrowthVs1hAgoPct -54.87%; h1 sellers 145 > buyers 102; price -1.78% above -7.5% stop but volu"
+    },
     {
       "symbol": "DELTA",
       "closedAt": 1791874936327,
@@ -391,57 +378,46 @@
       "strategy": "scalp · degen",
       "reason": "alasan masuk batal",
       "reasonDetail": "THESIS_INVALIDATED: 0x… degen copy_consensus at -22.3% near 25% stop. Matches avoidWhen: operators 2, low strength 1.55, chase +7.1%, devSoldShare 1, 16 distinct sellers h1, LLM gate failed open. Positions 244-251 s"
-    },
-    {
-      "symbol": "0x…",
-      "closedAt": 1791237008483,
-      "investedUsd": 7.16,
-      "netUsd": -2,
-      "netPct": -27.87,
-      "holdMinutes": 0,
-      "strategy": "scalp · degen",
-      "reason": "lainnya",
-      "reasonDetail": "FOLLOW_EXIT: 1/2 followed wallets sold"
     }
   ],
   "trading": {
     "paper": true,
     "mode": "dry_run",
     "initialUsd": 1500,
-    "cashUsd": 987.81,
-    "positionsUsd": 149.27,
-    "realizedUsd": -360.22,
-    "unrealizedUsd": -2.7,
-    "modeledFeesUsd": 146.11,
+    "cashUsd": 1137.27,
+    "positionsUsd": 0,
+    "realizedUsd": -362.73,
+    "unrealizedUsd": 0,
+    "modeledFeesUsd": 146.15,
     "peakUsd": 1183.97,
-    "drawdownPct": 3.96,
+    "drawdownPct": 3.94,
     "dayStartUsd": 1139.78,
     "paused": false,
     "startedAt": 1790405776427,
-    "status": "attention",
+    "status": "healthy",
     "processStatus": "online",
-    "heartbeatAt": 1791955562140,
+    "heartbeatAt": 1791955866817,
     "lastScanAt": 1791955576163,
     "cashPeg": 0.99976023,
     "llm": {
       "model": "MiniMax-M3",
       "calls24h": 127,
       "dailyBudget": 96,
-      "lastDecisionAt": 1791955001164,
+      "lastDecisionAt": 1791955632736,
       "lastAction": "WAIT",
-      "lastReason": "No candidate shows a testable BUY setup: AI shows distribution (5 buyers vs 78 sellers h1, score 12, h1 -6.95%); ORBIO mirrors recent losing setup with 55% top-10 concentration; VRAX has thin $84K liquidity and is rolling after h24 +86%; BONER shows zero volume last 15m and an extended move. Holding existing PONS thesis is intact."
+      "lastReason": "PONS thesis explicitly invalidated (volumeAccelH1 0.53x < 1x rule); exiting. No candidate meets criteria: ORBIO post-run chop with decelerating buyers (score 42, recent ORBIO 268 failed identical setup), VRAX is a falling knife (h1 -2.4%, volume decel), BONER post-pump exhaustion with buyersAccel 0.74x."
     },
     "activity24h": {
-      "scans": 143,
+      "scans": 142,
       "decisions": 120,
       "quotesRejected": 30,
       "entriesRejected": 0,
       "buys": 1,
-      "sells": 1
+      "sells": 2
     }
   },
   "schemaVersion": 2,
-  "generation": "db69b800-b71a-4f63-b22a-6e940f6d3c05",
+  "generation": "f014b901-254f-41af-a645-03a625014f28",
   "treasuryUsd": 0,
   "quality": {
     "complete": true,
@@ -449,25 +425,25 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791955581293,
+    "generatedAt": 1791955881637,
     "trades": {
-      "count": 269,
+      "count": 270,
       "wins": 48,
-      "losses": 213,
+      "losses": 214,
       "flat": 8,
-      "winRate": 18.39,
+      "winRate": 18.32,
       "usdComplete": true,
-      "netUsd": -360.22,
+      "netUsd": -362.72,
       "grossProfitUsd": 140.83,
-      "grossLossUsd": -501.05,
+      "grossLossUsd": -503.55,
       "profitFactor": 0.28,
       "profitFactorBasis": "usd",
       "expectancyUsd": -1.34,
-      "expectancyPct": -7.02,
+      "expectancyPct": -7,
       "avgWinUsd": 2.93,
       "avgLossUsd": -2.35,
       "avgWinPct": 15.34,
-      "avgLossPct": -12.32,
+      "avgLossPct": -12.27,
       "best": {
         "usd": 13.88,
         "pct": 52.47,
@@ -482,10 +458,10 @@
       },
       "longestWinStreak": 3,
       "longestLossStreak": 18,
-      "avgHoldMinutes": 140,
-      "tradesPerDay": 17,
+      "avgHoldMinutes": 139,
+      "tradesPerDay": 16.1,
       "firstAt": 1790510820968,
-      "lastAt": 1791874936327
+      "lastAt": 1791955633733
     },
     "equity": {
       "days": 17,
@@ -497,7 +473,7 @@
       "maxDrawdownPeakUsd": 500,
       "maxDrawdownTroughUsd": 1134.99,
       "currentDrawdownPct": 69.2,
-      "currentDrawdownUsd": 2555.16,
+      "currentDrawdownUsd": 2554.97,
       "positiveDaysPct": 0,
       "bestDayPct": 0,
       "worstDayPct": -27.69,
@@ -506,18 +482,18 @@
       "calmar": null,
       "since": 1790467193741
     },
-    "profitUsd": -362.92,
-    "profitPct": -24.19,
+    "profitUsd": -362.73,
+    "profitPct": -24.18,
     "recoveryFactor": -1.05,
     "score": {
       "axes": {
-        "winRate": 18.39,
+        "winRate": 18.32,
         "profitFactor": 0,
         "risk": 0,
         "recovery": 0,
         "consistency": 0
       },
-      "overall": 3.68,
+      "overall": 3.66,
       "complete": true
     }
   },
@@ -605,6 +581,13 @@
       "usd": -0.18,
       "w": 0,
       "l": 0
+    },
+    {
+      "d": "2026-10-14",
+      "n": 1,
+      "usd": -2.5,
+      "w": 0,
+      "l": 1
     }
   ]
 }
