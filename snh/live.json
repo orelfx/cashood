@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f7cb8a91-aa48-4b06-b6db-f2b985dc26b0",
-  "updatedAt": 1791974925542,
-  "generatedAt": "2026-10-14 17:48 WIB",
+  "generation": "a0decafd-7a2d-4357-99e2-79b7bec34158",
+  "updatedAt": 1791975225543,
+  "generatedAt": "2026-10-14 17:53 WIB",
   "usdIdr": null,
   "totalUsd": 926.2071164831847,
   "nativeSymbol": "SOL",
@@ -1291,12 +1291,12 @@
     "pnlUsd": -73.79288351681532,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1791974925542,
+    "heartbeatAt": 1791975225543,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.24,
-    "lastScanAt": 1791974922686,
+    "lastScanAt": 1791975222565,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1317,12 +1317,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "345",
+        "v": "346",
         "n": "24 jam · 29 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "2552",
+        "v": "2592",
         "n": "151 aktif"
       },
       {
@@ -1333,9 +1333,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1791974925542,
+      "lastDecisionAt": 1791975225543,
       "lastAction": "keputusan",
-      "lastReason": "HIGGS [low]: Dilewati karena red flag: insider/entrapment pegang 30%."
+      "lastReason": "VEIL [mid]: Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1354,7 +1354,7 @@
       ],
       [
         "Wallet dipantau",
-        "2552 · 151 aktif"
+        "2592 · 151 aktif"
       ],
       [
         "Cadangan kas",
@@ -1366,7 +1366,7 @@
       ],
       [
         "Label wallet",
-        "smart 815 · bot 1120 · blacklist 308 · lp 1 · fresh 104 · kol 102 · dolphin 100 · whale 2"
+        "smart 816 · bot 1121 · blacklist 308 · lp 1 · fresh 104 · kol 102 · dolphin 100 · whale 2 · unknown 38"
       ]
     ],
     "requirements": [
@@ -1414,23 +1414,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 2552,
+      "tracked": 2592,
       "active": 151,
-      "passive": 2401,
+      "passive": 2441,
       "trusted": 0,
       "promising": 20,
       "byLabel": [
         {
           "key": "bot",
-          "total": 1120,
+          "total": 1121,
           "active": 0,
-          "passive": 1120
+          "passive": 1121
         },
         {
           "key": "smart",
-          "total": 815,
+          "total": 816,
           "active": 125,
-          "passive": 690
+          "passive": 691
         },
         {
           "key": "blacklist",
@@ -1455,6 +1455,12 @@
           "total": 100,
           "active": 17,
           "passive": 83
+        },
+        {
+          "key": "unknown",
+          "total": 38,
+          "active": 0,
+          "passive": 38
         },
         {
           "key": "whale",
@@ -1570,6 +1576,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1791974988676,
+        "symbol": "VEIL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1791974627420,
         "symbol": "HIGGS",
@@ -2447,39 +2470,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 29%."
-      },
-      {
-        "at": 1791959167642,
-        "symbol": "TPA",
-        "action": "veto",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.5%"
-          },
-          {
-            "type": "sniper",
-            "count": 20,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 6.7%"
-          }
-        ],
-        "reason": "Diveto LLM: Both wallets are near-identical high-frequency bots with low hold times (7-13 min), sub-50% winrate, minimal big winners (only 1 x2-x5 each), and our copy histo. Tidak dimasuki."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 87,
+        "below_entry": 88,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2534,7 +2530,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1791975114754,
+    "generatedAt": 1791975412529,
     "trades": {
       "count": 134,
       "wins": 52,
