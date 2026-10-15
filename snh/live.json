@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9b99e705-9e4f-4196-9299-28bff735b682",
-  "updatedAt": 1792061950096,
-  "generatedAt": "2026-10-15 17:59 WIB",
+  "generation": "c323e77a-ca13-4642-b0ff-61241dede114",
+  "updatedAt": 1792062250113,
+  "generatedAt": "2026-10-15 18:04 WIB",
   "usdIdr": null,
   "totalUsd": 923.5574772921658,
   "nativeSymbol": "SOL",
@@ -1289,12 +1289,12 @@
     "pnlUsd": -76.4425227078342,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792061950096,
+    "heartbeatAt": 1792062250113,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792061946001,
+    "lastScanAt": 1792062247512,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1315,7 +1315,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "545",
+        "v": "544",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1331,9 +1331,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792061950096,
+      "lastDecisionAt": 1792062250113,
       "lastAction": "keputusan",
-      "lastReason": "REPOS [degen]: Dilewati: explore: zone/cooldown/budget."
+      "lastReason": "GROKLET [low]: Dilewati karena red flag: bundler pegang 71% supply."
     }
   },
   "strategy": {
@@ -1364,7 +1364,7 @@
       ],
       [
         "Label wallet",
-        "smart 3845 · bot 1492 · blacklist 333 · lp 1 · fresh 351 · kol 114 · dolphin 336 · whale 4 · unknown 6"
+        "smart 3844 · bot 1493 · blacklist 333 · lp 1 · fresh 351 · kol 114 · dolphin 336 · whale 4 · unknown 6"
       ]
     ],
     "requirements": [
@@ -1420,15 +1420,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 3845,
+          "total": 3844,
           "active": 221,
-          "passive": 3624
+          "passive": 3623
         },
         {
           "key": "bot",
-          "total": 1492,
+          "total": 1493,
           "active": 0,
-          "passive": 1492
+          "passive": 1493
         },
         {
           "key": "fresh",
@@ -1574,6 +1574,34 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792062235974,
+        "symbol": "GROKLET",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 71% supply."
+      },
+      {
+        "at": 1792062112223,
+        "symbol": "dopewif",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 78.96% supply."
+      },
       {
         "at": 1792061632736,
         "symbol": "REPOS",
@@ -2248,7 +2276,8 @@
         "action": "skip",
         "basket": "degen",
         "wallets": {
-          "smart": 2
+          "bot": 1,
+          "smart": 1
         },
         "reason": "Dilewati: harga sudah -27% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
@@ -2545,70 +2574,17 @@
           }
         ],
         "reason": "Keluar (trailing): Harga turun 35% dari puncak +115% setelah 21 menit, trailing stop menutup sisa posisi. TP1 sudah kena di +20%. Hasil +21,1%."
-      },
-      {
-        "at": 1792037651894,
-        "symbol": "Sycamore",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "bot": 1,
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 24.18%."
-      },
-      {
-        "at": 1792037267917,
-        "symbol": "PLUS1",
-        "action": "partial",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 15.08% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 13,
-            "note": "bundler pegang 6.3%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 11.1%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Take profit bertahap (TP1): jual sebagian senilai $15,84; sisanya jalan terus dengan stop di titik impas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 109,
+        "below_entry": 107,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 431,
+        "red_flag": 432,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2658,7 +2634,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792062116795,
+    "generatedAt": 1792062416431,
     "trades": {
       "count": 138,
       "wins": 54,
