@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "63ab3f21-5644-4b81-9fc8-d69c95db4833",
-  "updatedAt": 1792068250845,
-  "generatedAt": "2026-10-15 19:44 WIB",
+  "generation": "cb5f4301-82c7-4d12-bd5e-47c21df9c946",
+  "updatedAt": 1792068550846,
+  "generatedAt": "2026-10-15 19:49 WIB",
   "usdIdr": null,
   "totalUsd": 923.5574772921658,
   "nativeSymbol": "SOL",
@@ -1289,12 +1289,12 @@
     "pnlUsd": -76.4425227078342,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792068250845,
+    "heartbeatAt": 1792068550846,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792068248519,
+    "lastScanAt": 1792068547213,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1321,7 +1321,7 @@
       {
         "k": "Wallet dipantau",
         "v": "6766",
-        "n": "266 aktif"
+        "n": "265 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1331,9 +1331,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792068250845,
+      "lastDecisionAt": 1792068550846,
       "lastAction": "keputusan",
-      "lastReason": "Groklet [degen]: Dilewati karena red flag: holder baru 6."
+      "lastReason": "GROKLET [degen]: Dilewati karena red flag: holder baru 5."
     }
   },
   "strategy": {
@@ -1352,7 +1352,7 @@
       ],
       [
         "Wallet dipantau",
-        "6766 · 266 aktif"
+        "6766 · 265 aktif"
       ],
       [
         "Cadangan kas",
@@ -1364,7 +1364,7 @@
       ],
       [
         "Label wallet",
-        "smart 4083 · bot 1501 · blacklist 336 · lp 1 · fresh 360 · kol 115 · dolphin 360 · whale 4 · unknown 6"
+        "smart 4082 · bot 1502 · blacklist 336 · lp 1 · fresh 360 · kol 115 · dolphin 360 · whale 4 · unknown 6"
       ]
     ],
     "requirements": [
@@ -1413,22 +1413,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 6766,
-      "active": 266,
-      "passive": 6500,
+      "active": 265,
+      "passive": 6501,
       "trusted": 0,
       "promising": 23,
       "byLabel": [
         {
           "key": "smart",
-          "total": 4083,
-          "active": 226,
+          "total": 4082,
+          "active": 225,
           "passive": 3857
         },
         {
           "key": "bot",
-          "total": 1501,
+          "total": 1502,
           "active": 0,
-          "passive": 1501
+          "passive": 1502
         },
         {
           "key": "fresh",
@@ -1574,6 +1574,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792068388873,
+        "symbol": "GROKLET",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 5."
+      },
+      {
+        "at": 1792068280000,
+        "symbol": "scry",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 48.63% supply."
+      },
       {
         "at": 1792068198775,
         "symbol": "Groklet",
@@ -2299,54 +2319,17 @@
           }
         ],
         "reason": "Keluar (follow exit): 1 dari 2 wallet yang diikuti sudah menjual setelah 30 menit, jadi posisi ikut ditutup. TP1 sudah kena di +20%. Hasil +15,6%."
-      },
-      {
-        "at": 1792058571982,
-        "symbol": "Tralalero",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792058263359,
-        "symbol": "CHAT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 7,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 487,
-            "note": "5.3% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 96,
+        "below_entry": 95,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 446,
+        "red_flag": 447,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2396,7 +2379,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792068413849,
+    "generatedAt": 1792068718579,
     "trades": {
       "count": 138,
       "wins": 54,
