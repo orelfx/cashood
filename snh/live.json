@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "a4f375fd-0c4f-413a-8b92-56f8d949bcce",
-  "updatedAt": 1792085052568,
-  "generatedAt": "2026-10-16 00:24 WIB",
+  "generation": "902536b8-32b8-4d96-ab20-e1af64d5a26e",
+  "updatedAt": 1792085353321,
+  "generatedAt": "2026-10-16 00:29 WIB",
   "usdIdr": null,
   "totalUsd": 928.380491028194,
   "nativeSymbol": "SOL",
@@ -1302,12 +1302,12 @@
     "pnlUsd": -71.619508971806,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792085052568,
+    "heartbeatAt": 1792085353321,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.03,
-    "lastScanAt": 1792085020385,
+    "lastScanAt": 1792085348594,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1344,9 +1344,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792085052568,
+      "lastDecisionAt": 1792085353321,
       "lastAction": "keputusan",
-      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $84220."
+      "lastReason": "LARPCHECK [low]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1377,7 +1377,7 @@
       ],
       [
         "Label wallet",
-        "smart 4675 · bot 1586 · blacklist 340 · lp 1 · fresh 399 · kol 123 · dolphin 365 · unknown 45 · whale 2"
+        "smart 4706 · bot 1588 · blacklist 340 · lp 1 · fresh 406 · kol 123 · dolphin 365 · unknown 5 · whale 2"
       ]
     ],
     "requirements": [
@@ -1433,21 +1433,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 4675,
+          "total": 4706,
           "active": 244,
-          "passive": 4431
+          "passive": 4462
         },
         {
           "key": "bot",
-          "total": 1586,
+          "total": 1588,
           "active": 0,
-          "passive": 1586
+          "passive": 1588
         },
         {
           "key": "fresh",
-          "total": 399,
+          "total": 406,
           "active": 0,
-          "passive": 399
+          "passive": 406
         },
         {
           "key": "dolphin",
@@ -1469,9 +1469,9 @@
         },
         {
           "key": "unknown",
-          "total": 45,
+          "total": 5,
           "active": 0,
-          "passive": 45
+          "passive": 5
         },
         {
           "key": "whale",
@@ -1587,6 +1587,68 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792085328605,
+        "symbol": "LARPCHECK",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 409,
+            "note": "bundler pegang 6.6%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 13.7%"
+          },
+          {
+            "type": "sniper",
+            "count": 2,
+            "note": "sniper awal masih pegang 0.8%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "9.9% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 0.8%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792085320107,
+        "symbol": "BANGR",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 63% supply."
+      },
+      {
+        "at": 1792085172763,
+        "symbol": "PUMPE",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 28%."
+      },
       {
         "at": 1792084807969,
         "symbol": "STONK",
@@ -2306,47 +2368,17 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 22."
-      },
-      {
-        "at": 1792078646080,
-        "symbol": "Cosmo",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
-      },
-      {
-        "at": 1792078643698,
-        "symbol": "Ebay",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "bot": 2
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1792078280899,
-        "symbol": "Hope",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 87,
+        "below_entry": 86,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 472,
+        "red_flag": 473,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2396,7 +2428,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792085234310,
+    "generatedAt": 1792085524835,
     "trades": {
       "count": 139,
       "wins": 55,
