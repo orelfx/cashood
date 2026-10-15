@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c6707806-619b-47c3-9a42-013dbc66483a",
-  "updatedAt": 1792069150847,
-  "generatedAt": "2026-10-15 19:59 WIB",
+  "generation": "707c815b-9e25-479e-b77d-0d658cd22f6f",
+  "updatedAt": 1792069450847,
+  "generatedAt": "2026-10-15 20:04 WIB",
   "usdIdr": null,
   "totalUsd": 923.5574772921658,
   "nativeSymbol": "SOL",
@@ -1289,12 +1289,12 @@
     "pnlUsd": -76.4425227078342,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792069150847,
+    "heartbeatAt": 1792069450847,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792069148726,
+    "lastScanAt": 1792069448815,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1315,7 +1315,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "546",
+        "v": "549",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1331,9 +1331,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792069150847,
+      "lastDecisionAt": 1792069450847,
       "lastAction": "keputusan",
-      "lastReason": "GROKIANA [degen]: Dilewati karena red flag: holder baru 9."
+      "lastReason": "MERT [degen]: Dilewati: harga sudah -68% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1575,17 +1575,27 @@
     },
     "decisions": [
       {
-        "at": 1792068705029,
-        "symbol": "GROKIANA",
+        "at": 1792069337228,
+        "symbol": "MERT",
         "action": "skip",
         "basket": "degen",
         "wallets": {
           "smart": 4
         },
-        "reason": "Dilewati karena red flag: holder baru 9."
+        "reason": "Dilewati: harga sudah -68% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
-        "at": 1792068606259,
+        "at": 1792069309451,
+        "symbol": "GROKIANA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: holder baru 7."
+      },
+      {
+        "at": 1792069211225,
         "symbol": "STONK",
         "action": "skip",
         "basket": "big",
@@ -1594,6 +1604,26 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $79347."
+      },
+      {
+        "at": 1792069204613,
+        "symbol": "Grokette",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati karena red flag: holder baru 15."
+      },
+      {
+        "at": 1792068705029,
+        "symbol": "GROKIANA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati karena red flag: holder baru 9."
       },
       {
         "at": 1792068603697,
@@ -2186,87 +2216,17 @@
           }
         ],
         "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792062235974,
-        "symbol": "GROKLET",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 71% supply."
-      },
-      {
-        "at": 1792062112223,
-        "symbol": "dopewif",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 78.96% supply."
-      },
-      {
-        "at": 1792061632736,
-        "symbol": "REPOS",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 19.35% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 5%"
-          },
-          {
-            "type": "bundler",
-            "count": 14,
-            "note": "bundler pegang 19.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.1%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 5.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 3,
-            "note": "5.3% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 93,
+        "below_entry": 94,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 448,
+        "red_flag": 450,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2316,7 +2276,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792069321174,
+    "generatedAt": 1792069617107,
     "trades": {
       "count": 138,
       "wins": 54,
