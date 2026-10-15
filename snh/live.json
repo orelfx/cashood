@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c04f86f9-fa82-4b0e-b4bd-19e1df5172da",
-  "updatedAt": 1792078152360,
-  "generatedAt": "2026-10-15 22:29 WIB",
+  "generation": "017752c3-84d8-412b-99e2-73b57a55e281",
+  "updatedAt": 1792078452361,
+  "generatedAt": "2026-10-15 22:34 WIB",
   "usdIdr": null,
   "totalUsd": 923.5574772921658,
   "nativeSymbol": "SOL",
@@ -1289,12 +1289,12 @@
     "pnlUsd": -76.4425227078342,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792078152360,
+    "heartbeatAt": 1792078452361,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792078149799,
+    "lastScanAt": 1792078450522,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1315,7 +1315,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "557",
+        "v": "560",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1331,9 +1331,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792078152360,
+      "lastDecisionAt": 1792078452361,
       "lastAction": "keputusan",
-      "lastReason": "Cosmo [degen]: Dilewati karena red flag: insider/entrapment pegang 10%."
+      "lastReason": "Hope [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1574,6 +1574,54 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792078280899,
+        "symbol": "Hope",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1792078275369,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1,
+          "dolphin": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $84205."
+      },
+      {
+        "at": 1792078181240,
+        "symbol": "Playground",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": 5,
+            "note": "insider/entrapment pegang 13.2%"
+          },
+          {
+            "type": "sniper",
+            "count": 9,
+            "note": "sniper awal masih pegang 0.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 532,
+            "note": "10.2% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1792078043257,
         "symbol": "Cosmo",
@@ -2306,48 +2354,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $79793."
-      },
-      {
-        "at": 1792070699324,
-        "symbol": "b",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $1944."
-      },
-      {
-        "at": 1792070662830,
-        "symbol": "GOAF",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -77% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792070497121,
-        "symbol": "DaCity",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "sniper",
-            "count": 8,
-            "note": "sniper awal masih pegang 4.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 20,
-            "note": "15.7% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2358,7 +2364,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 456,
+        "red_flag": 459,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2408,7 +2414,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792078314486,
+    "generatedAt": 1792078620684,
     "trades": {
       "count": 138,
       "wins": 54,
@@ -2448,7 +2454,7 @@
     },
     "equity": {
       "days": 9,
-      "spanDays": 9.6,
+      "spanDays": 9.7,
       "returnPct": -6.68,
       "maxDrawdownPct": 7.15,
       "maxDrawdownAt": 1792003733021,
