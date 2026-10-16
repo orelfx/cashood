@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ebbb91cc-b30b-43d7-865e-cd5b706550a5",
-  "updatedAt": 1792170927351,
-  "generatedAt": "2026-10-17 00:15 WIB",
+  "generation": "bd3bbca6-adbd-4113-be4c-16c7043acc04",
+  "updatedAt": 1792171230240,
+  "generatedAt": "2026-10-17 00:20 WIB",
   "usdIdr": null,
   "totalUsd": 929.6905694880977,
   "nativeSymbol": "SOL",
@@ -1269,12 +1269,12 @@
     "pnlUsd": -70.30943051190229,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792170927351,
+    "heartbeatAt": 1792171230240,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.9,
-    "lastScanAt": 1792170924000,
+    "lastScanAt": 1792171216000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1311,9 +1311,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792170927351,
+      "lastDecisionAt": 1792171230240,
       "lastAction": "keputusan",
-      "lastReason": "X [low]: Dilewati karena red flag: dev masih pegang 79.31%."
+      "lastReason": "Glow [degen]: Dilewati karena red flag: bundler pegang 45% supply."
     }
   },
   "strategy": {
@@ -1344,7 +1344,7 @@
       ],
       [
         "Label wallet",
-        "smart 5205 · bot 1970 · blacklist 353 · lp 1 · fresh 449 · kol 130 · dolphin 310 · unknown 2580 · whale 2"
+        "smart 5285 · bot 1974 · blacklist 353 · lp 1 · fresh 453 · kol 131 · dolphin 312 · whale 2 · unknown 2489"
       ]
     ],
     "requirements": [
@@ -1400,27 +1400,27 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 5205,
+          "total": 5285,
           "active": 327,
-          "passive": 4878
+          "passive": 4958
         },
         {
           "key": "unknown",
-          "total": 2580,
+          "total": 2489,
           "active": 0,
-          "passive": 2580
+          "passive": 2489
         },
         {
           "key": "bot",
-          "total": 1970,
+          "total": 1974,
           "active": 0,
-          "passive": 1970
+          "passive": 1974
         },
         {
           "key": "fresh",
-          "total": 449,
+          "total": 453,
           "active": 0,
-          "passive": 449
+          "passive": 453
         },
         {
           "key": "blacklist",
@@ -1430,15 +1430,15 @@
         },
         {
           "key": "dolphin",
-          "total": 310,
+          "total": 312,
           "active": 29,
-          "passive": 281
+          "passive": 283
         },
         {
           "key": "kol",
-          "total": 130,
+          "total": 131,
           "active": 8,
-          "passive": 122
+          "passive": 123
         },
         {
           "key": "whale",
@@ -1554,6 +1554,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792171169348,
+        "symbol": "Glow",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 45% supply."
+      },
+      {
+        "at": 1792170969792,
+        "symbol": "AH",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: holder baru 5."
+      },
       {
         "at": 1792170857327,
         "symbol": "X",
@@ -2331,26 +2358,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792164467454,
-        "symbol": "Kurumi",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 29%."
-      },
-      {
-        "at": 1792164442332,
-        "symbol": "X",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 80%."
       }
     ],
     "reasonStats": {
@@ -2412,7 +2419,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792171014882,
+    "generatedAt": 1792171335776,
     "trades": {
       "count": 140,
       "wins": 56,
