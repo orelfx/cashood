@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4604093b-922b-419e-8bf3-8ed6db5c6408",
-  "updatedAt": 1792175481851,
-  "generatedAt": "2026-10-17 01:31 WIB",
+  "generation": "bc0c033f-506e-427b-9b31-a2ef6a9f0d06",
+  "updatedAt": 1792175782320,
+  "generatedAt": "2026-10-17 01:36 WIB",
   "usdIdr": null,
-  "totalUsd": 930.4886840884502,
+  "totalUsd": 930.4886268892759,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 930.4886840884502,
+  "botWalletUsd": 930.4886268892759,
   "walletUsd": 929.0606221745422,
-  "lpUsd": 1.42806191,
+  "lpUsd": 1.42800471,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,14 @@
       "bookLabel": "degen",
       "costUsd": 1.428004714733718,
       "investedUsd": 1.428004714733718,
-      "principalUsd": 1.42806191,
-      "valueUsd": 1.42806191,
+      "principalUsd": 1.42800471,
+      "valueUsd": 1.42800471,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 0.000057199174310129663,
+      "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000013292672096934378,
-      "priceUsd": 0.000015196155,
-      "ageMinutes": 32,
+      "ageMinutes": 37,
       "stopPct": 35,
       "targetPct": 80,
       "maxHoldHours": 4,
@@ -72,7 +71,7 @@
       "llmScore": 55,
       "peakPct": 22.49,
       "ddPct": -4.46,
-      "stale": false
+      "stale": true
     }
   ],
   "history": [
@@ -1318,18 +1317,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 929.0606221745422,
-    "positionsUsd": 1.42806191,
+    "positionsUsd": 1.42800471,
     "realizedUsd": -69.51137311,
-    "unrealizedUsd": 0.0000572,
-    "pnlUsd": -69.51131591154979,
+    "unrealizedUsd": 0,
+    "pnlUsd": -69.5113731107241,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792175481851,
+    "heartbeatAt": 1792175782320,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.82,
-    "lastScanAt": 1792175474000,
+    "lastScanAt": 1792175773000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1344,9 +1343,15 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$0.0001",
+        "v": "+$0.0000",
         "n": "dari posisi terbuka",
         "tone": "pos"
+      },
+      {
+        "k": "Harga belum tersedia",
+        "v": "1",
+        "n": "posisi ditandai belum terverifikasi",
+        "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
@@ -1366,9 +1371,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792175481851,
+      "lastDecisionAt": 1792175782320,
       "lastAction": "keputusan",
-      "lastReason": "Solomon [degen]: Dilewati karena red flag: bundler pegang 35% supply."
+      "lastReason": "VEIL [mid]: Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1399,7 +1404,7 @@
       ],
       [
         "Label wallet",
-        "smart 7473 · bot 2158 · blacklist 359 · lp 1 · fresh 619 · kol 143 · dolphin 366 · whale 4"
+        "smart 7472 · bot 2160 · blacklist 359 · lp 1 · fresh 618 · kol 143 · dolphin 366 · whale 4"
       ]
     ],
     "requirements": [
@@ -1455,21 +1460,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 7473,
+          "total": 7472,
           "active": 334,
-          "passive": 7139
+          "passive": 7138
         },
         {
           "key": "bot",
-          "total": 2158,
+          "total": 2160,
           "active": 0,
-          "passive": 2158
+          "passive": 2160
         },
         {
           "key": "fresh",
-          "total": 619,
+          "total": 618,
           "active": 0,
-          "passive": 619
+          "passive": 618
         },
         {
           "key": "dolphin",
@@ -1603,6 +1608,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792175496218,
+        "symbol": "VEIL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792175343664,
         "symbol": "Solomon",
@@ -2405,27 +2427,17 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792172764095,
-        "symbol": "HOTBOT",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 26%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 23,
+        "below_entry": 24,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 214,
+        "red_flag": 213,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2471,12 +2483,14 @@
     }
   },
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "1 posisi tanpa harga masuk/mark; nilainya dari catatan paper"
+    ]
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792175513357,
+    "generatedAt": 1792175815175,
     "trades": {
       "count": 140,
       "wins": 56,
