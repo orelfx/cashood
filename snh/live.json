@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8ed10ec8-dfbc-4e26-9de9-62247b23db02",
-  "updatedAt": 1792185709032,
-  "generatedAt": "2026-10-17 04:21 WIB",
+  "generation": "d057fae7-0ab4-41eb-b6cb-04004694e5f4",
+  "updatedAt": 1792186009032,
+  "generatedAt": "2026-10-17 04:26 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1287,12 +1287,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792185709032,
+    "heartbeatAt": 1792186009032,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792185696000,
+    "lastScanAt": 1792186005000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1313,13 +1313,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "274",
+        "v": "277",
         "n": "24 jam · 1 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "11566",
-        "n": "386 aktif"
+        "v": "11606",
+        "n": "387 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1329,9 +1329,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792185709032,
+      "lastDecisionAt": 1792186009032,
       "lastAction": "keputusan",
-      "lastReason": "parafactual [low]: Dilewati karena red flag: insider/entrapment pegang 19%."
+      "lastReason": "fone [mid]: Dilewati karena red flag: insider/entrapment pegang 28%."
     }
   },
   "strategy": {
@@ -1350,7 +1350,7 @@
       ],
       [
         "Wallet dipantau",
-        "11566 · 386 aktif"
+        "11606 · 387 aktif"
       ],
       [
         "Cadangan kas",
@@ -1362,7 +1362,7 @@
       ],
       [
         "Label wallet",
-        "smart 7808 · bot 2226 · blacklist 361 · lp 1 · fresh 648 · kol 146 · dolphin 370 · whale 5 · unknown 1"
+        "smart 7813 · bot 2230 · blacklist 361 · lp 1 · fresh 647 · kol 146 · dolphin 370 · whale 5 · unknown 33"
       ]
     ],
     "requirements": [
@@ -1410,29 +1410,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 11566,
-      "active": 386,
-      "passive": 11180,
+      "tracked": 11606,
+      "active": 387,
+      "passive": 11219,
       "trusted": 0,
       "promising": 24,
       "byLabel": [
         {
           "key": "smart",
-          "total": 7808,
-          "active": 344,
-          "passive": 7464
+          "total": 7813,
+          "active": 345,
+          "passive": 7468
         },
         {
           "key": "bot",
-          "total": 2226,
+          "total": 2230,
           "active": 0,
-          "passive": 2226
+          "passive": 2230
         },
         {
           "key": "fresh",
-          "total": 648,
+          "total": 647,
           "active": 0,
-          "passive": 648
+          "passive": 647
         },
         {
           "key": "dolphin",
@@ -1453,6 +1453,12 @@
           "passive": 137
         },
         {
+          "key": "unknown",
+          "total": 33,
+          "active": 0,
+          "passive": 33
+        },
+        {
           "key": "whale",
           "total": 5,
           "active": 3,
@@ -1460,12 +1466,6 @@
         },
         {
           "key": "lp",
-          "total": 1,
-          "active": 0,
-          "passive": 1
-        },
-        {
-          "key": "unknown",
           "total": 1,
           "active": 0,
           "passive": 1
@@ -1572,6 +1572,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792185891834,
+        "symbol": "fone",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 28%."
+      },
+      {
+        "at": 1792185851320,
+        "symbol": "Vampcoin",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 32.72% supply."
+      },
+      {
+        "at": 1792185799506,
+        "symbol": "VEIL",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": 3,
+            "note": "insider/entrapment pegang 13.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 50,
+            "note": "sniper awal masih pegang 0.1%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1792185686507,
         "symbol": "parafactual",
@@ -2120,16 +2162,6 @@
         "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
       },
       {
-        "at": 1792179437330,
-        "symbol": "fone",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 28%."
-      },
-      {
         "at": 1792179226444,
         "symbol": "Rockstar",
         "action": "skip",
@@ -2348,48 +2380,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 46% supply."
-      },
-      {
-        "at": 1792176722741,
-        "symbol": "Glow",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 192,
-            "note": "bundler pegang 21.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 200,
-            "note": "5.0% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 16x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792176643028,
-        "symbol": "TripleT",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 54%."
       }
     ],
     "reasonStats": {
@@ -2400,7 +2390,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 244,
+        "red_flag": 247,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2451,7 +2441,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792185732694,
+    "generatedAt": 1792186023427,
     "trades": {
       "count": 141,
       "wins": 57,
