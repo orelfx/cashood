@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f1bbd8bc-7700-4240-a2c2-676a6beab986",
-  "updatedAt": 1792262582847,
-  "generatedAt": "2026-10-18 01:43 WIB",
+  "generation": "1c5511af-19e9-4a7c-9a62-62ec5cbc4173",
+  "updatedAt": 1792262882868,
+  "generatedAt": "2026-10-18 01:48 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792262582847,
+    "heartbeatAt": 1792262882868,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792262573000,
+    "lastScanAt": 1792262875000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1320,7 +1320,7 @@
       {
         "k": "Wallet dipantau",
         "v": "14241",
-        "n": "426 aktif"
+        "n": "427 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792262582847,
+      "lastDecisionAt": 1792262882868,
       "lastAction": "keputusan",
-      "lastReason": "BOXDROP [degen]: Dilewati: solo_test: zone/cooldown/budget."
+      "lastReason": "zazu [degen]: Dilewati karena red flag: insider/entrapment pegang 11%."
     }
   },
   "strategy": {
@@ -1351,7 +1351,7 @@
       ],
       [
         "Wallet dipantau",
-        "14241 · 426 aktif"
+        "14241 · 427 aktif"
       ],
       [
         "Cadangan kas",
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 9683 · bot 2780 · blacklist 374 · lp 1 · fresh 818 · kol 153 · dolphin 385 · whale 7 · unknown 40"
+        "smart 9706 · bot 2786 · blacklist 374 · lp 1 · fresh 828 · kol 153 · dolphin 386 · whale 7"
       ]
     ],
     "requirements": [
@@ -1412,33 +1412,33 @@
   "copyTrade": {
     "wallets": {
       "tracked": 14241,
-      "active": 426,
-      "passive": 13815,
+      "active": 427,
+      "passive": 13814,
       "trusted": 0,
       "promising": 20,
       "byLabel": [
         {
           "key": "smart",
-          "total": 9683,
+          "total": 9706,
           "active": 392,
-          "passive": 9291
+          "passive": 9314
         },
         {
           "key": "bot",
-          "total": 2780,
+          "total": 2786,
           "active": 0,
-          "passive": 2780
+          "passive": 2786
         },
         {
           "key": "fresh",
-          "total": 818,
+          "total": 828,
           "active": 0,
-          "passive": 818
+          "passive": 828
         },
         {
           "key": "dolphin",
-          "total": 385,
-          "active": 24,
+          "total": 386,
+          "active": 25,
           "passive": 361
         },
         {
@@ -1452,12 +1452,6 @@
           "total": 153,
           "active": 6,
           "passive": 147
-        },
-        {
-          "key": "unknown",
-          "total": 40,
-          "active": 0,
-          "passive": 40
         },
         {
           "key": "whale",
@@ -1562,9 +1556,9 @@
           "trusted": false
         },
         {
-          "alias": "smart #3902",
-          "label": "smart",
-          "score": 99.9,
+          "alias": "dolphin #14202",
+          "label": "dolphin",
+          "score": 100,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1573,6 +1567,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792262823470,
+        "symbol": "zazu",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
+      },
+      {
+        "at": 1792262809832,
+        "symbol": "ECHO",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 14.26% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 48,
+            "note": "bundler pegang 14.8%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792262654286,
+        "symbol": "blocus",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 59.74% supply."
+      },
       {
         "at": 1792262563472,
         "symbol": "BOXDROP",
@@ -2199,36 +2240,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792258285042,
-        "symbol": "UDR",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -65% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792258279280,
-        "symbol": "ANIMA",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -57% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792258220568,
-        "symbol": "in",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 58.9% supply."
       }
     ],
     "reasonStats": {
@@ -2290,7 +2301,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792262813964,
+    "generatedAt": 1792263115422,
     "trades": {
       "count": 141,
       "wins": 57,
