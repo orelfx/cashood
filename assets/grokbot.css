@@ -61,9 +61,25 @@ a{color:var(--warn)}
 .gb-agent.hot{box-shadow:0 0 0 1px var(--ac);animation:agent 2s ease-in-out infinite}
 @keyframes agent{0%,100%{box-shadow:0 0 0 1px var(--ac)}50%{box-shadow:0 0 0 1px var(--ac),0 0 18px -4px var(--ac)}}
 .gb-foot{color:var(--tan2);font-size:12px;border-top:1px solid var(--line);padding-top:12px}
+.gb-replay{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px}
+.gb-replay button{font:inherit;color:var(--tan);background:#241910;border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer}
+.gb-replay button:disabled{opacity:.45;cursor:default}
+.gb-replay button.on,.gb-replay button[aria-pressed="true"]{color:var(--txt);border-color:var(--warn);background:#2a1f15}
+#replayToggle{color:var(--txt);border-color:var(--warn);font-weight:700}
+.gb-replay-run{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex:1}
+.gb-replay-run[hidden]{display:none}
+.gb-speeds{display:flex;gap:4px}
+.gb-speeds button{padding:4px 8px}
+.gb-scrub{flex:1;min-width:140px;display:flex;align-items:center}
+#replayScrub{width:100%;accent-color:var(--warn);cursor:pointer}
+.gb-replay-clock{color:var(--yel);font-weight:700;font-variant-numeric:tabular-nums;min-width:118px}
+.gb-pill.replay{color:var(--yel);border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.1)}
+@media (prefers-reduced-motion: reduce){
+ .gb-big,.gb-pill.live i,.gb-agent.hot{animation:none}
+}
 .gb-index{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .gb-link{text-decoration:none;color:var(--txt)}
 .gb-link:hover{border-color:var(--warn)}
 @media (max-width:1100px){.gb-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.gb-agents{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:800px){.gb-mid{grid-template-columns:1fr}.gb-chart-wrap{height:240px}.gb-log{height:260px}.gb-status{margin-left:0;width:100%;justify-content:space-between}}
-@media (max-width:560px){.gb-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.gb-agents{grid-template-columns:repeat(2,minmax(0,1fr))}.gb-index{grid-template-columns:1fr}.gb-card .v{font-size:21px}.gb-main{padding:12px}.gb-head{padding:10px 12px}}
+@media (max-width:560px){.gb-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.gb-agents{grid-template-columns:repeat(2,minmax(0,1fr))}.gb-index{grid-template-columns:1fr}.gb-card .v{font-size:21px}.gb-main{padding:12px}.gb-head{padding:10px 12px}.gb-scrub{min-width:100%}}

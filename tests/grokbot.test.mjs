@@ -19,9 +19,10 @@ test('setiap halaman rantai membaca satu buku saja dan berlabel PAPER', () => {
 
 test('skrip dashboard valid, hanya membaca branch data, tanpa alamat', () => {
   const js = read('assets/grokbot.js');
-  parse(js, { ecmaVersion: 'latest' });
+  parse(js, { ecmaVersion: 'latest', sourceType: 'module' });
+  parse(read('assets/grokbot-timeline.mjs'), { ecmaVersion: 'latest', sourceType: 'module' });
   assert.match(js, /raw\.githubusercontent\.com\/orelfx\/cashood\/data\//);
-  for (const f of ['assets/grokbot.js', 'assets/grokbot.css', ...Object.keys(pages), 'grokbot/index.html']) {
+  for (const f of ['assets/grokbot.js', 'assets/grokbot.css', 'assets/grokbot-timeline.mjs', ...Object.keys(pages), 'grokbot/index.html']) {
     const s = read(f);
     assert.doesNotMatch(s, /0x[0-9a-fA-F]{40}/, `${f} memuat alamat EVM`);
     assert.doesNotMatch(s, /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/, `${f} memuat sesuatu berbentuk alamat Solana`);
