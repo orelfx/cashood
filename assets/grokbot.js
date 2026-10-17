@@ -1,4 +1,5 @@
 import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.mjs';
+import { closeKind, exitRuleText, isPartial, planText, stopCell } from './grokbot-rules.mjs';
 /*
  * Devil Greed · dashboard paper (cashood.id/grokbot/...).
  * Satu halaman = satu buku (dgsol atau dgrh); dua buku tidak pernah digabung.
@@ -11,7 +12,6 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
   const RAW = 'https://raw.githubusercontent.com/orelfx/cashood/data/';
   const STALE_MS = 15 * 60e3, HOT_MS = 5 * 60e3, WIB = 7 * 3600e3;
   const BIG_USD = 20, BIG_PCT = 30;
-  const TRAIL_KEEP = 0.75;   // sama dengan watcher desk: keluar di max(harga isi, puncak × 0,75)
   const $ = (s) => document.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const num = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? null : Number(v));
@@ -58,18 +58,26 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
     return rows.filter((r) => num(r.closedAt) != null).sort((a, b) => a.closedAt - b.closedAt);
   }
 
-  const isPartial = (c) => /^jual separuh/i.test(c.reasonDetail || '');
-  const isTrail = (c) => /trailing stop setelah/i.test(c.reasonDetail || '');
-  const closeKind = (c) => (isPartial(c) ? ['TP1', 'tp'] : isTrail(c) ? ['TRAIL', 'tp'] : c.reason === 'take_profit' ? ['TP', 'tp'] : c.reason === 'stop_loss' ? ['STOP', 'skip']
-    : c.reason === 'time_exit' ? ['TIME EXIT', 'close'] : ['CLOSE', 'close']);
   const SKIPTXT = [[/^full_book/i, 'buku penuh'], [/^already holding/i, 'sudah pegang'], [/^safety:\s*/i, 'cek aman: '], [/^fact cut:\s*/i, 'fact cut: '],
     [/^judge\s*(\d+)/i, 'judge skor $1'], [/too small/i, 'beli leader terlalu kecil'], [/cooldown|24h|24 jam/i, 'jeda 24 jam'], [/full/i, 'buku penuh']];
   const skipWhy = (r) => { const s = String(r || ''); for (const [re, t] of SKIPTXT) if (re.test(s)) return t.includes('$1') ? s.replace(/^judge\s*(\d+).*/i, t) : (t.endsWith(': ') ? t + s.replace(re, '').slice(0, 70) : t); return s.slice(0, 70) || 'dilewati'; };
   const symOf = (s) => (!s || s === 'tanpa simbol' ? 'token baru' : '$' + s);
 
-  function trailPct(p) {
-    if (p.stopPct != null || num(p.peakPct) == null || !/\btrailing\b/.test(p.strategy || '')) return null;
-    return Math.max(0, ((1 + p.peakPct / 100) * TRAIL_KEEP - 1) * 100);
+  function stopHtml(row) {
+    const cell = stopCell(row);
+    if (cell.mode === 'ladder') return `<span title="${esc(cell.text)}">${esc(cell.text)}</span>`;
+    if (cell.mode === 'empty') return '<span class="sub">—</span>';
+    const bits = [];
+    if (cell.stop) bits.push(`<span class="neg">${esc(cell.stop)}</span>`);
+    if (cell.target) bits.push(`<span class="pos">${esc(cell.target)}</span>`);
+    return bits.join(' / ');
+  }
+  function renderExitRule(text) {
+    const el = $('#exitRule');
+    if (!el) return;
+    const show = typeof text === 'string' && text.trim();
+    el.hidden = !show;
+    el.textContent = show ? text.trim() : '';
   }
 
   function renderHeader(live) {
@@ -95,7 +103,7 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
     if (wins.length) {
       const best = wins.reduce((a, b) => (b.netUsd > a.netUsd ? b : a));
       $('#mWin').innerHTML = `<span class="pos">${esc(sgn(best.netUsd))}</span>`;
-      $('#mWinN').textContent = `${symOf(best.symbol)} ${pct(best.netPct)}${best.firstWallet ? ' · by ' + best.firstWallet : ''}${isPartial(best) ? ' · TP1' : ''}`;
+      $('#mWinN').textContent = `${symOf(best.symbol)} ${pct(best.netPct)}${best.firstWallet ? ' · by ' + best.firstWallet : ''}${isPartial(best) ? ' · ' + closeKind(best)[0] : ''}`;
     } else { $('#mWin').textContent = '—'; $('#mWinN').textContent = 'scanning...'; }
     const st = live.stats || {}, w = num(st.wins) ?? 0, l = num(st.losses) ?? 0, wr = w + l ? (w / (w + l)) * 100 : null;
     $('#mWr').textContent = wr == null ? '—' : wr.toFixed(1) + '%';
@@ -170,17 +178,10 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
     $('#posCount').textContent = `(${rows.length})`;
     const lag = Math.max(0, Math.round((Date.now() - live.updatedAt) / 60e3));
     $('#posNote').textContent = `nilai = jual bersih menurut harga mark · ${ago(live.updatedAt)}`;
-    $('#pos').innerHTML = rows.map((p) => {
-      const tp = trailPct(p);
-      const stop = tp != null ? `<span class="pos" title="TP1 sudah jual separuh; sisa keluar kalau harga turun 25% dari puncak, tidak di bawah harga isi">trail +${tp.toFixed(1)}%</span>`
-        : p.stopPct == null && p.targetPct == null ? '<span class="sub">—</span>'
-        : `<span class="neg">−${esc(Number(p.stopPct).toFixed(0))}%</span> / <span class="pos">+${esc(Number(p.targetPct).toFixed(0))}%</span>`;
-      const plan = [p.bookLabel, p.firstWallet ? `via ${p.firstWallet}` : '', tp != null ? 'TP1 selesai' : ''].filter(Boolean).join(' · ');
-      return `<tr><td><span class="sym ${cls(p.pnlUsd)}">●</span> <span class="sym">${esc(p.symbol)}</span>${p.stale ? '<div class="sub neg">harga belum terverifikasi</div>' : ''}</td>
-        <td>${esc(plan)}</td><td class="num">${esc(dur(num(p.ageMinutes) == null ? null : p.ageMinutes + lag))}</td>
+    $('#pos').innerHTML = rows.map((p) => `<tr><td><span class="sym ${cls(p.pnlUsd)}">●</span> <span class="sym">${esc(p.symbol)}</span>${p.stale ? '<div class="sub neg">harga belum terverifikasi</div>' : ''}</td>
+        <td>${esc(planText(p))}</td><td class="num">${esc(dur(num(p.ageMinutes) == null ? null : p.ageMinutes + lag))}</td>
         <td class="num">${esc(usd(p.costUsd))}</td><td class="num"><b>${esc(usd(p.valueUsd))}</b></td>
-        <td class="num ${cls(p.pnlUsd)}">${esc(sgn(p.pnlUsd))}<div class="sub">${esc(pct(p.pnlPct, 2))}</div></td><td class="num">${stop}</td></tr>`;
-    }).join('') || '<tr><td colspan="7" class="sub">Belum ada posisi terbuka.</td></tr>';
+        <td class="num ${cls(p.pnlUsd)}">${esc(sgn(p.pnlUsd))}<div class="sub">${esc(pct(p.pnlPct, 2))}</div></td><td class="num gb-ladder">${stopHtml(p)}</td></tr>`).join('') || '<tr><td colspan="7" class="sub">Belum ada posisi terbuka.</td></tr>';
   }
 
   function renderAgents(live, closes) {
@@ -231,7 +232,7 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
       const [live, nav] = await Promise.all([get(`${FUND}/live.json`), get(`${FUND}/nav.json`).catch(() => ({ points: [] }))]);
       const closes = await loadTrades(live);
       state = { live, nav, closes };
-      renderHeader(live); renderMetrics(live, closes); renderChart(nav, closes, live); renderLog(live, closes); renderPositions(live); renderAgents(live, closes);
+      renderHeader(live); renderMetrics(live, closes); renderChart(nav, closes, live); renderLog(live, closes); renderPositions(live); renderAgents(live, closes); renderExitRule(exitRuleText(live));
       if ($('#bigClose').hidden) bigClose(closes);
       const toggle = $('#replayToggle'); if (toggle) toggle.disabled = false;
     } catch (e) {
@@ -313,7 +314,7 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
     $('#mPnlN').textContent = `${pct(rp, 2)} sejak mulai · terealisasi ${sgn(frame.realized)}`;
     if (frame.largestWin) {
       $('#mWin').innerHTML = `<span class="pos">${esc(sgn(frame.largestWin.netUsd))}</span>`;
-      $('#mWinN').textContent = `${symOf(frame.largestWin.symbol)} ${pct(frame.largestWin.netPct)}${frame.largestWin.type === 'partial' ? ' · TP1' : ''}`;
+      $('#mWinN').textContent = `${symOf(frame.largestWin.symbol)} ${pct(frame.largestWin.netPct)}${frame.largestWin.type === 'partial' ? ' · ' + closeKind(frame.largestWin)[0] : ''}`;
     } else { $('#mWin').textContent = '—'; $('#mWinN').textContent = 'belum ada'; }
     $('#mWr').textContent = frame.winRate == null ? '—' : frame.winRate.toFixed(1) + '%';
     $('#mWrN').textContent = `${frame.wins} wins / ${frame.losses} losses`;
@@ -331,17 +332,13 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
     const rows = frame.positions;
     $('#posCount').textContent = `(${rows.length})`;
     $('#posNote').textContent = 'replay · nilai mark hanya pada snapshot terakhir';
+    renderExitRule(frame.exitRule);
     $('#pos').innerHTML = rows.map((row) => {
-      const trail = row.peakPct != null && /\btrailing\b/.test(row.strategy || '') && row.stopPct == null ? Math.max(0, ((1 + row.peakPct / 100) * TRAIL_KEEP - 1) * 100) : null;
-      const stop = trail != null ? `<span class="pos">trail +${trail.toFixed(1)}%</span>`
-        : row.partial ? '<span class="pos">TP1 selesai</span>'
-        : row.stopPct == null && row.targetPct == null ? '<span class="sub">—</span>'
-        : `<span class="neg">−${esc(Number(row.stopPct).toFixed(0))}%</span> / <span class="pos">+${esc(Number(row.targetPct).toFixed(0))}%</span>`;
       const age = dur(Math.max(0, Math.round((frame.t - row.openedAt) / 60000)));
       return `<tr><td><span class="sym ${cls(row.pnl)}">●</span> <span class="sym">${esc(row.symbol)}</span>${row.stale ? '<div class="sub neg">harga belum terverifikasi</div>' : ''}</td>
-        <td>${esc([row.book, row.partial ? 'TP1 selesai' : ''].filter(Boolean).join(' · '))}</td><td class="num">${esc(age)}</td>
+        <td>${esc(planText(row))}</td><td class="num">${esc(age)}</td>
         <td class="num">${esc(usd(row.cost))}</td><td class="num"><b>${esc(usd(row.value))}</b></td>
-        <td class="num ${cls(row.pnl)}">${esc(sgn(row.pnl))}<div class="sub">${esc(pct(row.pnlPct, 2))}</div></td><td class="num">${stop}</td></tr>`;
+        <td class="num ${cls(row.pnl)}">${esc(sgn(row.pnl))}<div class="sub">${esc(pct(row.pnlPct, 2))}</div></td><td class="num gb-ladder">${stopHtml(row)}</td></tr>`;
     }).join('') || '<tr><td colspan="7" class="sub">Belum ada posisi terbuka.</td></tr>';
     const day = dayKey(frame.t);
     const closes = frame.log.filter((e) => e.type === 'partial' || e.type === 'close');
@@ -413,7 +410,7 @@ import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.m
     hideBig();
     $('#replayRun').hidden = true;
     const toggle = $('#replayToggle'); if (toggle) toggle.hidden = false;
-    if (state) { renderHeader(state.live); renderMetrics(state.live, state.closes); renderChart(state.nav, state.closes, state.live); renderLog(state.live, state.closes); renderPositions(state.live); renderAgents(state.live, state.closes); }
+    if (state) { renderHeader(state.live); renderMetrics(state.live, state.closes); renderChart(state.nav, state.closes, state.live); renderLog(state.live, state.closes); renderPositions(state.live); renderAgents(state.live, state.closes); renderExitRule(exitRuleText(state.live)); }
     refresh();
   }
   const toggle = $('#replayToggle');

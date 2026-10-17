@@ -18,13 +18,18 @@ writeFileSync(resolve(out,'index.html'),html);
 // Dashboard paper Devil Greed (/grokbot/...): halaman terpisah, tidak menyentuh halaman Cashood.
 const gbAssets={};
 mkdirSync(resolve(out,'assets'),{recursive:true});
-const timelineSrc=readFileSync(resolve(root,'assets/grokbot-timeline.mjs'));
-const timelineHash=createHash('sha256').update(timelineSrc).digest('hex').slice(0,16);
-const timelineName=`assets/grokbot-timeline-${timelineHash}.js`;
-writeFileSync(resolve(out,timelineName),timelineSrc);
+const rulesSrc=readFileSync(resolve(root,'assets/grokbot-rules.mjs'),'utf8');
+const rulesHash=createHash('sha256').update(rulesSrc).digest('hex').slice(0,16);
+const rulesFile=`grokbot-rules-${rulesHash}.js`;
+writeFileSync(resolve(out,'assets',rulesFile),rulesSrc);
+let timelineText=readFileSync(resolve(root,'assets/grokbot-timeline.mjs'),'utf8').replaceAll('./grokbot-rules.mjs','./'+rulesFile);
+if(timelineText.includes('grokbot-rules.mjs')||timelineText.includes('grokbot-timeline.mjs'))throw new Error('impor rules di timeline belum di-hash');
+const timelineHash=createHash('sha256').update(timelineText).digest('hex').slice(0,16);
+const timelineFile=`grokbot-timeline-${timelineHash}.js`;
+writeFileSync(resolve(out,'assets',timelineFile),timelineText);
 for(const file of ['assets/grokbot.css','assets/grokbot.js']){
  let content=readFileSync(resolve(root,file));
- if(file.endsWith('grokbot.js')){let text=content.toString('utf8').replaceAll('./grokbot-timeline.mjs','./'+timelineName.slice('assets/'.length));if(text.includes('grokbot-timeline.mjs'))throw new Error('impor timeline belum di-hash');content=Buffer.from(text);}
+ if(file.endsWith('grokbot.js')){let text=content.toString('utf8').replaceAll('./grokbot-timeline.mjs','./'+timelineFile).replaceAll('./grokbot-rules.mjs','./'+rulesFile);if(text.includes('grokbot-timeline.mjs')||text.includes('grokbot-rules.mjs'))throw new Error('impor grokbot belum di-hash');content=Buffer.from(text);}
  const hash=createHash('sha256').update(content).digest('hex').slice(0,16);
  const name=file.replace(/\.(js|css)$/,'-'+hash+'.$1');writeFileSync(resolve(out,name),content);gbAssets[`/${file}?v=__BUILD__`]=`/${name}`;
 }
