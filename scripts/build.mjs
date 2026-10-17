@@ -15,6 +15,17 @@ for(const file of ['assets/style.css','assets/vendor/purify.min.js','assets/secu
  const name=file.replace(/\.(js|css)$/,'-'+hash+'.$1');mkdirSync(dirname(resolve(out,name)),{recursive:true});writeFileSync(resolve(out,name),content);html=html.replace(`${file}?v=__BUILD__`,name);
 }
 writeFileSync(resolve(out,'index.html'),html);
+// Dashboard paper Devil Greed (/grokbot/...): halaman terpisah, tidak menyentuh halaman Cashood.
+const gbAssets={};
+for(const file of ['assets/grokbot.css','assets/grokbot.js']){
+ const content=readFileSync(resolve(root,file));const hash=createHash('sha256').update(content).digest('hex').slice(0,16);
+ const name=file.replace(/\.(js|css)$/,'-'+hash+'.$1');writeFileSync(resolve(out,name),content);gbAssets[`/${file}?v=__BUILD__`]=`/${name}`;
+}
+for(const page of ['grokbot/index.html','grokbot/solana/index.html','grokbot/robinhood/index.html']){
+ let body=readFileSync(resolve(root,page),'utf8');for(const [from,to] of Object.entries(gbAssets))body=body.replace(from,to);
+ if(body.includes('__BUILD__'))throw new Error(`${page}: aset belum ter-hash`);
+ mkdirSync(dirname(resolve(out,page)),{recursive:true});writeFileSync(resolve(out,page),body);
+}
 for(const file of ['data/funds.json','data/updates.json',...['reborn','meridian','ferari','robsol','charon','forex','binance','dgrh','dgsol','snh','staking','safebox'].map(f=>`data/${f}/config.json`)]){
  const value=JSON.parse(readFileSync(resolve(root,file),'utf8'));assertPublic(value);if(file.endsWith('config.json')&&!file.includes('safebox'))Core.buildLedger(value);
  mkdirSync(dirname(resolve(out,file)),{recursive:true});writeFileSync(resolve(out,file),JSON.stringify(value));
