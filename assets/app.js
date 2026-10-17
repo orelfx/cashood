@@ -1179,6 +1179,13 @@ function renderPaperGeneric(nav, tr, tile) {
       <blockquote>${esc(llm.lastReason)}</blockquote>${nav.copyTrade ? '' : '<div class="n dim">catatan asli dari AI, bahasa Inggris</div>'}</div>` : '');
 }
 
+// Buku paper devil greed: setelah target pertama, sisa posisi keluar kalau harga
+// turun ke max(harga isi, puncak × 0,75). Level stop dihitung dari puncak yang
+// dikirim bot (peakPct), dalam % dari harga isi; null kalau posisi tidak trailing.
+const TRAIL_KEEP = 0.75;
+const trailPctOf = (r) => (r.stopPct == null && r.peakPct != null && /\btrailing\b/.test(r.strategy || '')
+  ? Math.max(0, ((1 + r.peakPct / 100) * TRAIL_KEEP - 1) * 100) : null);
+
 function renderTrades(nav) {
   const rows = nav.positions || [];
   const body = $('#lpTable').querySelector('tbody');
@@ -1196,13 +1203,18 @@ function renderTrades(nav) {
   const total = Number(nav.totalUsd) || 0;
   // Skenario dari rencana bot (stop/target dalam % dari modal posisi), supaya
   // rugi terburuk dan untung terbaik terbaca berdampingan dengan floating.
+  // Posisi trailing (target pertama sudah jual separuh) tidak punya stop/target
+  // tetap: stopnya trailing di atas harga isi, jadi "kena SL" berarti untung terkunci.
+  const trailRows = rows.filter((r) => trailPctOf(r) != null);
   const withSl = rows.filter((r) => r.stopPct != null), withTp = rows.filter((r) => r.targetPct != null);
-  const atSl = -withSl.reduce((t, r) => t + (Number(r.costUsd) || 0) * r.stopPct / 100, 0);
+  const atSl = -withSl.reduce((t, r) => t + (Number(r.costUsd) || 0) * r.stopPct / 100, 0)
+    + trailRows.reduce((t, r) => t + (Number(r.costUsd) || 0) * trailPctOf(r) / 100, 0);
+  const nSl = withSl.length + trailRows.length;
   const atTp = withTp.reduce((t, r) => t + (Number(r.costUsd) || 0) * r.targetPct / 100, 0);
   setHTML($('#lpSummary'), `${[
     tile('Modal di posisi', usd(cost), `${rows.length} posisi · eksposur ${total ? pct((value / total) * 100, 1) : '—'}`),
-    ...(withSl.length ? [tile('Kalau semua kena SL', signed(atSl), `rugi maksimal${withSl.length < rows.length ? ` · ${withSl.length}/${rows.length} posisi punya SL` : ''}`, 'neg')] : []),
-    ...(withTp.length ? [tile('Kalau semua kena TP', signed(atTp), `untung target${withTp.length < rows.length ? ` · ${withTp.length}/${rows.length} posisi punya TP` : ''}`, 'pos')] : []),
+    ...(nSl ? [tile('Kalau semua kena SL', signed(atSl), `rugi maksimal${trailRows.length ? ` · ${trailRows.length} posisi trailing (untung terkunci)` : ''}${nSl < rows.length ? ` · ${nSl}/${rows.length} posisi punya SL` : ''}`, cls(atSl))] : []),
+    ...(withTp.length ? [tile('Kalau semua kena TP', signed(atTp), `untung target${withTp.length < rows.length ? ` · ${withTp.length}/${rows.length} posisi punya TP${trailRows.length ? ', sisanya trailing' : ''}` : ''}`, 'pos')] : []),
     tile('Floating sekarang', signed(pnl), `nilai jual ${usd(value)} · ${cost ? (pnl >= 0 ? '+' : '') + pct((pnl / cost) * 100) : '—'}`, cls(pnl)),
   ].join('')}`);
   // Kelas tabel menentukan kolom mana yang tetap tampil di layar HP.
@@ -1231,13 +1243,14 @@ function renderTrades(nav) {
   setHTML(body, [...rows].sort((a, b) => (b.valueUsd || 0) - (a.valueUsd || 0)).map((r) => `<tr>
       <td class="mc-head"><span class="who"><span class="chip" style="background:${r.pnlUsd >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span>
         ${r.experimental ? '<div class="sub2">eksperimen</div>' : ''}${r.stale ? '<div class="sub2 neg">harga belum terverifikasi</div>' : ''}</td>
-      <td class="fx-strat mc-wide" data-k="Rencana">${stratDetails({ ...r, bookLabel: r.bookLabel || '—' }, [r.strategy && r.strategy !== r.bookLabel ? r.strategy : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.partialDone ? 'sebagian sudah dijual' : '',
+      <td class="fx-strat mc-wide" data-k="Rencana">${stratDetails({ ...r, bookLabel: r.bookLabel || '—' }, [r.strategy && r.strategy !== r.bookLabel ? r.strategy : '', r.maxHoldHours ? `maks ${r.maxHoldHours} jam` : '', r.partialDone || trailPctOf(r) != null ? 'sebagian sudah dijual' : '',
           r.firstWallet ? `pertama beli: ${r.firstWallet}` : '', r.llmScore != null ? `skor LLM ${r.llmScore}` : ''])}
         ${modeBadge(r)}${walletChips(r.wallets)}${flagChips(r.flags)}</td>
       <td class="num" data-k="Umur">${ageHtml(r, nav)}</td>
       <td class="num" data-k="Modal">${usd(r.costUsd)}</td>
       <td class="num" data-k="Nilai jual"><strong>${usd(r.valueUsd)}</strong></td>
-      <td class="num" data-k="Stop / target">${r.stopPct == null && r.targetPct == null ? '<span class="dim">belum diisi bot</span>'
+      <td class="num" data-k="Stop / target">${trailPctOf(r) != null ? `<span class="pos" title="stop ikut naik: turun ${pct((1 - TRAIL_KEEP) * 100, 0)} dari puncak, tidak di bawah harga isi">trail +${pct(trailPctOf(r), 1)}</span> / <span class="dim">—</span>`
+        : r.stopPct == null && r.targetPct == null ? '<span class="dim">belum diisi bot</span>'
         : `<span class="neg">${r.stopPct == null ? '—' : '−' + pct(r.stopPct, 1)}</span> / <span class="pos">${r.targetPct == null ? '—' : '+' + pct(r.targetPct, 1)}</span>`}</td>
       <td class="num ${cls(r.pnlUsd)}" data-k="Untung / rugi">${signed(r.pnlUsd)}<div class="sub2 ${cls(r.pnlUsd)}">${r.pnlPct == null ? '' : (r.pnlPct > 0 ? '+' : '') + pct(r.pnlPct)}</div></td>
     </tr>`).join(''));
