@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7dca1129-f5c3-47e9-ab20-7dc99ef13268",
-  "updatedAt": 1792196522374,
-  "generatedAt": "2026-10-17 07:22 WIB",
+  "generation": "355a408d-d7d7-476a-b848-9889b32bc818",
+  "updatedAt": 1792196823438,
+  "generatedAt": "2026-10-17 07:27 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792196522374,
+    "heartbeatAt": 1792196823438,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792196515000,
+    "lastScanAt": 1792196815000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1314,13 +1314,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "342",
+        "v": "345",
         "n": "24 jam · 1 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "12051",
-        "n": "401 aktif"
+        "v": "12091",
+        "n": "402 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792196522374,
+      "lastDecisionAt": 1792196823438,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      "lastReason": "DJT [low]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1351,7 +1351,7 @@
       ],
       [
         "Wallet dipantau",
-        "12051 · 401 aktif"
+        "12091 · 402 aktif"
       ],
       [
         "Cadangan kas",
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 8175 · bot 2317 · blacklist 363 · lp 1 · fresh 669 · kol 147 · dolphin 374 · whale 5"
+        "smart 8183 · bot 2318 · blacklist 363 · lp 1 · fresh 671 · kol 147 · dolphin 374 · whale 5 · unknown 29"
       ]
     ],
     "requirements": [
@@ -1411,29 +1411,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 12051,
-      "active": 401,
-      "passive": 11650,
+      "tracked": 12091,
+      "active": 402,
+      "passive": 11689,
       "trusted": 0,
       "promising": 25,
       "byLabel": [
         {
           "key": "smart",
-          "total": 8175,
-          "active": 359,
-          "passive": 7816
+          "total": 8183,
+          "active": 360,
+          "passive": 7823
         },
         {
           "key": "bot",
-          "total": 2317,
+          "total": 2318,
           "active": 0,
-          "passive": 2317
+          "passive": 2318
         },
         {
           "key": "fresh",
-          "total": 669,
+          "total": 671,
           "active": 0,
-          "passive": 669
+          "passive": 671
         },
         {
           "key": "dolphin",
@@ -1452,6 +1452,12 @@
           "total": 147,
           "active": 9,
           "passive": 138
+        },
+        {
+          "key": "unknown",
+          "total": 29,
+          "active": 0,
+          "passive": 29
         },
         {
           "key": "whale",
@@ -1568,6 +1574,43 @@
     },
     "decisions": [
       {
+        "at": 1792196810257,
+        "symbol": "DJT",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792196693447,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
+      },
+      {
+        "at": 1792196588921,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "dolphin": 2
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $89926."
+      },
+      {
         "at": 1792196477999,
         "symbol": "CARDS",
         "action": "skip",
@@ -1586,33 +1629,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1792196087492,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
-      },
-      {
-        "at": 1792195982382,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "dolphin": 2
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $89926."
       },
       {
         "at": 1792195643341,
@@ -2298,16 +2314,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 79.15% supply."
-      },
-      {
-        "at": 1792184319058,
-        "symbol": "UP",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 14%."
       }
     ],
     "reasonStats": {
@@ -2318,7 +2324,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 304,
+        "red_flag": 307,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2369,7 +2375,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792196534664,
+    "generatedAt": 1792197123447,
     "trades": {
       "count": 141,
       "wins": 57,
