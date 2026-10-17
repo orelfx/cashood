@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b465e3a6-27a0-4dd8-9808-58edb2988d32",
-  "updatedAt": 1792203134666,
-  "generatedAt": "2026-10-17 09:12 WIB",
+  "generation": "56f75298-9ced-4c8a-91db-f7ca80e9c502",
+  "updatedAt": 1792203435483,
+  "generatedAt": "2026-10-17 09:17 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792203134666,
+    "heartbeatAt": 1792203435483,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792203124000,
+    "lastScanAt": 1792203432000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1314,7 +1314,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "401",
+        "v": "406",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792203134666,
+      "lastDecisionAt": 1792203435483,
       "lastAction": "keputusan",
-      "lastReason": "simulator [mid]: Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "HUGO [degen]: Dilewati: explore: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 8411 · bot 2372 · blacklist 363 · lp 1 · fresh 695 · kol 147 · dolphin 382 · whale 5"
+        "smart 8410 · bot 2373 · blacklist 363 · lp 1 · fresh 695 · kol 147 · dolphin 382 · whale 5"
       ]
     ],
     "requirements": [
@@ -1419,15 +1419,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 8411,
+          "total": 8410,
           "active": 368,
-          "passive": 8043
+          "passive": 8042
         },
         {
           "key": "bot",
-          "total": 2372,
+          "total": 2373,
           "active": 0,
-          "passive": 2372
+          "passive": 2373
         },
         {
           "key": "fresh",
@@ -1568,6 +1568,90 @@
     },
     "decisions": [
       {
+        "at": 1792203386017,
+        "symbol": "HUGO",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 368,
+            "note": "bundler pegang 10.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 3.4%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 22.8%"
+          },
+          {
+            "type": "fresh",
+            "count": 496,
+            "note": "9.5% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
+      {
+        "at": 1792203385807,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
+      },
+      {
+        "at": 1792203356008,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      },
+      {
+        "at": 1792203250713,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "dolphin": 2
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $89543."
+      },
+      {
+        "at": 1792203140250,
+        "symbol": "ERIS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 26.42% supply."
+      },
+      {
         "at": 1792202830176,
         "symbol": "simulator",
         "action": "skip",
@@ -1585,26 +1669,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792202781087,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
-      },
-      {
-        "at": 1792202647395,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "dolphin": 2
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $89543."
       },
       {
         "at": 1792202540493,
@@ -2095,16 +2159,6 @@
         "reason": "Dilewati karena red flag: likuiditas cuma $89900."
       },
       {
-        "at": 1792197689232,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
-      },
-      {
         "at": 1792197259095,
         "symbol": "TDH",
         "action": "skip",
@@ -2285,43 +2339,6 @@
           "dolphin": 2
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $89685."
-      },
-      {
-        "at": 1792194062730,
-        "symbol": "roadster",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 73,
-            "note": "bundler pegang 8.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 3,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792194016782,
-        "symbol": "ROADSTER",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -54% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2332,7 +2349,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 357,
+        "red_flag": 362,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2383,7 +2400,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792203414544,
+    "generatedAt": 1792203726223,
     "trades": {
       "count": 141,
       "wins": 57,
