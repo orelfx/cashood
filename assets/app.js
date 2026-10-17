@@ -2592,6 +2592,7 @@ function parseHash() {
   if (parts[0] === 'pemegang') return { pemegang: true, tab: 'portfolio' };
   if (parts[0] === 'safebox') return { safebox: true, tab: 'portfolio' };
   if (parts[0] === 'index') return { index: true, tab: 'portfolio' };
+  if (parts[0] === 'grr') return { grr: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
@@ -2625,6 +2626,7 @@ function navItems(key) {
     .map((f) => ({ attr: `data-fund="${esc(f.id)}"`, name: f.label, sub: f.chain, accent: f.accent, on: state.view === 'fund' && f.id === state.fund }));
   if (state.safebox && (state.safebox.risk || 'low') === key) items.push({ attr: 'data-view="safebox"', name: state.safebox.label, sub: state.safebox.subtitle, accent: state.safebox.accent, on: state.view === 'safebox' });
   if (state.index && (state.index.risk || 'low') === key) items.push({ attr: 'data-view="index"', name: state.index.label, sub: state.index.subtitle, accent: state.index.accent, on: state.view === 'index' });
+  if (state.grr && (state.grr.risk || 'paper') === key) items.push({ attr: 'data-view="grr"', name: state.grr.label, sub: state.grr.subtitle, accent: state.grr.accent, on: state.view === 'grr' });
   return items;
 }
 function renderFundBar() {
@@ -3438,7 +3440,7 @@ const RISK = [
 ];
 
 function leaveHome() {
-  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index']) if ($(id)) $(id).hidden = true;
+  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr']) if ($(id)) $(id).hidden = true;
   if ($('#strip')) $('#strip').hidden = false;
   if (document.body.classList.contains('at-home')) {
     document.body.classList.remove('at-home');
@@ -3449,7 +3451,7 @@ function leaveHome() {
   }
 }
 
-const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index'];
+const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr'];
 function showGlobal(view, title) {
   state.view = view;
   banner('');
@@ -3481,6 +3483,82 @@ async function loadIndexSeries() {
   }
   return [];
 }
+/* ── Grok Reborn Rich (dry run): mirror vs challenger vs Reborn Rich asli ── */
+async function loadGrr(file) {
+  for (const url of [(rawDataBase('grr') || RAW_BASE + 'grr/') + file, 'data/grr/' + file]) {
+    try { const j = await getJSON(url); if (j) return j; } catch { /* sumber berikutnya */ }
+  }
+  return null;
+}
+function showGrr() { showGlobal('grr', 'Grok Reborn Rich — Cashood Headfund'); renderGrr().catch(() => setHTML($('#grrBody'), '<section class="card"><p class="miss">Menunggu data GRR.</p></section>')); }
+let grrEpoch = 0;
+async function renderGrr() {
+  const epoch = ++grrEpoch;
+  const [d, nav] = await Promise.all([loadGrr('live.json'), loadGrr('nav.json')]);
+  if (epoch !== grrEpoch || state.view !== 'grr') return;
+  const body = $('#grrBody');
+  if (!d || d.status !== 'ok') {
+    setHTML(body, `<section class="card"><div class="card-head"><h2>Grok Reborn Rich</h2><span class="pill sim">dry run · kertas</span></div>
+      <p class="miss" role="status">Menunggu data. ${esc(d?.reason || 'Mesin paper belum mengirim data.')}</p>
+      <p class="hint">Data diperbarui tiap 5 menit begitu mesin paper berjalan.</p></section>`);
+    return;
+  }
+  const books = [['mirror', 'Mirror', '#60a5fa', d.mirror], ['challenger', 'Challenger', '#a855f7', d.challenger], ['live', 'Reborn Rich asli', '#4ade80', d.live]];
+  const pctTxt = (v) => (v == null ? '—' : `${v > 0 ? '+' : ''}${pct(v, 2)}`);
+  const tiles = books.map(([k, name, c, b]) => `<div class="grr-tile" style="--c:${c}">
+      <div class="grr-k"><i></i>${esc(name)}</div>
+      <div class="grr-v ${cls(b?.pctSinceStart ?? 0)}">${pctTxt(b?.pctSinceStart)}</div>
+      <div class="grr-n">${b?.equityUsd != null ? usd(b.equityUsd) : '—'}${k === 'live' ? ' · uang asli' : ' · kertas'}</div>
+      ${k !== 'live' ? `<div class="grr-n">${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${b?.openSeats?.length ?? 0} seat terbuka</div>` : `<div class="grr-n">${b?.asOf ? 'per ' + tglRingkas(b.asOf) : ''}</div>`}
+    </div>`).join('');
+  // Grafik persen sejak awal, tiga garis.
+  const pts = (nav?.points || []).filter((p) => Number.isFinite(p.t));
+  let chart = '<p class="hint">Grafik muncul setelah beberapa titik terkumpul.</p>';
+  if (pts.length >= 2) {
+    const W = 720, H = 220, m = { t: 14, r: 54, b: 24, l: 8 };
+    const vals = pts.flatMap((p) => books.map(([k]) => p[k]).filter((v) => v != null));
+    let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals); const pad = (hi - lo) * 0.15 || 0.5; lo -= pad; hi += pad;
+    const t0 = pts[0].t, t1 = pts.at(-1).t;
+    const x = (t) => m.l + ((t - t0) / Math.max(1, t1 - t0)) * (W - m.l - m.r), y = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
+    const line = (k) => pts.filter((p) => p[k] != null).map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p[k]).toFixed(1)}`).join('');
+    const tick = (t) => { const z = new Date(t + 7 * 3600e3); return t1 - t0 < 36 * 3600e3 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()}/${z.getUTCMonth() + 1}`; };
+    chart = `<svg class="grr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Persen sejak awal: mirror, challenger, live">
+      <line x1="${m.l}" x2="${W - m.r}" y1="${y(0).toFixed(1)}" y2="${y(0).toFixed(1)}" class="g-base"/>
+      ${[hi - pad, 0, lo + pad].map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${v > 0 ? '+' : ''}${v.toFixed(2)}%</text>`).join('')}
+      ${books.map(([k, , c]) => `<path d="${line(k)}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`).join('')}
+      ${[t0, t1].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)}</text>`).join('')}
+    </svg>`;
+  }
+  const stat = (b) => (b ? `<td class="num" data-k="Close">${b.closes ?? 0}</td><td class="num" data-k="Win rate">${b.winRatePct == null ? '—' : pct(b.winRatePct, 0)}</td>
+      <td class="num pos" data-k="Rata² menang">${b.avgWinUsd == null ? '—' : signed(b.avgWinUsd)}</td><td class="num neg" data-k="Rata² kalah">${b.avgLossUsd == null ? '—' : signed(b.avgLossUsd)}</td>
+      <td class="num pos" data-k="Fee">${b.feesUsd == null ? '—' : usd(b.feesUsd)}</td><td class="num neg" data-k="Biaya">${b.costsUsd == null ? '—' : usd(b.costsUsd)}</td>` : '');
+  const seats = [['Mirror', d.mirror], ['Challenger', d.challenger]].flatMap(([n, b]) => (b?.openSeats || []).map((s) => ({ ...s, bookName: n })));
+  const closes = [['Mirror', d.mirror], ['Challenger', d.challenger]].flatMap(([n, b]) => (b?.last10Closes || []).map((c) => ({ ...c, bookName: n })))
+    .sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
+  setHTML(body, `<section class="card">
+      <div class="card-head"><h2>Grok Reborn Rich</h2><span class="pill sim">dry run · kertas</span></div>
+      <p class="lead">Uji kertas strategi LP Reborn Rich. <b>Mirror</b> menjalankan aturan live Reborn Rich di atas kertas, <b>Challenger</b> adalah strategi Grok v1.1, dan <b>Reborn Rich asli</b> jadi pembanding. Semuanya mulai dari modal yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}. Mirror dan Challenger bukan uang sungguhan.</p>
+      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}</p>
+      <div class="grr-tiles">${tiles}</div>
+      <div class="grr-legend">${books.map(([, n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>
+      ${chart}
+    </section>
+    <section class="card"><div class="card-head"><h2>Per buku</h2><span class="hint">hasil kertas setelah fee dan biaya</span></div>
+      <div class="table-scroll"><table class="mcards"><thead><tr><th>Buku</th><th class="num">Close</th><th class="num">Win rate</th><th class="num">Rata² menang</th><th class="num">Rata² kalah</th><th class="num">Fee</th><th class="num">Biaya</th></tr></thead>
+      <tbody>${[['Mirror', d.mirror], ['Challenger', d.challenger]].map(([n, b]) => `<tr><td class="mc-head"><b>${esc(n)}</b><div class="sub2">${esc(b?.label || '')}</div></td>${stat(b)}</tr>`).join('')}</tbody></table></div></section>
+    <section class="card"><div class="card-head"><h2>Seat terbuka <span class="count">(${seats.length})</span></h2></div>
+      ${seats.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Pool</th><th>Buku</th><th class="num">Fee tier</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Hasil</th><th>Range</th></tr></thead><tbody>
+      ${seats.map((s) => `<tr><td class="mc-head"><b>${esc(s.symbol)}</b></td><td data-k="Buku">${esc(s.bookName)}${s.book ? ` <span class="dim">${esc(s.book)}</span>` : ''}</td>
+        <td class="num" data-k="Fee tier">${s.feeTierPct == null ? '—' : pct(s.feeTierPct, 1)}</td><td class="num" data-k="Umur">${s.openedAt ? dur((Date.now() - s.openedAt) / 60000) : '—'}</td>
+        <td class="num" data-k="Modal">${s.basisUsd == null ? '—' : usd(s.basisUsd)}</td><td class="num ${cls(s.pnlPct ?? 0)}" data-k="Hasil">${pctTxt(s.pnlPct)}</td>
+        <td data-k="Range">${s.inRange == null ? '—' : `<span class="pill ${s.inRange ? 'in' : 'out2'}">${s.inRange ? 'di dalam' : 'di luar'}</span>`}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada seat terbuka.</p>'}</section>
+    <section class="card"><div class="card-head"><h2>10 close terakhir</h2><span class="hint">per buku</span></div>
+      ${closes.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Pool</th><th>Buku</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+      ${closes.map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol)}</b></td><td data-k="Buku">${esc(c.bookName)}</td><td class="num ${cls(c.netUsd ?? 0)}" data-k="Hasil">${c.netUsd == null ? '—' : signed(c.netUsd)}</td>
+        <td class="num ${cls(c.netPct ?? 0)}" data-k="%">${pctTxt(c.netPct)}</td><td data-k="Alasan">${esc(c.reason ? shortReason(c.reason) : '—')}</td><td class="num dim" data-k="Ditutup">${c.closedAt ? tglRingkas(c.closedAt) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi yang ditutup.</p>'}</section>
+    ${d.live?.note ? `<section class="card"><p class="hint"><b>Catatan pembanding live:</b> ${esc(d.live.note)}</p></section>` : ''}`);
+}
+
 function showIndex() { showGlobal('index', 'Cashood Index — Cashood Headfund'); renderIndex().catch(() => {}); }
 
 const indexView = { hours: 168 };
@@ -4259,6 +4337,7 @@ async function init() {
     state.coins = list.coins || ['eth'];
     state.safebox = list.safebox || null;
     state.index = list.index || null;
+    state.grr = list.grr || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -4276,6 +4355,7 @@ async function init() {
     if (view === 'home') { showHome(); return; }
     if (view === 'kinerja') { showKinerja(); return; }
     if (view === 'index') { showIndex(); return; }
+    if (view === 'grr') { showGrr(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
     if (view === 'update') { showUpdate(); return; }
@@ -4383,6 +4463,7 @@ async function init() {
     if (route.pemegang) { showPemegang(); return; }
     if (route.safebox) { showSafebox(); return; }
     if (route.index) { showIndex(); return; }
+    if (route.grr) { showGrr(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }

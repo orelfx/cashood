@@ -1462,3 +1462,15 @@ body.is-staking #lpCard, body.is-staking #closedCard, body.is-staking #profitCar
 /* HP: tombol Spider di header membuat header turun dua baris; tombol yang sama
    tetap ada di Beranda dan di bawah halaman. */
 @media (max-width: 640px) { header.top #spiderHeaderToggle { display: none; } }
+
+/* ── Grok Reborn Rich (dry run) ── */
+.grr-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 10px; }
+.grr-tile { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 14%, transparent), transparent 70%); }
+.grr-k { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.grr-k i, .grr-legend i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
+.grr-v { font: 700 30px var(--mono); margin: 6px 0 4px; }
+.grr-n { font-size: 12.5px; color: var(--muted); }
+.grr-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+.grr-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.grr-chart { width: 100%; height: auto; display: block; }
+@media (max-width: 640px) { .grr-tiles { grid-template-columns: 1fr; } .grr-v { font-size: 26px; } }

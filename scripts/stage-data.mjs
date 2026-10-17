@@ -41,5 +41,12 @@ for(const fund of ['reborn','meridian','ferari','robsol','charon','forex','binan
  }catch(err){console.error(`[stage] ${fund}: ${err.message}`);failed=true;}
 }
 rmSync(resolve(destination,'safebox','nav.json'),{force:true});
+// Grok Reborn Rich (dry run): panel terpisah dengan bentuknya sendiri — tiga
+// deret persen (mirror, challenger, live). "Menunggu data" pun ikut terbit.
+try{
+ const dir=resolve(ROOT,'data','grr'),live=readJSON(resolve(dir,'live.json'));
+ if(live){assertPublic(live);atomicJSON(resolve(destination,'grr','live.json'),live);
+  const nav=readJSON(resolve(dir,'nav.json'));if(nav){assertPublic(nav);atomicJSON(resolve(destination,'grr','nav.json'),nav);}}
+}catch(err){console.error(`[stage] grr: ${err.message}`);failed=true;}
 // Valid other funds may still publish, but the operator gets a nonzero status.
 if(failed)process.exitCode=2;
