@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<title>Devil Greed · Solana · paper</title>
+<link rel="stylesheet" href="/assets/grokbot.css?v=__BUILD__">
+</head>
+<body data-fund="dgsol" data-chain="SOLANA">
+<header class="gb-head">
+  <div class="gb-brand">
+    <svg class="gb-logo" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 4l5 8M26 4l-5 8" stroke="#f5a524" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="19" r="10" fill="#2a1f17" stroke="#f5a524" stroke-width="2"/><circle cx="12.5" cy="18" r="1.6" fill="#f87171"/><circle cx="19.5" cy="18" r="1.6" fill="#f87171"/><path d="M11.5 23q4.5 3 9 0" stroke="#f5a524" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+    <div><h1>Devil Greed</h1><div class="gb-sub">PAPER TRADING MODE · SOLANA</div></div>
+  </div>
+  <nav class="gb-nav"><a href="/grokbot/solana/" data-nav="dgsol">Solana</a><a href="/grokbot/robinhood/" data-nav="dgrh">Robinhood</a></nav>
+  <div class="gb-status">
+    <div class="gb-dec"><span class="k">KEPUTUSAN</span><b id="decCount">—</b></div>
+    <span id="livePill" class="gb-pill stale"><i></i><span>MEMUAT</span></span>
+    <span id="updated" class="gb-muted">—</span>
+  </div>
+</header>
+<main class="gb-main">
+  <div class="gb-paper">PAPER · modal kertas $1.000 · bukan uang sungguhan · tidak ada order on-chain</div>
+  <section class="gb-metrics">
+    <div class="gb-card"><div class="k">BALANCE</div><div class="v" id="mBal">—</div><div class="n" id="mBalN">started at $1,000</div></div>
+    <div class="gb-card"><div class="k">TOTAL P&amp;L</div><div class="v" id="mPnl">—</div><div class="n" id="mPnlN">sejak mulai</div></div>
+    <div class="gb-card"><div class="k">🏆 LARGEST WIN</div><div class="v" id="mWin">—</div><div class="n" id="mWinN">scanning...</div></div>
+    <div class="gb-card gb-wr"><div><div class="k">WIN RATE</div><div class="v" id="mWr">—</div><div class="n" id="mWrN">—</div></div><svg id="donut" viewBox="0 0 42 42" aria-hidden="true"></svg></div>
+    <div class="gb-card"><div class="k">🛡 RUGS BLOCKED</div><div class="v neg" id="mRug">—</div><div class="n" id="mRugN">—</div></div>
+  </section>
+  <section class="gb-mid">
+    <div class="gb-card gb-chart-card">
+      <div class="gb-card-head"><span class="k">BALANCE HISTORY</span><span class="gb-muted" id="chartNote">snapshot ekuitas nyata · titik = trade ditutup</span></div>
+      <div class="gb-chart-wrap"><svg id="chart" preserveAspectRatio="none" role="img" aria-label="Riwayat ekuitas"></svg><div id="bigClose" class="gb-big" hidden></div></div>
+    </div>
+    <div class="gb-card gb-log-card">
+      <div class="gb-card-head"><span class="k">ACTIVITY LOG</span><span class="gb-muted">WIB</span></div>
+      <ol id="log" class="gb-log"></ol>
+    </div>
+  </section>
+  <section class="gb-card">
+    <div class="gb-card-head"><span class="k">POSISI TERBUKA <span id="posCount"></span></span><span class="gb-muted" id="posNote"></span></div>
+    <div class="gb-table-scroll"><table class="gb-table">
+      <thead><tr><th>Token</th><th>Rencana</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Untung / rugi</th><th class="num">Stop / trailing</th></tr></thead>
+      <tbody id="pos"></tbody></table></div>
+  </section>
+  <section>
+    <div class="gb-sec-title">AGENTS</div>
+    <div class="gb-agents" id="agents"></div>
+  </section>
+  <footer class="gb-foot">Data: buku paper desk Devil Greed, diterbitkan tiap 5 menit. Harga ditandai watcher tiap 30 menit. Alamat wallet, token, dan pool tidak ditampilkan; leader memakai label anonim. <a href="/grokbot/">Semua buku</a></footer>
+</main>
+<script src="/assets/grokbot.js?v=__BUILD__"></script>
+</body>
+</html>
