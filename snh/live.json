@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "252aab60-4cfa-4848-be67-d2ab42baf0b7",
-  "updatedAt": 1792246669682,
-  "generatedAt": "2026-10-17 21:17 WIB",
+  "generation": "82a5b23b-55b1-44a6-86ab-219730835066",
+  "updatedAt": 1792246970646,
+  "generatedAt": "2026-10-17 21:22 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792246669682,
+    "heartbeatAt": 1792246970646,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792246659000,
+    "lastScanAt": 1792246965000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1314,7 +1314,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "640",
+        "v": "643",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792246669682,
+      "lastDecisionAt": 1792246970646,
       "lastAction": "keputusan",
-      "lastReason": "索拉纳 [degen]: Dilewati: market_data_unknown."
+      "lastReason": "索拉娜 [degen]: Dilewati karena red flag: holder baru 16."
     }
   },
   "strategy": {
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 9376 · bot 2604 · blacklist 371 · lp 1 · fresh 775 · kol 152 · dolphin 391 · whale 6"
+        "smart 9365 · bot 2615 · blacklist 371 · lp 1 · fresh 775 · kol 152 · dolphin 391 · whale 6"
       ]
     ],
     "requirements": [
@@ -1419,15 +1419,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 9376,
+          "total": 9365,
           "active": 385,
-          "passive": 8991
+          "passive": 8980
         },
         {
           "key": "bot",
-          "total": 2604,
+          "total": 2615,
           "active": 0,
-          "passive": 2604
+          "passive": 2615
         },
         {
           "key": "fresh",
@@ -1567,6 +1567,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792246963501,
+        "symbol": "索拉娜",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati karena red flag: holder baru 16."
+      },
+      {
+        "at": 1792246892694,
+        "symbol": "X",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1792246841769,
+        "symbol": "旺柴",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 81,
+            "note": "bundler pegang 5.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 8,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
       {
         "at": 1792246569439,
         "symbol": "索拉纳",
@@ -2225,69 +2267,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: holder baru 8."
-      },
-      {
-        "at": 1792241665152,
-        "symbol": "索人生",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 1."
-      },
-      {
-        "at": 1792241660055,
-        "symbol": "索拉纳",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: holder baru 6."
-      },
-      {
-        "at": 1792241590074,
-        "symbol": "索拉纳",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "kol": 1,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 15.38% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 558,
-            "note": "bundler pegang 31.8%"
-          },
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 2.9%"
-          },
-          {
-            "type": "fresh",
-            "count": 566,
-            "note": "16.7% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 13x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2298,7 +2277,7 @@
         "wallet_left": 3,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 574,
+        "red_flag": 577,
         "round_trip_cost": 3,
         "basket_full": 0,
         "slippage": 0,
@@ -2350,7 +2329,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792246928522,
+    "generatedAt": 1792247217862,
     "trades": {
       "count": 141,
       "wins": 57,
