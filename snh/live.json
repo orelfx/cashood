@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e8446194-f88a-4bbf-a376-62f3358a287c",
-  "updatedAt": 1792264385377,
-  "generatedAt": "2026-10-18 02:13 WIB",
+  "generation": "c419c10e-8c35-406a-af7a-b5accbd5fcc1",
+  "updatedAt": 1792264686102,
+  "generatedAt": "2026-10-18 02:18 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792264385377,
+    "heartbeatAt": 1792264686102,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792264379000,
+    "lastScanAt": 1792264677000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792264385377,
+      "lastDecisionAt": 1792264686102,
       "lastAction": "keputusan",
-      "lastReason": "MHDG [low]: Dilewati karena red flag: 10 holder terbesar pegang 74%."
+      "lastReason": "Dan [degen]: Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1567,6 +1567,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792264644175,
+        "symbol": "Dan",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -38% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792264448300,
+        "symbol": "HALO",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 16.8% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 0.53%"
+          },
+          {
+            "type": "bundler",
+            "count": 7,
+            "note": "bundler pegang 17.7%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 12.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 8,
+            "note": "5.7% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
       {
         "at": 1792264316744,
         "symbol": "MHDG",
@@ -2241,44 +2288,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: holder baru 12."
-      },
-      {
-        "at": 1792261109926,
-        "symbol": "ELOGE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
-      },
-      {
-        "at": 1792261101200,
-        "symbol": "DOPE67",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 73.56% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 52,
+        "below_entry": 53,
         "no_pullback": 0,
         "wallet_left": 3,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 550,
+        "red_flag": 549,
         "round_trip_cost": 3,
         "basket_full": 0,
         "slippage": 0,
@@ -2329,7 +2349,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792264619046,
+    "generatedAt": 1792264928823,
     "trades": {
       "count": 141,
       "wins": 57,
