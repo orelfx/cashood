@@ -17,8 +17,15 @@ for(const file of ['assets/style.css','assets/vendor/purify.min.js','assets/secu
 writeFileSync(resolve(out,'index.html'),html);
 // Dashboard paper Devil Greed (/grokbot/...): halaman terpisah, tidak menyentuh halaman Cashood.
 const gbAssets={};
+mkdirSync(resolve(out,'assets'),{recursive:true});
+const timelineSrc=readFileSync(resolve(root,'assets/grokbot-timeline.mjs'));
+const timelineHash=createHash('sha256').update(timelineSrc).digest('hex').slice(0,16);
+const timelineName=`assets/grokbot-timeline-${timelineHash}.js`;
+writeFileSync(resolve(out,timelineName),timelineSrc);
 for(const file of ['assets/grokbot.css','assets/grokbot.js']){
- const content=readFileSync(resolve(root,file));const hash=createHash('sha256').update(content).digest('hex').slice(0,16);
+ let content=readFileSync(resolve(root,file));
+ if(file.endsWith('grokbot.js')){let text=content.toString('utf8').replaceAll('./grokbot-timeline.mjs','./'+timelineName.slice('assets/'.length));if(text.includes('grokbot-timeline.mjs'))throw new Error('impor timeline belum di-hash');content=Buffer.from(text);}
+ const hash=createHash('sha256').update(content).digest('hex').slice(0,16);
  const name=file.replace(/\.(js|css)$/,'-'+hash+'.$1');writeFileSync(resolve(out,name),content);gbAssets[`/${file}?v=__BUILD__`]=`/${name}`;
 }
 for(const page of ['grokbot/index.html','grokbot/solana/index.html','grokbot/robinhood/index.html']){

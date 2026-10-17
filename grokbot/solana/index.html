@@ -23,6 +23,23 @@
 </header>
 <main class="gb-main">
   <div class="gb-paper">PAPER · modal kertas $1.000 · bukan uang sungguhan · tidak ada order on-chain</div>
+  <section class="gb-replay" id="replayBar" aria-label="Replay">
+    <button type="button" id="replayToggle" disabled>Replay</button>
+    <div class="gb-replay-run" id="replayRun" hidden>
+      <button type="button" id="replayPlay" aria-pressed="false">Putar</button>
+      <button type="button" id="replayPrev" aria-label="Kejadian sebelumnya">‹</button>
+      <button type="button" id="replayNext" aria-label="Kejadian berikutnya">›</button>
+      <div class="gb-speeds" role="group" aria-label="Kecepatan">
+        <button type="button" data-speed="1" title="1 menit buku per detik">1x</button>
+        <button type="button" data-speed="10" title="10 menit buku per detik">10x</button>
+        <button type="button" data-speed="60" title="1 jam buku per detik">60x</button>
+        <button type="button" data-speed="300" class="on" title="5 jam buku per detik">300x</button>
+      </div>
+      <label class="gb-scrub"><input id="replayScrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Posisi replay"></label>
+      <span id="replayClock" class="gb-replay-clock">—</span>
+      <button type="button" id="replayExit">Live</button>
+    </div>
+  </section>
   <section class="gb-metrics">
     <div class="gb-card"><div class="k">BALANCE</div><div class="v" id="mBal">—</div><div class="n" id="mBalN">started at $1,000</div></div>
     <div class="gb-card"><div class="k">TOTAL P&amp;L</div><div class="v" id="mPnl">—</div><div class="n" id="mPnlN">sejak mulai</div></div>
@@ -52,6 +69,6 @@
   </section>
   <footer class="gb-foot">Data: buku paper desk Devil Greed, diterbitkan tiap 5 menit. Harga ditandai watcher tiap 30 menit. Alamat wallet, token, dan pool tidak ditampilkan; leader memakai label anonim. <a href="/grokbot/">Semua buku</a></footer>
 </main>
-<script src="/assets/grokbot.js?v=__BUILD__"></script>
+<script type="module" src="/assets/grokbot.js?v=__BUILD__"></script>
 </body>
 </html>

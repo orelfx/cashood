@@ -1,3 +1,4 @@
+import { buildReplay, frameAt, stepTime, isBigClose } from './grokbot-timeline.mjs';
 /*
  * Devil Greed · dashboard paper (cashood.id/grokbot/...).
  * Satu halaman = satu buku (dgsol atau dgrh); dua buku tidak pernah digabung.
@@ -219,18 +220,20 @@
     box.innerHTML = `<div class="t">BIG CLOSE · ${esc(closeKind(c)[0])}</div><div class="b pos">${esc(symOf(c.symbol))} ${esc(sgn(c.netUsd))}</div><div class="gb-muted">${esc(pct(c.netPct))}${c.firstWallet ? ' · by ' + esc(c.firstWallet) : ''} · ${esc(stamp(c.closedAt))} WIB</div>`;
     box.hidden = false;
     box.onclick = mark;
-    setTimeout(mark, 9000);
+    clearTimeout(bigTimer);
+    bigTimer = setTimeout(mark, 9000);
   }
 
-  let state = null, busy = false;
+  let state = null, busy = false, replaying = false, bigTimer = null;
   async function refresh() {
-    if (busy) return; busy = true;
+    if (replaying || busy) return; busy = true;
     try {
       const [live, nav] = await Promise.all([get(`${FUND}/live.json`), get(`${FUND}/nav.json`).catch(() => ({ points: [] }))]);
       const closes = await loadTrades(live);
       state = { live, nav, closes };
       renderHeader(live); renderMetrics(live, closes); renderChart(nav, closes, live); renderLog(live, closes); renderPositions(live); renderAgents(live, closes);
       if ($('#bigClose').hidden) bigClose(closes);
+      const toggle = $('#replayToggle'); if (toggle) toggle.disabled = false;
     } catch (e) {
       const pill = $('#livePill'); pill.className = 'gb-pill stale'; pill.querySelector('span').textContent = 'STALE';
       $('#updated').textContent = 'feed belum bisa dimuat';
@@ -238,6 +241,210 @@
   }
   refresh();
   setInterval(refresh, 60e3);
-  setInterval(() => { if (state) renderHeader(state.live); }, 15e3);
-  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => state && renderChart(state.nav, state.closes, state.live), 150); });
+  setInterval(() => { if (!replaying && state) renderHeader(state.live); }, 15e3);
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!state) return; if (replaying) renderReplayChart(replayModel.points, frameAt(replayModel, clock)); else renderChart(state.nav, state.closes, state.live); }, 150); });
+
+  // 1x = 1 menit buku per detik dinding. 10x / 60x / 300x mengikuti itu.
+  const SPEED_MS = 60e3;
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const reducedMotion = () => motion.matches;
+  let replayModel = null, clock = 0, playing = false, speed = 300, raf = 0, lastTs = 0, dragging = false;
+  const replayStamp = (t) => { const s = wibDate(t).toISOString(); return `${s.slice(8, 10)}/${s.slice(5, 7)} ${s.slice(11, 16)} WIB`; };
+  const hideBig = () => { clearTimeout(bigTimer); const box = $('#bigClose'); if (box) box.hidden = true; };
+  const showReplayBig = (e) => {
+    if (!e) return;
+    const box = $('#bigClose');
+    box.innerHTML = `<div class="t">BIG CLOSE · ${esc(closeKind(e)[0])}</div><div class="b pos">${esc(symOf(e.symbol))} ${esc(sgn(e.netUsd))}</div><div class="gb-muted">${esc(pct(e.netPct))} · ${esc(replayStamp(e.t))}</div>`;
+    box.hidden = false;
+    box.onclick = hideBig;
+    clearTimeout(bigTimer);
+    bigTimer = setTimeout(hideBig, 4000);
+  };
+  function renderReplayChart(all, frame) {
+    const svg = $('#chart');
+    const ptsAll = (all || []).filter((p) => num(p.usd) != null && num(p.t) != null);
+    const W = svg.clientWidth || 800, H = svg.clientHeight || 320, padL = 54, padR = 70, padT = 18, padB = 26;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    if (ptsAll.length < 2) { svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" fill="#8c7a64" text-anchor="middle" font-size="13">belum cukup snapshot ekuitas</text>`; $('#chartNote').textContent = 'belum cukup snapshot ekuitas'; return; }
+    const t0 = ptsAll[0].t, t1 = ptsAll.at(-1).t;
+    let lo = Math.min(...ptsAll.map((p) => p.usd), 1000), hi = Math.max(...ptsAll.map((p) => p.usd), 1000);
+    const padY = (hi - lo) * 0.12 || 10; lo -= padY; hi += padY;
+    const x = (t) => padL + ((t - t0) / Math.max(1, t1 - t0)) * (W - padL - padR);
+    const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+    const pts = ptsAll.filter((p) => p.t <= frame.t);
+    const GAP = 6 * 3600e3;
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => lo + f * (hi - lo));
+    const grid = ticks.map((v) => `<line x1="${padL}" x2="${W - padR}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#3a2e23" stroke-dasharray="3 4"/><text x="${padL - 6}" y="${(y(v) + 4).toFixed(1)}" fill="#8c7a64" font-size="10" text-anchor="end">$${Math.round(v).toLocaleString('en-US')}</text>`).join('');
+    const xt = [0, 0.5, 1].map((f) => t0 + f * (t1 - t0)).map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 8}" fill="#8c7a64" font-size="10" text-anchor="${['start', 'middle', 'end'][i]}">${esc(replayStamp(t).replace(' WIB', ''))}</text>`).join('');
+    const base = `<line x1="${padL}" x2="${W - padR}" y1="${y(1000).toFixed(1)}" y2="${y(1000).toFixed(1)}" stroke="#b8a48a" stroke-opacity=".45"/><text x="${W - padR + 4}" y="${(y(1000) + 4).toFixed(1)}" fill="#8c7a64" font-size="10">modal</text>`;
+    let drawn = '';
+    if (pts.length >= 2) {
+      const line = pts.map((p, i) => `${i && p.t - pts[i - 1].t <= GAP ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join('');
+      const gaps = pts.slice(1).map((p, i) => [pts[i], p]).filter(([a, b]) => b.t - a.t > GAP)
+        .map(([a, b]) => `<line x1="${x(a.t).toFixed(1)}" y1="${y(a.usd).toFixed(1)}" x2="${x(b.t).toFixed(1)}" y2="${y(b.usd).toFixed(1)}" stroke="#8c7a64" stroke-dasharray="4 4"><title>tidak ada snapshot ${esc(replayStamp(a.t))} – ${esc(replayStamp(b.t))}</title></line>`).join('');
+      const area = `${pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join('')}L${x(pts.at(-1).t).toFixed(1)},${H - padB}L${x(pts[0].t).toFixed(1)},${H - padB}Z`;
+      const last = pts.at(-1), col = last.usd >= 1000 ? '#4ade80' : '#f87171';
+      drawn = `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".38"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${area}" fill="url(#g)"/>${gaps}<path d="${line}" fill="none" stroke="${col}" stroke-width="2"/><circle cx="${x(last.t).toFixed(1)}" cy="${y(last.usd).toFixed(1)}" r="5" fill="${col}"/>`;
+    } else if (pts.length === 1) {
+      const p = pts[0], col = p.usd >= 1000 ? '#4ade80' : '#f87171';
+      drawn = `<circle cx="${x(p.t).toFixed(1)}" cy="${y(p.usd).toFixed(1)}" r="5" fill="${col}"/>`;
+    }
+    const peak = pts.length ? pts.reduce((a, b) => (b.usd > a.usd ? b : a)) : null;
+    const peakMk = peak ? `<g><circle cx="${x(peak.t).toFixed(1)}" cy="${y(peak.usd).toFixed(1)}" r="4" fill="#facc15"/><text x="${x(peak.t).toFixed(1)}" y="${(y(peak.usd) - 8).toFixed(1)}" fill="#facc15" font-size="10" text-anchor="middle">puncak ${esc(usd(peak.usd))}</text></g>` : '';
+    const yKnown = (t) => { const known = ptsAll.filter((p) => p.t <= t); return known.length ? known.at(-1).usd : 1000; };
+    const marks = frame.log.filter((c) => (c.type === 'partial' || c.type === 'close') && c.t >= t0 && c.t <= t1 && c.t <= frame.t)
+      .map((c) => `<circle cx="${x(c.t).toFixed(1)}" cy="${y(yKnown(c.t)).toFixed(1)}" r="3" fill="${c.netUsd >= 0 ? '#4ade80' : '#f87171'}" stroke="#14100c"><title>${esc(`${replayStamp(c.t)} ${c.symbol} ${closeKind(c)[0]} ${sgn(c.netUsd)}`)}</title></circle>`).join('');
+    svg.innerHTML = `${grid}${base}${drawn}${marks}${peakMk}${xt}`;
+    $('#chartNote').textContent = `${pts.length} dari ${ptsAll.length} snapshot nyata · garis baru maju di titik berikutnya`;
+  }
+  function renderReplayFrame(frame) {
+    const pill = $('#livePill');
+    pill.className = 'gb-pill replay';
+    pill.querySelector('span').textContent = 'REPLAY';
+    const label = replayStamp(frame.t);
+    $('#updated').textContent = label;
+    if ($('#replayClock')) $('#replayClock').textContent = label;
+    $('#decCount').textContent = '—';
+    $('#decCount').title = 'replay';
+    $('#mBal').textContent = usd(frame.balance);
+    $('#mBalN').textContent = `started at ${usd(frame.initialUsd, 0)}` + (frame.cash == null ? '' : ` · kas ${usd(frame.cash)}`);
+    const p = $('#mPnl'); p.textContent = sgn(frame.pnl); p.className = 'v ' + cls(frame.pnl);
+    const rp = frame.pnl != null && frame.initialUsd ? (frame.pnl / frame.initialUsd) * 100 : null;
+    $('#mPnlN').textContent = `${pct(rp, 2)} sejak mulai · terealisasi ${sgn(frame.realized)}`;
+    if (frame.largestWin) {
+      $('#mWin').innerHTML = `<span class="pos">${esc(sgn(frame.largestWin.netUsd))}</span>`;
+      $('#mWinN').textContent = `${symOf(frame.largestWin.symbol)} ${pct(frame.largestWin.netPct)}${frame.largestWin.type === 'partial' ? ' · TP1' : ''}`;
+    } else { $('#mWin').textContent = '—'; $('#mWinN').textContent = 'belum ada'; }
+    $('#mWr').textContent = frame.winRate == null ? '—' : frame.winRate.toFixed(1) + '%';
+    $('#mWrN').textContent = `${frame.wins} wins / ${frame.losses} losses`;
+    const C = 2 * Math.PI * 16, f = frame.winRate == null ? 0 : frame.winRate / 100;
+    $('#donut').innerHTML = `<circle cx="21" cy="21" r="16" fill="none" stroke="#3a2e23" stroke-width="5"/>
+      <circle cx="21" cy="21" r="16" fill="none" stroke="#4ade80" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(C * f).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 21 21)"/>`;
+    $('#mRug').textContent = '—';
+    $('#mRugN').textContent = 'replay';
+    $('#log').innerHTML = frame.log.slice(-80).reverse().map((e) => {
+      const html = e.type === 'open'
+        ? `<span class="a copy">COPY/BUY</span>${esc(symOf(e.symbol))}${e.book ? ` <span class="why">· ${esc(e.book)}</span>` : ''}${e.cost != null ? ` <span class="pos">${esc(usd(e.cost))}</span>` : ''}`
+        : `<span class="a ${closeKind(e)[1]}">SELL/${esc(closeKind(e)[0])}</span>${esc(symOf(e.symbol))} <span class="${cls(e.netUsd)}">${esc(sgn(e.netUsd))} (${esc(pct(e.netPct))})</span>`;
+      return `<li><span class="t">[${esc(replayStamp(e.t))}]</span>${html}</li>`;
+    }).join('') || '<li class="why">belum ada aktivitas</li>';
+    const rows = frame.positions;
+    $('#posCount').textContent = `(${rows.length})`;
+    $('#posNote').textContent = 'replay · nilai mark hanya pada snapshot terakhir';
+    $('#pos').innerHTML = rows.map((row) => {
+      const trail = row.peakPct != null && /\btrailing\b/.test(row.strategy || '') && row.stopPct == null ? Math.max(0, ((1 + row.peakPct / 100) * TRAIL_KEEP - 1) * 100) : null;
+      const stop = trail != null ? `<span class="pos">trail +${trail.toFixed(1)}%</span>`
+        : row.partial ? '<span class="pos">TP1 selesai</span>'
+        : row.stopPct == null && row.targetPct == null ? '<span class="sub">—</span>'
+        : `<span class="neg">−${esc(Number(row.stopPct).toFixed(0))}%</span> / <span class="pos">+${esc(Number(row.targetPct).toFixed(0))}%</span>`;
+      const age = dur(Math.max(0, Math.round((frame.t - row.openedAt) / 60000)));
+      return `<tr><td><span class="sym ${cls(row.pnl)}">●</span> <span class="sym">${esc(row.symbol)}</span>${row.stale ? '<div class="sub neg">harga belum terverifikasi</div>' : ''}</td>
+        <td>${esc([row.book, row.partial ? 'TP1 selesai' : ''].filter(Boolean).join(' · '))}</td><td class="num">${esc(age)}</td>
+        <td class="num">${esc(usd(row.cost))}</td><td class="num"><b>${esc(usd(row.value))}</b></td>
+        <td class="num ${cls(row.pnl)}">${esc(sgn(row.pnl))}<div class="sub">${esc(pct(row.pnlPct, 2))}</div></td><td class="num">${stop}</td></tr>`;
+    }).join('') || '<tr><td colspan="7" class="sub">Belum ada posisi terbuka.</td></tr>';
+    const day = dayKey(frame.t);
+    const closes = frame.log.filter((e) => e.type === 'partial' || e.type === 'close');
+    const today = closes.filter((e) => dayKey(e.t) === day).length;
+    const cards = [
+      { name: 'Scout', ac: '#38bdf8', v: '—', n: 'belum ada data' },
+      { name: 'Cek Aman', ac: '#f87171', v: '—', n: 'belum ada data' },
+      { name: 'Wallet Mix', ac: '#a78bfa', v: '—', n: 'belum ada data' },
+      { name: 'Judge', ac: '#facc15', v: '—', n: 'belum ada data' },
+      { name: 'Watcher', ac: '#4ade80', v: String(today), n: 'tutup pada hari jam replay' },
+      { name: 'Jurnal', ac: '#f5a524', v: String(closes.length), n: `trade sampai ${replayStamp(frame.t)}` },
+    ];
+    $('#agents').innerHTML = cards.map((c) => `<div class="gb-card gb-agent" style="--ac:${c.ac}"><div class="k">${esc(c.name)}</div><div class="v">${esc(c.v)}</div><div class="n">${esc(c.n)}</div></div>`).join('');
+    renderReplayChart(replayModel.points, frame);
+  }
+  function paintScrub() {
+    const el = $('#replayScrub'); if (!el || !replayModel || dragging) return;
+    const span = Math.max(1, replayModel.end - replayModel.start);
+    const f = Math.min(1, Math.max(0, (clock - replayModel.start) / span));
+    el.value = String(Math.round(f * 1000));
+    el.style.background = `linear-gradient(90deg,#f5a524 ${f * 100}%,#3a2e23 ${f * 100}%)`;
+  }
+  function updatePlayBtn() {
+    const b = $('#replayPlay'); if (!b) return;
+    const stepMode = reducedMotion();
+    b.textContent = stepMode ? 'Langkah' : (playing ? 'Jeda' : 'Putar');
+    b.setAttribute('aria-pressed', playing ? 'true' : 'false');
+  }
+  function renderAt(reason, prev) {
+    const frame = frameAt(replayModel, clock);
+    renderReplayFrame(frame);
+    paintScrub();
+    if (reason === 'scrub') hideBig();
+    else if (reason === 'play' && prev != null) showReplayBig(replayModel.events.filter((e) => e.t > prev && e.t <= clock && isBigClose(e)).at(-1));
+    else if (reason === 'step') showReplayBig(replayModel.events.filter((e) => e.t === clock && isBigClose(e)).at(-1));
+  }
+  function stopPlay() { playing = false; cancelAnimationFrame(raf); updatePlayBtn(); }
+  function tick(now) {
+    if (!playing || !replaying) return;
+    if (reducedMotion()) { stopPlay(); return; }
+    const dt = Math.min(250, now - lastTs);
+    lastTs = now;
+    const prev = clock;
+    clock = Math.min(replayModel.end, clock + (dt / 1000) * speed * SPEED_MS);
+    renderAt('play', prev);
+    if (clock >= replayModel.end) { stopPlay(); return; }
+    raf = requestAnimationFrame(tick);
+  }
+  function enterReplay() {
+    if (!state || !$('#replayRun')) return;
+    replayModel = buildReplay(state.live, state.nav, state.closes);
+    if (!replayModel.events.length && replayModel.start === replayModel.end) return;
+    replaying = true;
+    clock = replayModel.start;
+    speed = 300;
+    document.querySelectorAll('.gb-speeds button').forEach((b) => b.classList.toggle('on', b.dataset.speed === '300'));
+    hideBig();
+    $('#replayRun').hidden = false;
+    $('#replayToggle').hidden = true;
+    playing = !reducedMotion();
+    updatePlayBtn();
+    renderAt('step', null);
+    if (playing) { lastTs = performance.now(); raf = requestAnimationFrame(tick); }
+  }
+  function exitReplay() {
+    if (!replaying) return;
+    replaying = false;
+    stopPlay();
+    hideBig();
+    $('#replayRun').hidden = true;
+    const toggle = $('#replayToggle'); if (toggle) toggle.hidden = false;
+    if (state) { renderHeader(state.live); renderMetrics(state.live, state.closes); renderChart(state.nav, state.closes, state.live); renderLog(state.live, state.closes); renderPositions(state.live); renderAgents(state.live, state.closes); }
+    refresh();
+  }
+  const toggle = $('#replayToggle');
+  if (toggle) {
+    toggle.onclick = enterReplay;
+    $('#replayExit').onclick = exitReplay;
+    $('#replayPlay').onclick = () => {
+      if (!replayModel) return;
+      if (reducedMotion()) { clock = stepTime(replayModel, clock, 1); renderAt('step', null); updatePlayBtn(); return; }
+      if (playing) { stopPlay(); return; }
+      if (clock >= replayModel.end) clock = replayModel.start;
+      playing = true; updatePlayBtn(); lastTs = performance.now(); raf = requestAnimationFrame(tick);
+    };
+    $('#replayNext').onclick = () => { if (!replayModel) return; stopPlay(); clock = stepTime(replayModel, clock, 1); renderAt('step', null); };
+    $('#replayPrev').onclick = () => { if (!replayModel) return; stopPlay(); clock = stepTime(replayModel, clock, -1); renderAt('step', null); };
+    document.querySelectorAll('.gb-speeds button').forEach((b) => b.addEventListener('click', () => {
+      speed = Number(b.dataset.speed) || 1;
+      document.querySelectorAll('.gb-speeds button').forEach((x) => x.classList.toggle('on', x === b));
+    }));
+    const scrub = $('#replayScrub');
+    scrub.addEventListener('pointerdown', () => { dragging = true; stopPlay(); });
+    scrub.addEventListener('pointerup', () => { dragging = false; });
+    scrub.addEventListener('input', () => {
+      if (!replayModel) return;
+      stopPlay(); dragging = true;
+      clock = replayModel.start + (Number(scrub.value) / 1000) * (replayModel.end - replayModel.start);
+      const f = Number(scrub.value) / 10;
+      scrub.style.background = `linear-gradient(90deg,#f5a524 ${f}%,#3a2e23 ${f}%)`;
+      renderAt('scrub', null);
+    });
+    scrub.addEventListener('change', () => { dragging = false; });
+    motion.addEventListener('change', () => { if (reducedMotion()) stopPlay(); else updatePlayBtn(); });
+  }
 })();
