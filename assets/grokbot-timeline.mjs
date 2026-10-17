@@ -1,10 +1,13 @@
 /*
  * Replay buku paper Devil Greed.
  * Hanya kejadian yang sudah ada di feed: titik nav, buka posisi (dari hold/umur
- * atau keputusan enter), jual separuh, dan tutup penuh. Tidak ada harga
- * sisipan dan tidak ada kejadian karangan. Di antara dua titik nav, saldo
- * tetap di titik nyata terakhir sampai jam replay menyentuh titik berikutnya.
+ * atau keputusan enter), jual sebagian (level tp1/tp2/tp3 atau "jual separuh"),
+ * dan tutup penuh. Tidak ada harga sisipan dan tidak ada kejadian karangan.
+ * Di antara dua titik nav, saldo tetap di titik nyata terakhir sampai jam
+ * replay menyentuh titik berikutnya. Ladder hanya muncul pada snapshot live.
  */
+import { exitRuleText, isPartial } from './grokbot-rules.mjs';
+
 const MATCH_MS = 2 * 60e3;
 const WIN_BAND = 0.5;
 const RANK = { open: 0, partial: 1, close: 2, nav: 3 };
@@ -13,7 +16,6 @@ export const BIG_USD = 20;
 export const BIG_PCT = 30;
 
 const num = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? null : Number(v));
-const isPartial = (c) => /^jual separuh/i.test(c?.reasonDetail || '');
 
 export function isBigClose(e) {
   const net = num(e?.netUsd);
@@ -23,7 +25,7 @@ export function isBigClose(e) {
 
 function blankLot(symbol, openedAt, book) {
   return {
-    symbol, openedAt, book: book || null, partialAt: null, partialInv: null, closeAt: null, closeInv: null,
+    symbol, openedAt, book: book || null, partials: [], closeAt: null, closeInv: null,
     posCost: null, openPos: null,
   };
 }
@@ -31,6 +33,40 @@ function blankLot(symbol, openedAt, book) {
 function findLot(lots, symbol, openedAt, openOnly) {
   if (!symbol || openedAt == null) return null;
   return lots.find((l) => l.symbol === symbol && l.openedAt != null && Math.abs(l.openedAt - openedAt) <= MATCH_MS && (!openOnly || l.closeAt == null)) || null;
+}
+
+function sumInvested(rows) {
+  let any = false, sum = 0;
+  for (const row of rows) {
+    if (row.investedUsd == null) continue;
+    any = true;
+    sum += row.investedUsd;
+  }
+  return any ? sum : null;
+}
+
+function copyLadder(ladder) {
+  if (!ladder || typeof ladder !== 'object' || Array.isArray(ladder)) return null;
+  const out = {};
+  const text = (v) => (v == null ? '' : String(v).trim());
+  if (text(ladder.label)) out.label = text(ladder.label);
+  if (text(ladder.text)) out.text = text(ladder.text);
+  if (text(ladder.level)) out.level = text(ladder.level);
+  if (text(ladder.floor)) out.floor = text(ladder.floor);
+  const line = num(ladder.exit_line_pct);
+  if (line != null) out.exit_line_pct = line;
+  if (text(ladder.exit_line_kind)) out.exit_line_kind = text(ladder.exit_line_kind);
+  if (text(ladder.next_tp)) out.next_tp = text(ladder.next_tp);
+  const nextPct = num(ladder.next_tp_pct);
+  if (nextPct != null) out.next_tp_pct = nextPct;
+  const trail = num(ladder.runner_trail_pct);
+  if (trail != null) out.runner_trail_pct = trail;
+  if (text(ladder.entry_mode_label)) out.entry_mode_label = text(ladder.entry_mode_label);
+  if (Array.isArray(ladder.hits)) {
+    const hits = ladder.hits.map((h) => String(h).trim()).filter(Boolean);
+    if (hits.length) out.hits = hits;
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 function navPoints(live, nav) {
@@ -71,6 +107,8 @@ export function buildReplay(live, nav, closes) {
       netPct: num(c.netPct),
       reason: c.reason || null,
       reasonDetail: c.reasonDetail || null,
+      level: c.level ? String(c.level) : null,
+      reason_legacy: c.reason_legacy ? String(c.reason_legacy) : null,
     };
   });
 
@@ -82,9 +120,8 @@ export function buildReplay(live, nav, closes) {
     }
     if (!lot) continue;
     if (!lot.book && c.book) lot.book = c.book;
-    if (c.partial) {
-      if (lot.partialAt == null || c.closedAt < lot.partialAt) { lot.partialAt = c.closedAt; lot.partialInv = c.investedUsd; }
-    } else if (lot.closeAt == null || c.closedAt < lot.closeAt) { lot.closeAt = c.closedAt; lot.closeInv = c.investedUsd; }
+    if (c.partial) lot.partials.push({ closedAt: c.closedAt, investedUsd: c.investedUsd });
+    else if (lot.closeAt == null || c.closedAt < lot.closeAt) { lot.closeAt = c.closedAt; lot.closeInv = c.investedUsd; }
   }
 
   for (const p of live?.positions || []) {
@@ -99,6 +136,9 @@ export function buildReplay(live, nav, closes) {
       valueUsd: num(p.valueUsd), pnlUsd: num(p.pnlUsd), pnlPct: num(p.pnlPct),
       stopPct: num(p.stopPct), targetPct: num(p.targetPct), peakPct: num(p.peakPct),
       strategy: p.strategy || '', stale: p.stale === true,
+      ladder: copyLadder(p.ladder),
+      firstWallet: p.firstWallet ? String(p.firstWallet) : '',
+      entryMode: p.entryMode ? String(p.entryMode) : '',
     };
   }
 
@@ -114,7 +154,7 @@ export function buildReplay(live, nav, closes) {
   }
 
   for (const lot of lots) {
-    const part = lot.partialInv;
+    const part = sumInvested(lot.partials);
     const rest = lot.closeInv != null ? lot.closeInv : lot.posCost;
     lot.costOpen = part != null && rest != null ? part + rest : (rest ?? part ?? lot.posCost);
     lot.costRest = rest;
@@ -130,7 +170,8 @@ export function buildReplay(live, nav, closes) {
     events.push({
       type: c.partial ? 'partial' : 'close', t: c.closedAt, symbol: c.symbol, book: c.book,
       cost: c.investedUsd, investedUsd: c.investedUsd, netUsd: c.netUsd, netPct: c.netPct,
-      reason: c.reason, reasonDetail: c.reasonDetail, source: 'close',
+      reason: c.reason, reasonDetail: c.reasonDetail, level: c.level, reason_legacy: c.reason_legacy,
+      source: 'close',
     });
   }
   events.sort((a, b) => a.t - b.t || (RANK[a.type] ?? 9) - (RANK[b.type] ?? 9) || String(a.symbol || '').localeCompare(String(b.symbol || '')));
@@ -138,7 +179,7 @@ export function buildReplay(live, nav, closes) {
   const times = [...(startedAt != null ? [startedAt] : []), ...(updatedAt != null ? [updatedAt] : []), ...events.map((e) => e.t)];
   const start = times.length ? Math.min(...times) : 0;
   const end = times.length ? Math.max(...times) : start;
-  return { initialUsd, startedAt, updatedAt, cashUsd, points, lots, events, start, end };
+  return { initialUsd, startedAt, updatedAt, cashUsd, points, lots, events, start, end, exitRule: exitRuleText(live) };
 }
 
 export function frameAt(replay, t) {
@@ -153,12 +194,18 @@ export function frameAt(replay, t) {
   const realized = done.reduce((s, e) => s + e.netUsd, 0);
   const won = done.filter((e) => e.netUsd > 0);
   const largestWin = won.length ? won.reduce((a, b) => (b.netUsd > a.netUsd ? b : a)) : null;
+  const showLive = replay.updatedAt != null && t >= replay.updatedAt;
   const positions = replay.lots.filter((lot) => lot.openedAt != null && lot.openedAt <= t && (lot.closeAt == null || lot.closeAt > t)).map((lot) => {
-    const after = lot.partialAt != null && lot.partialAt <= t;
-    const show = !!(lot.openPos && replay.updatedAt != null && t >= replay.updatedAt);
+    const doneParts = lot.partials.filter((p) => p.closedAt <= t);
+    const taken = sumInvested(doneParts);
+    const after = doneParts.length > 0;
+    const show = !!(lot.openPos && showLive);
+    let cost = lot.costOpen;
+    if (after && taken != null && lot.costOpen != null) cost = lot.costOpen - taken;
+    else if (after) cost = lot.costRest ?? lot.costOpen;
     return {
       symbol: lot.symbol, book: lot.book, openedAt: lot.openedAt,
-      cost: after ? (lot.costRest ?? lot.costOpen) : lot.costOpen,
+      cost,
       value: show ? lot.openPos.valueUsd : null,
       pnl: show ? lot.openPos.pnlUsd : null,
       pnlPct: show ? lot.openPos.pnlPct : null,
@@ -168,13 +215,17 @@ export function frameAt(replay, t) {
       strategy: show ? lot.openPos.strategy : '',
       stale: show ? lot.openPos.stale : false,
       partial: after,
+      ladder: show ? lot.openPos.ladder : null,
+      firstWallet: show ? lot.openPos.firstWallet : '',
+      entryMode: show ? lot.openPos.entryMode : '',
     };
   }).sort((a, b) => (b.cost || 0) - (a.cost || 0) || String(a.symbol).localeCompare(String(b.symbol)));
   const log = replay.events.filter((e) => e.type !== 'nav' && e.t <= t);
   return {
     t, balance, initialUsd: replay.initialUsd, pnl, realized, wins, losses, winRate, largestWin, positions,
     navPoints: navSeen, log,
-    cash: replay.updatedAt != null && t >= replay.updatedAt ? replay.cashUsd : null,
+    cash: showLive ? replay.cashUsd : null,
+    exitRule: showLive ? (replay.exitRule || null) : null,
   };
 }
 
