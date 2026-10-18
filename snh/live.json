@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d55d8504-3352-45a1-9aef-6a88e5335c9a",
-  "updatedAt": 1792349961938,
-  "generatedAt": "2026-10-19 01:59 WIB",
+  "generation": "f87ae4b6-461a-43fe-9434-266a9a6bb351",
+  "updatedAt": 1792350261938,
+  "generatedAt": "2026-10-19 02:04 WIB",
   "usdIdr": null,
   "totalUsd": 935.3280896530648,
   "nativeSymbol": "SOL",
@@ -1304,12 +1304,12 @@
     "pnlUsd": -64.67191034693519,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792349961938,
+    "heartbeatAt": 1792350261938,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.34,
-    "lastScanAt": 1792349952000,
+    "lastScanAt": 1792350257000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1330,12 +1330,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "456",
+        "v": "448",
         "n": "24 jam · 4 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "17276",
+        "v": "17277",
         "n": "476 aktif"
       },
       {
@@ -1346,9 +1346,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792349961938,
+      "lastDecisionAt": 1792350261938,
       "lastAction": "keputusan",
-      "lastReason": "mucron [low]: Dilewati: explore: isolated virtual capital."
+      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 1.4% dari market cap."
     }
   },
   "strategy": {
@@ -1367,7 +1367,7 @@
       ],
       [
         "Wallet dipantau",
-        "17276 · 476 aktif"
+        "17277 · 476 aktif"
       ],
       [
         "Cadangan kas",
@@ -1379,7 +1379,7 @@
       ],
       [
         "Label wallet",
-        "smart 11740 · bot 3582 · blacklist 393 · lp 1 · fresh 1008 · kol 184 · dolphin 361 · whale 7"
+        "smart 11737 · bot 3587 · blacklist 393 · lp 1 · fresh 1007 · kol 184 · dolphin 361 · whale 7"
       ]
     ],
     "requirements": [
@@ -1427,29 +1427,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 17276,
+      "tracked": 17277,
       "active": 476,
-      "passive": 16800,
+      "passive": 16801,
       "trusted": 0,
       "promising": 43,
       "byLabel": [
         {
           "key": "smart",
-          "total": 11740,
+          "total": 11737,
           "active": 446,
-          "passive": 11294
+          "passive": 11291
         },
         {
           "key": "bot",
-          "total": 3582,
+          "total": 3587,
           "active": 0,
-          "passive": 3582
+          "passive": 3587
         },
         {
           "key": "fresh",
-          "total": 1008,
+          "total": 1007,
           "active": 0,
-          "passive": 1008
+          "passive": 1007
         },
         {
           "key": "blacklist",
@@ -1583,6 +1583,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792350059680,
+        "symbol": "USDP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.4% dari market cap."
+      },
+      {
+        "at": 1792349995504,
+        "symbol": "AgenC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2,
+          "whale": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      },
       {
         "at": 1792349909231,
         "symbol": "mucron",
@@ -1723,27 +1744,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792349456987,
-        "symbol": "USDP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 1.4% dari market cap."
-      },
-      {
-        "at": 1792349393025,
-        "symbol": "AgenC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2,
-          "whale": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
       },
       {
         "at": 1792349293317,
@@ -2395,12 +2395,12 @@
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 39,
+        "below_entry": 38,
         "no_pullback": 0,
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 402,
+        "red_flag": 395,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2452,7 +2452,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792350088443,
+    "generatedAt": 1792350414230,
     "trades": {
       "count": 142,
       "wins": 58,
