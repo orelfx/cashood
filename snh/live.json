@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "61860fb6-8d2c-4b3b-9c39-20d6d019fced",
-  "updatedAt": 1792286014040,
-  "generatedAt": "2026-10-18 08:13 WIB",
+  "generation": "576200a4-4cba-43a4-8da8-bb2d5d14b89d",
+  "updatedAt": 1792286314764,
+  "generatedAt": "2026-10-18 08:18 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792286014040,
+    "heartbeatAt": 1792286314764,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792286008000,
+    "lastScanAt": 1792286305000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1314,7 +1314,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "602",
+        "v": "599",
         "n": "24 jam · 2 diveto LLM"
       },
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792286014040,
+      "lastDecisionAt": 1792286314764,
       "lastAction": "keputusan",
-      "lastReason": "OTTO [degen]: Dilewati karena red flag: bundler pegang 33.36% supply."
+      "lastReason": "PEPECOIN [degen]: Dilewati karena red flag: bundler pegang 78.94% supply."
     }
   },
   "strategy": {
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 10389 · bot 2987 · blacklist 377 · lp 1 · fresh 898 · kol 162 · dolphin 389 · whale 7"
+        "smart 10387 · bot 2989 · blacklist 377 · lp 1 · fresh 898 · kol 162 · dolphin 389 · whale 7"
       ]
     ],
     "requirements": [
@@ -1419,15 +1419,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 10389,
+          "total": 10387,
           "active": 423,
-          "passive": 9966
+          "passive": 9964
         },
         {
           "key": "bot",
-          "total": 2987,
+          "total": 2989,
           "active": 0,
-          "passive": 2987
+          "passive": 2989
         },
         {
           "key": "fresh",
@@ -1567,6 +1567,70 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792286080673,
+        "symbol": "PEPECOIN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 78.94% supply."
+      },
+      {
+        "at": 1792286074008,
+        "symbol": "TGSTARS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 22.1% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 32,
+            "note": "bundler pegang 23.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.2%"
+          }
+        ],
+        "reason": "Dilewati: likuiditas anjlok saat menunggu pullback."
+      },
+      {
+        "at": 1792286060679,
+        "symbol": "TGSTARS",
+        "action": "wait",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 22.1% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 32,
+            "note": "bundler pegang 23.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 0.2%"
+          }
+        ],
+        "reason": "Menunggu pullback: harga sudah +34% di atas harga beli wallet yang diikuti (zona masuk sampai +20%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 15 menit."
+      },
       {
         "at": 1792285501265,
         "symbol": "OTTO",
@@ -2414,82 +2478,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
-      },
-      {
-        "at": 1792274829875,
-        "symbol": "rebond",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 13
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 78,
-            "note": "bundler pegang 16.9%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: position_risk."
-      },
-      {
-        "at": 1792274794833,
-        "symbol": "rebond",
-        "action": "wait",
-        "basket": "low",
-        "wallets": {
-          "smart": 13
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 78,
-            "note": "bundler pegang 16.9%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Menunggu pullback: harga sudah +15% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
-      },
-      {
-        "at": 1792274757593,
-        "symbol": "XTV",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 8.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "8.6% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2499,8 +2487,8 @@
         "no_pullback": 0,
         "wallet_left": 4,
         "breakdown": 0,
-        "liq_drop": 1,
-        "red_flag": 536,
+        "liq_drop": 2,
+        "red_flag": 531,
         "round_trip_cost": 3,
         "basket_full": 0,
         "slippage": 0,
@@ -2513,7 +2501,7 @@
         "position_risk": 1
       },
       "wait": {
-        "jumlah": 6
+        "jumlah": 7
       },
       "add": {
         "jumlah": 0
@@ -2552,7 +2540,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792286213291,
+    "generatedAt": 1792286519339,
     "trades": {
       "count": 141,
       "wins": 57,
