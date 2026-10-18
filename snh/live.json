@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d73adcab-f985-4dd2-aaa8-ed1d00724823",
-  "updatedAt": 1792338222386,
-  "generatedAt": "2026-10-18 22:43 WIB",
+  "generation": "784abae8-b5ab-4f6c-9693-bcc7889f8005",
+  "updatedAt": 1792338522781,
+  "generatedAt": "2026-10-18 22:48 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792338222386,
+    "heartbeatAt": 1792338522781,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792338213000,
+    "lastScanAt": 1792338517000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1319,7 +1319,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "16909",
+        "v": "16949",
         "n": "479 aktif"
       },
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792338222386,
+      "lastDecisionAt": 1792338522781,
       "lastAction": "keputusan",
-      "lastReason": "Luna [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "AgenC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
     }
   },
   "strategy": {
@@ -1351,7 +1351,7 @@
       ],
       [
         "Wallet dipantau",
-        "16909 · 479 aktif"
+        "16949 · 479 aktif"
       ],
       [
         "Cadangan kas",
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 11573 · bot 3392 · blacklist 390 · lp 1 · fresh 1001 · kol 178 · dolphin 367 · whale 7"
+        "smart 11569 · bot 3396 · blacklist 390 · lp 1 · fresh 1001 · kol 178 · dolphin 367 · whale 7 · unknown 40"
       ]
     ],
     "requirements": [
@@ -1411,23 +1411,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 16909,
+      "tracked": 16949,
       "active": 479,
-      "passive": 16430,
+      "passive": 16470,
       "trusted": 0,
       "promising": 19,
       "byLabel": [
         {
           "key": "smart",
-          "total": 11573,
+          "total": 11569,
           "active": 445,
-          "passive": 11128
+          "passive": 11124
         },
         {
           "key": "bot",
-          "total": 3392,
+          "total": 3396,
           "active": 0,
-          "passive": 3392
+          "passive": 3396
         },
         {
           "key": "fresh",
@@ -1452,6 +1452,12 @@
           "total": 178,
           "active": 6,
           "passive": 172
+        },
+        {
+          "key": "unknown",
+          "total": 40,
+          "active": 0,
+          "passive": 40
         },
         {
           "key": "whale",
@@ -1568,8 +1574,18 @@
     },
     "decisions": [
       {
-        "at": 1792338112225,
-        "symbol": "Luna",
+        "at": 1792338407286,
+        "symbol": "AgenC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      },
+      {
+        "at": 1792338257985,
+        "symbol": "Kaida",
         "action": "skip",
         "basket": "degen",
         "wallets": {
@@ -1578,14 +1594,14 @@
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       },
       {
-        "at": 1792337802246,
-        "symbol": "AgenC",
+        "at": 1792338112225,
+        "symbol": "Luna",
         "action": "skip",
-        "basket": "mid",
+        "basket": "degen",
         "wallets": {
           "smart": 3
         },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       },
       {
         "at": 1792336776729,
@@ -2412,44 +2428,17 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792322213254,
-        "symbol": "SUPERCORE",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 551,
-            "note": "bundler pegang 12.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 10.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "11.6% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 43,
+        "below_entry": 42,
         "no_pullback": 0,
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 406,
+        "red_flag": 407,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2501,7 +2490,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792338412287,
+    "generatedAt": 1792338710665,
     "trades": {
       "count": 141,
       "wins": 57,
