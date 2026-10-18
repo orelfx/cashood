@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "983447f0-2348-4252-8022-eb800f8a8924",
-  "updatedAt": 1792286915305,
-  "generatedAt": "2026-10-18 08:28 WIB",
+  "generation": "8afec6d5-484d-455b-bb51-c20abd4286f0",
+  "updatedAt": 1792287215330,
+  "generatedAt": "2026-10-18 08:33 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792286915305,
+    "heartbeatAt": 1792287215330,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792286908000,
+    "lastScanAt": 1792287203000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1314,7 +1314,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "592",
+        "v": "591",
         "n": "24 jam · 3 diveto LLM"
       },
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792286915305,
+      "lastDecisionAt": 1792287215330,
       "lastAction": "keputusan",
-      "lastReason": "TGSTARS [degen]: Diveto LLM: Both wallets are arbitrageurs with 2-min exits and identical trading patterns suggesting same operator; ultra-fast timing is impractical for copy-trading. Tidak dimasuki."
+      "lastReason": "TSI [low]: Dilewati: explore: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 10390 · bot 2991 · blacklist 378 · lp 1 · fresh 895 · kol 162 · dolphin 389 · whale 7 · unknown 37"
+        "smart 10414 · bot 2999 · blacklist 378 · lp 1 · fresh 899 · kol 162 · dolphin 389 · whale 7 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1419,21 +1419,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 10390,
+          "total": 10414,
           "active": 424,
-          "passive": 9966
+          "passive": 9990
         },
         {
           "key": "bot",
-          "total": 2991,
+          "total": 2999,
           "active": 0,
-          "passive": 2991
+          "passive": 2999
         },
         {
           "key": "fresh",
-          "total": 895,
+          "total": 899,
           "active": 0,
-          "passive": 895
+          "passive": 899
         },
         {
           "key": "dolphin",
@@ -1454,12 +1454,6 @@
           "passive": 155
         },
         {
-          "key": "unknown",
-          "total": 37,
-          "active": 0,
-          "passive": 37
-        },
-        {
           "key": "whale",
           "total": 7,
           "active": 4,
@@ -1467,6 +1461,12 @@
         },
         {
           "key": "lp",
+          "total": 1,
+          "active": 0,
+          "passive": 1
+        },
+        {
+          "key": "unknown",
           "total": 1,
           "active": 0,
           "passive": 1
@@ -1573,6 +1573,54 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792287114850,
+        "symbol": "TSI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 471,
+            "note": "bundler pegang 28.7%"
+          },
+          {
+            "type": "rat",
+            "count": 6,
+            "note": "insider/entrapment pegang 1.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 402,
+            "note": "8.2% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 16x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
+      {
+        "at": 1792286950572,
+        "symbol": "Gemini",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
+      },
       {
         "at": 1792286690614,
         "symbol": "TGSTARS",
@@ -2486,26 +2534,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: holder baru 19."
-      },
-      {
-        "at": 1792275055535,
-        "symbol": "ChatGPT",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
-      },
-      {
-        "at": 1792274924852,
-        "symbol": "FOMO",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "whale": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
       }
     ],
     "reasonStats": {
@@ -2516,7 +2544,7 @@
         "wallet_left": 4,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 526,
+        "red_flag": 525,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2568,7 +2596,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792287107773,
+    "generatedAt": 1792287410723,
     "trades": {
       "count": 141,
       "wins": 57,
