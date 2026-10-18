@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "33d781ca-2de2-427c-9e5b-e5dadc6e04a0",
-  "updatedAt": 1792286615304,
-  "generatedAt": "2026-10-18 08:23 WIB",
+  "generation": "983447f0-2348-4252-8022-eb800f8a8924",
+  "updatedAt": 1792286915305,
+  "generatedAt": "2026-10-18 08:28 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792286615304,
+    "heartbeatAt": 1792286915305,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792286609000,
+    "lastScanAt": 1792286908000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1314,12 +1314,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "593",
-        "n": "24 jam · 2 diveto LLM"
+        "v": "592",
+        "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "15210",
+        "v": "15250",
         "n": "461 aktif"
       },
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792286615304,
+      "lastDecisionAt": 1792286915305,
       "lastAction": "keputusan",
-      "lastReason": "PEPECOIN [degen]: Dilewati karena red flag: bundler pegang 78.94% supply."
+      "lastReason": "TGSTARS [degen]: Diveto LLM: Both wallets are arbitrageurs with 2-min exits and identical trading patterns suggesting same operator; ultra-fast timing is impractical for copy-trading. Tidak dimasuki."
     }
   },
   "strategy": {
@@ -1351,7 +1351,7 @@
       ],
       [
         "Wallet dipantau",
-        "15210 · 461 aktif"
+        "15250 · 461 aktif"
       ],
       [
         "Cadangan kas",
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 10387 · bot 2990 · blacklist 377 · lp 1 · fresh 897 · kol 162 · dolphin 389 · whale 7"
+        "smart 10390 · bot 2991 · blacklist 378 · lp 1 · fresh 895 · kol 162 · dolphin 389 · whale 7 · unknown 37"
       ]
     ],
     "requirements": [
@@ -1411,29 +1411,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 15210,
+      "tracked": 15250,
       "active": 461,
-      "passive": 14749,
+      "passive": 14789,
       "trusted": 0,
       "promising": 19,
       "byLabel": [
         {
           "key": "smart",
-          "total": 10387,
+          "total": 10390,
           "active": 424,
-          "passive": 9963
+          "passive": 9966
         },
         {
           "key": "bot",
-          "total": 2990,
+          "total": 2991,
           "active": 0,
-          "passive": 2990
+          "passive": 2991
         },
         {
           "key": "fresh",
-          "total": 897,
+          "total": 895,
           "active": 0,
-          "passive": 897
+          "passive": 895
         },
         {
           "key": "dolphin",
@@ -1443,15 +1443,21 @@
         },
         {
           "key": "blacklist",
-          "total": 377,
+          "total": 378,
           "active": 0,
-          "passive": 377
+          "passive": 378
         },
         {
           "key": "kol",
           "total": 162,
           "active": 7,
           "passive": 155
+        },
+        {
+          "key": "unknown",
+          "total": 37,
+          "active": 0,
+          "passive": 37
         },
         {
           "key": "whale",
@@ -1567,6 +1573,38 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792286690614,
+        "symbol": "TGSTARS",
+        "action": "veto",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 22.1% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 51,
+            "note": "bundler pegang 33.0%"
+          },
+          {
+            "type": "rat",
+            "count": 2,
+            "note": "insider/entrapment pegang 0.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 16,
+            "note": "5.9% holder wallet baru"
+          }
+        ],
+        "reason": "Diveto LLM: Both wallets are arbitrageurs with 2-min exits and identical trading patterns suggesting same operator; ultra-fast timing is impractical for copy-trading. Tidak dimasuki."
+      },
       {
         "at": 1792286080673,
         "symbol": "PEPECOIN",
@@ -2468,16 +2506,6 @@
           "whale": 1
         },
         "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
-      },
-      {
-        "at": 1792274871651,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
       }
     ],
     "reasonStats": {
@@ -2488,7 +2516,7 @@
         "wallet_left": 4,
         "breakdown": 0,
         "liq_drop": 2,
-        "red_flag": 528,
+        "red_flag": 526,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2507,7 +2535,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 2
+        "llm": 3
       },
       "test": {
         "solo": 0,
@@ -2540,7 +2568,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792286814939,
+    "generatedAt": 1792287107773,
     "trades": {
       "count": 141,
       "wins": 57,
