@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4806820d-8001-4f81-b34e-617b4c4e7308",
-  "updatedAt": 1792344163110,
-  "generatedAt": "2026-10-19 00:22 WIB",
+  "generation": "cbd90fae-1b2b-4565-813e-19c1bb4550b4",
+  "updatedAt": 1792344556168,
+  "generatedAt": "2026-10-19 00:29 WIB",
   "usdIdr": null,
   "totalUsd": 935.3280896530648,
   "nativeSymbol": "SOL",
@@ -1304,12 +1304,12 @@
     "pnlUsd": -64.67191034693519,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792344163110,
+    "heartbeatAt": 1792344556168,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.34,
-    "lastScanAt": 1792344156000,
+    "lastScanAt": 1792344451000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1335,7 +1335,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "16993",
+        "v": "17034",
         "n": "471 aktif"
       },
       {
@@ -1346,9 +1346,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792344163110,
+      "lastDecisionAt": 1792344556168,
       "lastAction": "keputusan",
-      "lastReason": "AgenC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      "lastReason": "TSI [degen]: Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
     }
   },
   "strategy": {
@@ -1367,7 +1367,7 @@
       ],
       [
         "Wallet dipantau",
-        "16993 · 471 aktif"
+        "17034 · 471 aktif"
       ],
       [
         "Cadangan kas",
@@ -1379,7 +1379,7 @@
       ],
       [
         "Label wallet",
-        "smart 11556 · bot 3499 · blacklist 392 · lp 1 · fresh 997 · kol 179 · dolphin 362 · whale 7"
+        "smart 11552 · bot 3504 · blacklist 392 · lp 1 · fresh 996 · kol 180 · dolphin 362 · whale 7 · unknown 40"
       ]
     ],
     "requirements": [
@@ -1427,29 +1427,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 16993,
+      "tracked": 17034,
       "active": 471,
-      "passive": 16522,
+      "passive": 16563,
       "trusted": 0,
       "promising": 43,
       "byLabel": [
         {
           "key": "smart",
-          "total": 11556,
+          "total": 11552,
           "active": 441,
-          "passive": 11115
+          "passive": 11111
         },
         {
           "key": "bot",
-          "total": 3499,
+          "total": 3504,
           "active": 0,
-          "passive": 3499
+          "passive": 3504
         },
         {
           "key": "fresh",
-          "total": 997,
+          "total": 996,
           "active": 0,
-          "passive": 997
+          "passive": 996
         },
         {
           "key": "blacklist",
@@ -1465,9 +1465,15 @@
         },
         {
           "key": "kol",
-          "total": 179,
+          "total": 180,
           "active": 6,
-          "passive": 173
+          "passive": 174
+        },
+        {
+          "key": "unknown",
+          "total": 40,
+          "active": 0,
+          "passive": 40
         },
         {
           "key": "whale",
@@ -1583,6 +1589,40 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792344395224,
+        "symbol": "TSI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
+      },
+      {
+        "at": 1792344374252,
+        "symbol": "TTWO",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
       {
         "at": 1792343903503,
         "symbol": "AgenC",
@@ -2380,26 +2420,6 @@
           }
         ],
         "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792338848711,
-        "symbol": "MrBeast",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
-      },
-      {
-        "at": 1792338827911,
-        "symbol": "Kaida",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2462,7 +2482,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792344410854,
+    "generatedAt": 1792344711008,
     "trades": {
       "count": 142,
       "wins": 58,
