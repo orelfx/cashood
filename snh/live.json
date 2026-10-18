@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c24b4eca-d3ea-49f1-b704-36cf58418811",
-  "updatedAt": 1792289917919,
-  "generatedAt": "2026-10-18 09:18 WIB",
+  "generation": "c33e2552-dc6a-4ae5-a121-105cb138f207",
+  "updatedAt": 1792290218579,
+  "generatedAt": "2026-10-18 09:23 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792289917919,
+    "heartbeatAt": 1792290218579,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792289907000,
+    "lastScanAt": 1792290208000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792289917919,
+      "lastDecisionAt": 1792290218579,
       "lastAction": "keputusan",
-      "lastReason": "LouLou [low]: Dilewati: explore: zone/cooldown/budget."
+      "lastReason": "AgenC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
     }
   },
   "strategy": {
@@ -1568,6 +1568,65 @@
     },
     "decisions": [
       {
+        "at": 1792290180368,
+        "symbol": "AgenC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 7,
+            "note": "7 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      },
+      {
+        "at": 1792290097870,
+        "symbol": "ZeroFee",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 165,
+            "note": "bundler pegang 18.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 7.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 498,
+            "note": "7.6% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 3,
+            "note": "akun Twitter dev pernah ganti nama 3x"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
+      {
+        "at": 1792290015077,
+        "symbol": "Pikachu",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: holder baru 21."
+      },
+      {
         "at": 1792289872963,
         "symbol": "LouLou",
         "action": "skip",
@@ -1603,23 +1662,6 @@
           }
         ],
         "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792289574004,
-        "symbol": "AgenC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 6,
-            "note": "6 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
       },
       {
         "at": 1792289539402,
@@ -2471,26 +2513,6 @@
           "bot": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 33.41% supply."
-      },
-      {
-        "at": 1792279952953,
-        "symbol": "Chonk",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792278866010,
-        "symbol": "GTA6 Coin",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
       }
     ],
     "reasonStats": {
@@ -2500,8 +2522,8 @@
         "no_pullback": 0,
         "wallet_left": 4,
         "breakdown": 0,
-        "liq_drop": 2,
-        "red_flag": 513,
+        "liq_drop": 1,
+        "red_flag": 516,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2510,11 +2532,11 @@
         "day_loss": 0,
         "paused": 0,
         "reserve": 0,
-        "entry_zone": 2,
+        "entry_zone": 1,
         "position_risk": 1
       },
       "wait": {
-        "jumlah": 7
+        "jumlah": 6
       },
       "add": {
         "jumlah": 0
@@ -2553,7 +2575,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792290123898,
+    "generatedAt": 1792290409519,
     "trades": {
       "count": 141,
       "wins": 57,
