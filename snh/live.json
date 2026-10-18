@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1382dcd0-9236-4ea3-8b81-8b2b6279eb79",
-  "updatedAt": 1792290518580,
-  "generatedAt": "2026-10-18 09:28 WIB",
+  "generation": "852e6f8f-b6fa-4f45-8d8f-fe34ce73248d",
+  "updatedAt": 1792290818580,
+  "generatedAt": "2026-10-18 09:33 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792290518580,
+    "heartbeatAt": 1792290818580,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792290498000,
+    "lastScanAt": 1792290812000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792290518580,
+      "lastDecisionAt": 1792290818580,
       "lastAction": "keputusan",
-      "lastReason": "AgenC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      "lastReason": "OpenAI [low]: Dilewati karena red flag: dev masih pegang 79.31%."
     }
   },
   "strategy": {
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 10498 · bot 3029 · blacklist 378 · lp 1 · fresh 911 · kol 165 · dolphin 390 · whale 7 · unknown 31"
+        "smart 10519 · bot 3036 · blacklist 378 · lp 1 · fresh 913 · kol 165 · dolphin 390 · whale 7 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1419,21 +1419,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 10498,
+          "total": 10519,
           "active": 430,
-          "passive": 10068
+          "passive": 10089
         },
         {
           "key": "bot",
-          "total": 3029,
+          "total": 3036,
           "active": 0,
-          "passive": 3029
+          "passive": 3036
         },
         {
           "key": "fresh",
-          "total": 911,
+          "total": 913,
           "active": 0,
-          "passive": 911
+          "passive": 913
         },
         {
           "key": "dolphin",
@@ -1454,12 +1454,6 @@
           "passive": 158
         },
         {
-          "key": "unknown",
-          "total": 31,
-          "active": 0,
-          "passive": 31
-        },
-        {
           "key": "whale",
           "total": 7,
           "active": 4,
@@ -1467,6 +1461,12 @@
         },
         {
           "key": "lp",
+          "total": 1,
+          "active": 0,
+          "passive": 1
+        },
+        {
+          "key": "unknown",
           "total": 1,
           "active": 0,
           "passive": 1
@@ -1573,6 +1573,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792290660200,
+        "symbol": "OpenAI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
+      },
       {
         "at": 1792290180368,
         "symbol": "AgenC",
@@ -2508,17 +2518,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 78.56% supply."
-      },
-      {
-        "at": 1792280251539,
-        "symbol": "IRIS",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1,
-          "bot": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 33.41% supply."
       }
     ],
     "reasonStats": {
@@ -2581,7 +2580,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792290707971,
+    "generatedAt": 1792291011447,
     "trades": {
       "count": 141,
       "wins": 57,
