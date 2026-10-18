@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e27351b5-1ac7-460b-8de1-b328984f1bdb",
-  "updatedAt": 1792330409054,
-  "generatedAt": "2026-10-18 20:33 WIB",
+  "generation": "b3d4dec5-96df-4c31-b68a-a099029fb48f",
+  "updatedAt": 1792330709137,
+  "generatedAt": "2026-10-18 20:38 WIB",
   "usdIdr": null,
   "totalUsd": 930.2622674458433,
   "nativeSymbol": "SOL",
@@ -1288,12 +1288,12 @@
     "pnlUsd": -69.73773255415665,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792330409054,
+    "heartbeatAt": 1792330709137,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.84,
-    "lastScanAt": 1792330403000,
+    "lastScanAt": 1792330701000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1330,9 +1330,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792330409054,
+      "lastDecisionAt": 1792330709137,
       "lastAction": "keputusan",
-      "lastReason": "Altai [low]: Dilewati karena red flag: insider/entrapment pegang 26%."
+      "lastReason": "PUMP [big]: Dilewati: unsupported_extension."
     }
   },
   "strategy": {
@@ -1363,7 +1363,7 @@
       ],
       [
         "Label wallet",
-        "smart 11340 · bot 3283 · blacklist 384 · lp 1 · fresh 997 · kol 179 · dolphin 366 · whale 7 · unknown 31"
+        "smart 11364 · bot 3289 · blacklist 384 · lp 1 · fresh 998 · kol 179 · dolphin 366 · whale 7"
       ]
     ],
     "requirements": [
@@ -1419,21 +1419,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 11340,
+          "total": 11364,
           "active": 449,
-          "passive": 10891
+          "passive": 10915
         },
         {
           "key": "bot",
-          "total": 3283,
+          "total": 3289,
           "active": 0,
-          "passive": 3283
+          "passive": 3289
         },
         {
           "key": "fresh",
-          "total": 997,
+          "total": 998,
           "active": 0,
-          "passive": 997
+          "passive": 998
         },
         {
           "key": "blacklist",
@@ -1452,12 +1452,6 @@
           "total": 179,
           "active": 6,
           "passive": 173
-        },
-        {
-          "key": "unknown",
-          "total": 31,
-          "active": 0,
-          "passive": 31
         },
         {
           "key": "whale",
@@ -1573,6 +1567,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792330626120,
+        "symbol": "PUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: unsupported_extension."
+      },
       {
         "at": 1792330396411,
         "symbol": "Altai",
@@ -2456,43 +2468,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: bundler pegang 60.71% supply."
-      },
-      {
-        "at": 1792307489358,
-        "symbol": "XTV",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 642,
-            "note": "bundler pegang 9.7%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 10.3%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "10.6% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2555,7 +2530,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792330611838,
+    "generatedAt": 1792330911463,
     "trades": {
       "count": 141,
       "wins": 57,
