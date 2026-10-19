@@ -20,7 +20,8 @@ run_snapshot scripts/sync.mjs
 run_snapshot scripts/sync-meridian.mjs
 run_snapshot scripts/sync-ferari.mjs
 run_snapshot scripts/sync-charon.mjs
-run_snapshot scripts/sync-robsol.mjs
+# Robsol dibekukan (19 Okt 2026): wallet-nya tidak dipindai lagi; saldo dan
+# riwayat terakhir tetap tampil apa adanya sampai pemilik memberi wallet baru.
 run_snapshot scripts/sync-forex.mjs
 run_snapshot scripts/sync-binance.mjs
 run_snapshot scripts/sync-staking.mjs

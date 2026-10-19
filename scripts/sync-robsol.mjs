@@ -22,6 +22,8 @@ import { solanaPrices } from './lib/solana-prices.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'robsol');
+// Dibekukan: snapshot terakhir (saldo + riwayat) dipertahankan, wallet tidak dipindai.
+try { if (JSON.parse(readFileSync(resolve(DIR, 'live.json'), 'utf8')).frozen) { console.log('[robsol] dibekukan; tidak dipindai'); process.exit(0); } } catch { /* belum ada snapshot */ }
 const OUT = resolve(DIR, 'live.json');
 const WIB = 7 * 3600e3;
 const SOL_MINT = 'So11111111111111111111111111111111111111112';

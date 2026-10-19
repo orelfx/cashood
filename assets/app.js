@@ -469,7 +469,8 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
     stalePositions: snap.stalePositions || 0,
     ethPrice: Number(snap.ethPrice) || null,
     updatedAt: Number(snap.updatedAt) || null,
-    lpStale: age > 45 * 60e3,
+    frozen: snap.frozen || null,
+    lpStale: !snap.frozen && age > 45 * 60e3,
     partial: snap.quality?.complete !== true || positions.some(p => p.stale || p.unreadable),
     fetchedAt: Date.now(),
   };
@@ -4514,6 +4515,7 @@ async function load({ force = false } = {}) {
     const msgs = [...state.ledger.warnings];
     if (nav.partial) msgs.push('Data belum lengkap atau belum terverifikasi. Jangan gunakan sebagai dasar transaksi.');
     if (nav.lpStale) msgs.push(`Snapshot sumber sudah ${ago(nav.updatedAt)}. Semua saldo memakai snapshot, bukan saldo live.`);
+    if (nav.frozen) msgs.push(`Dana ini dibekukan sejak ${tglRingkas(nav.frozen.at)} WIB: wallet tidak dipindai lagi, saldo dan riwayat ditampilkan apa adanya.`);
     // Peringatan milik satu dana hanya tampil di halaman dana itu; halaman
     // ringkasan (beranda dll.) memuat dana bawaan di latar dan tidak boleh
     // mewarisi peringatannya.

@@ -61,3 +61,10 @@ test('Safe Box rejects stale, mixed-generation and unverified historical Index w
 test('Safe Box without a trusted snapshot publishes unavailable instead of inventing zero balances',()=>{
  const f=fixture();try{f.run('sync-safebox.mjs');const d=f.get('safebox/live.json');assert.equal(d.updatedAt,null);assert.equal(d.balanceUsd,undefined);assert.equal(d.quality.complete,false);assert.equal(existsSync(join(f.dir,'safebox/accrual-v3.local.json')),false);}finally{f.close();}
 });
+
+test('source quality: dana yang dibekukan tidak dianggap basi, dana biasa tetap dianggap basi', async () => {
+  const { sourceProblems } = await import('../scripts/lib/source-quality.mjs');
+  const now = Date.parse('2026-10-20T00:00:00Z'), old = now - 6 * 3600e3;
+  assert.deepEqual(sourceProblems('robsol', { updatedAt: old, frozen: { at: old }, quality: { complete: true } }, now), []);
+  assert.equal(sourceProblems('robsol', { updatedAt: old, quality: { complete: true } }, now).length, 1);
+});

@@ -5,7 +5,8 @@ export function sourceProblems(id, source, now) {
  if (!source) return [{id,reason:'sumber tidak tersedia'}];
  if (!Number.isFinite(source.updatedAt) || source.updatedAt<=0) reasons.push('waktu sumber tidak valid');
  else if (source.updatedAt>now+60_000) reasons.push('waktu sumber di masa depan');
- else if (now-source.updatedAt>MAX_SOURCE_AGE) reasons.push('sumber lebih lama dari 30 menit');
+ // Dana yang sengaja dibekukan (frozen) memang tidak diperbarui lagi; nilainya tetap.
+ else if (!source.frozen && now-source.updatedAt>MAX_SOURCE_AGE) reasons.push('sumber lebih lama dari 30 menit');
  if (source.quality?.complete!==true) reasons.push('kelengkapan sumber belum terverifikasi');
  if (source.quality?.estimated || source.quality?.degraded || source.quality?.allocationEstimated) reasons.push('sumber parsial atau estimasi');
  return reasons.map(reason=>({id,reason}));
