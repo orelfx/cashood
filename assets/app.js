@@ -3669,10 +3669,14 @@ async function loadSolbot() {
   return null;
 }
 function solbotChart(d) {
-  const pts = d.equityCurve || [];
+  // Setoran/penarikan tidak boleh tergambar sebagai lonjakan untung: titik
+  // sebelum arus dana digeser sebesar arus dana sesudahnya (sama seperti grafik
+  // dana lain), dan garis "modal" = modal bersih sekarang.
+  const fl = (d.flows || []).map((f) => ({ at: f.t, usd: f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd) }));
+  const pts = (d.equityCurve || []).map((p) => ({ t: p.t, usd: p.usd + flowsAfter(fl, p.t) }));
   if (pts.length < 2) return '<p class="hint">Grafik ekuitas muncul setelah beberapa titik terkumpul.</p>';
   const W = 720, H = 220, m = { t: 14, r: 64, b: 24, l: 8 };
-  const base = d.startCapitalUsd;
+  const base = d.basisUsd ?? d.startCapitalUsd;
   const vals = pts.map((p) => p.usd).concat(base > 0 ? [base] : []);
   let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.12 || Math.max(1, hi * 0.02); lo -= pad; hi += pad;
   const t0 = pts[0].t, t1 = pts.at(-1).t;
@@ -3687,8 +3691,9 @@ function solbotChart(d) {
     ${[hi - pad, lo + pad].map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${lbl(v)}</text>`).join('')}
     <path d="${path}L${x(t1).toFixed(1)},${H - m.b}L${x(t0).toFixed(1)},${H - m.b}Z" fill="url(#sbFill)"/>
     <path d="${path}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>
+    ${fl.filter((f) => f.at > t0 && f.at <= t1).map((f) => `<line x1="${x(f.at).toFixed(1)}" x2="${x(f.at).toFixed(1)}" y1="${m.t}" y2="${H - m.b}" class="g-flow"/><text x="${(x(f.at) + 4).toFixed(1)}" y="${m.t + 10}" class="g-flow-lbl">${f.usd < 0 ? 'penarikan' : 'setoran'} ${signedCompact(f.usd)}</text>`).join('')}
     ${[t0, t1].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)} WIB</text>`).join('')}
-  </svg>`;
+  </svg>${fl.length ? '<p class="hint">Grafik disesuaikan dengan setoran/penarikan, jadi modal yang masuk tidak terlihat sebagai untung.</p>' : ''}`;
 }
 async function renderSolbot() {
   const epoch = ++solbotEpoch;
@@ -3714,7 +3719,7 @@ async function renderSolbot() {
           <div class="n"><span class="${cls(d.changeUsd ?? 0)}">${sbUsd(d.changeUsd)} · ${sbPct(d.changePct)}</span> dari modal${d.netFlowUsd ? ' bersih' : ' awal'}</div>
           ${d.change24hPct != null ? `<div class="n">24 jam: <span class="${cls(d.change24hUsd ?? 0)}">${sbUsd(d.change24hUsd)} · ${sbPct(d.change24hPct)}</span></div>` : ''}</div>
         <div class="sb-eq-side">
-          <div><span class="k">Modal awal</span><b>${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}</b><small>${d.startCapitalSol != null ? `${Number(d.startCapitalSol).toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL` : ''}${d.netFlowUsd ? ` · arus dana ${sbUsd(d.netFlowUsd)}` : ''}</small></div>
+          <div><span class="k">Modal masuk</span><b>${d.basisUsd == null ? (d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)) : usd(d.basisUsd)}</b><small>awal ${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}${d.startCapitalSol != null ? ` (${Number(d.startCapitalSol).toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL)` : ''}${(d.flows || []).map((f) => ` · ${f.type === 'withdraw' ? 'tarik' : 'setor'} ${usd(Math.abs(f.usd))} ${esc(tglRingkas(f.t))}`).join('')}</small></div>
           <div><span class="k">Kas</span><b>${d.cashUsd == null ? '—' : usd(d.cashUsd)}</b><small>di luar posisi</small></div>
           <div><span class="k">Harga SOL</span><b>${d.solPriceUsd == null ? '—' : '$' + d.solPriceUsd.toFixed(2)}</b><small>${d.startedAt ? 'mulai ' + esc(sbWib(d.startedAt)) : ''}</small></div>
         </div>
@@ -3737,7 +3742,7 @@ async function renderSolbot() {
       </div></section>
     ${solbotPositionsHtml(d)}
     ${solbotClosedHtml(d)}
-    <section class="card sb-disc"><p>${SOLBOT_WARN}</p>${d.disclaimer ? `<p class="hint">${esc(d.disclaimer)}</p>` : ''}
+    <section class="card sb-disc"><p>${SOLBOT_WARN}</p>
       <p class="hint">Terpisah dari buku paper Devil Greed (grokbot/solana); angka SolBot tidak digabung dengan paper dan tidak masuk Cashood Index.</p></section>`);
   const month = $('#sbMonth');
   if (month) month.onchange = (e) => { solbotView.month = e.target.value; solbotView.page = 0; renderSolbot().catch(() => {}); };
@@ -3826,10 +3831,11 @@ function solbotClosedHtml(d) {
         ${months.map((m) => `<option value="${m}"${m === solbotView.month ? ' selected' : ''}>${label(m)} · ${all.filter((c) => c.closedAt && mon(c.closedAt) === m).length} posisi</option>`).join('')}</select></label>
       <span class="closed-sum"><b>${s.n}</b> posisi · hasil <b class="${cls(s.usd)}">${signed(s.usd)}</b> · <span class="pos">${s.w} untung</span> · <span class="neg">${s.l} rugi</span>${s.w + s.l ? ` · win rate ${pct((s.w / (s.w + s.l)) * 100, 1)}` : ''}${s.sim ? ` · ${s.sim} simulasi` : ''}</span>
     </div>
-    <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th>Mode</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+    ${t.trades ? `<p class="hint sb-tstat">Seluruh riwayat menurut bot: terbaik <b class="${cls(t.bestPct ?? 0)}">${sbPct(t.bestPct)}</b> · terburuk <b class="${cls(t.worstPct ?? 0)}">${sbPct(t.worstPct)}</b> · rata² lama posisi <b>${t.avgHoldMin == null ? '—' : dur(t.avgHoldMin)}</b>${d.feesUsd != null ? ` · total biaya (fee/gas) <b>${usd(d.feesUsd)}</b>` : ''}</p>` : ''}
+    <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th class="num">Modal</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
     ${rows.map((c) => `<tr${c.simulated ? ' class="sb-simrow"' : ''}>
-      <td class="mc-head"><span class="who"><span class="chip" style="background:${(c.pnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol)}</span></td>
-      <td data-k="Mode">${c.simulated ? '<span class="pill sb-sim">simulasi</span>' : '<span class="dim">uang asli</span>'}</td>
+      <td class="mc-head"><span class="who"><span class="chip" style="background:${(c.pnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol)}</span>${c.simulated ? ' <span class="pill sb-sim">simulasi</span>' : ''}</td>
+      <td class="num" data-k="Modal">${c.sizeUsd == null ? '—' : usd(c.sizeUsd)}</td>
       <td class="num dim" data-k="Lama">${c.openedAt && c.closedAt ? dur((c.closedAt - c.openedAt) / 60000) : '—'}</td>
       <td class="num ${cls(c.pnlUsd ?? 0)}" data-k="Hasil">${sbUsd(c.pnlUsd)}</td>
       <td class="num ${cls(c.pnlPct ?? 0)}" data-k="%">${sbPct(c.pnlPct)}</td>

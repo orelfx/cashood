@@ -76,6 +76,8 @@ const trade = (c) => ({
   entryPriceUsd: px(c.entry_price_usd), exitPriceUsd: px(c.exit_price_usd), pnlUsd: r2(c.pnl_usd), pnlPct: r2(c.pnl_pct),
   exitReason: EXITS.includes(String(c.exit_reason).toUpperCase()) ? String(c.exit_reason).toUpperCase() : text(c.exit_reason, 16),
   simulated: c.simulated === true, exitNote: text(c.exit_note, 200),
+  // Modal yang dipakai trade ini: dari bot kalau ada, kalau tidak dihitung dari PnL $ dan %.
+  sizeUsd: r2(c.size_usd) ?? (num(c.pnl_usd) != null && num(c.pnl_pct) ? r2(num(c.pnl_usd) / (num(c.pnl_pct) / 100)) : null),
 });
 const arr = (v) => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []);
 const positions = arr(src.positions).map(position).sort((a, b) => (b.valueUsd ?? 0) - (a.valueUsd ?? 0));
@@ -95,7 +97,7 @@ const closedStat = (list) => {
 const startUsd = r2(src.start_capital_usd), equityUsd = r2(src.equity_usd);
 // Field tambahan (opsional, aditif di v1): arus dana, biaya, untung terealisasi.
 // Nama field t/usd/sol (spesifikasi) atau at/amount_usd/amount_sol (yang dikirim bot) sama-sama diterima.
-const flows = arr(src.flows).map((f) => ({ t: time(f.t ?? f.at), usd: r2(f.usd ?? f.amount_usd), sol: r4(f.sol ?? f.amount_sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null }))
+const flows = arr(src.flows).map((f) => ({ t: time(f.t ?? f.at), usd: r2(f.usd ?? f.amount_usd), sol: r4(f.sol ?? f.amount_sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null, note: text(f.note, 200) }))
   .filter((f) => f.t && f.usd != null && f.type).sort((a, b) => a.t - b.t);
 const netFlowUsd = flows.length ? r2(flows.reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0)) : 0;
 const basisUsd = startUsd > 0 ? r2(startUsd + netFlowUsd) : null;   // modal awal + setoran − penarikan
@@ -116,6 +118,7 @@ const snapshot = {
   basisUsd, netFlowUsd, flows,
   change24hUsd: day && equityUsd != null ? r2(equityUsd - day.usd - flows24) : null,
   change24hPct: day && day.usd > 0 && equityUsd != null ? r2(((equityUsd - flows24) / day.usd - 1) * 100) : null,
+  capitalInUsd: r2(src.capital_in_usd), botNetPnlUsd: r2(src.net_pnl_usd), botNetPnlPct: r2(src.net_pnl_pct),
   realizedPnlUsd: r2(src.realized_pnl_usd), unrealizedPnlUsd: r2(src.unrealized_pnl_usd), feesUsd: r2(src.fees_usd),
   strategy: text(src.strategy, 300),
   totals: { trades: num(st.trades_total), wins: num(st.wins), losses: num(st.losses), winRatePct: r2(st.win_rate_pct), bestPct: r2(st.best_trade_pct), worstPct: r2(st.worst_trade_pct), avgHoldMin: r2(st.avg_hold_min) },
