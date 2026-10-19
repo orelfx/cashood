@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "34ba998f-8fce-4ccb-892e-016790c43242",
-  "updatedAt": 1792426650319,
-  "generatedAt": "2026-10-19 23:17 WIB",
+  "generation": "54a8add3-4bcc-4a35-ad5f-786062cdcde9",
+  "updatedAt": 1792426950496,
+  "generatedAt": "2026-10-19 23:22 WIB",
   "usdIdr": null,
   "totalUsd": 924.5905135094347,
   "nativeSymbol": "SOL",
@@ -1330,12 +1330,12 @@
     "pnlUsd": -75.40948649056531,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792426650319,
+    "heartbeatAt": 1792426950496,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.4,
-    "lastScanAt": 1792426616000,
+    "lastScanAt": 1792426944000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1372,9 +1372,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792426650319,
+      "lastDecisionAt": 1792426950496,
       "lastAction": "keputusan",
-      "lastReason": "AgenC [low]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      "lastReason": "PUMP [big]: Dilewati: unsupported_extension."
     }
   },
   "strategy": {
@@ -1405,7 +1405,7 @@
       ],
       [
         "Label wallet",
-        "smart 12283 · bot 4398 · blacklist 418 · lp 1 · fresh 1072 · kol 194 · dolphin 294 · whale 6"
+        "smart 12281 · bot 4401 · blacklist 418 · lp 1 · fresh 1071 · kol 194 · dolphin 294 · whale 6"
       ]
     ],
     "requirements": [
@@ -1461,21 +1461,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 12283,
+          "total": 12281,
           "active": 420,
-          "passive": 11863
+          "passive": 11861
         },
         {
           "key": "bot",
-          "total": 4398,
+          "total": 4401,
           "active": 0,
-          "passive": 4398
+          "passive": 4401
         },
         {
           "key": "fresh",
-          "total": 1072,
+          "total": 1071,
           "active": 0,
-          "passive": 1072
+          "passive": 1071
         },
         {
           "key": "blacklist",
@@ -1598,17 +1598,35 @@
           "trusted": false
         },
         {
-          "alias": "smart #2877",
+          "alias": "smart #9703",
           "label": "smart",
-          "score": 96.9,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
+          "score": 96.8,
+          "copied": 1,
+          "won": 1,
+          "pnlUsd": 5.0658222072215215,
           "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1792426679939,
+        "symbol": "PUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "kol": 2,
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: unsupported_extension."
+      },
       {
         "at": 1792426528626,
         "symbol": "AgenC",
@@ -1665,24 +1683,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 20%."
-      },
-      {
-        "at": 1792425229902,
-        "symbol": "PUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "kol": 2,
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: unsupported_extension."
       },
       {
         "at": 1792425049862,
@@ -2608,7 +2608,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792426915576,
+    "generatedAt": 1792427210269,
     "trades": {
       "count": 146,
       "wins": 59,
