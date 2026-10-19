@@ -3577,7 +3577,7 @@ async function renderDuel(key) {
   setHTML(body, `<section class="card">
       <div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
       <p class="lead">${cfg.lead(d)}</p>
-      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${d.phase === 'warmup' ? ' · <b>warmup</b> (belum dinilai)' : ''}${d.startedAt ? ` · T0 ${tglRingkas(d.startedAt)}${d.t0Pin ? ' (dipatok Cashood)' : ''}` : ''}${hashTxt(d.t0Pin?.prereg12 ? d.t0Pin : pr)}</p>
+      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${d.phase === 'warmup' ? ' · <b>warmup</b> (belum dinilai)' : ''}${d.startedAt ? ` · T0 ${tglRingkas(d.startedAt)}${d.t0Pin ? ' (dipatok Cashood)' : ''}` : ''}${hashTxt(d.t0Pin?.prereg12 ? d.t0Pin : pr)}${d.hashCheck && d.hashCheck !== 'set' ? ` · <span class="dim">${esc(d.hashCheck)}</span>` : ''}</p>
       ${(d.warnings || []).length ? `<div role="alert">${d.warnings.map((w) => { const i = w.indexOf(':'); return `<p class="neg"><b>⚠ ${esc(i > 0 ? w.slice(0, i) : 'Peringatan')}:</b> ${esc(i > 0 ? w.slice(i + 1).trim() : w)}</p>`; }).join('')}</div>` : ''}
       <div class="grr-tiles${books.length === 2 ? ' n2' : ''}">${tiles}</div>
       <div class="grr-legend">${books.map(([, n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>

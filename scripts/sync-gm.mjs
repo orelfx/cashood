@@ -105,12 +105,29 @@ const iso = (t) => new Date(t + 7 * 3600e3).toISOString().slice(0, 16).replace('
 let pin = readJSON(PIN) || readJSON(PIN_BACKUP);
 if (pin && !Number.isFinite(pin.startedAt)) pin = null;
 if (pin && !existsSync(PIN)) atomicJSON(PIN, pin);
-if (!pin && engineT0 && phase !== 'warmup') {
+// Fase resmi yang dinilai: "scored" ("live" diterima untuk kompatibilitas).
+// Fase kosong/null/"warmup" tidak pernah mematok T0. T0 juga tidak dipatok
+// selama hash pra-registrasi atau parameter belum ada.
+const SCORED = phase === 'scored' || phase === 'live';
+const hashesReady = Boolean(pr?.prereg12 && pr?.params12);
+// Hash final yang diharapkan (diisi di data/funds.json → gm.expectedHashes saat T0).
+const funds = readJSON(process.env.GM_FUNDS || resolve(HERE, '..', 'data', 'funds.json'), {});
+const expected = { prereg12: hash12(funds?.gm?.expectedHashes?.prereg12), params12: hash12(funds?.gm?.expectedHashes?.params12) };
+const expectedSet = Boolean(expected.prereg12 || expected.params12);
+if (!pin && engineT0 && SCORED && !hashesReady)
+  warnings.push('T0 belum dipatok: mesin sudah di fase dinilai, tetapi hash pra-registrasi atau parameter belum dikirim.');
+if (!pin && engineT0 && SCORED && hashesReady) {
   pin = { fund: 'gm', startedAt: engineT0, pinnedAt: now, version: pr?.version ?? null, prereg12: pr?.prereg12 ?? null, params12: pr?.params12 ?? null };
   atomicJSON(PIN, pin);
   console.log(`[gm] T0 dipatok: ${iso(engineT0)}`);
 }
 const t0 = pin?.startedAt ?? null;
+// Cocokkan hash (yang dipatok, atau yang dikirim mesin kalau belum dipatok) dengan hash final.
+const shown = pin?.prereg12 ? pin : pr;
+if (expectedSet) {
+  for (const [k, name] of [['prereg12', 'pra-registrasi'], ['params12', 'parameter']])
+    if (expected[k] && shown?.[k] !== expected[k]) warnings.push(`Hash ${name} tidak cocok dengan hash final: diharapkan ${expected[k]}, dari mesin ${shown?.[k] ?? 'tidak ada'}.`);
+}
 if (pin && engineT0 && engineT0 !== pin.startedAt)
   warnings.push(`T0 berubah: mesin sekarang mengirim ${iso(engineT0)}, padahal T0 yang dipatok ${iso(pin.startedAt)}. Cashood tetap memakai T0 yang dipatok.`);
 if (pin && pin.prereg12 && pr?.prereg12 !== pin.prereg12)
@@ -133,7 +150,7 @@ const mer = meridianData();
 
 // Kolom pembanding: dihitung di sini dari data dana Meridian, bukan dari mesin.
 function meridianLive() {
-  if (!t0) return { status: 'waiting_t0', note: phase === 'warmup' ? 'Menunggu T0: mesin paper masih warmup.' : 'Menunggu T0: mesin paper belum menetapkan waktu mulai.' };
+  if (!t0) return { status: 'waiting_t0', note: phase === 'warmup' ? 'Menunggu T0: mesin paper masih warmup.' : SCORED ? 'Menunggu T0: hash pra-registrasi/parameter belum lengkap.' : 'Menunggu T0: mesin paper belum masuk fase dinilai.' };
   const res = mer.flows ? linkedDietz({ points: mer.points, flows: mer.flows, t0 }) : null;
   if (!res) return { status: 'unavailable', note: 'Data dana Meridian di Cashood belum cukup untuk menghitung hasil sejak T0.' };
   const gap = start > 0 ? (start / res.startNavUsd - 1) * 100 : null;
@@ -188,6 +205,7 @@ const snapshot = {
   stale: now - updatedAt > 20 * 60e3,
   t0Pin: pin ? { startedAt: pin.startedAt, pinnedAt: pin.pinnedAt, version: pin.version, prereg12: pin.prereg12, params12: pin.params12 } : null,
   preregistration: pr,
+  hashCheck: expectedSet ? 'set' : 'hash final belum ditetapkan',
   warnings,
   challenger,
   shadows: (Array.isArray(src.shadows) ? src.shadows : []).slice(0, 8).map(shadow),

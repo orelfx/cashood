@@ -48,7 +48,7 @@ function runSync(engine, meridian, dir = setup(meridian), extraEnv = {}) {
   const data = join(dir, 'data');
   const src = join(dir, 'grok-meridian.json'); writeFileSync(src, JSON.stringify(engine));
   const run = spawnSync(process.execPath, [join(ROOT, 'scripts', 'sync-gm.mjs')], {
-    env: { ...process.env, GM_STATE: src, CASHOOD_DATA_DIR: data, GM_PIN_BACKUP: join(dir, 'no-backup.json'), ...extraEnv }, encoding: 'utf8' });
+    env: { ...process.env, GM_STATE: src, CASHOOD_DATA_DIR: data, GM_PIN_BACKUP: join(dir, 'no-backup.json'), GM_FUNDS: join(dir, 'no-funds.json'), ...extraEnv }, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   return JSON.parse(readFileSync(join(data, 'gm', 'live.json'), 'utf8'));
 }
@@ -57,7 +57,8 @@ const meridian = {
   'live.json': { updatedAt: D0 + 48 * H, totalUsd: 165, quality: { complete: true } },
   'config.json': { events: [{ type: 'deposit', usd: 50, at: D0 + 36 * H }] },
 };
-const engine = { paperOnly: true, updatedAt: D0 + 48 * H, startCapitalUsd: 100, challenger: { label: 'x', pctSinceStart: 3 },
+const P1 = { version: 'v1', sha256Prereg: 'a'.repeat(64), sha256Params: 'b'.repeat(64) };
+const engine = { paperOnly: true, phase: 'scored', preregistration: P1, updatedAt: D0 + 48 * H, startCapitalUsd: 100, challenger: { label: 'x', pctSinceStart: 3 },
   live: { pctSinceStart: 999, netFlowsUsd: -1, equityUsd: 1 } };
 
 test('sync-gm: kolom live dihitung dari data Meridian, blok live mesin diabaikan', () => {
@@ -77,7 +78,6 @@ test('sync-gm: tanpa startedAt → live menunggu T0', () => {
   assert.equal(out.live.pctSinceStart, undefined);
 });
 
-const P1 = { version: 'v1', sha256Prereg: 'a'.repeat(64), sha256Params: 'b'.repeat(64) };
 
 test('warmup: T0 tidak dipatok, live menunggu T0', () => {
   const dir = setup(meridian);
@@ -131,4 +131,45 @@ test('DD Grok dihitung harian dari dailyEquity dengan arus dana Cashood', () => 
   const noDaily = runSync({ ...engine, startedAt: D0, challenger: { ...engine.challenger, netFlowsUsd: 50, maxDrawdownPct: -1 } }, meridian);
   assert.equal(noDaily.challenger.maxDrawdownPct, null);
   assert.match(noDaily.challenger.ddNote, /dailyEquity/);
+});
+
+test('fase: tanpa phase tidak dipatok; "scored" dan "live" mematok', () => {
+  const { phase, ...noPhase } = engine;
+  const a = runSync({ ...noPhase, startedAt: D0 }, meridian);
+  assert.equal(a.startedAt, null);
+  assert.equal(a.live.status, 'waiting_t0');
+  const b = runSync({ ...engine, phase: null, startedAt: D0 }, meridian);
+  assert.equal(b.startedAt, null);
+  assert.equal(runSync({ ...engine, phase: 'scored', startedAt: D0 }, meridian).startedAt, D0);
+  assert.equal(runSync({ ...engine, phase: 'live', startedAt: D0 }, meridian).startedAt, D0);
+});
+
+test('hash kosong: T0 tidak dipatok dan ada peringatan', () => {
+  const dir = setup(meridian);
+  const out = runSync({ ...engine, startedAt: D0, preregistration: { version: 'v1', sha256Prereg: 'a'.repeat(64) } }, meridian, dir);
+  assert.equal(out.startedAt, null);
+  assert.ok(out.warnings.some((w) => /T0 belum dipatok/.test(w)));
+  assert.equal(existsSync(join(dir, 'data', 'gm', 't0.local.json')), false);
+  const none = runSync({ ...engine, startedAt: D0, preregistration: null }, meridian);
+  assert.equal(none.startedAt, null);
+});
+
+test('hash final: kosong = belum ditetapkan; cocok tanpa peringatan; beda diperingatkan', () => {
+  const dir = setup(meridian), funds = join(dir, 'funds.json');
+  const empty = runSync({ ...engine, startedAt: D0 }, meridian, dir);
+  assert.equal(empty.hashCheck, 'hash final belum ditetapkan');
+  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: 'bbbbbbbbbbbb' } } }));
+  const ok = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds });
+  assert.equal(ok.hashCheck, 'set');
+  assert.ok(!ok.warnings.some((w) => /hash final/.test(w)));
+  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: 'cccccccccccc' } } }));
+  const bad = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds });
+  assert.ok(bad.warnings.some((w) => /Hash parameter tidak cocok dengan hash final/.test(w)));
+  assert.ok(!bad.warnings.some((w) => /Hash pra-registrasi tidak cocok/.test(w)));
+});
+
+test('funds.json di repo: entri gm punya expectedHashes kosong', () => {
+  const f = JSON.parse(readFileSync(join(ROOT, 'data', 'funds.json'), 'utf8'));
+  assert.equal(f.gm.risk, 'paper');
+  assert.equal(f.gm.expectedHashes.prereg12, '');
 });
