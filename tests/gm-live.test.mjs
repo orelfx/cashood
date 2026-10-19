@@ -44,11 +44,14 @@ function setup(meridian) {
   for (const [n, v] of Object.entries(meridian)) writeFileSync(join(data, 'meridian', n), JSON.stringify(v));
   return dir;
 }
+// Hash final yang cocok dengan P1 (default semua tes; tes tertentu menimpanya).
+const MATCH = { gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: 'bbbbbbbbbbbb' } } };
 function runSync(engine, meridian, dir = setup(meridian), extraEnv = {}) {
   const data = join(dir, 'data');
+  const funds = join(dir, 'funds-match.json'); writeFileSync(funds, JSON.stringify(MATCH));
   const src = join(dir, 'grok-meridian.json'); writeFileSync(src, JSON.stringify(engine));
   const run = spawnSync(process.execPath, [join(ROOT, 'scripts', 'sync-gm.mjs')], {
-    env: { ...process.env, GM_STATE: src, CASHOOD_DATA_DIR: data, GM_PIN_BACKUP: join(dir, 'no-backup.json'), GM_FUNDS: join(dir, 'no-funds.json'), ...extraEnv }, encoding: 'utf8' });
+    env: { ...process.env, GM_STATE: src, CASHOOD_DATA_DIR: data, GM_PIN_BACKUP: join(dir, 'no-backup.json'), GM_FUNDS: funds, ...extraEnv }, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   return JSON.parse(readFileSync(join(data, 'gm', 'live.json'), 'utf8'));
 }
@@ -133,7 +136,7 @@ test('DD Grok dihitung harian dari dailyEquity dengan arus dana Cashood', () => 
   assert.match(noDaily.challenger.ddNote, /dailyEquity/);
 });
 
-test('fase: tanpa phase tidak dipatok; "scored" dan "live" mematok', () => {
+test('fase: hanya "scored" yang mematok (tanpa phase, null, "live" tidak)', () => {
   const { phase, ...noPhase } = engine;
   const a = runSync({ ...noPhase, startedAt: D0 }, meridian);
   assert.equal(a.startedAt, null);
@@ -141,7 +144,7 @@ test('fase: tanpa phase tidak dipatok; "scored" dan "live" mematok', () => {
   const b = runSync({ ...engine, phase: null, startedAt: D0 }, meridian);
   assert.equal(b.startedAt, null);
   assert.equal(runSync({ ...engine, phase: 'scored', startedAt: D0 }, meridian).startedAt, D0);
-  assert.equal(runSync({ ...engine, phase: 'live', startedAt: D0 }, meridian).startedAt, D0);
+  assert.equal(runSync({ ...engine, phase: 'live', startedAt: D0 }, meridian).startedAt, null);
 });
 
 test('hash kosong: T0 tidak dipatok dan ada peringatan', () => {
@@ -154,18 +157,33 @@ test('hash kosong: T0 tidak dipatok dan ada peringatan', () => {
   assert.equal(none.startedAt, null);
 });
 
-test('hash final: kosong = belum ditetapkan; cocok tanpa peringatan; beda diperingatkan', () => {
+test('hash final: T0 hanya dipatok kalau kedua hash final terisi dan persis sama', () => {
   const dir = setup(meridian), funds = join(dir, 'funds.json');
-  const empty = runSync({ ...engine, startedAt: D0 }, meridian, dir);
+  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: '', params12: '' } } }));
+  const empty = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds });
   assert.equal(empty.hashCheck, 'hash final belum ditetapkan');
-  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: 'bbbbbbbbbbbb' } } }));
-  const ok = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds });
-  assert.equal(ok.hashCheck, 'set');
-  assert.ok(!ok.warnings.some((w) => /hash final/.test(w)));
+  assert.equal(empty.startedAt, null);
+  assert.equal(empty.t0Wait, 'menunggu T0 (hash final belum cocok)');
+  assert.equal(empty.live.label, 'menunggu T0 (hash final belum cocok)');
+  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: '' } } }));
+  assert.equal(runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds }).startedAt, null);
   writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: 'cccccccccccc' } } }));
   const bad = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds });
+  assert.equal(bad.startedAt, null);
+  assert.equal(bad.t0Wait, 'menunggu T0 (hash final belum cocok)');
   assert.ok(bad.warnings.some((w) => /Hash parameter tidak cocok dengan hash final/.test(w)));
-  assert.ok(!bad.warnings.some((w) => /Hash pra-registrasi tidak cocok/.test(w)));
+  assert.equal(existsSync(join(dir, 'data', 'gm', 't0.local.json')), false);
+  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: 'aaaaaaaaaaaa', params12: 'bbbbbbbbbbbb' } } }));
+  const ok = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds });
+  assert.equal(ok.startedAt, D0);
+  assert.equal(ok.t0Wait, null);
+  assert.ok(!ok.warnings.some((w) => /hash final/.test(w)));
+});
+
+test('hash final cocok tetapi phase bukan scored: tidak dipatok', () => {
+  const out = runSync({ ...engine, phase: 'warmup', startedAt: D0 }, meridian);
+  assert.equal(out.startedAt, null);
+  assert.equal(out.t0Wait, 'menunggu T0 (warmup)');
 });
 
 test('funds.json di repo: entri gm punya expectedHashes kosong', () => {
