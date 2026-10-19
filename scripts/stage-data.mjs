@@ -48,7 +48,9 @@ for(const fund of ['grr','gm']){
  try{
   const dir=resolve(ROOT,'data',fund),live=readJSON(resolve(dir,'live.json'));
   if(live){assertPublic(live);atomicJSON(resolve(destination,fund,'live.json'),live);
-   const nav=readJSON(resolve(dir,'nav.json'));if(nav){assertPublic(nav);atomicJSON(resolve(destination,fund,'nav.json'),nav);}}
+   const nav=readJSON(resolve(dir,'nav.json'));if(nav){assertPublic(nav);atomicJSON(resolve(destination,fund,'nav.json'),nav);}
+   // GM: T0 yang dipatok Cashood ikut terbit, supaya tidak bisa digeser diam-diam.
+   const pin=readJSON(resolve(dir,'t0.local.json'));if(pin){assertPublic(pin);atomicJSON(resolve(destination,fund,'t0.json'),pin);}}
  }catch(err){console.error(`[stage] ${fund}: ${err.message}`);failed=true;}
 }
 // Valid other funds may still publish, but the operator gets a nonzero status.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,12 +38,17 @@ test('meridianFlows: reinvest dilewati, pasangan jual-beli saham saling hapus, o
   assert.equal(f.filter((x) => x.kind === 'outflow').length, 1);
 });
 
-function runSync(engine, meridian) {
+function setup(meridian) {
   const dir = mkdtempSync(join(tmpdir(), 'gm-')), data = join(dir, 'data');
   mkdirSync(join(data, 'meridian'), { recursive: true });
   for (const [n, v] of Object.entries(meridian)) writeFileSync(join(data, 'meridian', n), JSON.stringify(v));
+  return dir;
+}
+function runSync(engine, meridian, dir = setup(meridian), extraEnv = {}) {
+  const data = join(dir, 'data');
   const src = join(dir, 'grok-meridian.json'); writeFileSync(src, JSON.stringify(engine));
-  const run = spawnSync(process.execPath, [join(ROOT, 'scripts', 'sync-gm.mjs')], { env: { ...process.env, GM_STATE: src, CASHOOD_DATA_DIR: data }, encoding: 'utf8' });
+  const run = spawnSync(process.execPath, [join(ROOT, 'scripts', 'sync-gm.mjs')], {
+    env: { ...process.env, GM_STATE: src, CASHOOD_DATA_DIR: data, GM_PIN_BACKUP: join(dir, 'no-backup.json'), ...extraEnv }, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
   return JSON.parse(readFileSync(join(data, 'gm', 'live.json'), 'utf8'));
 }
@@ -70,4 +75,60 @@ test('sync-gm: tanpa startedAt → live menunggu T0', () => {
   const out = runSync(engine, meridian);
   assert.equal(out.live.status, 'waiting_t0');
   assert.equal(out.live.pctSinceStart, undefined);
+});
+
+const P1 = { version: 'v1', sha256Prereg: 'a'.repeat(64), sha256Params: 'b'.repeat(64) };
+
+test('warmup: T0 tidak dipatok, live menunggu T0', () => {
+  const dir = setup(meridian);
+  const out = runSync({ ...engine, startedAt: D0, phase: 'warmup' }, meridian, dir);
+  assert.equal(out.startedAt, null);
+  assert.equal(out.live.status, 'waiting_t0');
+  assert.equal(existsSync(join(dir, 'data', 'gm', 't0.local.json')), false);
+});
+
+test('T0 dipatok sekali; startedAt/hash yang berubah memunculkan peringatan', () => {
+  const dir = setup(meridian);
+  const a = runSync({ ...engine, startedAt: D0, preregistration: P1 }, meridian, dir);
+  assert.equal(a.startedAt, D0);
+  assert.equal(a.t0Pin.prereg12, 'aaaaaaaaaaaa');
+  assert.ok(!a.warnings.some((w) => /T0 berubah|Hash/.test(w)));
+  const b = runSync({ ...engine, startedAt: D0 + 2 * H, preregistration: { ...P1, sha256Prereg: 'c'.repeat(64) } }, meridian, dir);
+  assert.equal(b.startedAt, D0);
+  assert.equal(b.engineStartedAt, D0 + 2 * H);
+  assert.ok(b.warnings.some((w) => w.startsWith('T0 berubah')));
+  assert.ok(b.warnings.some((w) => /Hash pra-registrasi berubah/.test(w)));
+  assert.ok(!b.warnings.some((w) => /Hash parameter/.test(w)));
+  assert.equal(b.live.pctSinceStart, a.live.pctSinceStart);
+});
+
+test('T0 dipulihkan dari salinan terbit kalau berkas lokal hilang', () => {
+  const dir = setup(meridian), backup = join(dir, 't0.json');
+  writeFileSync(backup, JSON.stringify({ fund: 'gm', startedAt: D0, pinnedAt: D0, prereg12: null, params12: null }));
+  const out = runSync({ ...engine, startedAt: D0 + H }, meridian, dir, { GM_PIN_BACKUP: backup });
+  assert.equal(out.startedAt, D0);
+  assert.ok(out.warnings.some((w) => w.startsWith('T0 berubah')));
+});
+
+test('cek arus dana: cocok tanpa peringatan, selisih > $1 diperingatkan', () => {
+  const ok = runSync({ ...engine, startedAt: D0, challenger: { ...engine.challenger, netFlowsUsd: 50 } }, meridian);
+  assert.ok(!ok.warnings.some((w) => /Arus dana|arus dana/.test(w)));
+  assert.equal(ok.challenger.cashoodNetFlowsUsd, 50);
+  const bad = runSync({ ...engine, startedAt: D0, challenger: { ...engine.challenger, netFlowsUsd: 48 } }, meridian);
+  assert.ok(bad.warnings.some((w) => w.startsWith('Arus dana tidak cocok')));
+  const none = runSync({ ...engine, startedAt: D0 }, meridian);
+  assert.ok(none.warnings.some((w) => /belum melaporkan arus dana/.test(w)));
+});
+
+test('DD Grok dihitung harian dari dailyEquity dengan arus dana Cashood', () => {
+  const ch = { ...engine.challenger, netFlowsUsd: 50, pctSinceStart: Number(((0.9 * (1 + 5 / 115) - 1) * 100).toFixed(2)),
+    dailyEquity: [{ t: D0, equityUsd: 100 }, { t: D0 + 24 * H, equityUsd: 90 }, { t: D0 + 48 * H, equityUsd: 145 }] };
+  const out = runSync({ ...engine, startedAt: D0, challenger: ch }, meridian);
+  // hari 1: -10%; hari 2: (145-90-50)/(90+25) = 5/115
+  assert.equal(out.challenger.maxDrawdownPct, -10);
+  assert.equal(out.challenger.ddBasis, 'harian');
+  assert.ok(!out.warnings.some((w) => /Persen Grok/.test(w)));
+  const noDaily = runSync({ ...engine, startedAt: D0, challenger: { ...engine.challenger, netFlowsUsd: 50, maxDrawdownPct: -1 } }, meridian);
+  assert.equal(noDaily.challenger.maxDrawdownPct, null);
+  assert.match(noDaily.challenger.ddNote, /dailyEquity/);
 });

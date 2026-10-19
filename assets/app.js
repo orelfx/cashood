@@ -3573,13 +3573,16 @@ async function renderDuel(key) {
     .sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
   const bin = cfg.seatCol === 'bin';
   const pr = d.preregistration;
+  const hashTxt = (h) => (h?.prereg12 ? ` · pra-registrasi ${esc(h.version || '')} <span class="dim">${esc(h.prereg12)}</span>${h.params12 ? ` · parameter <span class="dim">${esc(h.params12)}</span>` : ''}` : '');
   setHTML(body, `<section class="card">
       <div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
       <p class="lead">${cfg.lead(d)}</p>
-      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${pr?.prereg12 ? ` · pra-registrasi ${esc(pr.version || '')} <span class="dim">${esc(pr.prereg12)}</span>${pr.params12 ? ` · parameter <span class="dim">${esc(pr.params12)}</span>` : ''}` : ''}</p>
+      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${d.phase === 'warmup' ? ' · <b>warmup</b> (belum dinilai)' : ''}${d.startedAt ? ` · T0 ${tglRingkas(d.startedAt)}${d.t0Pin ? ' (dipatok Cashood)' : ''}` : ''}${hashTxt(d.t0Pin?.prereg12 ? d.t0Pin : pr)}</p>
+      ${(d.warnings || []).length ? `<div role="alert">${d.warnings.map((w) => { const i = w.indexOf(':'); return `<p class="neg"><b>⚠ ${esc(i > 0 ? w.slice(0, i) : 'Peringatan')}:</b> ${esc(i > 0 ? w.slice(i + 1).trim() : w)}</p>`; }).join('')}</div>` : ''}
       <div class="grr-tiles${books.length === 2 ? ' n2' : ''}">${tiles}</div>
       <div class="grr-legend">${books.map(([, n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>
       ${chart}
+      ${paper.map(([, n, , b]) => (b?.ddNote ? `<p class="hint">${esc(n)}: ${esc(b.ddNote)}</p>` : '')).join('')}
     </section>
     <section class="card"><div class="card-head"><h2>Per buku</h2><span class="hint">hasil kertas setelah fee dan biaya</span></div>
       <div class="table-scroll"><table class="mcards"><thead><tr><th>Buku</th><th class="num">Close</th><th class="num">Win rate</th><th class="num">Rata² menang</th><th class="num">Rata² kalah</th><th class="num">Fee</th><th class="num">Biaya</th></tr></thead>
