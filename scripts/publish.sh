@@ -25,6 +25,7 @@ run_snapshot scripts/sync-forex.mjs
 run_snapshot scripts/sync-binance.mjs
 run_snapshot scripts/sync-staking.mjs
 run_snapshot scripts/sync-grr.mjs
+run_snapshot scripts/sync-gm.mjs
 # Buku paper devil greed: bot-nya menaruh berkas di kotak masuk; diimpor kalau ada.
 run_paper() {
   [ -f "$2" ] || return 0
@@ -47,7 +48,7 @@ run_snapshot scripts/sync-safebox.mjs
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
   git add -- reborn meridian ferari robsol staking grr charon forex binance safebox index
-  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh
+  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh; [ -d gm ] && git add -- gm
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 # Retry an earlier unpushed commit even when there are no file changes this run.

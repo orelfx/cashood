@@ -2593,6 +2593,7 @@ function parseHash() {
   if (parts[0] === 'safebox') return { safebox: true, tab: 'portfolio' };
   if (parts[0] === 'index') return { index: true, tab: 'portfolio' };
   if (parts[0] === 'grr') return { grr: true, tab: 'portfolio' };
+  if (parts[0] === 'gm') return { gm: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
@@ -2626,7 +2627,7 @@ function navItems(key) {
     .map((f) => ({ attr: `data-fund="${esc(f.id)}"`, name: f.label, sub: f.chain, accent: f.accent, on: state.view === 'fund' && f.id === state.fund }));
   if (state.safebox && (state.safebox.risk || 'low') === key) items.push({ attr: 'data-view="safebox"', name: state.safebox.label, sub: state.safebox.subtitle, accent: state.safebox.accent, on: state.view === 'safebox' });
   if (state.index && (state.index.risk || 'low') === key) items.push({ attr: 'data-view="index"', name: state.index.label, sub: state.index.subtitle, accent: state.index.accent, on: state.view === 'index' });
-  if (state.grr && (state.grr.risk || 'paper') === key) items.push({ attr: 'data-view="grr"', name: state.grr.label, sub: state.grr.subtitle, accent: state.grr.accent, on: state.view === 'grr' });
+  for (const k of ['grr', 'gm']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, on: state.view === k });
   return items;
 }
 function renderFundBar() {
@@ -3440,7 +3441,7 @@ const RISK = [
 ];
 
 function leaveHome() {
-  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr']) if ($(id)) $(id).hidden = true;
+  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm']) if ($(id)) $(id).hidden = true;
   if ($('#strip')) $('#strip').hidden = false;
   if (document.body.classList.contains('at-home')) {
     document.body.classList.remove('at-home');
@@ -3451,7 +3452,7 @@ function leaveHome() {
   }
 }
 
-const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr'];
+const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm'];
 function showGlobal(view, title) {
   state.view = view;
   banner('');
@@ -3483,33 +3484,64 @@ async function loadIndexSeries() {
   }
   return [];
 }
-/* ── Grok Reborn Rich (dry run): mirror vs challenger vs Reborn Rich asli ── */
-async function loadGrr(file) {
-  for (const url of [(rawDataBase('grr') || RAW_BASE + 'grr/') + file, 'data/grr/' + file]) {
+/* ── Panel dry run "duel": mirror vs challenger vs bot asli ──
+ * GRR = Grok Reborn Rich (vs Reborn Rich), GM = Grok Meridian (vs Meridian).
+ * Bentuk data sama: tiga deret persen sejak modal awal yang sama (dikoreksi
+ * arus dana), statistik per buku, seat terbuka, dan 10 close terakhir. */
+const DUELS = {
+  grr: {
+    title: 'Grok Reborn Rich', liveName: 'Reborn Rich asli', chal: '#a855f7',
+    lead: (d) => `Uji kertas strategi LP Reborn Rich. <b>Mirror</b> menjalankan aturan live Reborn Rich di atas kertas, <b>Challenger</b> adalah strategi Grok v1.1, dan <b>Reborn Rich asli</b> jadi pembanding. Semuanya mulai dari modal yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}. Mirror dan Challenger bukan uang sungguhan.`,
+  },
+  gm: {
+    title: 'Grok Meridian', liveName: 'Meridian asli', chal: '#38bdf8', seatCol: 'bin',
+    lead: (d) => `Uji kertas strategi LP Meteora DLMM. <b>Mirror</b> menjalankan aturan Meridian di atas kertas, <b>Challenger</b> adalah strategi Grok${d.preregistration?.version ? ` ${esc(d.preregistration.version)}` : ''}, dan <b>Meridian asli</b> (dana Meridian di Cashood) jadi juri. Semuanya mulai dari NAV Meridian yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}; setoran dan penarikan Meridian ikut dicerminkan ke buku kertas, jadi yang dibandingkan adalah persen hasil, bukan dolar. Mirror dan Challenger bukan uang sungguhan.`,
+    preparing: `<div class="grr-prep"><b>Yang sedang disiapkan</b><ul>
+      <li>Modal awal: NAV dana Meridian di Cashood pada saat mulai (T0), dalam dolar.</li>
+      <li>Mirror = aturan Meridian, Challenger = strategi Grok, varian shadow dilaporkan semua tapi tidak dinilai.</li>
+      <li>Penilaian: hasil bersih dalam persen modal, jendela waktu yang sama dengan Meridian asli, minimal 14 hari dan 30 close, drawdown maksimum ditampilkan.</li>
+      <li>Parameter dikunci sebelum mulai; hash pra-registrasi tampil di sini begitu dikunci.</li></ul></div>`,
+  },
+};
+async function loadDuel(key, file) {
+  for (const url of [(rawDataBase(key) || RAW_BASE + key + '/') + file, `data/${key}/` + file]) {
     try { const j = await getJSON(url); if (j) return j; } catch { /* sumber berikutnya */ }
   }
   return null;
 }
-function showGrr() { showGlobal('grr', 'Grok Reborn Rich — Cashood Headfund'); renderGrr().catch(() => setHTML($('#grrBody'), '<section class="card"><p class="miss">Menunggu data GRR.</p></section>')); }
-let grrEpoch = 0;
-async function renderGrr() {
-  const epoch = ++grrEpoch;
-  const [d, nav] = await Promise.all([loadGrr('live.json'), loadGrr('nav.json')]);
-  if (epoch !== grrEpoch || state.view !== 'grr') return;
-  const body = $('#grrBody');
+function showDuel(key) {
+  const cfg = DUELS[key];
+  showGlobal(key, `${cfg.title} — Cashood Headfund`);
+  renderDuel(key).catch(() => setHTML($(`#${key}Body`), `<section class="card"><p class="miss">Menunggu data ${esc(cfg.title)}.</p></section>`));
+}
+function showGrr() { showDuel('grr'); }
+function showGm() { showDuel('gm'); }
+const duelEpoch = {};
+async function renderDuel(key) {
+  const cfg = DUELS[key];
+  const epoch = duelEpoch[key] = (duelEpoch[key] || 0) + 1;
+  const [d, nav] = await Promise.all([loadDuel(key, 'live.json'), loadDuel(key, 'nav.json')]);
+  if (epoch !== duelEpoch[key] || state.view !== key) return;
+  const body = $(`#${key}Body`);
   if (!d || d.status !== 'ok') {
-    setHTML(body, `<section class="card"><div class="card-head"><h2>Grok Reborn Rich</h2><span class="pill sim">dry run · kertas</span></div>
-      <p class="miss" role="status">Menunggu data. ${esc(d?.reason || 'Mesin paper belum mengirim data.')}</p>
+    // GM: belum ada berkas sama sekali, atau mesin melapor "preparing" → persiapan.
+    const prep = key === 'gm' && (!d || d.status === 'preparing');
+    setHTML(body, `<section class="card"><div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
+      ${prep ? `<p class="miss" role="status"><b>Persiapan — mesin paper belum mulai.</b> Belum ada angka; tidak ada yang ditampilkan sebelum mesin paper benar-benar berjalan.</p>${cfg.preparing || ''}`
+        : `<p class="miss" role="status">Menunggu data. ${esc(d?.reason || 'Mesin paper belum mengirim data.')}</p>`}
       <p class="hint">Data diperbarui tiap 5 menit begitu mesin paper berjalan.</p></section>`);
     return;
   }
-  const books = [['mirror', 'Mirror', '#60a5fa', d.mirror], ['challenger', 'Challenger', '#a855f7', d.challenger], ['live', 'Reborn Rich asli', '#4ade80', d.live]];
+  const books = [['mirror', 'Mirror', '#60a5fa', d.mirror], ['challenger', 'Challenger', cfg.chal, d.challenger], ['live', cfg.liveName, '#4ade80', d.live]];
   const pctTxt = (v) => (v == null ? '—' : `${v > 0 ? '+' : ''}${pct(v, 2)}`);
+  const solTxt = (v) => (v == null ? '' : ` · ${Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 })} SOL`);
+  const ddTxt = (b) => (b?.maxDrawdownPct == null ? '' : ` · DD maks ${pct(b.maxDrawdownPct, 1)}`);
   const tiles = books.map(([k, name, c, b]) => `<div class="grr-tile" style="--c:${c}">
       <div class="grr-k"><i></i>${esc(name)}</div>
       <div class="grr-v ${cls(b?.pctSinceStart ?? 0)}">${pctTxt(b?.pctSinceStart)}</div>
-      <div class="grr-n">${b?.equityUsd != null ? usd(b.equityUsd) : '—'}${k === 'live' ? ' · uang asli' : ' · kertas'}</div>
-      ${k !== 'live' ? `<div class="grr-n">${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${b?.openSeats?.length ?? 0} seat terbuka</div>` : `<div class="grr-n">${b?.asOf ? 'per ' + tglRingkas(b.asOf) : ''}</div>`}
+      <div class="grr-n">${b?.equityUsd != null ? usd(b.equityUsd) : '—'}${solTxt(b?.equitySol)}${k === 'live' ? ' · uang asli' : ' · kertas'}</div>
+      ${k !== 'live' ? `<div class="grr-n">${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${b?.openSeats?.length ?? 0} seat terbuka${ddTxt(b)}</div>` : `<div class="grr-n">${b?.asOf ? 'per ' + tglRingkas(b.asOf) : ''}${ddTxt(b)}</div>`}
+      ${k === 'live' && b?.rawPctSinceStart != null && b.rawPctSinceStart !== b.pctSinceStart ? `<div class="grr-n dim2">tanpa koreksi arus dana ${pctTxt(b.rawPctSinceStart)}</div>` : ''}
     </div>`).join('');
   // Grafik persen sejak awal, tiga garis.
   const pts = (nav?.points || []).filter((p) => Number.isFinite(p.t));
@@ -3532,24 +3564,33 @@ async function renderGrr() {
   const stat = (b) => (b ? `<td class="num" data-k="Close">${b.closes ?? 0}</td><td class="num" data-k="Win rate">${b.winRatePct == null ? '—' : pct(b.winRatePct, 0)}</td>
       <td class="num pos" data-k="Rata² menang">${b.avgWinUsd == null ? '—' : signed(b.avgWinUsd)}</td><td class="num neg" data-k="Rata² kalah">${b.avgLossUsd == null ? '—' : signed(b.avgLossUsd)}</td>
       <td class="num pos" data-k="Fee">${b.feesUsd == null ? '—' : usd(b.feesUsd)}</td><td class="num neg" data-k="Biaya">${b.costsUsd == null ? '—' : usd(b.costsUsd)}</td>` : '');
-  const seats = [['Mirror', d.mirror], ['Challenger', d.challenger]].flatMap(([n, b]) => (b?.openSeats || []).map((s) => ({ ...s, bookName: n })));
-  const closes = [['Mirror', d.mirror], ['Challenger', d.challenger]].flatMap(([n, b]) => (b?.last10Closes || []).map((c) => ({ ...c, bookName: n })))
+  const rows = [['Mirror', d.mirror], ['Challenger', d.challenger]];
+  const shadows = Array.isArray(d.shadows) ? d.shadows : [];
+  const seats = rows.flatMap(([n, b]) => (b?.openSeats || []).map((s) => ({ ...s, bookName: n })));
+  const closes = rows.flatMap(([n, b]) => (b?.last10Closes || []).map((c) => ({ ...c, bookName: n })))
     .sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
+  const bin = cfg.seatCol === 'bin';
+  const pr = d.preregistration;
   setHTML(body, `<section class="card">
-      <div class="card-head"><h2>Grok Reborn Rich</h2><span class="pill sim">dry run · kertas</span></div>
-      <p class="lead">Uji kertas strategi LP Reborn Rich. <b>Mirror</b> menjalankan aturan live Reborn Rich di atas kertas, <b>Challenger</b> adalah strategi Grok v1.1, dan <b>Reborn Rich asli</b> jadi pembanding. Semuanya mulai dari modal yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}. Mirror dan Challenger bukan uang sungguhan.</p>
-      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}</p>
+      <div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
+      <p class="lead">${cfg.lead(d)}</p>
+      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${pr?.prereg12 ? ` · pra-registrasi ${esc(pr.version || '')} <span class="dim">${esc(pr.prereg12)}</span>${pr.params12 ? ` · parameter <span class="dim">${esc(pr.params12)}</span>` : ''}` : ''}</p>
       <div class="grr-tiles">${tiles}</div>
       <div class="grr-legend">${books.map(([, n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>
       ${chart}
     </section>
     <section class="card"><div class="card-head"><h2>Per buku</h2><span class="hint">hasil kertas setelah fee dan biaya</span></div>
       <div class="table-scroll"><table class="mcards"><thead><tr><th>Buku</th><th class="num">Close</th><th class="num">Win rate</th><th class="num">Rata² menang</th><th class="num">Rata² kalah</th><th class="num">Fee</th><th class="num">Biaya</th></tr></thead>
-      <tbody>${[['Mirror', d.mirror], ['Challenger', d.challenger]].map(([n, b]) => `<tr><td class="mc-head"><b>${esc(n)}</b><div class="sub2">${esc(b?.label || '')}</div></td>${stat(b)}</tr>`).join('')}</tbody></table></div></section>
+      <tbody>${rows.map(([n, b]) => `<tr><td class="mc-head"><b>${esc(n)}</b><div class="sub2">${esc(b?.label || '')}</div></td>${stat(b)}</tr>`).join('')}</tbody></table></div></section>
+    ${shadows.length ? `<section class="card"><div class="card-head"><h2>Varian shadow <span class="count">(${shadows.length})</span></h2><span class="hint">didaftarkan sebelum mulai · dilaporkan semua · tidak dinilai</span></div>
+      <div class="table-scroll"><table class="mcards"><thead><tr><th>Varian</th><th class="num">Hasil</th><th class="num">DD maks</th><th class="num">Close</th><th class="num">Win rate</th><th class="num">Fee</th><th class="num">Biaya</th></tr></thead><tbody>
+      ${shadows.map((s) => `<tr><td class="mc-head"><b>${esc(s.id || '—')}</b><div class="sub2">${esc(s.label || '')}</div></td><td class="num ${cls(s.pctSinceStart ?? 0)}" data-k="Hasil">${pctTxt(s.pctSinceStart)}</td>
+        <td class="num" data-k="DD maks">${s.maxDrawdownPct == null ? '—' : pct(s.maxDrawdownPct, 1)}</td><td class="num" data-k="Close">${s.closes ?? 0}</td><td class="num" data-k="Win rate">${s.winRatePct == null ? '—' : pct(s.winRatePct, 0)}</td>
+        <td class="num pos" data-k="Fee">${s.feesUsd == null ? '—' : usd(s.feesUsd)}</td><td class="num neg" data-k="Biaya">${s.costsUsd == null ? '—' : usd(s.costsUsd)}</td></tr>`).join('')}</tbody></table></div></section>` : ''}
     <section class="card"><div class="card-head"><h2>Seat terbuka <span class="count">(${seats.length})</span></h2></div>
-      ${seats.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Pool</th><th>Buku</th><th class="num">Fee tier</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Hasil</th><th>Range</th></tr></thead><tbody>
+      ${seats.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Pool</th><th>Buku</th><th class="num">${bin ? 'Bin step · bin' : 'Fee tier'}</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Hasil</th><th>Range</th></tr></thead><tbody>
       ${seats.map((s) => `<tr><td class="mc-head"><b>${esc(s.symbol)}</b></td><td data-k="Buku">${esc(s.bookName)}${s.book ? ` <span class="dim">${esc(s.book)}</span>` : ''}</td>
-        <td class="num" data-k="Fee tier">${s.feeTierPct == null ? '—' : pct(s.feeTierPct, 1)}</td><td class="num" data-k="Umur">${s.openedAt ? dur((Date.now() - s.openedAt) / 60000) : '—'}</td>
+        <td class="num" data-k="${bin ? 'Bin' : 'Fee tier'}">${bin ? `${s.binStep ?? '—'}${s.bins != null ? ` · ${s.bins}` : ''}${s.shape ? ` <span class="dim">${esc(s.shape)}</span>` : ''}` : (s.feeTierPct == null ? '—' : pct(s.feeTierPct, 1))}</td><td class="num" data-k="Umur">${s.openedAt ? dur((Date.now() - s.openedAt) / 60000) : '—'}</td>
         <td class="num" data-k="Modal">${s.basisUsd == null ? '—' : usd(s.basisUsd)}</td><td class="num ${cls(s.pnlPct ?? 0)}" data-k="Hasil">${pctTxt(s.pnlPct)}</td>
         <td data-k="Range">${s.inRange == null ? '—' : `<span class="pill ${s.inRange ? 'in' : 'out2'}">${s.inRange ? 'di dalam' : 'di luar'}</span>`}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada seat terbuka.</p>'}</section>
     <section class="card"><div class="card-head"><h2>10 close terakhir</h2><span class="hint">per buku</span></div>
@@ -4338,6 +4379,7 @@ async function init() {
     state.safebox = list.safebox || null;
     state.index = list.index || null;
     state.grr = list.grr || null;
+    state.gm = list.gm || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -4356,6 +4398,7 @@ async function init() {
     if (view === 'kinerja') { showKinerja(); return; }
     if (view === 'index') { showIndex(); return; }
     if (view === 'grr') { showGrr(); return; }
+    if (view === 'gm') { showGm(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
     if (view === 'update') { showUpdate(); return; }
@@ -4464,6 +4507,7 @@ async function init() {
     if (route.safebox) { showSafebox(); return; }
     if (route.index) { showIndex(); return; }
     if (route.grr) { showGrr(); return; }
+    if (route.gm) { showGm(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }
