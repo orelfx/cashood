@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "generation": "16c01f49-d172-453b-8bc1-b4bb08601a8b",
   "updatedAt": 1792410953071,
-  "checkedAt": 1792411011213,
+  "checkedAt": 1792411338806,
   "sourceGeneration": "fc253a4e-44bd-4cb2-9d38-ca4d600006e8",
   "generatedAt": "2026-10-19T18:56 WIB",
   "principalUsd": 1000,
@@ -227,11 +227,24 @@
   ],
   "earning": true,
   "quality": {
-    "complete": true,
-    "estimated": false,
-    "degraded": false,
-    "allocationEstimated": false,
-    "problems": []
+    "complete": false,
+    "estimated": true,
+    "degraded": true,
+    "calculationDeferred": true,
+    "problems": [
+      {
+        "id": "index",
+        "reason": "kelengkapan sumber belum terverifikasi"
+      },
+      {
+        "id": "index",
+        "reason": "sumber parsial atau estimasi"
+      },
+      {
+        "id": "index/robsol",
+        "reason": "sumber lebih lama dari 30 menit"
+      }
+    ]
   },
   "measure": {
     "monthlyPct": 0.501,
@@ -252,5 +265,6 @@
     "spanDays": 14,
     "basis": "minimal 0,5% per bulan; di atasnya rata-rata kenaikan Cashood Index 7 hari terakhir; jatah per minggu, kelebihan disimpan untuk minggu rugi; paling banyak 3% per bulan",
     "since": "2026-10-05"
-  }
+  },
+  "dataNotice": "Perhitungan ditunda. Angka yang tersedia adalah hasil terakhir, bukan pembaruan saldo. index: kelengkapan sumber belum terverifikasi; index: sumber parsial atau estimasi; index/robsol: sumber lebih lama dari 30 menit"
 }
