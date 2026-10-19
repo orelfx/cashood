@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8ba84db6-2138-4b18-a3db-90c0cd9cc362",
-  "updatedAt": 1792367996001,
-  "generatedAt": "2026-10-19 06:59 WIB",
+  "generation": "86074c87-7c8f-421c-9a2b-cf7a48ad4ba8",
+  "updatedAt": 1792368297406,
+  "generatedAt": "2026-10-19 07:04 WIB",
   "usdIdr": null,
   "totalUsd": 936.054273131302,
   "nativeSymbol": "SOL",
@@ -1307,12 +1307,12 @@
     "pnlUsd": -63.94572686869799,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792367996001,
+    "heartbeatAt": 1792368297406,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.27,
-    "lastScanAt": 1792367984000,
+    "lastScanAt": 1792368276000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1333,7 +1333,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "467",
+        "v": "463",
         "n": "24 jam · 3 diveto LLM"
       },
       {
@@ -1349,9 +1349,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792367996001,
+      "lastDecisionAt": 1792368297406,
       "lastAction": "keputusan",
-      "lastReason": "VSWAP [degen]: Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "VSWAP [low]: Dilewati: solo_test: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1382,7 +1382,7 @@
       ],
       [
         "Label wallet",
-        "smart 12192 · bot 3861 · blacklist 399 · lp 1 · fresh 1061 · kol 188 · dolphin 366 · whale 7 · unknown 7"
+        "smart 12198 · bot 3862 · blacklist 399 · lp 1 · fresh 1061 · kol 188 · dolphin 366 · whale 7"
       ]
     ],
     "requirements": [
@@ -1438,15 +1438,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 12192,
+          "total": 12198,
           "active": 460,
-          "passive": 11732
+          "passive": 11738
         },
         {
           "key": "bot",
-          "total": 3861,
+          "total": 3862,
           "active": 0,
-          "passive": 3861
+          "passive": 3862
         },
         {
           "key": "fresh",
@@ -1477,12 +1477,6 @@
           "total": 7,
           "active": 1,
           "passive": 6
-        },
-        {
-          "key": "unknown",
-          "total": 7,
-          "active": 0,
-          "passive": 7
         },
         {
           "key": "lp",
@@ -1592,6 +1586,43 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792368099786,
+        "symbol": "VSWAP",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 131,
+            "note": "bundler pegang 11.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 9.0%"
+          },
+          {
+            "type": "sniper",
+            "count": 4,
+            "note": "sniper awal masih pegang 1.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 511,
+            "note": "11.2% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 1.1%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1792367491681,
         "symbol": "VSWAP",
@@ -2529,16 +2560,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 63%."
-      },
-      {
-        "at": 1792358611789,
-        "symbol": "LAMPORT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: holder baru 23."
       }
     ],
     "reasonStats": {
@@ -2549,7 +2570,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 1,
-        "red_flag": 405,
+        "red_flag": 401,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2600,7 +2621,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792368095091,
+    "generatedAt": 1792368411917,
     "trades": {
       "count": 144,
       "wins": 59,
