@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "921e07a8-dc95-45f0-8cac-780ae06a3c46",
-  "updatedAt": 1792421225741,
-  "generatedAt": "2026-10-19 21:47 WIB",
+  "generation": "95fe09e9-0e81-4fc3-9074-7119298840b2",
+  "updatedAt": 1792421525811,
+  "generatedAt": "2026-10-19 21:52 WIB",
   "usdIdr": null,
   "totalUsd": 924.5905135094347,
   "nativeSymbol": "SOL",
@@ -1330,12 +1330,12 @@
     "pnlUsd": -75.40948649056531,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792421225741,
+    "heartbeatAt": 1792421525811,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.4,
-    "lastScanAt": 1792421218000,
+    "lastScanAt": 1792421520000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1356,13 +1356,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "461",
+        "v": "463",
         "n": "24 jam · 7 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "18661",
-        "n": "449 aktif"
+        "v": "18662",
+        "n": "450 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1372,9 +1372,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792421225741,
+      "lastDecisionAt": 1792421525811,
       "lastAction": "keputusan",
-      "lastReason": "POH [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
+      "lastReason": "AgenC [low]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
     }
   },
   "strategy": {
@@ -1393,7 +1393,7 @@
       ],
       [
         "Wallet dipantau",
-        "18661 · 449 aktif"
+        "18662 · 450 aktif"
       ],
       [
         "Cadangan kas",
@@ -1405,7 +1405,7 @@
       ],
       [
         "Label wallet",
-        "smart 12356 · bot 4316 · blacklist 418 · lp 1 · fresh 1079 · kol 191 · dolphin 294 · whale 6"
+        "smart 12355 · bot 4317 · blacklist 418 · lp 1 · fresh 1080 · kol 192 · dolphin 293 · whale 6"
       ]
     ],
     "requirements": [
@@ -1453,29 +1453,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 18661,
-      "active": 449,
+      "tracked": 18662,
+      "active": 450,
       "passive": 18212,
       "trusted": 0,
       "promising": 40,
       "byLabel": [
         {
           "key": "smart",
-          "total": 12356,
-          "active": 421,
-          "passive": 11935
+          "total": 12355,
+          "active": 422,
+          "passive": 11933
         },
         {
           "key": "bot",
-          "total": 4316,
+          "total": 4317,
           "active": 0,
-          "passive": 4316
+          "passive": 4317
         },
         {
           "key": "fresh",
-          "total": 1079,
+          "total": 1080,
           "active": 0,
-          "passive": 1079
+          "passive": 1080
         },
         {
           "key": "blacklist",
@@ -1485,15 +1485,15 @@
         },
         {
           "key": "dolphin",
-          "total": 294,
+          "total": 293,
           "active": 20,
-          "passive": 274
+          "passive": 273
         },
         {
           "key": "kol",
-          "total": 191,
+          "total": 192,
           "active": 7,
-          "passive": 184
+          "passive": 185
         },
         {
           "key": "whale",
@@ -1610,6 +1610,53 @@
     },
     "decisions": [
       {
+        "at": 1792421515745,
+        "symbol": "AgenC",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      },
+      {
+        "at": 1792421400483,
+        "symbol": "Gold",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 140,
+            "note": "bundler pegang 5.2%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 8.9%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 2.7%"
+          },
+          {
+            "type": "fresh",
+            "count": 933,
+            "note": "8.6% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 2.7%"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
+      {
         "at": 1792420929151,
         "symbol": "POH",
         "action": "skip",
@@ -1625,16 +1672,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1792420907545,
-        "symbol": "AgenC",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 47%."
       },
       {
         "at": 1792420900880,
@@ -2504,38 +2541,6 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 42.27% supply."
-      },
-      {
-        "at": 1792399868669,
-        "symbol": "XTV",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 665,
-            "note": "bundler pegang 8.9%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 9.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "9.6% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2546,7 +2551,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 392,
+        "red_flag": 394,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2597,7 +2602,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792421518077,
+    "generatedAt": 1792421815258,
     "trades": {
       "count": 146,
       "wins": 59,
