@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d1d0106a-cd40-41f0-acff-13fb00aed163",
-  "updatedAt": 1792422127646,
-  "generatedAt": "2026-10-19 22:02 WIB",
+  "generation": "41dac8f2-479a-48a5-8599-2f1cc02a91c7",
+  "updatedAt": 1792422428023,
+  "generatedAt": "2026-10-19 22:07 WIB",
   "usdIdr": null,
   "totalUsd": 924.5905135094347,
   "nativeSymbol": "SOL",
@@ -1330,12 +1330,12 @@
     "pnlUsd": -75.40948649056531,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792422127646,
+    "heartbeatAt": 1792422428023,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.4,
-    "lastScanAt": 1792422115000,
+    "lastScanAt": 1792422421000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1356,13 +1356,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "466",
+        "v": "464",
         "n": "24 jam · 7 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "18662",
-        "n": "451 aktif"
+        "n": "450 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1372,9 +1372,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792422127646,
+      "lastDecisionAt": 1792422428023,
       "lastAction": "keputusan",
-      "lastReason": "AgenC [low]: Dilewati karena red flag: 10 holder terbesar pegang 47%."
+      "lastReason": "WORTHLESS [degen]: Dilewati karena red flag: bundler pegang 68.21% supply."
     }
   },
   "strategy": {
@@ -1393,7 +1393,7 @@
       ],
       [
         "Wallet dipantau",
-        "18662 · 451 aktif"
+        "18662 · 450 aktif"
       ],
       [
         "Cadangan kas",
@@ -1405,7 +1405,7 @@
       ],
       [
         "Label wallet",
-        "smart 12326 · bot 4348 · blacklist 418 · lp 1 · fresh 1078 · kol 192 · dolphin 293 · whale 6"
+        "smart 12312 · bot 4362 · blacklist 418 · lp 1 · fresh 1078 · kol 192 · dolphin 293 · whale 6"
       ]
     ],
     "requirements": [
@@ -1454,22 +1454,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 18662,
-      "active": 451,
-      "passive": 18211,
+      "active": 450,
+      "passive": 18212,
       "trusted": 0,
       "promising": 41,
       "byLabel": [
         {
           "key": "smart",
-          "total": 12326,
-          "active": 423,
-          "passive": 11903
+          "total": 12312,
+          "active": 422,
+          "passive": 11890
         },
         {
           "key": "bot",
-          "total": 4348,
+          "total": 4362,
           "active": 0,
-          "passive": 4348
+          "passive": 4362
         },
         {
           "key": "fresh",
@@ -1609,6 +1609,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792422162914,
+        "symbol": "WORTHLESS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 68.21% supply."
+      },
       {
         "at": 1792422122861,
         "symbol": "AgenC",
@@ -1889,7 +1899,8 @@
         "action": "skip",
         "basket": "big",
         "wallets": {
-          "smart": 2,
+          "smart": 1,
+          "bot": 1,
           "kol": 1
         },
         "flags": [
@@ -2129,8 +2140,8 @@
         "action": "skip",
         "basket": "mid",
         "wallets": {
-          "smart": 2,
-          "bot": 1
+          "bot": 2,
+          "smart": 1
         },
         "flags": [
           {
@@ -2541,34 +2552,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma 1.0% dari market cap."
-      },
-      {
-        "at": 1792401797492,
-        "symbol": "Mimi",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 53,
+        "below_entry": 52,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 397,
+        "red_flag": 396,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2619,7 +2613,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792422418696,
+    "generatedAt": 1792422709264,
     "trades": {
       "count": 146,
       "wins": 59,
