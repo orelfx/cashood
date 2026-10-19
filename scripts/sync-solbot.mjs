@@ -69,13 +69,13 @@ const position = (p) => ({
   sizeUsd: r2(p.size_usd), valueUsd: r2(p.value_usd), pnlUsd: r2(p.pnl_usd), pnlPct: r2(p.pnl_pct),
   tpStage: num(p.tp_stage), tpStagesTotal: num(p.tp_stages_total), stopPriceUsd: px(p.stop_price_usd),
   // Opsional: harga target TP berikutnya dan satu kalimat alasan masuk.
-  nextTpPriceUsd: px(p.next_tp_price_usd), entryNote: text(p.entry_note, 200),
+  nextTpPriceUsd: px(p.next_tp_price_usd), entryNote: text(p.entry_note, 200), peakPriceUsd: px(p.peak_price_usd),
 });
 const trade = (c) => ({
   symbol: text(c.symbol, 24) || '—', openedAt: time(c.opened_at), closedAt: time(c.closed_at),
   entryPriceUsd: px(c.entry_price_usd), exitPriceUsd: px(c.exit_price_usd), pnlUsd: r2(c.pnl_usd), pnlPct: r2(c.pnl_pct),
   exitReason: EXITS.includes(String(c.exit_reason).toUpperCase()) ? String(c.exit_reason).toUpperCase() : text(c.exit_reason, 16),
-  simulated: c.simulated === true, exitNote: text(c.exit_note, 200),
+  simulated: c.simulated === true, exitNote: text(c.exit_note, 200), tpStage: num(c.tp_stage),
   // Modal yang dipakai trade ini: dari bot kalau ada, kalau tidak dihitung dari PnL $ dan %.
   sizeUsd: r2(c.size_usd) ?? (num(c.pnl_usd) != null && num(c.pnl_pct) ? r2(num(c.pnl_usd) / (num(c.pnl_pct) / 100)) : null),
 });

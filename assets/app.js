@@ -3759,6 +3759,40 @@ async function renderSolbot() {
  * skenario (semua kena stop / semua kena target berikutnya / floating), lalu
  * tabel rencana per posisi. Skenario dihitung dari harga stop dan harga target
  * berikutnya terhadap harga mark sekarang. */
+/* Aturan keluar SolBot (dari bot, dihitung dari harga masuk): stop awal −30%;
+ * TP1 +30% jual 30% → stop ke harga masuk (BE); TP2 +100% jual 25% → stop
+ * +50%; TP3 +300% jual 25%; sisa 20% runner dengan trailing stop 30% di bawah
+ * puncak. Batas waktu 72 jam / 168 jam. Harga level dihitung dari entry
+ * kalau bot belum mengirim harga targetnya sendiri. */
+const SB_LADDER = [{ n: 1, pct: 30, sell: 30, stop: 0, stopLbl: 'BE' }, { n: 2, pct: 100, sell: 25, stop: 50, stopLbl: '+50%' }, { n: 3, pct: 300, sell: 25, stop: null, stopLbl: 'trailing' }];
+const SB_STOP0 = -30, SB_TRAIL = 30, SB_RUNNER = 20;
+function sbLadder(r) {
+  const e = r.entryPriceUsd > 0 ? r.entryPriceUsd : null;
+  const stage = Math.max(0, Math.min(3, Number(r.tpStage) || 0));
+  const lv = (p) => (e ? e * (1 + p / 100) : null);
+  // Puncak: dari bot kalau ada; kalau tidak, minimal harga TP3 dan harga mark sekarang.
+  const peak = stage >= 3 ? Math.max(r.peakPriceUsd || 0, r.markPriceUsd || 0, lv(300) || 0) || null : null;
+  const stopModel = stage === 0 ? lv(SB_STOP0) : stage === 1 ? e : stage === 2 ? lv(50) : peak ? peak * (1 - SB_TRAIL / 100) : null;
+  const stopLbl = stage === 0 ? `${SB_STOP0}%` : SB_LADDER[stage - 1].stopLbl;
+  const next = stage < 3 ? SB_LADDER[stage] : null;
+  const sold = SB_LADDER.slice(0, stage).reduce((t, x) => t + x.sell, 0);
+  return { e, stage, peak, stop: r.stopPriceUsd ?? stopModel, stopLbl, next, nextPrice: next ? (r.nextTpPriceUsd ?? lv(next.pct)) : null, sold, left: 100 - sold, lv,
+    peakEstimated: stage >= 3 && !(r.peakPriceUsd > 0) };
+}
+const sbDots = (stage) => `<span class="sb-dots" title="TP ${stage}/3">${[1, 2, 3].map((i) => `<i class="${i <= stage ? 'on' : ''}"></i>`).join('')}</span>`;
+function sbLadderTable(L, hitUpTo = L.stage) {
+  if (!L.e) return '<div class="sub2">Harga masuk belum dikirim bot; tangga tidak bisa dihitung.</div>';
+  const row = (k, price, what, on, cl = '') => `<tr class="${on ? 'hit' : ''}"><td>${k}</td><td class="num ${cl}">${sbPx(price)}</td><td>${what}</td></tr>`;
+  return `<table class="sb-ladder"><tbody>
+    ${row('Stop awal −30%', L.lv(SB_STOP0), 'jual semua kalau belum ada TP yang kena', false, 'neg')}
+    ${SB_LADDER.map((x) => row(`${hitUpTo >= x.n ? '✓ ' : ''}TP${x.n} +${x.pct}%`, L.lv(x.pct), `jual ${x.sell}%${x.stop != null ? ` · stop naik ke ${x.stopLbl}${x.stop ? ` (${sbPx(L.lv(x.stop))})` : ` (${sbPx(L.e)})`}` : ''}`, hitUpTo >= x.n, 'pos')).join('')}
+    ${row('Runner 20%', null, `trailing stop ${SB_TRAIL}% di bawah harga puncak`, hitUpTo >= 3)}
+  </tbody></table><div class="sub2">batas waktu 72 jam / 168 jam</div>`;
+}
+
+/* Posisi SolBot, bentuknya sama dengan "Posisi trading" buku paper: ringkasan
+ * skenario (semua kena stop / semua kena TP berikutnya / floating), lalu
+ * tabel rencana per posisi dengan tangga TP. */
 function solbotPositionsHtml(d) {
   const rows = [...(d.positions || [])].sort((a, b) => (b.valueUsd ?? 0) - (a.valueUsd ?? 0));
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
@@ -3766,34 +3800,42 @@ function solbotPositionsHtml(d) {
   if (!rows.length) return `<section class="card">${head}<p class="dim">Belum ada posisi terbuka — bot sedang menunggu sinyal dari wallet yang diikuti.</p></section>`;
   const cost = rows.reduce((t, r) => t + (r.sizeUsd || 0), 0), value = rows.reduce((t, r) => t + (r.valueUsd || 0), 0);
   const pnl = rows.reduce((t, r) => t + (r.pnlUsd || 0), 0);
-  // Nilai posisi kalau harga menyentuh level tertentu: nilai × (level / mark).
-  const at = (r, level) => (level > 0 && r.markPriceUsd > 0 && r.valueUsd != null ? r.valueUsd * (level / r.markPriceUsd) - (r.sizeUsd ?? r.valueUsd) : null);
-  const sl = rows.map((r) => at(r, r.stopPriceUsd)).filter((v) => v != null), tp = rows.map((r) => at(r, r.nextTpPriceUsd)).filter((v) => v != null);
+  // Skenario per posisi menurut tangga: hasil TP yang sudah dijual + sisa
+  // posisi dinilai di harga level itu, dikurangi modal awal posisi.
+  const scen = (r, L, price) => {
+    if (!(price > 0) || !L.e || !(r.sizeUsd > 0)) return null;
+    const realized = SB_LADDER.slice(0, L.stage).reduce((t, x) => t + r.sizeUsd * x.sell / 100 * (1 + x.pct / 100), 0);
+    return realized + r.sizeUsd * L.left / 100 * (price / L.e) - r.sizeUsd;
+  };
+  const Ls = rows.map(sbLadder);
+  const sl = rows.map((r, i) => scen(r, Ls[i], Ls[i].stop)).filter((v) => v != null);
+  const tp = rows.map((r, i) => (Ls[i].next ? scen(r, Ls[i], Ls[i].nextPrice) : null)).filter((v) => v != null);
   const sum = (a) => a.reduce((t, v) => t + v, 0);
-  const pctOf = (r, level) => (level > 0 && r.entryPriceUsd > 0 ? (level / r.entryPriceUsd - 1) * 100 : null);
   const tiles = [
     tile('Modal di posisi', usd(cost), `${rows.length} posisi · eksposur ${d.equityUsd ? pct((value / d.equityUsd) * 100, 1) : '—'}`),
-    sl.length ? tile('Kalau semua kena SL', signed(sum(sl)), `rugi maksimal${sl.length < rows.length ? ` · ${sl.length}/${rows.length} posisi punya stop` : ''}`, cls(sum(sl))) : '',
-    tp.length ? tile('Kalau semua kena TP', signed(sum(tp)), `target berikutnya${tp.length < rows.length ? ` · ${tp.length}/${rows.length} posisi` : ''}`, 'pos') : '',
+    sl.length ? tile('Kalau semua kena SL', signed(sum(sl)), `${sum(sl) < 0 ? 'rugi maksimal' : 'untung terkunci'} · di stop yang berlaku sekarang`, cls(sum(sl))) : '',
+    tp.length ? tile('Kalau semua kena TP', signed(sum(tp)), `TP berikutnya tiap posisi${tp.length < rows.length ? ` · ${tp.length}/${rows.length} posisi (sisanya runner)` : ''}`, cls(sum(tp))) : '',
     tile('Floating sekarang', signed(pnl), `nilai jual ${usd(value)} · ${cost ? (pnl >= 0 ? '+' : '') + pct((pnl / cost) * 100) : '—'}`, cls(pnl)),
   ].filter(Boolean);
   const summary = `<div class="stats lp-sum n${tiles.length}">${tiles.join('')}</div>`;
-  const plan = (r) => {
-    const sp = pctOf(r, r.stopPriceUsd), tpP = pctOf(r, r.nextTpPriceUsd);
-    const chip = [sp != null ? `stop ${sp > 0 ? '+' : '−'}${pct(Math.abs(sp), 0)}` : '', r.tpStagesTotal ? `TP ${r.tpStage ?? 0}/${r.tpStagesTotal}` : '', tpP != null ? `next TP +${pct(tpP, 0)}` : ''].filter(Boolean).join(' · ');
-    const more = [r.name ? `<div class="sub2">${esc(r.name)}</div>` : '', `<div class="sub2">entry ${sbPx(r.entryPriceUsd)} · mark ${sbPx(r.markPriceUsd)}</div>`,
-      r.entryNote ? `<p class="fx-why"><b>Alasan masuk:</b> ${esc(r.entryNote)}</p>` : ''].join('');
-    return `<details class="fx-det"><summary>${r.tpStage ? 'Ambil untung bertahap' : 'Copy-trade'}</summary>${more}</details>${chip ? `<span class="pill sb-plan">${esc(chip)}</span>` : ''}`;
+  const plan = (r, L) => {
+    const more = [r.name ? `<div class="sub2">${esc(r.name)}</div>` : '', `<div class="sub2">masuk ${sbPx(r.entryPriceUsd)} · sekarang ${sbPx(r.markPriceUsd)}${L.stage ? ` · sudah dijual ${L.sold}%, sisa ${L.left}%` : ''}</div>`,
+      sbLadderTable(L), r.entryNote ? `<p class="fx-why"><b>Alasan masuk:</b> ${esc(r.entryNote)}</p>` : ''].join('');
+    return `<details class="fx-det"><summary>${L.stage >= 3 ? 'Runner (trailing)' : L.stage ? 'Ambil untung bertahap' : 'Copy-trade'}</summary>${more}</details>
+      <span class="pill sb-plan">stop ${esc(L.stopLbl)} · TP ${L.stage}/3 ${sbDots(L.stage)}${L.next ? ` · next TP${L.next.n} +${L.next.pct}%` : ''}</span>`;
   };
+  const stopCell = (L) => `<div><span class="dim">stop</span> <span class="neg">${L.stop == null ? '—' : sbPx(L.stop)}</span> <small class="dim">${L.stage >= 3 ? `trailing ${SB_TRAIL}%` : esc(L.stopLbl)}</small></div>`;
+  const targetCell = (L) => (L.next ? `<div><span class="dim">TP${L.next.n}</span> <span class="pos">${sbPx(L.nextPrice)}</span> <small class="pos">+${L.next.pct}%</small></div>`
+    : `<div><span class="pos">runner</span> <small class="dim">trail ${SB_TRAIL}% dari puncak ${L.peak ? `${L.peakEstimated ? '≥' : ''}${sbPx(L.peak)}` : '—'}</small></div>`);
   return `<section class="card">${head}${summary}
     <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th>Rencana</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai jual</th><th class="num">Stop / target</th><th class="num">Untung / rugi</th></tr></thead><tbody>
-    ${rows.map((r) => `<tr>
+    ${rows.map((r, i) => `<tr>
       <td class="mc-head"><span class="who"><span class="chip" style="background:${(r.pnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span></td>
-      <td class="fx-strat mc-wide" data-k="Rencana">${plan(r)}</td>
+      <td class="fx-strat mc-wide" data-k="Rencana">${plan(r, Ls[i])}</td>
       <td class="num" data-k="Umur">${r.openedAt ? `${dur((Date.now() - r.openedAt) / 60000)}<div class="sub2">sejak ${esc(sbWib(r.openedAt))}</div>` : '—'}</td>
       <td class="num" data-k="Modal">${r.sizeUsd == null ? '—' : usd(r.sizeUsd)}</td>
       <td class="num" data-k="Nilai jual"><strong>${r.valueUsd == null ? '—' : usd(r.valueUsd)}</strong></td>
-      <td class="num" data-k="Stop / target"><span class="neg">${sbPx(r.stopPriceUsd)}</span> / <span class="pos">${sbPx(r.nextTpPriceUsd)}</span></td>
+      <td class="num sb-st" data-k="Stop / target">${stopCell(Ls[i])}${targetCell(Ls[i])}</td>
       <td class="num ${cls(r.pnlUsd ?? 0)}" data-k="Untung / rugi">${sbUsd(r.pnlUsd)}<div class="sub2 ${cls(r.pnlPct ?? 0)}">${sbPct(r.pnlPct)}</div></td></tr>`).join('')}
     </tbody></table></div></section>`;
 }
@@ -3801,6 +3843,18 @@ function solbotPositionsHtml(d) {
 /* Riwayat SolBot, bentuknya sama dengan "Riwayat posisi ditutup": pilihan
  * periode per bulan, ringkasan hasil, dan halaman 20 baris. Alasan keluar
  * ditulis pendek; ditekan → harga masuk/keluar, waktu, dan catatan bot. */
+// TP yang sempat kena sebelum posisi ditutup: dari bot (tp_stage) kalau ada;
+// kalau tidak, diperkirakan dari harga keluar terhadap harga masuk — stop di
+// −30% berarti belum ada TP, stop di harga masuk = TP1, stop di +50% = TP2,
+// keluar di atas TP3 = runner.
+function sbClosedTp(c) {
+  const done = (stage, guess) => ({ stage, guess, left: 100 - SB_LADDER.slice(0, stage).reduce((t, x) => t + x.sell, 0) });
+  if (c.tpStage != null) return done(Math.max(0, Math.min(3, c.tpStage)), false);
+  if (!(c.entryPriceUsd > 0) || !(c.exitPriceUsd > 0)) return null;
+  const r = c.exitPriceUsd / c.entryPriceUsd;
+  if (c.exitReason === 'TP') return done(SB_LADDER.filter((x) => r >= (1 + x.pct / 100) * 0.97).length, true);
+  return done(r < 0.85 ? 0 : r < 1.25 ? 1 : r < 2.5 ? 2 : 3, true);
+}
 const SB_EXIT = { TP: ['Take profit', 'pos'], STOP: ['Stop loss', 'neg'], HALT: ['Halt (batas rugi)', 'neg'], MANUAL: ['Manual', 'dim'] };
 function solbotClosedHtml(d) {
   const all = d.closedTrades || [];
@@ -3821,8 +3875,11 @@ function solbotClosedHtml(d) {
   const rows = scope.slice(solbotView.page * CLOSED_PER_PAGE, (solbotView.page + 1) * CLOSED_PER_PAGE);
   const why = (c) => {
     const [txt, k] = SB_EXIT[c.exitReason] || [c.exitReason || '—', 'dim'];
-    return `<details class="fx-det"><summary class="${k === 'dim' ? '' : k}">${esc(txt)}</summary>
-      <div class="sub2">${sbPx(c.entryPriceUsd)} → ${sbPx(c.exitPriceUsd)}</div>
+    const h = sbClosedTp(c);
+    const tpTxt = h == null ? '' : `<div class="sub2">${h.stage ? `TP yang sempat kena: ${SB_LADDER.slice(0, h.stage).map((x) => `TP${x.n} (+${x.pct}%, jual ${x.sell}%)`).join(', ')}` : 'belum ada TP yang kena'}${h.guess ? ' · perkiraan dari harga keluar' : ''}</div>
+      <div class="sub2">sisa ${h.left}% dijual ${c.exitReason === 'TP' ? 'di target' : c.exitReason === 'STOP' ? `di stop (${h.stage >= 3 ? `trailing ${SB_TRAIL}%` : h.stage ? SB_LADDER[h.stage - 1].stopLbl : `${SB_STOP0}%`})` : 'saat keluar'}</div>`;
+    return `<details class="fx-det"><summary class="${k === 'dim' ? '' : k}">${esc(txt)}${h == null ? '' : ` ${sbDots(h.stage)}`}</summary>
+      ${tpTxt}<div class="sub2">${sbPx(c.entryPriceUsd)} → ${sbPx(c.exitPriceUsd)}</div>
       <div class="sub2">buka ${esc(sbWib(c.openedAt))} · tutup ${esc(sbWib(c.closedAt))}</div>${c.exitNote ? `<p class="fx-why">${esc(c.exitNote)}</p>` : ''}</details>`;
   };
   return `<section class="card" id="sbClosed">${head(`halaman ${solbotView.page + 1} dari ${pages} · ${solbotView.month ? label(solbotView.month) : 'seluruh riwayat'}`)}
