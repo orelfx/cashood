@@ -41,6 +41,10 @@ run_paper snh /root/cashood-inbox/snipehunt.json
 # Grok Meridian (dry run): mesinnya di abil-vps menaruh grok-meridian.json di kotak
 # masuk sana; fetch-paper-inbox.sh di atas menariknya ke kotak masuk lokal.
 run_snapshot scripts/sync-gm.mjs
+# SolBot (UANG ASLI, high risk): satu berkas publik dari VPS bot lewat key sendiri,
+# terpisah dari buku paper Devil Greed. Tarikan gagal → umur data yang menentukan.
+timeout --kill-after=5 40 scripts/fetch-live-solana.sh || true
+run_snapshot scripts/sync-solbot.mjs
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
 run_snapshot scripts/sync-index.mjs
 # Bunga Safe Box mengikuti gerak harian index, jadi dihitung sesudahnya.
@@ -50,7 +54,7 @@ run_snapshot scripts/sync-safebox.mjs
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
   git add -- reborn meridian ferari robsol staking grr charon forex binance safebox index
-  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh; [ -d gm ] && git add -- gm
+  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh; [ -d gm ] && git add -- gm; [ -d solbot ] && git add -- solbot
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 # Retry an earlier unpushed commit even when there are no file changes this run.

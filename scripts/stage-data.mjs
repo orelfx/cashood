@@ -53,5 +53,10 @@ for(const fund of ['grr','gm']){
    const pin=readJSON(resolve(dir,'t0.local.json'));if(pin){assertPublic(pin);atomicJSON(resolve(destination,fund,'t0.json'),pin);}}
  }catch(err){console.error(`[stage] ${fund}: ${err.message}`);failed=true;}
 }
+// SolBot (uang asli, high risk): satu berkas, sudah disaring sync-solbot.mjs.
+try{
+ const live=readJSON(resolve(ROOT,'data','solbot','live.json'));
+ if(live){assertPublic(live);if(/[1-9A-HJ-NP-Za-km-z]{32,}/.test(JSON.stringify(live)))throw new Error('string mirip alamat');atomicJSON(resolve(destination,'solbot','live.json'),live);}
+}catch(err){console.error(`[stage] solbot: ${err.message}`);failed=true;}
 // Valid other funds may still publish, but the operator gets a nonzero status.
 if(failed)process.exitCode=2;

@@ -2594,6 +2594,7 @@ function parseHash() {
   if (parts[0] === 'index') return { index: true, tab: 'portfolio' };
   if (parts[0] === 'grr') return { grr: true, tab: 'portfolio' };
   if (parts[0] === 'gm') return { gm: true, tab: 'portfolio' };
+  if (parts[0] === 'solbot') return { solbot: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
@@ -2627,7 +2628,7 @@ function navItems(key) {
     .map((f) => ({ attr: `data-fund="${esc(f.id)}"`, name: f.label, sub: f.chain, accent: f.accent, on: state.view === 'fund' && f.id === state.fund }));
   if (state.safebox && (state.safebox.risk || 'low') === key) items.push({ attr: 'data-view="safebox"', name: state.safebox.label, sub: state.safebox.subtitle, accent: state.safebox.accent, on: state.view === 'safebox' });
   if (state.index && (state.index.risk || 'low') === key) items.push({ attr: 'data-view="index"', name: state.index.label, sub: state.index.subtitle, accent: state.index.accent, on: state.view === 'index' });
-  for (const k of ['grr', 'gm']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, on: state.view === k });
+  for (const k of ['solbot', 'grr', 'gm']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, badge: state[k].badge, on: state.view === k });
   return items;
 }
 function renderFundBar() {
@@ -2640,7 +2641,7 @@ function renderFundBar() {
       <button class="nav-top" data-menu="${g.key}" aria-haspopup="true" aria-expanded="${navOpen === g.key}">
         <span class="nav-dot"></span><span class="nav-lbl">${g.label}${cur ? `<small>${esc(cur.name)}</small>` : ''}</span><span class="nav-caret">▾</span></button>
       <div class="nav-menu" role="menu"${navOpen === g.key ? '' : ' hidden'}>${items.map((i) => `<button role="menuitem" ${i.attr} class="${i.on ? 'on' : ''}">
-        <span class="fdot" style="background:${i.accent}"></span><span class="nav-item"><b>${esc(i.name)}</b><small>${esc(i.sub || '')}</small></span>${i.on ? '<span class="nav-check">✓</span>' : ''}</button>`).join('')}</div>
+        <span class="fdot" style="background:${i.accent}"></span><span class="nav-item"><b>${esc(i.name)}${i.badge ? ` <em class="nav-badge">${esc(i.badge)}</em>` : ''}</b><small>${esc(i.sub || '')}</small></span>${i.on ? '<span class="nav-check">✓</span>' : ''}</button>`).join('')}</div>
     </div>`;
   }).join('');
   setHTML($('#fundBar'), top('home', 'Beranda', state.view === 'home') + top('analisa', 'Portofolio', state.view === 'analisa')
@@ -3441,7 +3442,7 @@ const RISK = [
 ];
 
 function leaveHome() {
-  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm']) if ($(id)) $(id).hidden = true;
+  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm', '#tab-solbot']) if ($(id)) $(id).hidden = true;
   if ($('#strip')) $('#strip').hidden = false;
   if (document.body.classList.contains('at-home')) {
     document.body.classList.remove('at-home');
@@ -3452,7 +3453,7 @@ function leaveHome() {
   }
 }
 
-const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm'];
+const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm', 'solbot'];
 function showGlobal(view, title) {
   state.view = view;
   banner('');
@@ -3603,6 +3604,135 @@ async function renderDuel(key) {
       ${closes.map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol)}</b></td><td data-k="Buku">${esc(c.bookName)}</td><td class="num ${cls(c.netUsd ?? 0)}" data-k="Hasil">${c.netUsd == null ? '—' : signed(c.netUsd)}</td>
         <td class="num ${cls(c.netPct ?? 0)}" data-k="%">${pctTxt(c.netPct)}</td><td data-k="Alasan">${esc(c.reason ? shortReason(c.reason) : '—')}</td><td class="num dim" data-k="Ditutup">${c.closedAt ? tglRingkas(c.closedAt) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi yang ditutup.</p>'}</section>
     ${d.live?.note ? `<section class="card"><p class="hint"><b>Catatan pembanding live:</b> ${esc(d.live.note)}</p></section>` : ''}`);
+}
+
+/* ── SolBot: trading meme coin Solana dengan UANG ASLI (high risk) ──────────
+ * Terpisah dari buku paper Devil Greed (grokbot/solana): angkanya tidak pernah
+ * digabung dengan paper. Data dari sync-solbot.mjs (sudah disaring: tanpa
+ * alamat, mint/pool, signature, chart_url). Data kosong → kosong; data lebih
+ * dari 15 menit → "tertunda" tanpa angka, supaya angka lama tidak tampil
+ * seolah live. */
+const SOLBOT_STALE_MS = 15 * 60e3;
+const solbotView = { allClosed: false };
+let solbotEpoch = 0, solbotTimer = null;
+function showSolbot() {
+  showGlobal('solbot', 'SolBot — Cashood Headfund');
+  renderSolbot().catch(() => setHTML($('#solbotBody'), solbotWait('Data belum masuk / tertunda', null)));
+  clearInterval(solbotTimer);
+  // Umur data dinilai ulang tiap menit selama halaman terbuka.
+  solbotTimer = setInterval(() => { if (state.view === 'solbot') renderSolbot().catch(() => {}); else clearInterval(solbotTimer); }, 60e3);
+}
+const sbPx = (v) => (v == null ? '—' : '$' + Number(v).toLocaleString('en-US', { maximumSignificantDigits: 4 }));
+const sbPct = (v, dp = 2) => (v == null ? '—' : `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(dp)}%`);
+const sbUsd = (v) => (v == null ? '—' : v < 0 ? '−' + usd(Math.abs(v)) : (v > 0 ? '+' : '') + usd(v));
+const sbLimit = (v) => (v == null ? '—' : `−${Math.abs(v).toFixed(0)}%`);
+const sbWib = (t) => (t ? tglRingkas(t) + ' WIB' : '—');
+const SOLBOT_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">SolBot <span class="sb-real">REAL</span></div>
+  <div class="sb-sub">Trading meme coin Solana · uang asli · <span class="sb-risk">⚠ High risk</span></div></div>`;
+const SOLBOT_WARN = '<b>Uang asli, risiko tinggi.</b> SolBot memperdagangkan meme coin Solana memakai dana sungguhan. Harga meme coin bisa jatuh puluhan persen dalam hitungan menit; modal bisa berkurang sebagian atau habis. Hasil masa lalu tidak menjamin hasil berikutnya dan <b>profit tidak dijamin</b>.';
+function solbotWait(msg, asOf) {
+  return `<section class="card sb-hero">${SOLBOT_HEAD}<span class="sb-mode sb-m-wait">${esc(msg)}</span></div>
+    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir dari bot: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : ''}Angka tidak ditampilkan sampai data baru masuk.</p>
+    <p class="hint">Bot mengirim data tiap 1–3 menit; halaman ini diperbarui sekitar tiap 5 menit.</p></section>
+    <section class="card sb-disc"><p>${SOLBOT_WARN}</p></section>`;
+}
+async function loadSolbot() {
+  for (const url of [(rawDataBase('solbot') || RAW_BASE + 'solbot/') + 'live.json', 'data/solbot/live.json']) {
+    try { const j = await getJSON(url); if (j?.fund === 'solbot') return j; } catch { /* sumber berikutnya */ }
+  }
+  return null;
+}
+function solbotChart(d) {
+  const pts = d.equityCurve || [];
+  if (pts.length < 2) return '<p class="hint">Grafik ekuitas muncul setelah beberapa titik terkumpul.</p>';
+  const W = 720, H = 220, m = { t: 14, r: 64, b: 24, l: 8 };
+  const base = d.startCapitalUsd;
+  const vals = pts.map((p) => p.usd).concat(base > 0 ? [base] : []);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.12 || Math.max(1, hi * 0.02); lo -= pad; hi += pad;
+  const t0 = pts[0].t, t1 = pts.at(-1).t;
+  const x = (t) => m.l + ((t - t0) / Math.max(1, t1 - t0)) * (W - m.l - m.r), y = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
+  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join('');
+  const up = base > 0 ? pts.at(-1).usd >= base : true, c = up ? 'var(--green)' : 'var(--red)';
+  const tick = (t) => { const z = new Date(t + 7 * 3600e3); return t1 - t0 < 36 * 3600e3 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()}/${z.getUTCMonth() + 1}`; };
+  const lbl = (v) => '$' + Number(v).toLocaleString('en-US', { maximumFractionDigits: v < 1000 ? 2 : 0 });
+  return `<svg class="grr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kurva ekuitas SolBot (WIB)">
+    <defs><linearGradient id="sbFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".22"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs>
+    ${base > 0 ? `<line x1="${m.l}" x2="${W - m.r}" y1="${y(base).toFixed(1)}" y2="${y(base).toFixed(1)}" class="g-base" stroke-dasharray="4 4"/><text x="${W - m.r + 6}" y="${(y(base) + 4).toFixed(1)}" class="g-lbl">modal</text>` : ''}
+    ${[hi - pad, lo + pad].map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${lbl(v)}</text>`).join('')}
+    <path d="${path}L${x(t1).toFixed(1)},${H - m.b}L${x(t0).toFixed(1)},${H - m.b}Z" fill="url(#sbFill)"/>
+    <path d="${path}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>
+    ${[t0, t1].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)} WIB</text>`).join('')}
+  </svg>`;
+}
+async function renderSolbot() {
+  const epoch = ++solbotEpoch;
+  const d = await loadSolbot();
+  if (epoch !== solbotEpoch || state.view !== 'solbot') return;
+  const body = $('#solbotBody');
+  if (!d || d.status === 'waiting') { setHTML(body, solbotWait('Data belum masuk / tertunda', null)); return; }
+  if (d.status !== 'ok' || !d.asOf || Date.now() - d.asOf > SOLBOT_STALE_MS) { setHTML(body, solbotWait('Data belum masuk / tertunda', d.asOf || null)); return; }
+  const MODE = { LIVE: ['LIVE', 'sb-m-live'], DRY_RUN: ['DRY RUN', 'sb-m-dry'], HALTED: ['HALTED', 'sb-m-halt'] };
+  const [modeTxt, modeCls] = MODE[d.mode] || ['STATUS TIDAK DIKENAL', 'sb-m-wait'];
+  const g = d.guards || {};
+  const meter = (used, limit) => { const f = used != null && limit ? Math.max(0, Math.min(1, -Math.min(0, used) / Math.abs(limit))) : 0; return `<div class="sb-meter" aria-hidden="true"><i style="width:${(f * 100).toFixed(0)}%" class="${f >= 0.75 ? 'hot' : f >= 0.4 ? 'warm' : ''}"></i></div>`; };
+  const ddUsed = g.drawdownPct == null ? null : -Math.abs(g.drawdownPct);
+  const stopTxt = g.stopButton == null ? '—' : g.stopButton === true ? 'DITEKAN' : g.stopButton === false ? 'tidak ditekan' : String(g.stopButton);
+  const stopHot = g.stopButton === true || /tekan|pressed|on|aktif|active|engaged|halt/i.test(String(g.stopButton)) && g.stopButton !== false && !/tidak|not|off|siap|ready|idle/i.test(String(g.stopButton));
+  const tile = (k, v, n, c = '', extra = '') => `<div class="sb-g"><div class="k">${k}</div><div class="v ${c}">${v}</div>${extra}<div class="n">${n}</div></div>`;
+  const pos = d.positions || [];
+  const closed = d.closedTrades || [];
+  const shownClosed = solbotView.allClosed ? closed : closed.slice(0, 15);
+  const st = d.closedStats || {};
+  const EXIT = { TP: 'pos', STOP: 'neg', HALT: 'neg', MANUAL: 'dim' };
+  setHTML(body, `<section class="card sb-hero">
+      ${SOLBOT_HEAD}<span class="sb-mode ${modeCls}"><i></i>${modeTxt}</span></div>
+      ${d.mode === 'HALTED' || d.haltReason ? `<p class="sb-halt" role="alert"><b>Bot dihentikan${d.mode === 'HALTED' ? '' : ' (catatan)'}:</b> ${esc(d.haltReason || 'alasan tidak dilaporkan')}</p>` : ''}
+      ${d.mode === 'DRY_RUN' ? '<p class="hint">Mode <b>DRY RUN</b>: bot berjalan tanpa mengirim order sungguhan; trade yang terjadi di mode ini ditandai "simulasi".</p>' : ''}
+      <div class="sb-eq">
+        <div><div class="k">Ekuitas sekarang</div><div class="sb-big">${d.equityUsd == null ? '—' : usd(d.equityUsd)}</div>
+          <div class="n"><span class="${cls(d.changeUsd ?? 0)}">${sbUsd(d.changeUsd)} · ${sbPct(d.changePct)}</span> dari modal awal</div></div>
+        <div class="sb-eq-side">
+          <div><span class="k">Modal awal</span><b>${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}</b>${d.startCapitalSol != null ? `<small>${Number(d.startCapitalSol).toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL</small>` : ''}</div>
+          <div><span class="k">Kas</span><b>${d.cashUsd == null ? '—' : usd(d.cashUsd)}</b><small>di luar posisi</small></div>
+          <div><span class="k">Harga SOL</span><b>${d.solPriceUsd == null ? '—' : '$' + d.solPriceUsd.toFixed(2)}</b><small>${d.startedAt ? 'mulai ' + esc(sbWib(d.startedAt)) : ''}</small></div>
+        </div>
+      </div>
+      ${solbotChart(d)}
+      <p class="hint">Data bot per ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}) · semua waktu dalam WIB</p>
+    </section>
+    <section class="card sb-guard"><div class="card-head"><h2>Pengaman (guard)</h2><span class="hint">batas yang dijaga bot</span></div>
+      <div class="sb-grid">
+        ${tile('Tiket per trade', g.ticketPct == null ? '—' : pct(g.ticketPct, 0), 'maksimal dari ekuitas per posisi')}
+        ${tile('Stop per posisi', sbLimit(g.stopPct), 'posisi dijual kalau turun segini')}
+        ${tile('Halt harian', sbLimit(g.dailyHaltPct), 'bot berhenti hari itu')}
+        ${tile('Halt total', sbLimit(g.totalHaltPct), 'bot berhenti total dari modal')}
+        ${tile('PnL hari ini', sbPct(g.dailyPnlPct), `batas ${sbLimit(g.dailyHaltPct)}`, cls(g.dailyPnlPct ?? 0), meter(g.dailyPnlPct, g.dailyHaltPct))}
+        ${tile('Sisa ruang loss harian', g.dailyRoomPct == null ? '—' : pct(Math.abs(g.dailyRoomPct), 2), 'sebelum halt harian')}
+        ${tile('Drawdown', g.drawdownPct == null ? '—' : sbPct(ddUsed), `batas ${sbLimit(g.totalHaltPct)}`, ddUsed ? 'neg' : 'dim', meter(ddUsed, g.totalHaltPct))}
+        ${tile('Tombol stop', esc(stopTxt), 'stop darurat manual', stopHot ? 'neg' : 'dim')}
+      </div></section>
+    <section class="card"><div class="card-head"><h2>Posisi terbuka <span class="count">(${pos.length})</span></h2></div>
+      ${pos.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Koin</th><th class="num">Entry</th><th class="num">Mark</th><th class="num">Nilai</th><th class="num">PnL</th><th class="num">TP</th><th class="num">Stop</th><th class="num">Umur</th></tr></thead><tbody>
+      ${pos.map((p) => `<tr><td class="mc-head"><b>${esc(p.symbol)}</b>${p.name ? `<div class="sub2">${esc(p.name)}</div>` : ''}</td>
+        <td class="num" data-k="Entry">${sbPx(p.entryPriceUsd)}</td><td class="num" data-k="Mark">${sbPx(p.markPriceUsd)}</td>
+        <td class="num" data-k="Nilai">${p.valueUsd == null ? '—' : usd(p.valueUsd)}${p.sizeUsd != null ? `<div class="sub2">modal ${usd(p.sizeUsd)}</div>` : ''}</td>
+        <td class="num ${cls(p.pnlUsd ?? 0)}" data-k="PnL">${sbUsd(p.pnlUsd)}<div class="sub2 ${cls(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</div></td>
+        <td class="num" data-k="TP">${p.tpStage == null ? '—' : `${p.tpStage}/${p.tpStagesTotal ?? '?'}`}</td>
+        <td class="num" data-k="Stop">${sbPx(p.stopPriceUsd)}</td>
+        <td class="num dim" data-k="Umur">${p.openedAt ? dur((Date.now() - p.openedAt) / 60000) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Tidak ada posisi terbuka.</p>'}</section>
+    <section class="card"><div class="card-head"><h2>Trade tertutup <span class="count">(${st.all?.count ?? closed.length})</span></h2>
+      <span class="hint">${st.real?.count ? `uang asli: ${st.real.count} trade · win ${st.real.winRatePct == null ? '—' : pct(st.real.winRatePct, 0)} · <span class="${cls(st.real.pnlUsd ?? 0)}">${sbUsd(st.real.pnlUsd)}</span>` : ''}${st.simulated ? `${st.real?.count ? ' · ' : ''}${st.simulated} simulasi` : ''}</span></div>
+      ${closed.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Koin</th><th class="num">Buka</th><th class="num">Tutup</th><th class="num">Entry → exit</th><th class="num">PnL</th><th>Keluar</th></tr></thead><tbody>
+      ${shownClosed.map((c) => `<tr${c.simulated ? ' class="sb-simrow"' : ''}><td class="mc-head"><b>${esc(c.symbol)}</b>${c.simulated ? ' <span class="pill sb-sim">simulasi</span>' : ''}</td>
+        <td class="num dim" data-k="Buka">${esc(sbWib(c.openedAt))}</td><td class="num dim" data-k="Tutup">${esc(sbWib(c.closedAt))}</td>
+        <td class="num" data-k="Entry → exit">${sbPx(c.entryPriceUsd)} → ${sbPx(c.exitPriceUsd)}</td>
+        <td class="num ${cls(c.pnlUsd ?? 0)}" data-k="PnL">${sbUsd(c.pnlUsd)}<div class="sub2 ${cls(c.pnlPct ?? 0)}">${sbPct(c.pnlPct)}</div></td>
+        <td data-k="Keluar"><span class="pill sb-x ${EXIT[c.exitReason] || 'dim'}">${esc(c.exitReason || '—')}</span></td></tr>`).join('')}</tbody></table></div>
+        ${closed.length > 15 ? `<p class="sb-more"><button class="btn ghost" id="sbMore">${solbotView.allClosed ? 'Tampilkan lebih sedikit' : `Tampilkan semua (${closed.length})`}</button></p>` : ''}` : '<p class="dim">Belum ada trade yang ditutup.</p>'}</section>
+    <section class="card sb-disc"><p>${SOLBOT_WARN}</p>${d.disclaimer ? `<p class="hint">${esc(d.disclaimer)}</p>` : ''}
+      <p class="hint">Terpisah dari buku paper Devil Greed (grokbot/solana); angka SolBot tidak digabung dengan paper dan tidak masuk Cashood Index.</p></section>`);
+  const more = $('#sbMore');
+  if (more) more.onclick = () => { solbotView.allClosed = !solbotView.allClosed; renderSolbot().catch(() => {}); };
 }
 
 function showIndex() { showGlobal('index', 'Cashood Index — Cashood Headfund'); renderIndex().catch(() => {}); }
@@ -4370,6 +4500,7 @@ function renderVisible() {
   else if (state.view === 'kinerja') renderKinerja().catch(() => {});
   else if (state.view === 'pemegang') renderPemegang().catch(() => {});
   else if (state.view === 'index') renderIndex().catch(() => {});
+  else if (state.view === 'solbot') renderSolbot().catch(() => {});
   else if (state.view === 'safebox') renderSafebox();
   else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
   else if (state.view === 'update') renderUpdates();
@@ -4385,6 +4516,7 @@ async function init() {
     state.index = list.index || null;
     state.grr = list.grr || null;
     state.gm = list.gm || null;
+    state.solbot = list.solbot || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -4404,6 +4536,7 @@ async function init() {
     if (view === 'index') { showIndex(); return; }
     if (view === 'grr') { showGrr(); return; }
     if (view === 'gm') { showGm(); return; }
+    if (view === 'solbot') { showSolbot(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
     if (view === 'update') { showUpdate(); return; }
@@ -4493,6 +4626,7 @@ async function init() {
     else if (state.view === 'kinerja') renderKinerja().catch(() => {});
     else if (state.view === 'pemegang') renderPemegang().catch(() => {});
     else if (state.view === 'index') renderIndex().catch(() => {});
+    else if (state.view === 'solbot') renderSolbot().catch(() => {});
     else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
     else if (state.view === 'safebox') renderSafebox();
     else if (state.view === 'update') renderUpdates();
@@ -4513,6 +4647,7 @@ async function init() {
     if (route.index) { showIndex(); return; }
     if (route.grr) { showGrr(); return; }
     if (route.gm) { showGm(); return; }
+    if (route.solbot) { showSolbot(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }

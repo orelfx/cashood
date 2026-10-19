@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+/*
+ * SolBot — buku trading meme coin Solana dengan UANG ASLI (Devil Greed live).
+ * High risk. Terpisah total dari buku paper Devil Greed (dgsol, grokbot/solana):
+ * angkanya tidak pernah digabung dengan paper, tidak masuk Cashood Index.
+ *
+ * Sumber: /root/cashood-inbox/live-solana-public.json, skema
+ * "devil-greed-live-solana/v1", ditarik dari VPS bot oleh fetch-live-solana.sh
+ * (key sendiri). HANYA DIBACA.
+ *
+ * Yang terbit hanya field yang dikenal (allowlist). chart_url, label, alamat
+ * wallet/mint/pool dan signature tidak pernah ikut: teks bebas dibersihkan dari
+ * string base58/0x panjang, lalu seluruh hasil diperiksa sekali lagi.
+ * Kalau berkas belum ada, rusak, atau umurnya lebih dari 15 menit, yang terbit
+ * adalah status tanpa angka — angka lama tidak boleh tampil seolah live.
+ */
+import { readFileSync, statSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { atomicJSON, assertPublic, lock } from './lib/io.mjs';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'solbot');
+const SRC = process.env.SOLBOT_SRC || '/root/cashood-inbox/live-solana-public.json';
+const SCHEMA = 'devil-greed-live-solana/v1';
+const STALE_MS = 15 * 60e3;
+const release = lock(resolve(DIR, 'sync.lock.local'));
+const now = Number(process.env.SOLBOT_NOW) || Date.now();
+
+const num = (v) => (v === null || v === undefined || v === '' || typeof v === 'boolean' || !Number.isFinite(Number(v)) ? null : Number(v));
+const r2 = (v) => (num(v) == null ? null : Number(Number(v).toFixed(2)));
+const r4 = (v) => (num(v) == null ? null : Number(Number(v).toFixed(4)));
+// Harga meme coin bisa 0,00000123 → simpan 6 angka penting, bukan 2 desimal.
+const px = (v) => (num(v) == null ? null : Number(Number(v).toPrecision(6)));
+const time = (v) => { const t = typeof v === 'number' ? v : Date.parse(v); return Number.isFinite(t) ? t : null; };
+// Teks bebas: alamat/signature (base58 Solana, 0x…) dibuang, panjang dibatasi.
+const ADDR = /0x[0-9a-fA-F]{16,}|[1-9A-HJ-NP-Za-km-z]{32,}/g;
+const text = (v, max = 120) => (v == null || typeof v === 'object' ? null : String(v).replace(ADDR, '…').replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim().slice(0, max) || null);
+const MODES = ['DRY_RUN', 'LIVE', 'HALTED'];
+const EXITS = ['TP', 'STOP', 'HALT', 'MANUAL'];
+
+function publish(snapshot) {
+  assertPublic(snapshot);
+  const raw = JSON.stringify(snapshot);
+  if (/[1-9A-HJ-NP-Za-km-z]{32,}/.test(raw)) throw new Error('string mirip alamat/signature lolos ke data SolBot; dibatalkan');
+  atomicJSON(resolve(DIR, 'live.json'), snapshot);
+}
+function waiting(status, reason, extra = {}) {
+  publish({ fund: 'solbot', status, reason, checkedAt: now, ...extra });
+  console.log(`[solbot] ${status}: ${reason}`);
+  release(); process.exit(0);
+}
+
+let src;
+try {
+  statSync(SRC);
+  src = JSON.parse(readFileSync(SRC, 'utf8'));
+} catch { waiting('waiting', 'Data belum masuk'); }
+if (src?.schema !== SCHEMA) waiting('waiting', 'Format data belum sesuai');
+const asOf = time(src.as_of);
+if (!asOf) waiting('waiting', 'Data belum lengkap (as_of kosong)');
+const mode = MODES.includes(String(src.mode).toUpperCase()) ? String(src.mode).toUpperCase() : null;
+// Umur dinilai dari as_of milik bot, bukan dari waktu berkas ditarik.
+if (now - asOf > STALE_MS) waiting('stale', 'Data tertunda', { asOf, mode });
+
+const position = (p) => ({
+  symbol: text(p.symbol, 24) || '—', name: text(p.name, 40),
+  openedAt: time(p.opened_at), entryPriceUsd: px(p.entry_price_usd), markPriceUsd: px(p.mark_price_usd),
+  sizeUsd: r2(p.size_usd), valueUsd: r2(p.value_usd), pnlUsd: r2(p.pnl_usd), pnlPct: r2(p.pnl_pct),
+  tpStage: num(p.tp_stage), tpStagesTotal: num(p.tp_stages_total), stopPriceUsd: px(p.stop_price_usd),
+});
+const trade = (c) => ({
+  symbol: text(c.symbol, 24) || '—', openedAt: time(c.opened_at), closedAt: time(c.closed_at),
+  entryPriceUsd: px(c.entry_price_usd), exitPriceUsd: px(c.exit_price_usd), pnlUsd: r2(c.pnl_usd), pnlPct: r2(c.pnl_pct),
+  exitReason: EXITS.includes(String(c.exit_reason).toUpperCase()) ? String(c.exit_reason).toUpperCase() : text(c.exit_reason, 16),
+  simulated: c.simulated === true,
+});
+const arr = (v) => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []);
+const positions = arr(src.positions).map(position).sort((a, b) => (b.valueUsd ?? 0) - (a.valueUsd ?? 0));
+const allClosed = arr(src.closed_trades).map(trade).sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
+
+// Kurva ekuitas: maksimal ~720 titik (rata dari awal sampai akhir, titik terakhir selalu ikut).
+let curve = arr(src.equity_curve).map((p) => ({ t: time(p.t), usd: r2(p.equity_usd) })).filter((p) => p.t && p.usd != null).sort((a, b) => a.t - b.t);
+if (curve.length > 720) { const step = curve.length / 719; curve = [...Array.from({ length: 719 }, (_, i) => curve[Math.floor(i * step)]), curve.at(-1)]; }
+
+const g = src.guards && typeof src.guards === 'object' ? src.guards : {};
+const stopButton = typeof g.stop_button === 'boolean' ? g.stop_button : text(g.stop_button, 30);
+const closedStat = (list) => {
+  const graded = list.filter((c) => c.pnlUsd != null);
+  const wins = graded.filter((c) => c.pnlUsd > 0).length;
+  return { count: list.length, wins, losses: graded.filter((c) => c.pnlUsd < 0).length, winRatePct: graded.length ? r2((wins / graded.length) * 100) : null, pnlUsd: r2(graded.reduce((t, c) => t + c.pnlUsd, 0)) };
+};
+const startUsd = r2(src.start_capital_usd), equityUsd = r2(src.equity_usd);
+
+const snapshot = {
+  fund: 'solbot', status: 'ok', schema: SCHEMA, realMoney: true,
+  mode, haltReason: text(src.halt_reason, 200),
+  asOf, startedAt: time(src.started_at), checkedAt: now,
+  startCapitalUsd: startUsd, startCapitalSol: r4(src.start_capital_sol), solPriceUsd: r2(src.sol_price_usd),
+  cashUsd: r2(src.cash_usd), equityUsd,
+  changeUsd: startUsd > 0 && equityUsd != null ? r2(equityUsd - startUsd) : null,
+  changePct: startUsd > 0 && equityUsd != null ? r2((equityUsd / startUsd - 1) * 100) : null,
+  equityCurve: curve,
+  positions,
+  closedTrades: allClosed.slice(0, 200),
+  closedStats: { all: closedStat(allClosed), real: closedStat(allClosed.filter((c) => !c.simulated)), simulated: allClosed.filter((c) => c.simulated).length },
+  guards: {
+    ticketPct: r2(g.ticket_pct), stopPct: r2(g.stop_pct), dailyHaltPct: r2(g.daily_halt_pct), totalHaltPct: r2(g.total_halt_pct),
+    dailyPnlPct: r2(g.daily_pnl_pct), dailyRoomPct: r2(g.daily_room_pct), drawdownPct: r2(g.drawdown_pct), stopButton: stopButton ?? null,
+  },
+  disclaimer: text(src.disclaimer, 400),
+};
+publish(snapshot);
+console.log(`[solbot] ${mode || '?'} equity $${equityUsd ?? '—'} (${snapshot.changePct ?? '—'}%) · ${positions.length} posisi · ${allClosed.length} trade tertutup`);
+release();
