@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8f2ba380-0ea3-4cad-8f94-83aefd94107d",
-  "updatedAt": 1792449556091,
-  "generatedAt": "2026-10-20 05:39 WIB",
+  "generation": "069b39d6-b736-4228-bda1-db2abc016533",
+  "updatedAt": 1792449856489,
+  "generatedAt": "2026-10-20 05:44 WIB",
   "usdIdr": null,
   "totalUsd": 925.7091295862683,
   "nativeSymbol": "SOL",
@@ -1332,12 +1332,12 @@
     "pnlUsd": -74.29087041373168,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792449556091,
+    "heartbeatAt": 1792449856489,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.29,
-    "lastScanAt": 1792449551000,
+    "lastScanAt": 1792449850000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1358,13 +1358,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "404",
+        "v": "405",
         "n": "24 jam · 7 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "19595",
-        "n": "500 aktif"
+        "n": "501 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1374,9 +1374,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792449556091,
+      "lastDecisionAt": 1792449856489,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      "lastReason": "TOPCAT [degen]: Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1395,7 +1395,7 @@
       ],
       [
         "Wallet dipantau",
-        "19595 · 500 aktif"
+        "19595 · 501 aktif"
       ],
       [
         "Cadangan kas",
@@ -1407,7 +1407,7 @@
       ],
       [
         "Label wallet",
-        "smart 12869 · bot 4670 · blacklist 423 · lp 1 · fresh 1144 · kol 200 · dolphin 281 · whale 7"
+        "smart 12866 · bot 4674 · blacklist 423 · lp 1 · fresh 1143 · kol 199 · dolphin 282 · whale 7"
       ]
     ],
     "requirements": [
@@ -1456,28 +1456,28 @@
   "copyTrade": {
     "wallets": {
       "tracked": 19595,
-      "active": 500,
-      "passive": 19095,
+      "active": 501,
+      "passive": 19094,
       "trusted": 0,
       "promising": 43,
       "byLabel": [
         {
           "key": "smart",
-          "total": 12869,
-          "active": 467,
-          "passive": 12402
+          "total": 12866,
+          "active": 468,
+          "passive": 12398
         },
         {
           "key": "bot",
-          "total": 4670,
+          "total": 4674,
           "active": 0,
-          "passive": 4670
+          "passive": 4674
         },
         {
           "key": "fresh",
-          "total": 1144,
+          "total": 1143,
           "active": 0,
-          "passive": 1144
+          "passive": 1143
         },
         {
           "key": "blacklist",
@@ -1487,15 +1487,15 @@
         },
         {
           "key": "dolphin",
-          "total": 281,
+          "total": 282,
           "active": 22,
-          "passive": 259
+          "passive": 260
         },
         {
           "key": "kol",
-          "total": 200,
+          "total": 199,
           "active": 9,
-          "passive": 191
+          "passive": 190
         },
         {
           "key": "whale",
@@ -1611,6 +1611,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792449593309,
+        "symbol": "TOPCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792449415410,
         "symbol": "CARDS",
@@ -2620,49 +2630,12 @@
           }
         ],
         "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792438516029,
-        "symbol": "Kim",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 590,
-            "note": "bundler pegang 7.3%"
-          },
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 2.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "5.9% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 5x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 40,
+        "below_entry": 41,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
@@ -2718,7 +2691,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792449710122,
+    "generatedAt": 1792450017215,
     "trades": {
       "count": 147,
       "wins": 60,
