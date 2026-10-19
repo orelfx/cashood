@@ -102,9 +102,6 @@ const pr = src.preregistration && typeof src.preregistration === 'object' ? {
 const engineT0 = time(src.startedAt);
 const warnings = [];
 const iso = (t) => new Date(t + 7 * 3600e3).toISOString().slice(0, 16).replace('T', ' ') + ' WIB';
-let pin = readJSON(PIN) || readJSON(PIN_BACKUP);
-if (pin && !Number.isFinite(pin.startedAt)) pin = null;
-if (pin && !existsSync(PIN)) atomicJSON(PIN, pin);
 // T0 hanya dipatok kalau SEMUA syarat ini terpenuhi:
 //  - phase === "scored" (fase kosong/null/"warmup"/lainnya tidak pernah mematok);
 //  - mesin mengirim kedua hash (pra-registrasi dan parameter);
@@ -118,16 +115,33 @@ const expected = { prereg12: hash12(funds?.gm?.expectedHashes?.prereg12), params
 const expectedSet = Boolean(expected.prereg12 || expected.params12);
 const expectedComplete = Boolean(expected.prereg12 && expected.params12);
 const hashesMatch = hashesReady && expectedComplete && pr.prereg12 === expected.prereg12 && pr.params12 === expected.params12;
+// Pin yang sudah ada (data/gm/t0.local.json, atau cadangan gm/t0.json dari branch data)
+// divalidasi ulang SETIAP run terhadap gm.expectedHashes. Kalau hash-nya tidak persis sama
+// dengan kedua hash final, pin itu diabaikan (tidak dipakai, tidak ditimpa, tidak dihapus)
+// dan panel menampilkan "pin lama tidak cocok, menunggu T0".
+const STALE_PIN = 'pin lama tidak cocok, menunggu T0';
+const pinLocal = readJSON(PIN);
+let pin = pinLocal || readJSON(PIN_BACKUP);
+if (pin && !Number.isFinite(pin.startedAt)) pin = null;
+let stalePin = null;
+if (pin && !(expectedComplete && pin.prereg12 === expected.prereg12 && pin.params12 === expected.params12)) {
+  stalePin = { source: pinLocal ? 't0.local.json' : 'gm/t0.json (branch data)', startedAt: pin.startedAt,
+    prereg12: hash12(pin.prereg12), params12: hash12(pin.params12) };
+  warnings.push(`Pin T0 lama diabaikan: hash-nya (${stalePin.prereg12 ?? 'tidak ada'} / ${stalePin.params12 ?? 'tidak ada'}) tidak cocok dengan hash final (${expected.prereg12 || 'kosong'} / ${expected.params12 || 'kosong'}).`);
+  pin = null;
+}
+if (pin && !pinLocal) atomicJSON(PIN, pin);
 let waitReason = null;
-if (!pin) {
+if (stalePin) waitReason = STALE_PIN;
+else if (!pin) {
   if (phase === 'warmup') waitReason = 'menunggu T0 (warmup)';
   else if (!SCORED) waitReason = 'menunggu T0 (mesin belum di fase dinilai)';
   else if (!engineT0) waitReason = 'menunggu T0 (mesin belum mengirim startedAt)';
   else if (!hashesMatch) waitReason = 'menunggu T0 (hash final belum cocok)';
 }
-if (!pin && engineT0 && SCORED && !hashesReady)
+if (!pin && !stalePin && engineT0 && SCORED && !hashesReady)
   warnings.push('T0 belum dipatok: mesin sudah di fase dinilai, tetapi hash pra-registrasi atau parameter belum dikirim.');
-if (!pin && engineT0 && SCORED && !waitReason) {
+if (!pin && !stalePin && engineT0 && SCORED && !waitReason) {
   pin = { fund: 'gm', startedAt: engineT0, pinnedAt: now, version: pr?.version ?? null, prereg12: pr.prereg12, params12: pr.params12 };
   atomicJSON(PIN, pin);
   console.log(`[gm] T0 dipatok: ${iso(engineT0)}`);
@@ -218,6 +232,7 @@ const snapshot = {
   preregistration: pr,
   hashCheck: expectedSet ? 'set' : 'hash final belum ditetapkan',
   t0Wait: t0 ? null : (waitReason || 'menunggu T0'),
+  stalePin,
   warnings,
   challenger,
   shadows: (Array.isArray(src.shadows) ? src.shadows : []).slice(0, 8).map(shadow),
