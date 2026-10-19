@@ -41,9 +41,9 @@ run_paper snh /root/cashood-inbox/snipehunt.json
 # Grok Meridian (dry run): mesinnya di abil-vps menaruh grok-meridian.json di kotak
 # masuk sana; fetch-paper-inbox.sh di atas menariknya ke kotak masuk lokal.
 run_snapshot scripts/sync-gm.mjs
-# SolBot (UANG ASLI, high risk): satu berkas publik dari VPS bot lewat key sendiri,
-# terpisah dari buku paper Devil Greed. Tarikan gagal → umur data yang menentukan.
-timeout --kill-after=5 40 scripts/fetch-live-solana.sh || true
+# SolBot (UANG ASLI, high risk): bot/Grok menaruh live-solana-public.json langsung
+# di kotak masuk server ini (tulis lokal, atau kirim lewat receive-live-solana.sh).
+# Tidak ditarik dari VPS lain. Data basi (>15 menit) → halaman tanpa angka.
 run_snapshot scripts/sync-solbot.mjs
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
 run_snapshot scripts/sync-index.mjs
