@@ -3064,6 +3064,7 @@ async function loadFundBrief(id) {
       pnlUsd: snap?.trading?.capitalKnown === false ? null
         : total + ledger.withdrawn - dividendTotals(cfg).gross + dividendTotals(cfg).net - ledger.deposited - (Number(ledger.reinvested) || 0),
       updatedAt: Number(snap?.updatedAt) || null,
+      frozen: Boolean(snap?.frozen),             // dana dibekukan: nilainya sengaja tidak diperbarui
       paper: Boolean(meta?.paper),
       risk: meta?.risk || null,
       capacityUsd: Number(cfg.fund?.capacityUsd) || 0,
@@ -3092,11 +3093,33 @@ async function loadFundBrief(id) {
   return job;
 }
 
+/* SolBot (uang asli) ikut total aset sebagai satu "dana" ringkas: nilai =
+ * ekuitas, modal = modal awal + setoran − penarikan, deret = kurva ekuitas.
+ * Data kosong atau lebih dari 15 menit → tidak dijumlahkan dan total ditandai
+ * sebagian, supaya angka lama tidak ikut seolah live. Terpisah dari paper. */
+async function solbotBrief() {
+  if (!state.solbot) return null;
+  const d = await loadSolbot().catch(() => null);
+  if (!d || d.status !== 'ok' || !d.asOf || Date.now() - d.asOf > SOLBOT_STALE_MS || !(d.equityUsd >= 0)) return null;
+  const f = state.solbot;
+  return {
+    id: 'solbot', label: f.label, chain: f.chain || 'Solana', accent: f.accent, totalUsd: d.equityUsd,
+    depositedUsd: Number(d.basisUsd ?? d.startCapitalUsd) || 0, pnlUsd: d.changeUsd ?? null, updatedAt: d.asOf, risk: f.risk, paper: false,
+    flows: (d.flows || []).map((x) => ({ at: x.t, usd: x.type === 'withdraw' ? -Math.abs(x.usd) : Math.abs(x.usd) })),
+    series: (d.equityCurve || []).map((p) => ({ t: p.t, usd: p.usd })),
+    owners: [], openCount: (d.positions || []).length, closedCount: d.totals?.trades ?? d.closedStats?.all?.count ?? 0,
+    winRate: d.totals?.winRatePct ?? d.closedStats?.real?.winRatePct ?? null, solbot: d,
+  };
+}
+
 /** Angka global yang sama untuk halaman Portofolio dan Beranda. */
 async function portoTotals() {
   const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
   const boxJob = state.safebox ? loadSafebox().catch(() => null) : Promise.resolve(null);   // bersamaan dengan dana
+  const sbJob = solbotBrief();
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
+  const sb = await sbJob;
+  if (state.solbot) { ids.push('solbot'); loaded.push(sb); }
   const briefs = loaded.filter(Boolean);
   const box = await boxJob;
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
@@ -3114,7 +3137,9 @@ async function renderPortofolio() {
   // akan membuat total itu bohong.
   const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
   const boxJob = state.safebox ? loadSafebox().catch(() => null) : Promise.resolve(null);
+  const sbJob = solbotBrief();
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
+  if (state.solbot) { ids.push('solbot'); loaded.push(await sbJob); }
   const missing = ids.filter((id, i) => !loaded[i]);
   const briefs = loaded.filter(Boolean);
   const box = await boxJob;
@@ -3143,7 +3168,7 @@ async function renderPortofolio() {
     tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham${pokokBox > 0 ? ` · termasuk ${usd(pokokBox, 0)} Safe Box` : ''}`),
     tile('Untung / rugi', signed(untung), setoran ? pct((untung / setoran) * 100) + ' dari modal' : '—', cls(untung)),
   ].join(''));
-  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · gagal: ' + missing.join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
+  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
 
   setHTML($('#portoList'), briefs.map((b) => `
     <div class="porto-fund">
@@ -3153,7 +3178,7 @@ async function renderPortofolio() {
         <span class="porto-val">${usd(b.totalUsd)}<span class="n ${cls(b.pnlUsd)}">${signed(b.pnlUsd)}</span></span>
       </div>
       <div class="table-scroll"><table class="porto-tbl"><tbody>
-        ${b.owners.map((o) => `<tr>
+        ${b.id === 'solbot' ? `<tr><td colspan="3" class="dim">Uang asli · ekuitas bot trading, bukan saham investor · <a href="#solbot">buka SolBot</a></td></tr>` : ''}${b.owners.map((o) => `<tr>
           <td><span class="who"><span class="chip" style="background:${o.color || '#4ade80'}"></span>${esc(o.name)}</span></td>
           <td class="num">${pct(o.share)}</td>
           <td class="num">${usd(o.value)}</td></tr>`).join('')}
@@ -3953,6 +3978,7 @@ let sbCapacity = null;
 const homeView = { hours: 24, referenceAt: null, selectedAt: null };
 const seriesCache = new Map();
 async function loadFundSeries(b) {
+  if (b.series) return b.series;                 // SolBot: kurva ekuitas dari datanya sendiri
   const hit = seriesCache.get(b.id);
   if (hit && Date.now() - hit.at < 60000) return hit.points;
   const pts = (await readNavSeries(b.cfg, { fund: b.id })).map((p) => ({ t: Number(p.t), usd: Number(p.usd) }))
@@ -4201,7 +4227,7 @@ async function renderHome() {
     ...(box ? [{ id: 'safebox', name: state.safebox.label, color: state.safebox.accent, usd: g.simpanan }] : [])]
     .filter((p) => p.usd > 0).sort((a, b) => b.usd - a.usd);
   const pnlPct = g.setoran ? (g.untung / g.setoran) * 100 : 0;
-  const tua = Math.min(...g.briefs.map((b) => b.updatedAt || Date.now()), box?.updatedAt || Date.now());
+  const tua = Math.min(...g.briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || Date.now()), box?.updatedAt || Date.now());
   setHTML($('#homeAum'), `
     <div class="aum-k"><span class="live-dot"></span>Total aset dikelola${g.missing.length ? ' <span class="dim">(sebagian)</span>' : ''}</div>
     <div class="aum-v">${usd(g.total, 0)}</div>
