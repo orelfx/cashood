@@ -3540,10 +3540,10 @@ async function renderDuel(key) {
   const ddTxt = (b) => (b?.maxDrawdownPct == null ? '' : ` · DD maks ${pct(b.maxDrawdownPct, 1)}`);
   const tiles = books.map(([k, name, c, b]) => `<div class="grr-tile" style="--c:${c}">
       <div class="grr-k"><i></i>${esc(name)}</div>
-      <div class="grr-v ${cls(b?.pctSinceStart ?? 0)}">${pctTxt(b?.pctSinceStart)}</div>
+      <div class="grr-v ${cls(b?.pctSinceStart ?? 0)}">${b?.status === 'waiting_t0' ? '<span class="dim">menunggu T0</span>' : pctTxt(b?.pctSinceStart)}</div>
       <div class="grr-n">${b?.equityUsd != null ? usd(b.equityUsd) : '—'}${solTxt(b?.equitySol)}${k === 'live' ? ' · uang asli' : ' · kertas'}</div>
       ${k !== 'live' ? `<div class="grr-n">${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${b?.openSeats?.length ?? 0} seat terbuka${ddTxt(b)}</div>` : `<div class="grr-n">${b?.asOf ? 'per ' + tglRingkas(b.asOf) : ''}${ddTxt(b)}</div>`}
-      ${k === 'live' && b?.rawPctSinceStart != null && b.rawPctSinceStart !== b.pctSinceStart ? `<div class="grr-n dim2">tanpa koreksi arus dana ${pctTxt(b.rawPctSinceStart)}</div>` : ''}
+      ${k === 'live' && b?.rawPctSinceStart != null && b.rawPctSinceStart !== b.pctSinceStart ? `<div class="grr-n dim2">tanpa koreksi arus dana ${pctTxt(b.rawPctSinceStart)}${b.netFlowsUsd ? ` · arus dana ${signed(b.netFlowsUsd)}` : ''}</div>` : ''}
     </div>`).join('');
   // Grafik persen sejak awal, tiga garis.
   const pts = (nav?.points || []).filter((p) => Number.isFinite(p.t));

@@ -7,8 +7,16 @@
  * atomik tiap 5 menit di kotak masuk sana; fetch-paper-inbox.sh menariknya ke
  * kotak masuk lokal bersama berkas devil greed. Isinya satu buku kertas
  * (challenger = strategi Grok), varian shadow yang didaftarkan sebelum mulai
- * (dilaporkan, tidak dinilai), dan "live" (Meridian asli di Cashood) sebagai
- * pembanding. Tidak ada buku mirror (keputusan pemilik 2026-10-19).
+ * (dilaporkan, tidak dinilai). Tidak ada buku mirror (keputusan pemilik
+ * 2026-10-19).
+ *
+ * Kolom "Meridian asli" TIDAK diambil dari berkas mesin (mesin Grok tidak boleh
+ * menilai lawannya sendiri; blok "live" di berkas itu diabaikan). Skrip ini
+ * menghitungnya sendiri dari data dana Meridian yang sudah ada di Cashood
+ * (data/meridian/nav.json, live.json, config.json), mulai dari T0 = startedAt
+ * di berkas mesin: Modified Dietz harian dirangkai dalam USD (metode yang sama
+ * dengan buku Grok), arus dana bersih sejak T0, dan persen mentah sebagai
+ * catatan. Tanpa startedAt kolom ini "menunggu T0".
  *
  * Satuan: USD. Modal awal = NAV Meridian saat T0; setoran/penarikan Meridian
  * dicerminkan ke buku kertas, jadi semua buku dinilai dengan persen yang sudah
@@ -22,9 +30,12 @@ import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { atomicJSON, assertPublic, downsample, lock, readJSON } from './lib/io.mjs';
+import { linkedDietz, meridianFlows } from './lib/dietz.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'gm');
+const DATA = process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data');
+const DIR = resolve(DATA, 'gm');
+const MERIDIAN = resolve(DATA, 'meridian');
 const SRC = process.env.GM_STATE || '/root/cashood-inbox/grok-meridian.json';
 const release = lock(resolve(DIR, 'sync.lock.local'));
 const now = Date.now();
@@ -75,11 +86,30 @@ const book = (b, id) => ({
 // Shadow: varian yang didaftarkan sebelum T0 (mis. range 70 dan 100 bin).
 // Dilaporkan apa adanya; ringkas saja, tanpa daftar seat.
 const shadow = (b) => { const x = book(b); return { id: x.id, label: x.label, equityUsd: x.equityUsd, pctSinceStart: x.pctSinceStart, maxDrawdownPct: x.maxDrawdownPct, closes: x.closes, winRatePct: x.winRatePct, feesUsd: x.feesUsd, costsUsd: x.costsUsd }; };
-const live = src.live && typeof src.live === 'object' ? {
-  equityUsd: r2(src.live.equityUsd), pctSinceStart: r2(src.live.pctSinceStart), rawPctSinceStart: r2(src.live.rawPctSinceStart),
-  netFlowsUsd: r2(src.live.netFlowsUsd), maxDrawdownPct: r2(src.live.maxDrawdownPct), closes: num(src.live.closes),
-  asOf: time(src.live.asOf), source: text(src.live.source, 30), note: text(src.live.note, 600),
-} : null;
+// Kolom pembanding: dihitung di sini dari data dana Meridian, bukan dari mesin.
+function meridianLive(t0) {
+  if (!t0) return { status: 'waiting_t0', note: 'Menunggu T0: mesin paper belum menetapkan waktu mulai.' };
+  const nav = readJSON(resolve(MERIDIAN, 'nav.json'), { points: [] });
+  const snap = readJSON(resolve(MERIDIAN, 'live.json'));
+  const cfg = readJSON(resolve(MERIDIAN, 'config.json'));
+  const points = (nav.points || []).filter((p) => p.quality == null || p.quality === 'complete').map((p) => ({ t: p.t, usd: p.usd, outflowTotalUsd: p.outflowTotalUsd }));
+  const lastT = points.at(-1)?.t ?? 0;
+  if (snap && Number.isFinite(snap.updatedAt) && snap.updatedAt > lastT && Number.isFinite(snap.totalUsd) && (snap.quality?.complete ?? true))
+    points.push({ t: snap.updatedAt, usd: snap.totalUsd, outflowTotalUsd: snap.outflowTotalUsd });
+  const res = cfg ? linkedDietz({ points, flows: meridianFlows(cfg, points), t0 }) : null;
+  if (!res) return { status: 'unavailable', note: 'Data dana Meridian di Cashood belum cukup untuk menghitung hasil sejak T0.' };
+  const gap = start > 0 ? (start / res.startNavUsd - 1) * 100 : null;
+  return {
+    status: 'ok', equityUsd: r2(res.endNavUsd), pctSinceStart: r2(res.pctSinceStart), rawPctSinceStart: r2(res.rawPctSinceStart),
+    netFlowsUsd: r2(res.netFlowsUsd), maxDrawdownPct: r2(res.maxDrawdownPct), startNavUsd: r2(res.startNavUsd), startNavAt: res.startNavAt,
+    asOf: res.asOf, source: 'cashood meridian',
+    note: `Dihitung Cashood dari data dana Meridian, bukan dari mesin Grok: Modified Dietz harian dirangkai (USD) sejak T0. `
+      + `NAV di T0 $${res.startNavUsd.toFixed(2)}, sekarang $${res.endNavUsd.toFixed(2)}; arus dana bersih sejak T0 $${res.netFlowsUsd.toFixed(2)}; `
+      + `tanpa koreksi arus dana ${res.rawPctSinceStart >= 0 ? '+' : ''}${res.rawPctSinceStart.toFixed(2)}%.`
+      + (gap != null && Math.abs(gap) > 1 ? ` Perhatian: modal kertas berbeda ${gap.toFixed(2)}% dari NAV Meridian di T0.` : ''),
+  };
+}
+const live = meridianLive(time(src.startedAt));
 const pr = src.preregistration && typeof src.preregistration === 'object' ? {
   version: text(src.preregistration.version, 24), lockedAt: time(src.preregistration.lockedAt),
   prereg12: hash12(src.preregistration.sha256Prereg), params12: hash12(src.preregistration.sha256Params),
@@ -100,9 +130,9 @@ assertPublic(snapshot);
 const histFile = resolve(DIR, 'nav.json');
 const hist = readJSON(histFile, { points: [] });
 const lastT = hist.points.at(-1)?.t ?? 0;
-if (updatedAt > lastT) hist.points.push({ t: updatedAt, usd: snapshot.challenger.equityUsd ?? start, challenger: snapshot.challenger.pctSinceStart, live: live?.pctSinceStart ?? null });
+if (updatedAt > lastT) hist.points.push({ t: updatedAt, usd: snapshot.challenger.equityUsd ?? start, challenger: snapshot.challenger.pctSinceStart, live: live.pctSinceStart ?? null });
 const points = downsample(hist.points, now).map((p) => ({ t: p.t, usd: p.usd, challenger: p.challenger ?? null, live: p.live ?? null }));
 atomicJSON(histFile, { updatedAt, points });
 atomicJSON(resolve(DIR, 'live.json'), snapshot);
-console.log(`[gm] grok ${snapshot.challenger.pctSinceStart}% · live ${live?.pctSinceStart ?? '—'}%`);
+console.log(`[gm] grok ${snapshot.challenger.pctSinceStart}% · live ${live.pctSinceStart ?? live.status}%`);
 release();
