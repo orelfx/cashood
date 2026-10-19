@@ -63,8 +63,10 @@ const mode = MODES.includes(String(src.mode).toUpperCase()) ? String(src.mode).t
 // Umur dinilai dari as_of milik bot, bukan dari waktu berkas ditarik.
 if (now - asOf > STALE_MS) waiting('stale', 'Data tertunda', { asOf, mode });
 
+// Kategori market cap dari bot: degen < $200 rb, low $200 rb – $30 jt.
+const sleeve = (v) => { const t = String(v ?? '').toLowerCase().trim(); return ['degen', 'low'].includes(t) ? t : text(v, 16); };
 const position = (p) => ({
-  symbol: text(p.symbol, 24) || '—', name: text(p.name, 40),
+  symbol: text(p.symbol, 24) || '—', name: text(p.name, 40), sleeve: sleeve(p.sleeve),
   openedAt: time(p.opened_at), entryPriceUsd: px(p.entry_price_usd), markPriceUsd: px(p.mark_price_usd),
   sizeUsd: r2(p.size_usd), valueUsd: r2(p.value_usd), pnlUsd: r2(p.pnl_usd), pnlPct: r2(p.pnl_pct),
   tpStage: num(p.tp_stage), tpStagesTotal: num(p.tp_stages_total), stopPriceUsd: px(p.stop_price_usd),
@@ -72,7 +74,7 @@ const position = (p) => ({
   nextTpPriceUsd: px(p.next_tp_price_usd), entryNote: text(p.entry_note, 200), peakPriceUsd: px(p.peak_price_usd),
 });
 const trade = (c) => ({
-  symbol: text(c.symbol, 24) || '—', openedAt: time(c.opened_at), closedAt: time(c.closed_at),
+  symbol: text(c.symbol, 24) || '—', sleeve: sleeve(c.sleeve), openedAt: time(c.opened_at), closedAt: time(c.closed_at),
   entryPriceUsd: px(c.entry_price_usd), exitPriceUsd: px(c.exit_price_usd), pnlUsd: r2(c.pnl_usd), pnlPct: r2(c.pnl_pct),
   exitReason: EXITS.includes(String(c.exit_reason).toUpperCase()) ? String(c.exit_reason).toUpperCase() : text(c.exit_reason, 16),
   simulated: c.simulated === true, exitNote: text(c.exit_note, 200), tpStage: num(c.tp_stage),

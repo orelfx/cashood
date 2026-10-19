@@ -114,3 +114,12 @@ test('solbot: flows dengan nama field at/amount_usd/amount_sol juga dihitung seb
   assert.equal(d.basisUsd, 136);
   assert.equal(d.changeUsd, -10.7);
 });
+
+test('solbot: sleeve (degen/low) ikut terbit di posisi dan trade tertutup', () => {
+  const src = source();
+  src.positions[0].sleeve = 'Degen';
+  src.closed_trades[0].sleeve = 'low';
+  const d = run(src);
+  assert.equal(d.positions[0].sleeve, 'degen');
+  assert.equal(d.closedTrades.find((c) => c.symbol === 'AAA').sleeve, 'low');
+});

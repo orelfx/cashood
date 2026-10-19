@@ -3892,6 +3892,9 @@ function paintSolbot(d) {
  * kalau bot belum mengirim harga targetnya sendiri. */
 const SB_LADDER = [{ n: 1, pct: 30, sell: 30, stop: 0, stopLbl: 'BE' }, { n: 2, pct: 100, sell: 25, stop: 50, stopLbl: '+50%' }, { n: 3, pct: 300, sell: 25, stop: null, stopLbl: 'trailing' }];
 const SB_STOP0 = -30, SB_TRAIL = 30, SB_RUNNER = 20;
+// Kategori market cap (field sleeve dari bot); sistem keluarnya sama untuk keduanya.
+const SB_SLEEVE = { degen: ['Degen', 'market cap di bawah $200 rb'], low: ['Low', 'market cap $200 rb – $30 jt'] };
+const sbSleeve = (v) => (v ? SB_SLEEVE[v] || [String(v), ''] : null);
 function sbLadder(r) {
   const e = r.entryPriceUsd > 0 ? r.entryPriceUsd : null;
   const stage = Math.max(0, Math.min(3, Number(r.tpStage) || 0));
@@ -3947,7 +3950,9 @@ function solbotPositionsHtml(d) {
   const plan = (r, L) => {
     const more = [r.name ? `<div class="sub2">${esc(r.name)}</div>` : '', `<div class="sub2">masuk ${sbPx(r.entryPriceUsd)} · sekarang ${sbPx(r.markPriceUsd)}${L.stage ? ` · sudah dijual ${L.sold}%, sisa ${L.left}%` : ''}</div>`,
       sbLadderTable(L), r.entryNote ? `<p class="fx-why"><b>Alasan masuk:</b> ${esc(r.entryNote)}</p>` : ''].join('');
-    return `<details class="fx-det"><summary>${L.stage >= 3 ? 'Runner (trailing)' : L.stage ? 'Ambil untung bertahap' : 'Copy-trade'}</summary>${more}</details>
+    const sv = sbSleeve(r.sleeve);
+    const phase = L.stage >= 3 ? 'runner (trailing)' : L.stage ? 'ambil untung bertahap' : '';
+    return `<details class="fx-det"><summary>${sv ? esc(sv[0]) : 'Copy-trade'}${phase ? ` <span class="dim">· ${phase}</span>` : ''}</summary>${sv && sv[1] ? `<div class="sub2">${esc(sv[0])} = ${esc(sv[1])} · aturan keluar sama untuk degen dan low</div>` : ''}${more}</details>
       <span class="pill sb-plan">stop ${esc(L.stopLbl)} · TP ${L.stage}/3 ${sbDots(L.stage)}${L.next ? ` · next TP${L.next.n} +${L.next.pct}%` : ''}</span>`;
   };
   const stopCell = (L) => `<div><span class="dim">stop</span> <span class="neg">${L.stop == null ? '—' : sbPx(L.stop)}</span> <small class="dim">${L.stage >= 3 ? `trailing ${SB_TRAIL}%` : esc(L.stopLbl)}</small></div>`;
@@ -4014,10 +4019,12 @@ function solbotClosedHtml(d) {
         ${months.map((m) => `<option value="${m}"${m === solbotView.month ? ' selected' : ''}>${label(m)} · ${all.filter((c) => c.closedAt && mon(c.closedAt) === m).length} posisi</option>`).join('')}</select></label>
       <span class="closed-sum"><b>${s.n}</b> posisi · hasil <b class="${cls(s.usd)}">${signed(s.usd)}</b> · <span class="pos">${s.w} untung</span> · <span class="neg">${s.l} rugi</span>${s.w + s.l ? ` · win rate ${pct((s.w / (s.w + s.l)) * 100, 1)}` : ''}${s.sim ? ` · ${s.sim} simulasi` : ''}</span>
     </div>
+    ${scope.some((c) => c.sleeve) ? `<p class="hint sb-tstat">${['degen', 'low'].map((k) => { const ss = sum(scope.filter((c) => c.sleeve === k)); return ss.n ? `<b>${SB_SLEEVE[k][0]}</b> ${ss.n} posisi · <span class="${cls(ss.usd)}">${signed(ss.usd)}</span>${ss.w + ss.l ? ` · win ${pct((ss.w / (ss.w + ss.l)) * 100, 0)}` : ''}` : ''; }).filter(Boolean).join(' &nbsp;·&nbsp; ')} <span class="dim">· degen &lt; $200 rb, low $200 rb–$30 jt market cap</span></p>` : ''}
     ${t.trades ? `<p class="hint sb-tstat">Seluruh riwayat menurut bot: terbaik <b class="${cls(t.bestPct ?? 0)}">${sbPct(t.bestPct)}</b> · terburuk <b class="${cls(t.worstPct ?? 0)}">${sbPct(t.worstPct)}</b> · rata² lama posisi <b>${t.avgHoldMin == null ? '—' : dur(t.avgHoldMin)}</b>${d.feesUsd != null ? ` · total biaya (fee/gas) <b>${usd(d.feesUsd)}</b>` : ''}</p>` : ''}
-    <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th class="num">Modal</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+    <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th>Strategi</th><th class="num">Modal</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
     ${rows.map((c) => `<tr${c.simulated ? ' class="sb-simrow"' : ''}>
       <td class="mc-head"><span class="who"><span class="chip" style="background:${(c.pnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol)}</span>${c.simulated ? ' <span class="pill sb-sim">simulasi</span>' : ''}</td>
+      <td data-k="Strategi" title="${esc(sbSleeve(c.sleeve)?.[1] || '')}">${c.sleeve ? esc(c.sleeve) : '<span class="dim">—</span>'}</td>
       <td class="num" data-k="Modal">${c.sizeUsd == null ? '—' : usd(c.sizeUsd)}</td>
       <td class="num dim" data-k="Lama">${c.openedAt && c.closedAt ? dur((c.closedAt - c.openedAt) / 60000) : '—'}</td>
       <td class="num ${cls(c.pnlUsd ?? 0)}" data-k="Hasil">${sbUsd(c.pnlUsd)}</td>
