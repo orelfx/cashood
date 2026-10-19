@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5abbcf14-8737-4d47-b5e4-1f629bf28b97",
-  "updatedAt": 1792399284920,
-  "generatedAt": "2026-10-19 15:41 WIB",
+  "generation": "c1d30637-4e1d-43aa-9717-c226e42ccd20",
+  "updatedAt": 1792399585525,
+  "generatedAt": "2026-10-19 15:46 WIB",
   "usdIdr": null,
   "totalUsd": 931.3450739893949,
   "nativeSymbol": "SOL",
@@ -1314,12 +1314,12 @@
     "pnlUsd": -68.6549260106051,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792399284920,
+    "heartbeatAt": 1792399585525,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.73,
-    "lastScanAt": 1792399271000,
+    "lastScanAt": 1792399577000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1346,7 +1346,7 @@
       {
         "k": "Wallet dipantau",
         "v": "18654",
-        "n": "456 aktif"
+        "n": "455 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1356,9 +1356,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792399284920,
+      "lastDecisionAt": 1792399585525,
       "lastAction": "keputusan",
-      "lastReason": "Mimi [degen]: Dilewati karena red flag: bundler pegang 25.31% supply."
+      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 1.0% dari market cap."
     }
   },
   "strategy": {
@@ -1377,7 +1377,7 @@
       ],
       [
         "Wallet dipantau",
-        "18654 · 456 aktif"
+        "18654 · 455 aktif"
       ],
       [
         "Cadangan kas",
@@ -1389,7 +1389,7 @@
       ],
       [
         "Label wallet",
-        "smart 12436 · bot 4159 · blacklist 411 · lp 1 · fresh 1095 · kol 192 · dolphin 353 · whale 7"
+        "smart 12438 · bot 4158 · blacklist 411 · lp 1 · fresh 1094 · kol 192 · dolphin 353 · whale 7"
       ]
     ],
     "requirements": [
@@ -1438,28 +1438,28 @@
   "copyTrade": {
     "wallets": {
       "tracked": 18654,
-      "active": 456,
-      "passive": 18198,
+      "active": 455,
+      "passive": 18199,
       "trusted": 0,
       "promising": 42,
       "byLabel": [
         {
           "key": "smart",
-          "total": 12436,
-          "active": 429,
-          "passive": 12007
+          "total": 12438,
+          "active": 428,
+          "passive": 12010
         },
         {
           "key": "bot",
-          "total": 4159,
+          "total": 4158,
           "active": 0,
-          "passive": 4159
+          "passive": 4158
         },
         {
           "key": "fresh",
-          "total": 1095,
+          "total": 1094,
           "active": 0,
-          "passive": 1095
+          "passive": 1094
         },
         {
           "key": "blacklist",
@@ -1500,15 +1500,6 @@
         "promising": "Pernah membawa untung tapi belum cukup teruji: pembelian solonya diuji sebagai posisi bayangan."
       },
       "top": [
-        {
-          "alias": "smart #11407",
-          "label": "smart",
-          "score": 100,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
         {
           "alias": "dolphin #14202",
           "label": "dolphin",
@@ -1589,10 +1580,29 @@
           "won": 0,
           "pnlUsd": 0,
           "trusted": false
+        },
+        {
+          "alias": "smart #7229",
+          "label": "smart",
+          "score": 97.4,
+          "copied": 1,
+          "won": 1,
+          "pnlUsd": 5.0658222072215215,
+          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1792399454152,
+        "symbol": "USDP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.0% dari market cap."
+      },
       {
         "at": 1792399060459,
         "symbol": "Mimi",
@@ -2369,58 +2379,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: bundler pegang 34.51% supply."
-      },
-      {
-        "at": 1792381312989,
-        "symbol": "SXSITBL",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 8,
-            "note": "8 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 1.07% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 924,
-            "note": "bundler pegang 47.8%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 6.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 4,
-            "note": "sniper awal masih pegang 0.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 679,
-            "note": "12.8% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 37x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: Wallet 1 has losing copy history (-19.2% avg, 1 rug), Wallet 3 is a confirmed bot/sniper (1546 round trips, 599 sold within 2min) unsuitable for copy-trading, a. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2482,7 +2440,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792399305069,
+    "generatedAt": 1792399614079,
     "trades": {
       "count": 145,
       "wins": 59,
