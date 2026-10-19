@@ -78,7 +78,9 @@ if (problems.length) {
   assertPublic(held); atomicJSON(resolve(DIR,'live.json'),held);
   console.warn('[index] perhitungan ditunda:',problems); release(); process.exit(0);
 }
-const sourceAt=Math.min(...loaded.map(f=>f.live.updatedAt));
+// Dana yang dibekukan tidak menahan waktu sumber index: nilainya memang tetap.
+const liveAt=loaded.filter(f=>!f.live.frozen).map(f=>f.live.updatedAt);
+const sourceAt=Math.min(...(liveAt.length?liveAt:loaded.map(f=>f.live.updatedAt)));
 
 const stateFile = resolve(DIR, 'state.local.json');
 let state = process.argv.includes('--backfill') ? null : readJSON(stateFile);
