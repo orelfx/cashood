@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "cceddb67-6f37-40a0-b386-4b0f446f5b8d",
-  "updatedAt": 1792370709415,
-  "generatedAt": "2026-10-19 07:45 WIB",
+  "generation": "1c19a8b0-c7c7-4511-9100-69ae9ee65a25",
+  "updatedAt": 1792371011394,
+  "generatedAt": "2026-10-19 07:50 WIB",
   "usdIdr": null,
   "totalUsd": 936.054273131302,
   "nativeSymbol": "SOL",
@@ -1307,12 +1307,12 @@
     "pnlUsd": -63.94572686869799,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792370709415,
+    "heartbeatAt": 1792371011394,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.27,
-    "lastScanAt": 1792370695000,
+    "lastScanAt": 1792371005000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1333,8 +1333,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "464",
-        "n": "24 jam · 3 diveto LLM"
+        "v": "465",
+        "n": "24 jam · 4 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1349,9 +1349,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792370709415,
+      "lastDecisionAt": 1792371011394,
       "lastAction": "keputusan",
-      "lastReason": "100xbroker [degen]: Dilewati: explore: zone/cooldown/budget."
+      "lastReason": "HOOT [low]: Dilewati karena red flag: akun Twitter dev sudah ganti nama 7x."
     }
   },
   "strategy": {
@@ -1382,7 +1382,7 @@
       ],
       [
         "Label wallet",
-        "smart 12250 · bot 3898 · blacklist 399 · lp 1 · fresh 1070 · kol 189 · dolphin 367 · whale 7 · unknown 21"
+        "smart 12264 · bot 3903 · blacklist 399 · lp 1 · fresh 1071 · kol 189 · dolphin 367 · whale 7 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1438,21 +1438,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 12250,
+          "total": 12264,
           "active": 464,
-          "passive": 11786
+          "passive": 11800
         },
         {
           "key": "bot",
-          "total": 3898,
+          "total": 3903,
           "active": 0,
-          "passive": 3898
+          "passive": 3903
         },
         {
           "key": "fresh",
-          "total": 1070,
+          "total": 1071,
           "active": 0,
-          "passive": 1070
+          "passive": 1071
         },
         {
           "key": "blacklist",
@@ -1473,12 +1473,6 @@
           "passive": 182
         },
         {
-          "key": "unknown",
-          "total": 21,
-          "active": 0,
-          "passive": 21
-        },
-        {
           "key": "whale",
           "total": 7,
           "active": 1,
@@ -1486,6 +1480,12 @@
         },
         {
           "key": "lp",
+          "total": 1,
+          "active": 0,
+          "passive": 1
+        },
+        {
+          "key": "unknown",
           "total": 1,
           "active": 0,
           "passive": 1
@@ -1592,6 +1592,77 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792370747967,
+        "symbol": "HOOT",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 7x."
+      },
+      {
+        "at": 1792370738225,
+        "symbol": "HOOT",
+        "action": "veto",
+        "basket": "low",
+        "wallets": {
+          "smart": 2,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 14.1% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 363,
+            "note": "bundler pegang 28.4%"
+          },
+          {
+            "type": "rat",
+            "count": 2,
+            "note": "insider/entrapment pegang 2.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 4,
+            "note": "sniper awal masih pegang 8.7%"
+          },
+          {
+            "type": "fresh",
+            "count": 450,
+            "note": "17.3% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 12x likuiditas"
+          }
+        ],
+        "reason": "Diveto LLM: Only dolphin #12174 is a strong performer but no over-x5 winners; smart #93 is a high-churn sniper with 39% winrate; smart #1193 is losing with serial token creation; gro. Tidak dimasuki."
+      },
       {
         "at": 1792370534753,
         "symbol": "100xbroker",
@@ -2509,38 +2580,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 26%."
-      },
-      {
-        "at": 1792361172952,
-        "symbol": "#TP",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 26.09% supply."
-      },
-      {
-        "at": 1792360919224,
-        "symbol": "BARN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 1.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 1.3%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
@@ -2569,7 +2608,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 3
+        "llm": 4
       },
       "test": {
         "solo": 0,
@@ -2602,7 +2641,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792370811355,
+    "generatedAt": 1792371114070,
     "trades": {
       "count": 144,
       "wins": 59,
