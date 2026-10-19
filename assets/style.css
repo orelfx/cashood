@@ -1564,3 +1564,9 @@ tr.sb-simrow td { opacity: .78; }
 .sb-tbl th, .sb-tbl td { padding-left: 8px; padding-right: 8px; }
 .sb-tbl th, .sb-tbl td { padding-left: 6px; padding-right: 6px; }
 .sb-tbl td.fx-strat { max-width: 300px; }
+.sb-status { margin-top: 14px; border-radius: 12px; overflow: hidden; }
+.sb-top { grid-template-columns: repeat(4, 1fr); margin: 16px 0; border-radius: 14px; overflow: hidden; }
+.sb-top .stat .v { font-size: 22px; }
+@media (max-width: 860px) { .sb-top, .sb-status { grid-template-columns: repeat(2, 1fr); } }
+.stat .v .warn { color: var(--amber); }
+#sbChart { touch-action: pan-y; }

@@ -3639,7 +3639,7 @@ async function renderDuel(key) {
  * dari 15 menit → "tertunda" tanpa angka, supaya angka lama tidak tampil
  * seolah live. */
 const SOLBOT_STALE_MS = 15 * 60e3;
-const solbotView = { month: '', page: 0 };
+const solbotView = { month: '', page: 0, hours: 24, profit: 'cal', calMonth: '', last: null, chart: null };
 let solbotEpoch = 0, solbotTimer = null;
 function showSolbot() {
   showGlobal('solbot', 'SolBot — Cashood Headfund');
@@ -3668,33 +3668,135 @@ async function loadSolbot() {
   }
   return null;
 }
-function solbotChart(d) {
-  // Setoran/penarikan tidak boleh tergambar sebagai lonjakan untung: titik
-  // sebelum arus dana digeser sebesar arus dana sesudahnya (sama seperti grafik
-  // dana lain), dan garis "modal" = modal bersih sekarang.
+// Grafik nilai SolBot, perilakunya sama dengan grafik "Nilai wallet" dana:
+// rentang 24 jam / 7 hari / semua, garis modal, dan titik yang bisa ditekan
+// (waktu WIB + nilai). Setoran/penarikan digeser seperti grafik dana lain.
+function solbotChartSvg(d) {
   const fl = (d.flows || []).map((f) => ({ at: f.t, usd: f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd) }));
-  const pts = (d.equityCurve || []).map((p) => ({ t: p.t, usd: p.usd + flowsAfter(fl, p.t) }));
-  if (pts.length < 2) return '<p class="hint">Grafik ekuitas muncul setelah beberapa titik terkumpul.</p>';
-  const W = 720, H = 220, m = { t: 14, r: 64, b: 24, l: 8 };
-  const base = d.basisUsd ?? d.startCapitalUsd;
-  const vals = pts.map((p) => p.usd).concat(base > 0 ? [base] : []);
-  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.12 || Math.max(1, hi * 0.02); lo -= pad; hi += pad;
-  const t0 = pts[0].t, t1 = pts.at(-1).t;
-  const x = (t) => m.l + ((t - t0) / Math.max(1, t1 - t0)) * (W - m.l - m.r), y = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
-  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join('');
-  const up = base > 0 ? pts.at(-1).usd >= base : true, c = up ? 'var(--green)' : 'var(--red)';
-  const tick = (t) => { const z = new Date(t + 7 * 3600e3); return t1 - t0 < 36 * 3600e3 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()}/${z.getUTCMonth() + 1}`; };
-  const lbl = (v) => '$' + Number(v).toLocaleString('en-US', { maximumFractionDigits: v < 1000 ? 2 : 0 });
-  return `<svg class="grr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kurva ekuitas SolBot (WIB)">
-    <defs><linearGradient id="sbFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".22"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs>
-    ${base > 0 ? `<line x1="${m.l}" x2="${W - m.r}" y1="${y(base).toFixed(1)}" y2="${y(base).toFixed(1)}" class="g-base" stroke-dasharray="4 4"/><text x="${W - m.r + 6}" y="${(y(base) + 4).toFixed(1)}" class="g-lbl">modal</text>` : ''}
-    ${[hi - pad, lo + pad].map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${lbl(v)}</text>`).join('')}
-    <path d="${path}L${x(t1).toFixed(1)},${H - m.b}L${x(t0).toFixed(1)},${H - m.b}Z" fill="url(#sbFill)"/>
-    <path d="${path}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>
-    ${fl.filter((f) => f.at > t0 && f.at <= t1).map((f) => `<line x1="${x(f.at).toFixed(1)}" x2="${x(f.at).toFixed(1)}" y1="${m.t}" y2="${H - m.b}" class="g-flow"/><text x="${(x(f.at) + 4).toFixed(1)}" y="${m.t + 10}" class="g-flow-lbl">${f.usd < 0 ? 'penarikan' : 'setoran'} ${signedCompact(f.usd)}</text>`).join('')}
-    ${[t0, t1].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)} WIB</text>`).join('')}
-  </svg>${fl.length ? '<p class="hint">Grafik disesuaikan dengan setoran/penarikan, jadi modal yang masuk tidak terlihat sebagai untung.</p>' : ''}`;
+  const cut = solbotView.hours ? Date.now() - solbotView.hours * 3600e3 : 0;
+  const pts = (d.equityCurve || []).filter((p) => p.t >= cut).map((p) => ({ t: p.t, v: p.usd + flowsAfter(fl, p.t), raw: p.usd }));
+  const small = narrow(), W = small ? 420 : 720, H = small ? 280 : 240, m = small ? { t: 18, r: 14, b: 30, l: 62 } : { t: 16, r: 54, b: 30, l: 60 };
+  if (pts.length < 2) return { svg: `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" class="g-lbl">Grafik muncul setelah beberapa titik terkumpul di rentang ini.</text>`, hint: '', W, H };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const modal = d.basisUsd ?? d.startCapitalUsd ?? 0;
+  const vals = pts.map((p) => p.v), span = Math.max(...vals) - Math.min(...vals);
+  const padY = Math.max(span * 0.15, Math.max(...vals) * 0.004, 0.5);
+  let lo = Math.min(...vals) - padY, hi = Math.max(...vals) + padY;
+  if (modal > 0 && !(modal > lo && modal < hi) && Math.abs(modal - (lo + hi) / 2) < Math.max(span, padY) * 3) { lo = Math.min(lo, modal - padY); hi = Math.max(hi, modal + padY); }
+  const x = (t) => m.l + ((t - pts[0].t) / ((pts.at(-1).t - pts[0].t) || 1)) * pw;
+  const y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph;
+  const fmt = (n) => usdText(n, n < 1000 ? 2 : 0);
+  let grid = '';
+  const ySteps = small ? 2 : 3;
+  for (let i = 0; i <= ySteps; i += 1) { const v = lo + ((hi - lo) / ySteps) * i; grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/><text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${fmt(v)}</text>`; }
+  const ref = modal > 0 && modal >= lo && modal <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${y(modal)}" y2="${y(modal)}" stroke="#8b97a8" stroke-width="1" stroke-dasharray="4 4"/><text x="${small ? W - m.r - 2 : W - m.r + 6}" y="${y(modal) + (small ? -4 : 3.5)}" text-anchor="${small ? 'end' : 'start'}" class="g-lbl">modal</text>` : '';
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+  const last = pts.at(-1), up = last.v >= modal, stroke = up ? 'var(--green)' : 'var(--red)';
+  const fmtT = (t) => { const z = new Date(t + 7 * 3600e3); return solbotView.hours && solbotView.hours <= 48 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()} ${M_SHORT[z.getUTCMonth()]}`; };
+  let ticks = '';
+  const xSteps = small ? 2 : 4;
+  for (let i = 0; i <= xSteps; i += 1) { const t = pts[0].t + ((last.t - pts[0].t) / xSteps) * i; ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="${i === 0 ? 'start' : i === xSteps ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`; }
+  const marks = fl.filter((f) => f.at > pts[0].t && f.at <= last.t).map((f) => `<line x1="${x(f.at).toFixed(1)}" x2="${x(f.at).toFixed(1)}" y1="${m.t}" y2="${m.t + ph}" class="g-flow"/><text x="${(x(f.at) + 4).toFixed(1)}" y="${m.t + 10}" class="g-flow-lbl">${f.usd < 0 ? 'penarikan' : 'setoran'} ${signedCompact(f.usd)}</text>`).join('');
+  const svg = `<defs><linearGradient id="sbFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity=".22"/><stop offset="100%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${ref}<path d="${line} L${x(last.t).toFixed(1)},${y(lo)} L${x(pts[0].t).toFixed(1)},${y(lo)} Z" fill="url(#sbFill)"/>
+    <path d="${line}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${marks}
+    <circle cx="${x(last.t)}" cy="${y(last.v)}" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2"/>
+    <text x="${x(last.t)}" y="${y(last.v) - 12}" text-anchor="end" class="g-cap">${fmt(last.v)}</text>${ticks}
+    <line id="sbCross" x1="0" x2="0" y1="${m.t}" y2="${m.t + ph}" stroke="#3a4552" stroke-width="1" style="display:none"/>
+    <circle id="sbDot" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2" style="display:none"/>
+    <rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" id="sbHit"/>`;
+  const delta = last.v - pts[0].v, movePct = pts[0].v ? (delta / pts[0].v) * 100 : 0;
+  const flowIn = fl.filter((f) => f.at > pts[0].t && f.at <= last.t).reduce((t, f) => t + f.usd, 0);
+  solbotView.chart = { pts, x, y, W, fmtT, small };
+  return { W, H, svg, hint: `${pts.length} titik · ${signed(delta)} (${movePct >= 0 ? '+' : ''}${pct(movePct)}) di rentang ini${Math.abs(flowIn) >= 1 ? ` · arus dana ${signed(flowIn)} tidak dihitung` : ''}` };
 }
+function wireSolbotChart() {
+  const c = solbotView.chart, wrap = $('#sbWrap'), tip = $('#sbTip'), svg = $('#sbChart');
+  if (!c || !wrap || !svg) return;
+  const hit = svg.querySelector('#sbHit'), cross = svg.querySelector('#sbCross'), dot = svg.querySelector('#sbDot');
+  if (!hit) return;
+  hit.onpointermove = hit.onpointerdown = (ev) => {
+    const box = wrap.getBoundingClientRect(), ratio = c.W / (box.width || c.W), sx = (ev.clientX - box.left) * ratio;
+    let near = c.pts[0];
+    for (const p of c.pts) if (Math.abs(c.x(p.t) - sx) < Math.abs(c.x(near.t) - sx)) near = p;
+    cross.setAttribute('x1', c.x(near.t)); cross.setAttribute('x2', c.x(near.t)); cross.style.display = '';
+    dot.setAttribute('cx', c.x(near.t)); dot.setAttribute('cy', c.y(near.v)); dot.style.display = '';
+    setHTML(tip, `<div class="t-d">${esc(tglRingkas(near.t))} WIB</div><div class="t-v">${usd(near.v)}</div>${Math.abs(near.v - near.raw) >= 0.01 ? `<div class="t-n">nilai asli saat itu ${usd(near.raw)} · disesuaikan arus dana</div>` : ''}`);
+    tip.hidden = false;
+    tip.style.left = (c.x(near.t) / ratio) + 'px';
+    tip.style.top = ((c.y(near.v) - 10) / ratio) + 'px';
+  };
+  hit.onpointerleave = (ev) => { if (ev.pointerType === 'mouse') { tip.hidden = true; cross.style.display = 'none'; dot.style.display = 'none'; } };
+}
+
+/* Riwayat profit SolBot: per hari WIB dari trade yang sudah ditutup — kotak
+ * statistik, lalu grafik batang harian atau kalender bulanan (sama dengan
+ * "Riwayat profit" dana). */
+function solbotDays(d) {
+  const map = new Map();
+  for (const c of d.closedTrades || []) {
+    if (!c.closedAt || c.pnlUsd == null) continue;
+    const day = new Date(c.closedAt + 7 * 3600e3).toISOString().slice(0, 10);
+    const r = map.get(day) || { date: day, usd: 0, closes: 0, wins: 0, losses: 0 };
+    r.usd += c.pnlUsd; r.closes += 1; if (c.pnlUsd > 0) r.wins += 1; else if (c.pnlUsd < 0) r.losses += 1;
+    map.set(day, r);
+  }
+  return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+function solbotProfitHtml(d) {
+  const days = solbotDays(d), closed = d.closedTrades || [];
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const t = d.totals || {}, real = d.closedStats?.real || {};
+  const locked = d.realizedPnlUsd ?? closed.reduce((s2, c) => s2 + (c.pnlUsd || 0), 0);
+  const wins = t.wins ?? real.wins ?? 0, losses = t.losses ?? real.losses ?? 0;
+  const sized = closed.filter((c) => c.sizeUsd > 0);
+  const best = days.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
+  const stats = `<div class="stats">${[
+    tile('Profit terkunci', signed(locked), 'dari posisi yang sudah ditutup', cls(locked)),
+    tile('Win rate', wins + losses ? pct((wins / (wins + losses)) * 100, 1) : '—', `${wins} untung · ${losses} rugi`),
+    tile('Posisi ditutup', String(t.trades ?? closed.length), `${(d.positions || []).length} masih jalan`),
+    tile('Rata-rata modal', sized.length ? usd(sized.reduce((s2, c) => s2 + c.sizeUsd, 0) / sized.length) : '—', 'per posisi'),
+    best ? tile('Hari terbaik', signed(best.usd), fmtDay(best.date), cls(best.usd)) : tile('Hari terbaik', '—', 'belum ada data'),
+  ].join('')}</div>`;
+  const seg = `<div class="controls"><div class="seg" id="sbProfitView" role="group" aria-label="Tampilan"><button data-v="chart" class="${solbotView.profit === 'chart' ? 'on' : ''}">grafik</button><button data-v="cal" class="${solbotView.profit !== 'chart' ? 'on' : ''}">kalender</button></div></div>`;
+  let content = '<p class="dim">Belum ada posisi yang ditutup.</p>';
+  if (days.length && solbotView.profit === 'chart') {
+    const W = 720, H = 240, m = { t: 16, r: 16, b: 30, l: 60 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+    const peak = Math.max(1, ...days.map((r) => Math.abs(r.usd)));
+    const lo = Math.min(0, ...days.map((r) => r.usd)) * 1.15, hi = Math.max(0, ...days.map((r) => r.usd)) * 1.15 || 1;
+    const y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph, bw = Math.min(46, pw / days.length * 0.7);
+    const xs = (i) => m.l + (pw / days.length) * (i + 0.5);
+    content = `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Profit terkunci per hari">
+      <line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" class="g-base"/>
+      ${[hi, 0, lo].filter((v, i, a) => a.indexOf(v) === i).map((v) => `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usdText(v, 0)}</text>`).join('')}
+      ${days.map((r, i) => `<rect x="${(xs(i) - bw / 2).toFixed(1)}" y="${Math.min(y(r.usd), y(0)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1, Math.abs(y(r.usd) - y(0))).toFixed(1)}" rx="3" fill="${r.usd >= 0 ? '#4ade80' : '#f87171'}" opacity="${(0.45 + 0.55 * Math.abs(r.usd) / peak).toFixed(2)}"><title>${fmtDay(r.date)} · ${signedText(r.usd)} · ${r.closes} tutup</title></rect>
+        <text x="${xs(i)}" y="${H - m.b + 18}" text-anchor="middle" class="g-lbl">${fmtDay(r.date)}</text>`).join('')}
+    </svg></div>`;
+  } else if (days.length) {
+    const months = [...new Set(days.map((r) => r.date.slice(0, 7)))].sort();
+    if (!solbotView.calMonth || !months.includes(solbotView.calMonth)) solbotView.calMonth = months.at(-1);
+    const [yy, mm] = solbotView.calMonth.split('-').map(Number);
+    const first = new Date(Date.UTC(yy, mm - 1, 1)), nDays = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
+    const map = new Map(days.map((r) => [r.date, r])), peak = Math.max(1, ...days.map((r) => Math.abs(r.usd)));
+    let cells = '', tot = 0, n = 0;
+    for (let i = 0; i < first.getUTCDay(); i += 1) cells += '<div class="cell void"></div>';
+    for (let dd = 1; dd <= nDays; dd += 1) {
+      const r = map.get(`${solbotView.calMonth}-${String(dd).padStart(2, '0')}`);
+      if (!r) { cells += `<div class="cell void"><span class="d">${dd}</span></div>`; continue; }
+      tot += r.usd; n += r.closes;
+      const a = 0.12 + 0.42 * (Math.abs(r.usd) / peak), rgb = r.usd >= 0 ? '74,222,128' : '248,113,113';
+      cells += `<div class="cell" style="background:rgba(${rgb},${a.toFixed(3)});border-color:rgba(${rgb},.4)"><span class="d">${dd}</span><span class="a ${cls(r.usd)}">${narrow() ? signedCompact(r.usd) : signed(r.usd)}</span><span class="c">${r.closes} tutup</span></div>`;
+    }
+    const idx = months.indexOf(solbotView.calMonth);
+    content = `<div class="cal-head"><button class="btn ghost" data-cal="-1" aria-label="Bulan sebelumnya"${idx <= 0 ? ' disabled' : ''}>‹</button><strong>${M_SHORT[mm - 1]} ${yy}</strong><button class="btn ghost" data-cal="1" aria-label="Bulan berikutnya"${idx >= months.length - 1 ? ' disabled' : ''}>›</button></div>
+      <div class="cal-dow">${D_SHORT.map((x) => `<span>${x}</span>`).join('')}</div><div class="cal-grid">${cells}</div>
+      <div class="cal-foot"><span>${n} posisi ditutup bulan ini</span><span>Total <b class="${cls(tot)}">${signed(tot)}</b></span></div>`;
+  }
+  return `<section class="card" id="sbProfit"><div class="card-head"><h2>Riwayat profit</h2><span class="hint">${days.length} hari ada transaksi · hasil trade uang asli yang sudah ditutup</span></div>
+    ${stats}${seg}<div id="sbProfitBody" data-months="">${content}</div>
+    <p class="hint">Yang dihitung di kartu ini cuma profit yang sudah terkunci. Untung/rugi ${(d.positions || []).length} posisi yang masih jalan belum masuk sini — bagian itu sudah ikut di "Nilai sekarang" di atas.</p></section>`;
+}
+
 async function renderSolbot() {
   const epoch = ++solbotEpoch;
   const d = await loadSolbot();
@@ -3702,63 +3804,87 @@ async function renderSolbot() {
   const body = $('#solbotBody');
   if (!d || d.status === 'waiting') { setHTML(body, solbotWait('Data belum masuk / tertunda', null)); return; }
   if (d.status !== 'ok' || !d.asOf || Date.now() - d.asOf > SOLBOT_STALE_MS) { setHTML(body, solbotWait('Data belum masuk / tertunda', d.asOf || null)); return; }
-  const MODE = { LIVE: ['LIVE', 'sb-m-live'], DRY_RUN: ['DRY RUN', 'sb-m-dry'], HALTED: ['HALTED', 'sb-m-halt'] };
-  const [modeTxt, modeCls] = MODE[d.mode] || ['STATUS TIDAK DIKENAL', 'sb-m-wait'];
+  solbotView.last = d;
+  paintSolbot(d);
+}
+function paintSolbot(d) {
+  const body = $('#solbotBody');
+  const MODE = { LIVE: ['LIVE', 'sb-m-live', 'running', 'pos'], DRY_RUN: ['DRY RUN', 'sb-m-dry', 'dry run', 'warn'], HALTED: ['HALTED', 'sb-m-halt', 'dihentikan', 'neg'] };
+  const [modeTxt, modeCls, kondisi, kondisiCls] = MODE[d.mode] || ['STATUS TIDAK DIKENAL', 'sb-m-wait', 'tidak dikenal', 'dim'];
   const g = d.guards || {};
   const meter = (used, limit) => { const f = used != null && limit ? Math.max(0, Math.min(1, -Math.min(0, used) / Math.abs(limit))) : 0; return `<div class="sb-meter" aria-hidden="true"><i style="width:${(f * 100).toFixed(0)}%" class="${f >= 0.75 ? 'hot' : f >= 0.4 ? 'warm' : ''}"></i></div>`; };
   const ddUsed = g.drawdownPct == null ? null : -Math.abs(g.drawdownPct);
   const stopTxt = g.stopButton == null ? '—' : g.stopButton === true ? 'DITEKAN' : g.stopButton === false ? 'tidak ditekan' : String(g.stopButton);
   const stopHot = g.stopButton === true || /tekan|pressed|on|aktif|active|engaged|halt/i.test(String(g.stopButton)) && g.stopButton !== false && !/tidak|not|off|siap|ready|idle/i.test(String(g.stopButton));
-  const tile = (k, v, n, c = '', extra = '') => `<div class="sb-g"><div class="k">${k}</div><div class="v ${c}">${v}</div>${extra}<div class="n">${n}</div></div>`;
+  const gtile = (k, v, n, c = '', extra = '') => `<div class="sb-g"><div class="k">${k}</div><div class="v ${c}">${v}</div>${extra}<div class="n">${n}</div></div>`;
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const pos = d.positions || [];
+  const posVal = pos.reduce((t, r) => t + (r.valueUsd || 0), 0);
+  const unreal = d.unrealizedPnlUsd ?? pos.reduce((t, r) => t + (r.pnlUsd || 0), 0);
+  const locked = d.realizedPnlUsd ?? (d.closedTrades || []).reduce((t, c) => t + (c.pnlUsd || 0), 0);
+  const nClosed = d.totals?.trades ?? (d.closedTrades || []).length;
+  const chart = solbotChartSvg(d);
+  const flowsTxt = (d.flows || []).map((f) => ` + ${f.type === 'withdraw' ? 'tarik' : 'setor'} ${usd(Math.abs(f.usd))}`).join('');
   setHTML(body, `<section class="card sb-hero">
       ${SOLBOT_HEAD}<span class="sb-mode ${modeCls}"><i></i>${modeTxt}</span></div>
       ${d.mode === 'HALTED' || d.haltReason ? `<p class="sb-halt" role="alert"><b>Bot dihentikan${d.mode === 'HALTED' ? '' : ' (catatan)'}:</b> ${esc(d.haltReason || 'alasan tidak dilaporkan')}</p>` : ''}
       ${d.mode === 'DRY_RUN' ? '<p class="hint">Mode <b>DRY RUN</b>: bot berjalan tanpa mengirim order sungguhan; trade yang terjadi di mode ini ditandai "simulasi".</p>' : ''}
-      <div class="sb-eq">
-        <div><div class="k">Ekuitas sekarang</div><div class="sb-big">${d.equityUsd == null ? '—' : usd(d.equityUsd)}</div>
-          <div class="n"><span class="${cls(d.changeUsd ?? 0)}">${sbUsd(d.changeUsd)} · ${sbPct(d.changePct)}</span> dari modal${d.netFlowUsd ? ' bersih' : ' awal'}</div>
-          ${d.change24hPct != null ? `<div class="n">24 jam: <span class="${cls(d.change24hUsd ?? 0)}">${sbUsd(d.change24hUsd)} · ${sbPct(d.change24hPct)}</span></div>` : ''}</div>
-        <div class="sb-eq-side">
-          <div><span class="k">Modal masuk</span><b>${d.basisUsd == null ? (d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)) : usd(d.basisUsd)}</b><small>awal ${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}${d.startCapitalSol != null ? ` (${Number(d.startCapitalSol).toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL)` : ''}${(d.flows || []).map((f) => ` · ${f.type === 'withdraw' ? 'tarik' : 'setor'} ${usd(Math.abs(f.usd))} ${esc(tglRingkas(f.t))}`).join('')}</small></div>
-          <div><span class="k">Kas</span><b>${d.cashUsd == null ? '—' : usd(d.cashUsd)}</b><small>di luar posisi</small></div>
-          <div><span class="k">Harga SOL</span><b>${d.solPriceUsd == null ? '—' : '$' + d.solPriceUsd.toFixed(2)}</b><small>${d.startedAt ? 'mulai ' + esc(sbWib(d.startedAt)) : ''}</small></div>
-        </div>
-      </div>
-      ${d.realizedPnlUsd != null || d.unrealizedPnlUsd != null || d.feesUsd != null ? `<p class="hint sb-pnl">Terealisasi <b class="${cls(d.realizedPnlUsd ?? 0)}">${sbUsd(d.realizedPnlUsd)}</b> · belum terealisasi <b class="${cls(d.unrealizedPnlUsd ?? 0)}">${sbUsd(d.unrealizedPnlUsd)}</b>${d.feesUsd != null ? ` · biaya (fee/gas) <b>${usd(d.feesUsd)}</b>` : ''}</p>` : ''}
       ${d.strategy ? `<p class="sb-strat">${esc(d.strategy)}</p>` : ''}
-      ${solbotChart(d)}
-      <p class="hint">Data bot per ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}) · semua waktu dalam WIB</p>
+      <div class="stats lp-sum sb-status">${[
+        tile('Kondisi bot', `<span class="${kondisiCls}">${kondisi}</span>`, `data bot ${esc(ago(d.asOf))}`),
+        tile('Turun dari puncak', g.drawdownPct == null ? '—' : pct(Math.abs(g.drawdownPct), 2), `batas halt ${sbLimit(g.totalHaltPct)}`, g.drawdownPct ? 'neg' : ''),
+        tile('Posisi terbuka', String(pos.length), `tiket maks ${g.ticketPct == null ? '—' : pct(g.ticketPct, 0)} per posisi`),
+        tile('Kas', d.cashUsd == null ? '—' : usd(d.cashUsd), 'belum dipakai'),
+        tile('Belum terealisasi', sbUsd(unreal), 'dari posisi terbuka', cls(unreal ?? 0)),
+      ].join('')}</div>
+    </section>
+    <div class="stats sb-top">${[
+      tile('Nilai sekarang', d.equityUsd == null ? '—' : usd(d.equityUsd), `${d.cashUsd == null ? '—' : usd(d.cashUsd, 0)} kas + ${usd(posVal, 0)} di ${pos.length} posisi`),
+      tile('Modal masuk', d.basisUsd == null ? '—' : usd(d.basisUsd), `awal ${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}${flowsTxt} · uang asli`),
+      tile('Untung terkunci', signed(locked), `${nClosed} trade ditutup · berjalan ${sbUsd(unreal)}${d.feesUsd != null ? ` · biaya ${usd(d.feesUsd)}` : ''}`, cls(locked)),
+      tile('Untung / rugi', d.changeUsd == null ? '—' : signed(d.changeUsd), `${sbPct(d.changePct)} dari modal${d.change24hPct != null ? ` · 24 jam ${sbPct(d.change24hPct)}` : ''}`, cls(d.changeUsd ?? 0)),
+    ].join('')}</div>
+    <section class="card"><div class="card-head"><div class="seg tabs2"><button class="on" tabindex="-1">Nilai wallet</button></div><span class="hint">${chart.hint}</span></div>
+      <div class="controls"><div class="seg" id="sbRange" role="group" aria-label="Rentang grafik">${[[24, '24 jam'], [168, '7 hari'], [0, 'semua']].map(([h, l]) => `<button data-h="${h}" class="${solbotView.hours === h ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+      <div class="chart-wrap" id="sbWrap"><svg id="sbChart" viewBox="0 0 ${chart.W} ${chart.H}" role="img" aria-label="Nilai SolBot dari waktu ke waktu (WIB)">${chart.svg}</svg><div class="tip" id="sbTip" hidden></div></div>
+      ${(d.flows || []).length ? '<p class="hint" style="margin-top:10px">Ada setoran/penarikan modal. Supaya tidak terbaca sebagai untung atau rugi, titik sebelum arus dana digeser sebesar jumlahnya; titik terakhir tetap nilai sebenarnya.</p>' : ''}
+      <p class="hint">Data bot per ${esc(sbWib(d.asOf))} · mulai ${esc(sbWib(d.startedAt))} · harga SOL ${d.solPriceUsd == null ? '—' : '$' + d.solPriceUsd.toFixed(2)} · semua waktu dalam WIB</p>
     </section>
     <section class="card sb-guard"><div class="card-head"><h2>Pengaman (guard)</h2><span class="hint">batas yang dijaga bot</span></div>
       <div class="sb-grid">
-        ${tile('Tiket per trade', g.ticketPct == null ? '—' : pct(g.ticketPct, 0), 'maksimal dari ekuitas per posisi')}
-        ${tile('Stop per posisi', sbLimit(g.stopPct), 'posisi dijual kalau turun segini')}
-        ${tile('Halt harian', sbLimit(g.dailyHaltPct), 'bot berhenti hari itu')}
-        ${tile('Halt total', sbLimit(g.totalHaltPct), 'bot berhenti total dari modal')}
-        ${tile('PnL hari ini', sbPct(g.dailyPnlPct), `batas ${sbLimit(g.dailyHaltPct)}`, cls(g.dailyPnlPct ?? 0), meter(g.dailyPnlPct, g.dailyHaltPct))}
-        ${tile('Sisa ruang loss harian', g.dailyRoomPct == null ? '—' : pct(Math.abs(g.dailyRoomPct), 2), 'sebelum halt harian')}
-        ${tile('Drawdown', g.drawdownPct == null ? '—' : sbPct(ddUsed), `batas ${sbLimit(g.totalHaltPct)}`, ddUsed ? 'neg' : 'dim', meter(ddUsed, g.totalHaltPct))}
-        ${tile('Tombol stop', esc(stopTxt), 'stop darurat manual', stopHot ? 'neg' : 'dim')}
+        ${gtile('Tiket per trade', g.ticketPct == null ? '—' : pct(g.ticketPct, 0), 'maksimal dari ekuitas per posisi')}
+        ${gtile('Stop per posisi', sbLimit(g.stopPct), 'posisi dijual kalau turun segini')}
+        ${gtile('Halt harian', sbLimit(g.dailyHaltPct), 'bot berhenti hari itu')}
+        ${gtile('Halt total', sbLimit(g.totalHaltPct), 'bot berhenti total dari modal')}
+        ${gtile('PnL hari ini', sbPct(g.dailyPnlPct), `batas ${sbLimit(g.dailyHaltPct)}`, cls(g.dailyPnlPct ?? 0), meter(g.dailyPnlPct, g.dailyHaltPct))}
+        ${gtile('Sisa ruang loss harian', g.dailyRoomPct == null ? '—' : pct(Math.abs(g.dailyRoomPct), 2), 'sebelum halt harian')}
+        ${gtile('Drawdown', g.drawdownPct == null ? '—' : sbPct(ddUsed), `batas ${sbLimit(g.totalHaltPct)}`, ddUsed ? 'neg' : 'dim', meter(ddUsed, g.totalHaltPct))}
+        ${gtile('Tombol stop', esc(stopTxt), 'stop darurat manual', stopHot ? 'neg' : 'dim')}
       </div></section>
     ${solbotPositionsHtml(d)}
+    ${solbotProfitHtml(d)}
     ${solbotClosedHtml(d)}
     <section class="card sb-disc"><p>${SOLBOT_WARN}</p>
       <p class="hint">Terpisah dari buku paper Devil Greed (grokbot/solana); angka SolBot tidak digabung dengan paper dan tidak masuk Cashood Index.</p></section>`);
-  const month = $('#sbMonth');
-  if (month) month.onchange = (e) => { solbotView.month = e.target.value; solbotView.page = 0; renderSolbot().catch(() => {}); };
-  const pager = $('#sbPager');
-  if (pager) pager.onclick = (e) => {
+  wireSolbotChart();
+  const repaint = () => { if (solbotView.last) paintSolbot(solbotView.last); };
+  body.onclick = (e) => {
     const btn = e.target.closest('button');
     if (!btn || btn.disabled) return;
-    solbotView.page = Number(btn.getAttribute('data-p')) || 0;
-    renderSolbot().then(() => $('#sbClosed')?.scrollIntoView({ block: 'start', behavior: 'smooth' })).catch(() => {});
+    if (btn.closest('#sbRange')) { solbotView.hours = Number(btn.getAttribute('data-h')) || 0; repaint(); return; }
+    if (btn.closest('#sbProfitView')) { solbotView.profit = btn.getAttribute('data-v'); repaint(); return; }
+    if (btn.hasAttribute('data-cal')) {
+      const months = [...new Set(solbotDays(solbotView.last).map((r) => r.date.slice(0, 7)))].sort();
+      const i = months.indexOf(solbotView.calMonth) + Number(btn.getAttribute('data-cal'));
+      if (months[i]) { solbotView.calMonth = months[i]; repaint(); }
+      return;
+    }
+    if (btn.closest('#sbPager')) { solbotView.page = Number(btn.getAttribute('data-p')) || 0; repaint(); $('#sbClosed')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
   };
+  const month = $('#sbMonth');
+  if (month) month.onchange = (e) => { solbotView.month = e.target.value; solbotView.page = 0; repaint(); };
 }
 
-/* Posisi SolBot, bentuknya sama dengan "Posisi trading" buku paper: ringkasan
- * skenario (semua kena stop / semua kena target berikutnya / floating), lalu
- * tabel rencana per posisi. Skenario dihitung dari harga stop dan harga target
- * berikutnya terhadap harga mark sekarang. */
 /* Aturan keluar SolBot (dari bot, dihitung dari harga masuk): stop awal −30%;
  * TP1 +30% jual 30% → stop ke harga masuk (BE); TP2 +100% jual 25% → stop
  * +50%; TP3 +300% jual 25%; sisa 20% runner dengan trailing stop 30% di bawah
