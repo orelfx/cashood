@@ -107,7 +107,7 @@ test('T0 dipatok sekali; startedAt/hash yang berubah memunculkan peringatan', ()
 
 test('T0 dipulihkan dari salinan terbit kalau berkas lokal hilang', () => {
   const dir = setup(meridian), backup = join(dir, 't0.json');
-  writeFileSync(backup, JSON.stringify({ fund: 'gm', startedAt: D0, pinnedAt: D0, prereg12: null, params12: null }));
+  writeFileSync(backup, JSON.stringify({ fund: 'gm', startedAt: D0, pinnedAt: D0, prereg12: 'aaaaaaaaaaaa', params12: 'bbbbbbbbbbbb' }));
   const out = runSync({ ...engine, startedAt: D0 + H }, meridian, dir, { GM_PIN_BACKUP: backup });
   assert.equal(out.startedAt, D0);
   assert.ok(out.warnings.some((w) => w.startsWith('T0 berubah')));
@@ -186,8 +186,49 @@ test('hash final cocok tetapi phase bukan scored: tidak dipatok', () => {
   assert.equal(out.t0Wait, 'menunggu T0 (warmup)');
 });
 
-test('funds.json di repo: entri gm punya expectedHashes kosong', () => {
+test('funds.json di repo: entri gm memakai hash final rev4f', () => {
   const f = JSON.parse(readFileSync(join(ROOT, 'data', 'funds.json'), 'utf8'));
   assert.equal(f.gm.risk, 'paper');
-  assert.equal(f.gm.expectedHashes.prereg12, '');
+  // sha256 preregistration-v1.md / challenger-v1.json rev4f, 12 hex pertama
+  assert.equal(f.gm.expectedHashes.prereg12, 'e2c586f75220');
+  assert.equal(f.gm.expectedHashes.params12, '090f40854d88');
+});
+
+test('pin lama divalidasi ulang tiap run: hash tidak cocok → diabaikan, tidak dipakai, tidak ditimpa', () => {
+  const STALE = 'pin lama tidak cocok, menunggu T0';
+  const dir = setup(meridian), pinFile = join(dir, 'data', 'gm', 't0.local.json');
+  mkdirSync(join(dir, 'data', 'gm'), { recursive: true });
+  const old = { fund: 'gm', startedAt: D0 - 24 * H, pinnedAt: D0 - 24 * H, prereg12: 'dddddddddddd', params12: 'bbbbbbbbbbbb' };
+  writeFileSync(pinFile, JSON.stringify(old));
+  const a = runSync({ ...engine, startedAt: D0 }, meridian, dir);
+  assert.equal(a.startedAt, null);
+  assert.equal(a.t0Pin, null);
+  assert.equal(a.t0Wait, STALE);
+  assert.equal(a.live.status, 'waiting_t0');
+  assert.equal(a.live.label, STALE);
+  assert.equal(a.stalePin.source, 't0.local.json');
+  assert.ok(a.warnings.some((w) => w.startsWith('Pin T0 lama diabaikan')));
+  assert.deepEqual(JSON.parse(readFileSync(pinFile, 'utf8')), old);   // tidak ditimpa
+  // pin tanpa hash (mis. dari warmup) juga diabaikan
+  writeFileSync(pinFile, JSON.stringify({ ...old, prereg12: null, params12: null }));
+  assert.equal(runSync({ ...engine, startedAt: D0 }, meridian, dir).t0Wait, STALE);
+  // hash final kosong → pin apa pun tidak dipakai
+  writeFileSync(pinFile, JSON.stringify({ ...old, prereg12: 'aaaaaaaaaaaa' }));
+  const funds = join(dir, 'funds-empty.json');
+  writeFileSync(funds, JSON.stringify({ gm: { expectedHashes: { prereg12: '', params12: '' } } }));
+  assert.equal(runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_FUNDS: funds }).t0Wait, STALE);
+  // pin yang cocok tetap dipakai
+  const good = runSync({ ...engine, startedAt: D0 }, meridian, dir);
+  assert.equal(good.startedAt, D0 - 24 * H);
+  assert.equal(good.stalePin, null);
+});
+
+test('pin cadangan dari branch data yang tidak cocok diabaikan dan tidak disalin ke lokal', () => {
+  const dir = setup(meridian), backup = join(dir, 't0.json');
+  writeFileSync(backup, JSON.stringify({ fund: 'gm', startedAt: D0, pinnedAt: D0, prereg12: 'aaaaaaaaaaaa', params12: 'eeeeeeeeeeee' }));
+  const out = runSync({ ...engine, startedAt: D0 }, meridian, dir, { GM_PIN_BACKUP: backup });
+  assert.equal(out.startedAt, null);
+  assert.equal(out.t0Wait, 'pin lama tidak cocok, menunggu T0');
+  assert.equal(out.stalePin.source, 'gm/t0.json (branch data)');
+  assert.equal(existsSync(join(dir, 'data', 'gm', 't0.local.json')), false);
 });
