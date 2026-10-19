@@ -186,12 +186,12 @@ test('hash final cocok tetapi phase bukan scored: tidak dipatok', () => {
   assert.equal(out.t0Wait, 'menunggu T0 (warmup)');
 });
 
-test('funds.json di repo: entri gm memakai hash final rev4f', () => {
+test('funds.json di repo: entri gm memakai hash final rev4g', () => {
   const f = JSON.parse(readFileSync(join(ROOT, 'data', 'funds.json'), 'utf8'));
   assert.equal(f.gm.risk, 'paper');
-  // sha256 preregistration-v1.md / challenger-v1.json rev4f, 12 hex pertama
-  assert.equal(f.gm.expectedHashes.prereg12, 'e2c586f75220');
-  assert.equal(f.gm.expectedHashes.params12, '090f40854d88');
+  // 12 hex pertama sha256 preregistration-v1.md / challenger-v1.json rev4g (format yang dikirim mesin)
+  assert.equal(f.gm.expectedHashes.prereg12, '54f62aaf6f37');
+  assert.equal(f.gm.expectedHashes.params12, 'ce466f00d29f');
 });
 
 test('pin lama divalidasi ulang tiap run: hash tidak cocok → diabaikan, tidak dipakai, tidak ditimpa', () => {
