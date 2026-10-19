@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "65646ba1-2e41-4ac5-83cb-30aab8454b41",
-  "updatedAt": 1792413407948,
-  "generatedAt": "2026-10-19 19:36 WIB",
+  "generation": "ab501373-074d-4cd3-a486-e420695fdeae",
+  "updatedAt": 1792413707999,
+  "generatedAt": "2026-10-19 19:41 WIB",
   "usdIdr": null,
   "totalUsd": 924.5905135094347,
   "nativeSymbol": "SOL",
@@ -1330,12 +1330,12 @@
     "pnlUsd": -75.40948649056531,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792413407948,
+    "heartbeatAt": 1792413707999,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.4,
-    "lastScanAt": 1792413397000,
+    "lastScanAt": 1792413700000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1356,7 +1356,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "470",
+        "v": "469",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1372,9 +1372,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792413407948,
+      "lastDecisionAt": 1792413707999,
       "lastAction": "keputusan",
-      "lastReason": "RWA [low]: Dilewati karena red flag: bundler pegang 78.31% supply."
+      "lastReason": "SPCX [mid]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1405,7 +1405,7 @@
       ],
       [
         "Label wallet",
-        "smart 12396 · bot 4226 · blacklist 416 · lp 1 · fresh 1092 · kol 192 · dolphin 328 · whale 7"
+        "smart 12394 · bot 4227 · blacklist 417 · lp 1 · fresh 1092 · kol 192 · dolphin 328 · whale 7"
       ]
     ],
     "requirements": [
@@ -1461,15 +1461,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 12396,
+          "total": 12394,
           "active": 423,
-          "passive": 11973
+          "passive": 11971
         },
         {
           "key": "bot",
-          "total": 4226,
+          "total": 4227,
           "active": 0,
-          "passive": 4226
+          "passive": 4227
         },
         {
           "key": "fresh",
@@ -1479,9 +1479,9 @@
         },
         {
           "key": "blacklist",
-          "total": 416,
+          "total": 417,
           "active": 0,
-          "passive": 416
+          "passive": 417
         },
         {
           "key": "dolphin",
@@ -1609,6 +1609,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792413624369,
+        "symbol": "SPCX",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
       {
         "at": 1792412924011,
         "symbol": "RWA",
@@ -2376,53 +2393,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792388897336,
-        "symbol": "KIBI",
-        "action": "veto",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 29.83% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 382,
-            "note": "bundler pegang 36.1%"
-          },
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 0.9%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 4.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 330,
-            "note": "16.5% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 11x likuiditas"
-          }
-        ],
-        "reason": "Diveto LLM: All three wallets show 0 x2-to-x5 or over-x5 winners in 7 days and very low realized PnL per token ($1-$125), indicating no edge despite the label; Wallet 2's e. Tidak dimasuki."
       }
     ],
     "reasonStats": {
@@ -2433,7 +2403,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 404,
+        "red_flag": 403,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2484,7 +2454,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792413416766,
+    "generatedAt": 1792413715398,
     "trades": {
       "count": 146,
       "wins": 59,
