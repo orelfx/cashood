@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7cc99375-8417-4a74-8f67-203345007b4e",
-  "updatedAt": 1792391770475,
-  "generatedAt": "2026-10-19 13:36 WIB",
+  "generation": "3d1fbbfc-bb2c-443b-a862-23b33ab770d9",
+  "updatedAt": 1792392070488,
+  "generatedAt": "2026-10-19 13:41 WIB",
   "usdIdr": null,
   "totalUsd": 931.3450739893949,
   "nativeSymbol": "SOL",
@@ -1314,12 +1314,12 @@
     "pnlUsd": -68.6549260106051,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792391770475,
+    "heartbeatAt": 1792392070488,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.73,
-    "lastScanAt": 1792391754000,
+    "lastScanAt": 1792392064000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1340,7 +1340,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "445",
+        "v": "446",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1356,9 +1356,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792391770475,
+      "lastDecisionAt": 1792392070488,
       "lastAction": "keputusan",
-      "lastReason": "USDP [big]: Dilewati karena red flag: likuiditas cuma 1.1% dari market cap."
+      "lastReason": "SPSI [degen]: Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1389,7 +1389,7 @@
       ],
       [
         "Label wallet",
-        "smart 12478 · bot 4106 · blacklist 406 · lp 1 · fresh 1101 · kol 192 · dolphin 354 · whale 7"
+        "smart 12472 · bot 4113 · blacklist 406 · lp 1 · fresh 1100 · kol 192 · dolphin 354 · whale 7"
       ]
     ],
     "requirements": [
@@ -1445,21 +1445,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 12478,
+          "total": 12472,
           "active": 434,
-          "passive": 12044
+          "passive": 12038
         },
         {
           "key": "bot",
-          "total": 4106,
+          "total": 4113,
           "active": 0,
-          "passive": 4106
+          "passive": 4113
         },
         {
           "key": "fresh",
-          "total": 1101,
+          "total": 1100,
           "active": 0,
-          "passive": 1101
+          "passive": 1100
         },
         {
           "key": "blacklist",
@@ -1593,6 +1593,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792391881925,
+        "symbol": "SPSI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -32% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792391585242,
         "symbol": "USDP",
@@ -2586,22 +2603,12 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1792371797144,
-        "symbol": "Scintilla",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 52,
+        "below_entry": 53,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2657,7 +2664,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792391824516,
+    "generatedAt": 1792392116416,
     "trades": {
       "count": 145,
       "wins": 59,
