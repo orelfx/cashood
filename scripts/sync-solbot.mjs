@@ -91,6 +91,15 @@ const closedStat = (list) => {
   return { count: list.length, wins, losses: graded.filter((c) => c.pnlUsd < 0).length, winRatePct: graded.length ? r2((wins / graded.length) * 100) : null, pnlUsd: r2(graded.reduce((t, c) => t + c.pnlUsd, 0)) };
 };
 const startUsd = r2(src.start_capital_usd), equityUsd = r2(src.equity_usd);
+// Field tambahan (opsional, aditif di v1): arus dana, biaya, untung terealisasi.
+const flows = arr(src.flows).map((f) => ({ t: time(f.t), usd: r2(f.usd), sol: r4(f.sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null }))
+  .filter((f) => f.t && f.usd != null && f.type).sort((a, b) => a.t - b.t);
+const netFlowUsd = flows.length ? r2(flows.reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0)) : 0;
+const basisUsd = startUsd > 0 ? r2(startUsd + netFlowUsd) : null;   // modal awal + setoran − penarikan
+const st = src.stats && typeof src.stats === 'object' ? src.stats : {};
+// Perubahan 24 jam dari kurva ekuitas (titik terdekat ke 24 jam lalu, minimal 20 jam ke belakang).
+const day = curve.length ? curve.filter((p) => p.t <= asOf - 20 * 3600e3).at(-1) : null;
+const flows24 = flows.filter((f) => day && f.t > day.t).reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0);
 
 const snapshot = {
   fund: 'solbot', status: 'ok', schema: SCHEMA, realMoney: true,
@@ -98,8 +107,15 @@ const snapshot = {
   asOf, startedAt: time(src.started_at), checkedAt: now,
   startCapitalUsd: startUsd, startCapitalSol: r4(src.start_capital_sol), solPriceUsd: r2(src.sol_price_usd),
   cashUsd: r2(src.cash_usd), equityUsd,
-  changeUsd: startUsd > 0 && equityUsd != null ? r2(equityUsd - startUsd) : null,
-  changePct: startUsd > 0 && equityUsd != null ? r2((equityUsd / startUsd - 1) * 100) : null,
+  // Untung/rugi terhadap modal bersih (modal awal + setoran − penarikan).
+  changeUsd: basisUsd > 0 && equityUsd != null ? r2(equityUsd - basisUsd) : null,
+  changePct: basisUsd > 0 && equityUsd != null ? r2((equityUsd / basisUsd - 1) * 100) : null,
+  basisUsd, netFlowUsd, flows,
+  change24hUsd: day && equityUsd != null ? r2(equityUsd - day.usd - flows24) : null,
+  change24hPct: day && day.usd > 0 && equityUsd != null ? r2(((equityUsd - flows24) / day.usd - 1) * 100) : null,
+  realizedPnlUsd: r2(src.realized_pnl_usd), unrealizedPnlUsd: r2(src.unrealized_pnl_usd), feesUsd: r2(src.fees_usd),
+  strategy: text(src.strategy, 300),
+  totals: { trades: num(st.trades_total), wins: num(st.wins), losses: num(st.losses), winRatePct: r2(st.win_rate_pct), bestPct: r2(st.best_trade_pct), worstPct: r2(st.worst_trade_pct), avgHoldMin: r2(st.avg_hold_min) },
   equityCurve: curve,
   positions,
   closedTrades: allClosed.slice(0, 200),

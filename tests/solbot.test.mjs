@@ -84,10 +84,26 @@ test('solbot: mode tak dikenal tidak ditebak', () => {
   assert.equal(run(source({ mode: 'halted', halt_reason: 'halt harian -15%' })).haltReason, 'halt harian -15%');
 });
 
-test('funds.json: SolBot di High risk dengan badge REAL', () => {
+test('funds.json: SolBot di High risk tanpa badge', () => {
   const f = JSON.parse(readFileSync(join(ROOT, 'data', 'funds.json'), 'utf8'));
   assert.equal(f.solbot.label, 'SolBot');
   assert.equal(f.solbot.risk, 'high');
-  assert.equal(f.solbot.badge, 'REAL');
+  assert.equal(f.solbot.badge, undefined);
   assert.ok(!f.funds.some((x) => x.id === 'solbot'), 'SolBot bukan dana investor dan tidak masuk index');
+});
+
+test('solbot: field tambahan — arus dana, 24 jam, strategi', () => {
+  const d = run(source({
+    equity_curve: [{ t: iso(26 * 60), equity_usd: 100 }, { t: iso(23 * 60), equity_usd: 104 }, { t: iso(2), equity_usd: 146.3 }],
+    equity_usd: 146.3, flows: [{ t: iso(60), usd: 50, type: 'deposit' }, { t: iso(30), usd: 5, type: 'aneh' }],
+    realized_pnl_usd: -3.2, unrealized_pnl_usd: 1.1, fees_usd: 0.9, strategy: `Beli meme coin baru ${MINT}`,
+    stats: { trades_total: 40, wins: 18, losses: 22, win_rate_pct: 45 },
+  }));
+  assert.equal(d.netFlowUsd, 50);
+  assert.equal(d.basisUsd, 157);
+  assert.equal(d.changeUsd, -10.7);
+  assert.equal(d.change24hUsd, -7.7);                       // 146.3 − 50 setoran − 104 (titik 23 jam lalu)
+  assert.equal(d.flows.length, 1);
+  assert.equal(d.totals.trades, 40);
+  assert.ok(!d.strategy.includes(MINT));
 });

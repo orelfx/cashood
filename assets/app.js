@@ -3627,7 +3627,7 @@ const sbPct = (v, dp = 2) => (v == null ? '—' : `${v > 0 ? '+' : v < 0 ? '−'
 const sbUsd = (v) => (v == null ? '—' : v < 0 ? '−' + usd(Math.abs(v)) : (v > 0 ? '+' : '') + usd(v));
 const sbLimit = (v) => (v == null ? '—' : `−${Math.abs(v).toFixed(0)}%`);
 const sbWib = (t) => (t ? tglRingkas(t) + ' WIB' : '—');
-const SOLBOT_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">SolBot <span class="sb-real">REAL</span></div>
+const SOLBOT_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">SolBot</div>
   <div class="sb-sub">Trading meme coin Solana · uang asli · <span class="sb-risk">⚠ High risk</span></div></div>`;
 const SOLBOT_WARN = '<b>Uang asli, risiko tinggi.</b> SolBot memperdagangkan meme coin Solana memakai dana sungguhan. Harga meme coin bisa jatuh puluhan persen dalam hitungan menit; modal bisa berkurang sebagian atau habis. Hasil masa lalu tidak menjamin hasil berikutnya dan <b>profit tidak dijamin</b>.';
 function solbotWait(msg, asOf) {
@@ -3690,13 +3690,16 @@ async function renderSolbot() {
       ${d.mode === 'DRY_RUN' ? '<p class="hint">Mode <b>DRY RUN</b>: bot berjalan tanpa mengirim order sungguhan; trade yang terjadi di mode ini ditandai "simulasi".</p>' : ''}
       <div class="sb-eq">
         <div><div class="k">Ekuitas sekarang</div><div class="sb-big">${d.equityUsd == null ? '—' : usd(d.equityUsd)}</div>
-          <div class="n"><span class="${cls(d.changeUsd ?? 0)}">${sbUsd(d.changeUsd)} · ${sbPct(d.changePct)}</span> dari modal awal</div></div>
+          <div class="n"><span class="${cls(d.changeUsd ?? 0)}">${sbUsd(d.changeUsd)} · ${sbPct(d.changePct)}</span> dari modal${d.netFlowUsd ? ' bersih' : ' awal'}</div>
+          ${d.change24hPct != null ? `<div class="n">24 jam: <span class="${cls(d.change24hUsd ?? 0)}">${sbUsd(d.change24hUsd)} · ${sbPct(d.change24hPct)}</span></div>` : ''}</div>
         <div class="sb-eq-side">
-          <div><span class="k">Modal awal</span><b>${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}</b>${d.startCapitalSol != null ? `<small>${Number(d.startCapitalSol).toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL</small>` : ''}</div>
+          <div><span class="k">Modal awal</span><b>${d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd)}</b><small>${d.startCapitalSol != null ? `${Number(d.startCapitalSol).toLocaleString('en-US', { maximumFractionDigits: 4 })} SOL` : ''}${d.netFlowUsd ? ` · arus dana ${sbUsd(d.netFlowUsd)}` : ''}</small></div>
           <div><span class="k">Kas</span><b>${d.cashUsd == null ? '—' : usd(d.cashUsd)}</b><small>di luar posisi</small></div>
           <div><span class="k">Harga SOL</span><b>${d.solPriceUsd == null ? '—' : '$' + d.solPriceUsd.toFixed(2)}</b><small>${d.startedAt ? 'mulai ' + esc(sbWib(d.startedAt)) : ''}</small></div>
         </div>
       </div>
+      ${d.realizedPnlUsd != null || d.unrealizedPnlUsd != null || d.feesUsd != null ? `<p class="hint sb-pnl">Terealisasi <b class="${cls(d.realizedPnlUsd ?? 0)}">${sbUsd(d.realizedPnlUsd)}</b> · belum terealisasi <b class="${cls(d.unrealizedPnlUsd ?? 0)}">${sbUsd(d.unrealizedPnlUsd)}</b>${d.feesUsd != null ? ` · biaya (fee/gas) <b>${usd(d.feesUsd)}</b>` : ''}</p>` : ''}
+      ${d.strategy ? `<p class="sb-strat">${esc(d.strategy)}</p>` : ''}
       ${solbotChart(d)}
       <p class="hint">Data bot per ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}) · semua waktu dalam WIB</p>
     </section>
@@ -4290,9 +4293,34 @@ async function renderHome() {
       </div>
       <span class="prod-go">Buka Cashood Index <b>→</b></span></a>`;
   };
+  const sbData = state.solbot ? await loadSolbot().catch(() => null) : null;
+  if (epoch !== homeEpoch || state.view !== 'home') return;
+  const solbotCard = () => {
+    const f = state.solbot, d = sbData && sbData.status === 'ok' && sbData.asOf && Date.now() - sbData.asOf <= SOLBOT_STALE_MS ? sbData : null;
+    const MODE = { LIVE: 'live', DRY_RUN: 'dry run', HALTED: 'dihentikan' };
+    const s1 = (v) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${pct(v, 1)}`);
+    const t = d?.totals || {}, real = d?.closedStats?.real || {};
+    const win = t.winRatePct ?? real.winRatePct;
+    return `<a class="prod" href="#solbot" style="--c:${f.accent}">
+      <div class="prod-top">${iconTile('zap', f.accent)}
+        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${d ? esc(MODE[d.mode] || 'status tidak dikenal') : 'menunggu data'}</div></div>
+        ${d?.change24hPct == null ? '' : `<span class="chg ${d.change24hPct >= 0 ? 'up' : 'down'}">${d.change24hPct >= 0 ? '▲' : '▼'} ${pct(Math.abs(d.change24hPct), 2)}<small>24 jam</small></span>`}</div>
+      <p class="prod-desc">${esc(f.blurb || '')}</p>
+      <div class="prod-nums">
+        <div><span class="k">Ekuitas</span><span class="v">${d?.equityUsd == null ? '—' : usd(d.equityUsd, 0)}</span></div>
+        <div><span class="k">Untung / rugi</span><span class="v ${cls(d?.changeUsd ?? 0)}">${d?.changeUsd == null ? '—' : `${signed(d.changeUsd)}<small>${s1(d.changePct)}</small>`}</span></div>
+        <div><span class="k">Win rate</span><span class="v">${win == null ? '—' : pct(win, 0)}</span></div>
+        <div><span class="k">Posisi terbuka</span><span class="v">${d ? String(d.positions?.length ?? 0) : '—'}</span></div>
+        <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || '—')}</span></div>
+        <div><span class="k">Pengaman</span><span class="v txt">stop −30% · halt −15%/hari</span></div>
+      </div>
+      ${d ? '' : '<p class="hint">Data belum masuk / tertunda — angka muncul begitu bot mengirim data.</p>'}
+      <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
+  };
   setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
     // Low risk: Safe Box & Index (kartu khusus) ditambah dana biasa berisiko rendah (Staking).
-    const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : []), ...state.funds.filter((f) => f.risk === 'low').map(card)] : state.funds.filter((f) => f.risk === r.key).map(card);
+    const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : []), ...state.funds.filter((f) => f.risk === 'low').map(card)]
+      : [...state.funds.filter((f) => f.risk === r.key).map(card), ...(state.solbot && (state.solbot.risk || 'high') === r.key ? [solbotCard()] : [])];
     if (!items.length) return '';
     return `<div class="risk-group" style="--rc:${r.color}">
       <div class="rg-head"><span class="rg-badge">${r.title}</span><span class="rg-note">${r.note}</span></div>
