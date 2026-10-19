@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "fac97d9f-d73e-485e-be57-ccbeaf073e40",
-  "updatedAt": 1792384559630,
-  "generatedAt": "2026-10-19 11:35 WIB",
+  "generation": "51dea2d1-92bb-4d79-9a5f-15f44c2a7123",
+  "updatedAt": 1792384860879,
+  "generatedAt": "2026-10-19 11:41 WIB",
   "usdIdr": null,
   "totalUsd": 931.3450739893949,
   "nativeSymbol": "SOL",
@@ -1314,12 +1314,12 @@
     "pnlUsd": -68.6549260106051,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792384559630,
+    "heartbeatAt": 1792384860879,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 7.73,
-    "lastScanAt": 1792384542000,
+    "lastScanAt": 1792384844000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1340,13 +1340,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "449",
+        "v": "448",
         "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "18645",
-        "n": "481 aktif"
+        "n": "478 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1356,9 +1356,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792384559630,
+      "lastDecisionAt": 1792384860879,
       "lastAction": "keputusan",
-      "lastReason": "SOLFI [degen]: Dilewati karena red flag: bundler pegang 75.45% supply."
+      "lastReason": "slopcannon [low]: Dilewati: explore: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1377,7 +1377,7 @@
       ],
       [
         "Wallet dipantau",
-        "18645 · 481 aktif"
+        "18645 · 478 aktif"
       ],
       [
         "Cadangan kas",
@@ -1389,7 +1389,7 @@
       ],
       [
         "Label wallet",
-        "smart 12510 · bot 4067 · blacklist 405 · lp 1 · fresh 1102 · kol 192 · dolphin 361 · whale 7"
+        "smart 12510 · bot 4066 · blacklist 405 · lp 1 · fresh 1103 · kol 192 · dolphin 361 · whale 7"
       ]
     ],
     "requirements": [
@@ -1438,28 +1438,28 @@
   "copyTrade": {
     "wallets": {
       "tracked": 18645,
-      "active": 481,
-      "passive": 18164,
+      "active": 478,
+      "passive": 18167,
       "trusted": 0,
       "promising": 42,
       "byLabel": [
         {
           "key": "smart",
           "total": 12510,
-          "active": 453,
-          "passive": 12057
+          "active": 450,
+          "passive": 12060
         },
         {
           "key": "bot",
-          "total": 4067,
+          "total": 4066,
           "active": 0,
-          "passive": 4067
+          "passive": 4066
         },
         {
           "key": "fresh",
-          "total": 1102,
+          "total": 1103,
           "active": 0,
-          "passive": 1102
+          "passive": 1103
         },
         {
           "key": "blacklist",
@@ -1528,18 +1528,9 @@
           "trusted": false
         },
         {
-          "alias": "smart #7105",
-          "label": "smart",
-          "score": 99,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
           "alias": "smart #6312",
           "label": "smart",
-          "score": 98.5,
+          "score": 98.6,
           "copied": 1,
           "won": 1,
           "pnlUsd": 5.0658222072215215,
@@ -1589,10 +1580,46 @@
           "won": 0,
           "pnlUsd": 0,
           "trusted": false
+        },
+        {
+          "alias": "smart #6201",
+          "label": "smart",
+          "score": 97.5,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1792384800111,
+        "symbol": "slopcannon",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 1000,
+            "note": "bundler pegang 1.4%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 12.4%"
+          },
+          {
+            "type": "sniper",
+            "count": 30,
+            "note": "sniper awal masih pegang 0.0%"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
       {
         "at": 1792384553127,
         "symbol": "SOLFI",
@@ -2628,16 +2655,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792369840820,
-        "symbol": "BISCUIT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2648,7 +2665,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 384,
+        "red_flag": 383,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2699,7 +2716,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792384626845,
+    "generatedAt": 1792384918049,
     "trades": {
       "count": 145,
       "wins": 59,
