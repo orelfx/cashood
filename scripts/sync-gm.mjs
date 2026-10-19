@@ -2,11 +2,13 @@
 /*
  * Grok Meridian (GM) — dry run, panel terpisah, pola yang sama dengan GRR.
  *
- * Sumber: /root/grok-meridian/state/cashood.json (ditulis mesin paper pm2
- * grok-meridian-paper tiap 5 menit, atomik) — HANYA DIBACA. Isinya dua buku
- * kertas (mirror = aturan Meridian live, challenger = strategi Grok), varian
- * shadow yang sudah didaftarkan sebelum mulai (dilaporkan, tidak dinilai), dan
- * "live" (Meridian asli di Cashood) sebagai pembanding.
+ * Sumber: /root/cashood-inbox/grok-meridian.json — HANYA DIBACA. Mesin paper
+ * Grok Meridian berjalan di VPS lain (abil-vps) dan menulis berkas itu secara
+ * atomik tiap 5 menit di kotak masuk sana; fetch-paper-inbox.sh menariknya ke
+ * kotak masuk lokal bersama berkas devil greed. Isinya satu buku kertas
+ * (challenger = strategi Grok), varian shadow yang didaftarkan sebelum mulai
+ * (dilaporkan, tidak dinilai), dan "live" (Meridian asli di Cashood) sebagai
+ * pembanding. Tidak ada buku mirror (keputusan pemilik 2026-10-19).
  *
  * Satuan: USD. Modal awal = NAV Meridian saat T0; setoran/penarikan Meridian
  * dicerminkan ke buku kertas, jadi semua buku dinilai dengan persen yang sudah
@@ -23,7 +25,7 @@ import { atomicJSON, assertPublic, downsample, lock, readJSON } from './lib/io.m
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'gm');
-const SRC = process.env.GM_STATE || '/root/grok-meridian/state/cashood.json';
+const SRC = process.env.GM_STATE || '/root/cashood-inbox/grok-meridian.json';
 const release = lock(resolve(DIR, 'sync.lock.local'));
 const now = Date.now();
 const num = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v)) ? null : Number(v));
@@ -40,7 +42,7 @@ function stop(status, reason) {
   const prev = readJSON(resolve(DIR, 'live.json'));
   atomicJSON(resolve(DIR, 'live.json'), {
     fund: 'gm', status, paperOnly: true, reason, checkedAt: now, startCapitalUsd: null, startedAt: null,
-    mirror: null, challenger: null, live: null, last: prev?.status === 'ok' ? { updatedAt: prev.updatedAt } : null,
+    challenger: null, live: null, last: prev?.status === 'ok' ? { updatedAt: prev.updatedAt } : null,
   });
   console.log(`[gm] ${status}: ${reason}`);
   release(); process.exit(0);
@@ -51,7 +53,7 @@ let src;
 try { src = JSON.parse(readFileSync(SRC, 'utf8')); } catch { stop('waiting', 'berkas data GM tidak terbaca'); }
 if (src?.status === 'preparing') stop('preparing', text(src.reason, 200) || 'Persiapan — mesin paper belum mulai.');
 const start = num(src?.startCapitalUsd), updatedAt = time(src?.updatedAt ?? src?.as_of);
-if (!(start > 0) || !updatedAt || !src.mirror || !src.challenger) stop('waiting', 'isi berkas data GM belum lengkap');
+if (!(start > 0) || !updatedAt || !src.challenger) stop('waiting', 'isi berkas data GM belum lengkap');
 
 const seat = (s) => ({
   symbol: text(s.symbol, 24) || '—', book: text(s.book, 16), binStep: num(s.binStep), bins: num(s.bins), shape: text(s.shape ?? s.strategy, 16),
@@ -88,7 +90,7 @@ const snapshot = {
   updatedAt, checkedAt: now, startCapitalUsd: start, startedAt: time(src.startedAt), solPriceUsd: r2(src.solPriceUsd),
   stale: now - updatedAt > 20 * 60e3,
   preregistration: pr,
-  mirror: book(src.mirror, 'mirror'), challenger: book(src.challenger, 'challenger'),
+  challenger: book(src.challenger, 'challenger'),
   shadows: (Array.isArray(src.shadows) ? src.shadows : []).slice(0, 8).map(shadow),
   live,
 };
@@ -98,9 +100,9 @@ assertPublic(snapshot);
 const histFile = resolve(DIR, 'nav.json');
 const hist = readJSON(histFile, { points: [] });
 const lastT = hist.points.at(-1)?.t ?? 0;
-if (updatedAt > lastT) hist.points.push({ t: updatedAt, usd: snapshot.challenger.equityUsd ?? start, mirror: snapshot.mirror.pctSinceStart, challenger: snapshot.challenger.pctSinceStart, live: live?.pctSinceStart ?? null });
-const points = downsample(hist.points, now).map((p) => ({ t: p.t, usd: p.usd, mirror: p.mirror ?? null, challenger: p.challenger ?? null, live: p.live ?? null }));
+if (updatedAt > lastT) hist.points.push({ t: updatedAt, usd: snapshot.challenger.equityUsd ?? start, challenger: snapshot.challenger.pctSinceStart, live: live?.pctSinceStart ?? null });
+const points = downsample(hist.points, now).map((p) => ({ t: p.t, usd: p.usd, challenger: p.challenger ?? null, live: p.live ?? null }));
 atomicJSON(histFile, { updatedAt, points });
 atomicJSON(resolve(DIR, 'live.json'), snapshot);
-console.log(`[gm] mirror ${snapshot.mirror.pctSinceStart}% · challenger ${snapshot.challenger.pctSinceStart}% · live ${live?.pctSinceStart ?? '—'}%`);
+console.log(`[gm] grok ${snapshot.challenger.pctSinceStart}% · live ${live?.pctSinceStart ?? '—'}%`);
 release();

@@ -3490,15 +3490,15 @@ async function loadIndexSeries() {
  * arus dana), statistik per buku, seat terbuka, dan 10 close terakhir. */
 const DUELS = {
   grr: {
-    title: 'Grok Reborn Rich', liveName: 'Reborn Rich asli', chal: '#a855f7',
+    title: 'Grok Reborn Rich', liveName: 'Reborn Rich asli', chal: '#a855f7', books: [['mirror', 'Mirror'], ['challenger', 'Challenger']],
     lead: (d) => `Uji kertas strategi LP Reborn Rich. <b>Mirror</b> menjalankan aturan live Reborn Rich di atas kertas, <b>Challenger</b> adalah strategi Grok v1.1, dan <b>Reborn Rich asli</b> jadi pembanding. Semuanya mulai dari modal yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}. Mirror dan Challenger bukan uang sungguhan.`,
   },
   gm: {
-    title: 'Grok Meridian', liveName: 'Meridian asli', chal: '#38bdf8', seatCol: 'bin',
-    lead: (d) => `Uji kertas strategi LP Meteora DLMM. <b>Mirror</b> menjalankan aturan Meridian di atas kertas, <b>Challenger</b> adalah strategi Grok${d.preregistration?.version ? ` ${esc(d.preregistration.version)}` : ''}, dan <b>Meridian asli</b> (dana Meridian di Cashood) jadi juri. Semuanya mulai dari NAV Meridian yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}; setoran dan penarikan Meridian ikut dicerminkan ke buku kertas, jadi yang dibandingkan adalah persen hasil, bukan dolar. Mirror dan Challenger bukan uang sungguhan.`,
+    title: 'Grok Meridian', liveName: 'Meridian asli', chal: '#38bdf8', seatCol: 'bin', books: [['challenger', 'Grok Meridian']],
+    lead: (d) => `Uji kertas strategi LP Meteora DLMM. <b>Grok Meridian</b> (strategi Grok${d.preregistration?.version ? ` ${esc(d.preregistration.version)}` : ''}, di atas kertas) melawan <b>Meridian asli</b>, dana Meridian di Cashood. Keduanya mulai dari NAV Meridian yang sama, ${usd(d.startCapitalUsd, 0)}${d.startedAt ? ` sejak ${tglRingkas(d.startedAt)}` : ''}; setoran dan penarikan Meridian ikut dicerminkan ke buku kertas, jadi yang dibandingkan adalah persen hasil, bukan dolar. Grok Meridian bukan uang sungguhan.`,
     preparing: `<div class="grr-prep"><b>Yang sedang disiapkan</b><ul>
       <li>Modal awal: NAV dana Meridian di Cashood pada saat mulai (T0), dalam dolar.</li>
-      <li>Mirror = aturan Meridian, Challenger = strategi Grok, varian shadow dilaporkan semua tapi tidak dinilai.</li>
+      <li>Grok Meridian (kertas) melawan Meridian asli; varian shadow dilaporkan semua tapi tidak dinilai.</li>
       <li>Penilaian: hasil bersih dalam persen modal, jendela waktu yang sama dengan Meridian asli, minimal 14 hari dan 30 close, drawdown maksimum ditampilkan.</li>
       <li>Parameter dikunci sebelum mulai; hash pra-registrasi tampil di sini begitu dikunci.</li></ul></div>`,
   },
@@ -3532,7 +3532,9 @@ async function renderDuel(key) {
       <p class="hint">Data diperbarui tiap 5 menit begitu mesin paper berjalan.</p></section>`);
     return;
   }
-  const books = [['mirror', 'Mirror', '#60a5fa', d.mirror], ['challenger', 'Challenger', cfg.chal, d.challenger], ['live', cfg.liveName, '#4ade80', d.live]];
+  const COLOR = { mirror: '#60a5fa', challenger: cfg.chal };
+  const paper = cfg.books.map(([k, n]) => [k, n, COLOR[k], d[k]]);
+  const books = [...paper, ['live', cfg.liveName, '#4ade80', d.live]];
   const pctTxt = (v) => (v == null ? '—' : `${v > 0 ? '+' : ''}${pct(v, 2)}`);
   const solTxt = (v) => (v == null ? '' : ` · ${Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 })} SOL`);
   const ddTxt = (b) => (b?.maxDrawdownPct == null ? '' : ` · DD maks ${pct(b.maxDrawdownPct, 1)}`);
@@ -3554,7 +3556,7 @@ async function renderDuel(key) {
     const x = (t) => m.l + ((t - t0) / Math.max(1, t1 - t0)) * (W - m.l - m.r), y = (v) => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
     const line = (k) => pts.filter((p) => p[k] != null).map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p[k]).toFixed(1)}`).join('');
     const tick = (t) => { const z = new Date(t + 7 * 3600e3); return t1 - t0 < 36 * 3600e3 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()}/${z.getUTCMonth() + 1}`; };
-    chart = `<svg class="grr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Persen sejak awal: mirror, challenger, live">
+    chart = `<svg class="grr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Persen sejak awal: ${esc(books.map(([, n]) => n).join(', '))}">
       <line x1="${m.l}" x2="${W - m.r}" y1="${y(0).toFixed(1)}" y2="${y(0).toFixed(1)}" class="g-base"/>
       ${[hi - pad, 0, lo + pad].map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${v > 0 ? '+' : ''}${v.toFixed(2)}%</text>`).join('')}
       ${books.map(([k, , c]) => `<path d="${line(k)}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`).join('')}
@@ -3564,7 +3566,7 @@ async function renderDuel(key) {
   const stat = (b) => (b ? `<td class="num" data-k="Close">${b.closes ?? 0}</td><td class="num" data-k="Win rate">${b.winRatePct == null ? '—' : pct(b.winRatePct, 0)}</td>
       <td class="num pos" data-k="Rata² menang">${b.avgWinUsd == null ? '—' : signed(b.avgWinUsd)}</td><td class="num neg" data-k="Rata² kalah">${b.avgLossUsd == null ? '—' : signed(b.avgLossUsd)}</td>
       <td class="num pos" data-k="Fee">${b.feesUsd == null ? '—' : usd(b.feesUsd)}</td><td class="num neg" data-k="Biaya">${b.costsUsd == null ? '—' : usd(b.costsUsd)}</td>` : '');
-  const rows = [['Mirror', d.mirror], ['Challenger', d.challenger]];
+  const rows = paper.map(([, n, , b]) => [n, b]);
   const shadows = Array.isArray(d.shadows) ? d.shadows : [];
   const seats = rows.flatMap(([n, b]) => (b?.openSeats || []).map((s) => ({ ...s, bookName: n })));
   const closes = rows.flatMap(([n, b]) => (b?.last10Closes || []).map((c) => ({ ...c, bookName: n })))
@@ -3575,7 +3577,7 @@ async function renderDuel(key) {
       <div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
       <p class="lead">${cfg.lead(d)}</p>
       <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${pr?.prereg12 ? ` · pra-registrasi ${esc(pr.version || '')} <span class="dim">${esc(pr.prereg12)}</span>${pr.params12 ? ` · parameter <span class="dim">${esc(pr.params12)}</span>` : ''}` : ''}</p>
-      <div class="grr-tiles">${tiles}</div>
+      <div class="grr-tiles${books.length === 2 ? ' n2' : ''}">${tiles}</div>
       <div class="grr-legend">${books.map(([, n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>
       ${chart}
     </section>

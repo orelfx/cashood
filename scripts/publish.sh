@@ -25,7 +25,6 @@ run_snapshot scripts/sync-forex.mjs
 run_snapshot scripts/sync-binance.mjs
 run_snapshot scripts/sync-staking.mjs
 run_snapshot scripts/sync-grr.mjs
-run_snapshot scripts/sync-gm.mjs
 # Buku paper devil greed: bot-nya menaruh berkas di kotak masuk; diimpor kalau ada.
 run_paper() {
   [ -f "$2" ] || return 0
@@ -39,6 +38,9 @@ run_paper dgrh /root/cashood-inbox/devil-greed-robin-hood.json
 run_paper dgsol /root/cashood-inbox/devil-greed-solana.json
 # SnipeHunt menulis berkasnya langsung ke kotak masuk (VPS yang sama).
 run_paper snh /root/cashood-inbox/snipehunt.json
+# Grok Meridian (dry run): mesinnya di abil-vps menaruh grok-meridian.json di kotak
+# masuk sana; fetch-paper-inbox.sh di atas menariknya ke kotak masuk lokal.
+run_snapshot scripts/sync-gm.mjs
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
 run_snapshot scripts/sync-index.mjs
 # Bunga Safe Box mengikuti gerak harian index, jadi dihitung sesudahnya.

@@ -12,7 +12,8 @@ tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 ssh -i /root/.ssh/cashood_inbox_pull -p "${port:-22}" -o BatchMode=yes -o ConnectTimeout=10 \
     -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes "$target" true 2>/dev/null \
   | tar -x -C "$tmp" --no-same-owner 2>/dev/null || { echo "PERINGATAN: kotak masuk devil greed tidak bisa ditarik" >&2; exit 1; }
-for f in devil-greed-robin-hood.json devil-greed-solana.json; do
+# grok-meridian.json (Grok Meridian, dry run) ikut kalau perintah tar di sisi sana memuatnya.
+for f in devil-greed-robin-hood.json devil-greed-solana.json grok-meridian.json; do
   [ -f "$tmp/$f" ] || continue
   # Hanya JSON utuh yang boleh menggantikan berkas lama.
   /usr/bin/node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))' "$tmp/$f" 2>/dev/null || { echo "PERINGATAN: $f bukan JSON utuh; dilewati" >&2; continue; }
