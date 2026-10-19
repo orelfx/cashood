@@ -3542,7 +3542,7 @@ async function renderDuel(key) {
       <div class="grr-k"><i></i>${esc(name)}</div>
       <div class="grr-v ${cls(b?.pctSinceStart ?? 0)}">${b?.status === 'waiting_t0' ? '<span class="dim">menunggu T0</span>' : pctTxt(b?.pctSinceStart)}</div>
       <div class="grr-n">${b?.equityUsd != null ? usd(b.equityUsd) : '—'}${solTxt(b?.equitySol)}${k === 'live' ? ' · uang asli' : ' · kertas'}</div>
-      ${k !== 'live' ? `<div class="grr-n">${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${b?.openSeats?.length ?? 0} seat terbuka${ddTxt(b)}</div>` : `<div class="grr-n">${b?.asOf ? 'per ' + tglRingkas(b.asOf) : ''}${ddTxt(b)}</div>`}
+      ${k !== 'live' ? `<div class="grr-n">${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${b?.openSeats?.length ?? 0} seat terbuka${ddTxt(b)}</div>` : `<div class="grr-n">${b?.status === 'waiting_t0' && b.label ? esc(b.label) : b?.asOf ? 'per ' + tglRingkas(b.asOf) : ''}${ddTxt(b)}</div>`}
       ${k === 'live' && b?.rawPctSinceStart != null && b.rawPctSinceStart !== b.pctSinceStart ? `<div class="grr-n dim2">tanpa koreksi arus dana ${pctTxt(b.rawPctSinceStart)}${b.netFlowsUsd ? ` · arus dana ${signed(b.netFlowsUsd)}` : ''}</div>` : ''}
     </div>`).join('');
   // Grafik persen sejak awal, tiga garis.
@@ -3577,7 +3577,7 @@ async function renderDuel(key) {
   setHTML(body, `<section class="card">
       <div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
       <p class="lead">${cfg.lead(d)}</p>
-      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${d.phase === 'warmup' ? ' · <b>warmup</b> (belum dinilai)' : ''}${d.startedAt ? ` · T0 ${tglRingkas(d.startedAt)}${d.t0Pin ? ' (dipatok Cashood)' : ''}` : ''}${hashTxt(d.t0Pin?.prereg12 ? d.t0Pin : pr)}${d.hashCheck && d.hashCheck !== 'set' ? ` · <span class="dim">${esc(d.hashCheck)}</span>` : ''}</p>
+      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${d.phase === 'warmup' ? ' · <b>warmup</b> (belum dinilai)' : ''}${d.startedAt ? ` · T0 ${tglRingkas(d.startedAt)}${d.t0Pin ? ' (dipatok Cashood)' : ''}` : d.t0Wait ? ` · <b>${esc(d.t0Wait)}</b>` : ''}${hashTxt(d.t0Pin?.prereg12 ? d.t0Pin : pr)}${d.hashCheck && d.hashCheck !== 'set' ? ` · <span class="dim">${esc(d.hashCheck)}</span>` : ''}</p>
       ${(d.warnings || []).length ? `<div role="alert">${d.warnings.map((w) => { const i = w.indexOf(':'); return `<p class="neg"><b>⚠ ${esc(i > 0 ? w.slice(0, i) : 'Peringatan')}:</b> ${esc(i > 0 ? w.slice(i + 1).trim() : w)}</p>`; }).join('')}</div>` : ''}
       <div class="grr-tiles${books.length === 2 ? ' n2' : ''}">${tiles}</div>
       <div class="grr-legend">${books.map(([, n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>
