@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "eee01b64-e890-4c38-afba-7ca27316d94f",
-  "updatedAt": 1792453759788,
-  "generatedAt": "2026-10-20 06:49 WIB",
+  "generation": "645cc29b-b0bf-4960-8d58-4e2aa4dab17d",
+  "updatedAt": 1792454059788,
+  "generatedAt": "2026-10-20 06:54 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792453759788,
+    "heartbeatAt": 1792454059788,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792453747000,
+    "lastScanAt": 1792454052000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1349,12 +1349,12 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "403",
+        "v": "404",
         "n": "24 jam · 7 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "19756",
+        "v": "19796",
         "n": "505 aktif"
       },
       {
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792453759788,
+      "lastDecisionAt": 1792454059788,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      "lastReason": "JUP [big]: Dilewati karena red flag: likuiditas cuma 0.0% dari market cap."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Wallet dipantau",
-        "19756 · 505 aktif"
+        "19796 · 505 aktif"
       ],
       [
         "Cadangan kas",
@@ -1398,7 +1398,7 @@
       ],
       [
         "Label wallet",
-        "smart 12958 · bot 4732 · blacklist 423 · lp 1 · fresh 1153 · kol 200 · dolphin 282 · whale 7"
+        "smart 12973 · bot 4739 · blacklist 423 · lp 1 · fresh 1156 · kol 200 · dolphin 282 · whale 7 · unknown 15"
       ]
     ],
     "requirements": [
@@ -1446,29 +1446,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 19756,
+      "tracked": 19796,
       "active": 505,
-      "passive": 19251,
+      "passive": 19291,
       "trusted": 0,
       "promising": 42,
       "byLabel": [
         {
           "key": "smart",
-          "total": 12958,
+          "total": 12973,
           "active": 471,
-          "passive": 12487
+          "passive": 12502
         },
         {
           "key": "bot",
-          "total": 4732,
+          "total": 4739,
           "active": 0,
-          "passive": 4732
+          "passive": 4739
         },
         {
           "key": "fresh",
-          "total": 1153,
+          "total": 1156,
           "active": 0,
-          "passive": 1153
+          "passive": 1156
         },
         {
           "key": "blacklist",
@@ -1487,6 +1487,12 @@
           "total": 200,
           "active": 10,
           "passive": 190
+        },
+        {
+          "key": "unknown",
+          "total": 15,
+          "active": 0,
+          "passive": 15
         },
         {
           "key": "whale",
@@ -1602,6 +1608,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792453914482,
+        "symbol": "JUP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.0% dari market cap."
+      },
+      {
+        "at": 1792453810310,
+        "symbol": "Wojak",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792453681178,
         "symbol": "CARDS",
@@ -2491,65 +2517,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 39.2% supply."
-      },
-      {
-        "at": 1792439508195,
-        "symbol": "OPEQ",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 340,
-            "note": "bundler pegang 4.0%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 6.0%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 627,
-            "note": "6.2% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792439392732,
-        "symbol": "Agency",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 14.5%"
-          },
-          {
-            "type": "rat",
-            "count": 4,
-            "note": "insider/entrapment pegang 14.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 6,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
@@ -2560,7 +2527,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 352,
+        "red_flag": 353,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2610,7 +2577,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792453913570,
+    "generatedAt": 1792454211143,
     "trades": {
       "count": 148,
       "wins": 60,
