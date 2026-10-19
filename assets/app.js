@@ -3639,7 +3639,7 @@ async function renderDuel(key) {
  * dari 15 menit → "tertunda" tanpa angka, supaya angka lama tidak tampil
  * seolah live. */
 const SOLBOT_STALE_MS = 15 * 60e3;
-const solbotView = { allClosed: false };
+const solbotView = { month: '', page: 0 };
 let solbotEpoch = 0, solbotTimer = null;
 function showSolbot() {
   showGlobal('solbot', 'SolBot — Cashood Headfund');
@@ -3705,11 +3705,6 @@ async function renderSolbot() {
   const stopTxt = g.stopButton == null ? '—' : g.stopButton === true ? 'DITEKAN' : g.stopButton === false ? 'tidak ditekan' : String(g.stopButton);
   const stopHot = g.stopButton === true || /tekan|pressed|on|aktif|active|engaged|halt/i.test(String(g.stopButton)) && g.stopButton !== false && !/tidak|not|off|siap|ready|idle/i.test(String(g.stopButton));
   const tile = (k, v, n, c = '', extra = '') => `<div class="sb-g"><div class="k">${k}</div><div class="v ${c}">${v}</div>${extra}<div class="n">${n}</div></div>`;
-  const pos = d.positions || [];
-  const closed = d.closedTrades || [];
-  const shownClosed = solbotView.allClosed ? closed : closed.slice(0, 15);
-  const st = d.closedStats || {};
-  const EXIT = { TP: 'pos', STOP: 'neg', HALT: 'neg', MANUAL: 'dim' };
   setHTML(body, `<section class="card sb-hero">
       ${SOLBOT_HEAD}<span class="sb-mode ${modeCls}"><i></i>${modeTxt}</span></div>
       ${d.mode === 'HALTED' || d.haltReason ? `<p class="sb-halt" role="alert"><b>Bot dihentikan${d.mode === 'HALTED' ? '' : ' (catatan)'}:</b> ${esc(d.haltReason || 'alasan tidak dilaporkan')}</p>` : ''}
@@ -3740,28 +3735,108 @@ async function renderSolbot() {
         ${tile('Drawdown', g.drawdownPct == null ? '—' : sbPct(ddUsed), `batas ${sbLimit(g.totalHaltPct)}`, ddUsed ? 'neg' : 'dim', meter(ddUsed, g.totalHaltPct))}
         ${tile('Tombol stop', esc(stopTxt), 'stop darurat manual', stopHot ? 'neg' : 'dim')}
       </div></section>
-    <section class="card"><div class="card-head"><h2>Posisi terbuka <span class="count">(${pos.length})</span></h2></div>
-      ${pos.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Koin</th><th class="num">Entry</th><th class="num">Mark</th><th class="num">Nilai</th><th class="num">PnL</th><th class="num">TP</th><th class="num">Stop</th><th class="num">Umur</th></tr></thead><tbody>
-      ${pos.map((p) => `<tr><td class="mc-head"><b>${esc(p.symbol)}</b>${p.name ? `<div class="sub2">${esc(p.name)}</div>` : ''}</td>
-        <td class="num" data-k="Entry">${sbPx(p.entryPriceUsd)}</td><td class="num" data-k="Mark">${sbPx(p.markPriceUsd)}</td>
-        <td class="num" data-k="Nilai">${p.valueUsd == null ? '—' : usd(p.valueUsd)}${p.sizeUsd != null ? `<div class="sub2">modal ${usd(p.sizeUsd)}</div>` : ''}</td>
-        <td class="num ${cls(p.pnlUsd ?? 0)}" data-k="PnL">${sbUsd(p.pnlUsd)}<div class="sub2 ${cls(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</div></td>
-        <td class="num" data-k="TP">${p.tpStage == null ? '—' : `${p.tpStage}/${p.tpStagesTotal ?? '?'}`}</td>
-        <td class="num" data-k="Stop">${sbPx(p.stopPriceUsd)}</td>
-        <td class="num dim" data-k="Umur">${p.openedAt ? dur((Date.now() - p.openedAt) / 60000) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Tidak ada posisi terbuka.</p>'}</section>
-    <section class="card"><div class="card-head"><h2>Trade tertutup <span class="count">(${st.all?.count ?? closed.length})</span></h2>
-      <span class="hint">${st.real?.count ? `uang asli: ${st.real.count} trade · win ${st.real.winRatePct == null ? '—' : pct(st.real.winRatePct, 0)} · <span class="${cls(st.real.pnlUsd ?? 0)}">${sbUsd(st.real.pnlUsd)}</span>` : ''}${st.simulated ? `${st.real?.count ? ' · ' : ''}${st.simulated} simulasi` : ''}</span></div>
-      ${closed.length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Koin</th><th class="num">Buka</th><th class="num">Tutup</th><th class="num">Entry → exit</th><th class="num">PnL</th><th>Keluar</th></tr></thead><tbody>
-      ${shownClosed.map((c) => `<tr${c.simulated ? ' class="sb-simrow"' : ''}><td class="mc-head"><b>${esc(c.symbol)}</b>${c.simulated ? ' <span class="pill sb-sim">simulasi</span>' : ''}</td>
-        <td class="num dim" data-k="Buka">${esc(sbWib(c.openedAt))}</td><td class="num dim" data-k="Tutup">${esc(sbWib(c.closedAt))}</td>
-        <td class="num" data-k="Entry → exit">${sbPx(c.entryPriceUsd)} → ${sbPx(c.exitPriceUsd)}</td>
-        <td class="num ${cls(c.pnlUsd ?? 0)}" data-k="PnL">${sbUsd(c.pnlUsd)}<div class="sub2 ${cls(c.pnlPct ?? 0)}">${sbPct(c.pnlPct)}</div></td>
-        <td data-k="Keluar"><span class="pill sb-x ${EXIT[c.exitReason] || 'dim'}">${esc(c.exitReason || '—')}</span></td></tr>`).join('')}</tbody></table></div>
-        ${closed.length > 15 ? `<p class="sb-more"><button class="btn ghost" id="sbMore">${solbotView.allClosed ? 'Tampilkan lebih sedikit' : `Tampilkan semua (${closed.length})`}</button></p>` : ''}` : '<p class="dim">Belum ada trade yang ditutup.</p>'}</section>
+    ${solbotPositionsHtml(d)}
+    ${solbotClosedHtml(d)}
     <section class="card sb-disc"><p>${SOLBOT_WARN}</p>${d.disclaimer ? `<p class="hint">${esc(d.disclaimer)}</p>` : ''}
       <p class="hint">Terpisah dari buku paper Devil Greed (grokbot/solana); angka SolBot tidak digabung dengan paper dan tidak masuk Cashood Index.</p></section>`);
-  const more = $('#sbMore');
-  if (more) more.onclick = () => { solbotView.allClosed = !solbotView.allClosed; renderSolbot().catch(() => {}); };
+  const month = $('#sbMonth');
+  if (month) month.onchange = (e) => { solbotView.month = e.target.value; solbotView.page = 0; renderSolbot().catch(() => {}); };
+  const pager = $('#sbPager');
+  if (pager) pager.onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.disabled) return;
+    solbotView.page = Number(btn.getAttribute('data-p')) || 0;
+    renderSolbot().then(() => $('#sbClosed')?.scrollIntoView({ block: 'start', behavior: 'smooth' })).catch(() => {});
+  };
+}
+
+/* Posisi SolBot, bentuknya sama dengan "Posisi trading" buku paper: ringkasan
+ * skenario (semua kena stop / semua kena target berikutnya / floating), lalu
+ * tabel rencana per posisi. Skenario dihitung dari harga stop dan harga target
+ * berikutnya terhadap harga mark sekarang. */
+function solbotPositionsHtml(d) {
+  const rows = [...(d.positions || [])].sort((a, b) => (b.valueUsd ?? 0) - (a.valueUsd ?? 0));
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const head = `<div class="card-head"><h2>Posisi trading <span class="count">(${rows.length})</span></h2><span class="hint">nilai = harga mark × jumlah token · data bot ${esc(ago(d.asOf))}</span></div>`;
+  if (!rows.length) return `<section class="card">${head}<p class="dim">Belum ada posisi terbuka — bot sedang menunggu sinyal dari wallet yang diikuti.</p></section>`;
+  const cost = rows.reduce((t, r) => t + (r.sizeUsd || 0), 0), value = rows.reduce((t, r) => t + (r.valueUsd || 0), 0);
+  const pnl = rows.reduce((t, r) => t + (r.pnlUsd || 0), 0);
+  // Nilai posisi kalau harga menyentuh level tertentu: nilai × (level / mark).
+  const at = (r, level) => (level > 0 && r.markPriceUsd > 0 && r.valueUsd != null ? r.valueUsd * (level / r.markPriceUsd) - (r.sizeUsd ?? r.valueUsd) : null);
+  const sl = rows.map((r) => at(r, r.stopPriceUsd)).filter((v) => v != null), tp = rows.map((r) => at(r, r.nextTpPriceUsd)).filter((v) => v != null);
+  const sum = (a) => a.reduce((t, v) => t + v, 0);
+  const pctOf = (r, level) => (level > 0 && r.entryPriceUsd > 0 ? (level / r.entryPriceUsd - 1) * 100 : null);
+  const tiles = [
+    tile('Modal di posisi', usd(cost), `${rows.length} posisi · eksposur ${d.equityUsd ? pct((value / d.equityUsd) * 100, 1) : '—'}`),
+    sl.length ? tile('Kalau semua kena SL', signed(sum(sl)), `rugi maksimal${sl.length < rows.length ? ` · ${sl.length}/${rows.length} posisi punya stop` : ''}`, cls(sum(sl))) : '',
+    tp.length ? tile('Kalau semua kena TP', signed(sum(tp)), `target berikutnya${tp.length < rows.length ? ` · ${tp.length}/${rows.length} posisi` : ''}`, 'pos') : '',
+    tile('Floating sekarang', signed(pnl), `nilai jual ${usd(value)} · ${cost ? (pnl >= 0 ? '+' : '') + pct((pnl / cost) * 100) : '—'}`, cls(pnl)),
+  ].filter(Boolean);
+  const summary = `<div class="stats lp-sum n${tiles.length}">${tiles.join('')}</div>`;
+  const plan = (r) => {
+    const sp = pctOf(r, r.stopPriceUsd), tpP = pctOf(r, r.nextTpPriceUsd);
+    const chip = [sp != null ? `stop ${sp > 0 ? '+' : '−'}${pct(Math.abs(sp), 0)}` : '', r.tpStagesTotal ? `TP ${r.tpStage ?? 0}/${r.tpStagesTotal}` : '', tpP != null ? `next TP +${pct(tpP, 0)}` : ''].filter(Boolean).join(' · ');
+    const more = [r.name ? `<div class="sub2">${esc(r.name)}</div>` : '', `<div class="sub2">entry ${sbPx(r.entryPriceUsd)} · mark ${sbPx(r.markPriceUsd)}</div>`,
+      r.entryNote ? `<p class="fx-why"><b>Alasan masuk:</b> ${esc(r.entryNote)}</p>` : ''].join('');
+    return `<details class="fx-det"><summary>${r.tpStage ? 'Ambil untung bertahap' : 'Copy-trade'}</summary>${more}</details>${chip ? `<span class="pill sb-plan">${esc(chip)}</span>` : ''}`;
+  };
+  return `<section class="card">${head}${summary}
+    <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th>Rencana</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai jual</th><th class="num">Stop / target</th><th class="num">Untung / rugi</th></tr></thead><tbody>
+    ${rows.map((r) => `<tr>
+      <td class="mc-head"><span class="who"><span class="chip" style="background:${(r.pnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(r.symbol)}</span></td>
+      <td class="fx-strat mc-wide" data-k="Rencana">${plan(r)}</td>
+      <td class="num" data-k="Umur">${r.openedAt ? `${dur((Date.now() - r.openedAt) / 60000)}<div class="sub2">sejak ${esc(sbWib(r.openedAt))}</div>` : '—'}</td>
+      <td class="num" data-k="Modal">${r.sizeUsd == null ? '—' : usd(r.sizeUsd)}</td>
+      <td class="num" data-k="Nilai jual"><strong>${r.valueUsd == null ? '—' : usd(r.valueUsd)}</strong></td>
+      <td class="num" data-k="Stop / target"><span class="neg">${sbPx(r.stopPriceUsd)}</span> / <span class="pos">${sbPx(r.nextTpPriceUsd)}</span></td>
+      <td class="num ${cls(r.pnlUsd ?? 0)}" data-k="Untung / rugi">${sbUsd(r.pnlUsd)}<div class="sub2 ${cls(r.pnlPct ?? 0)}">${sbPct(r.pnlPct)}</div></td></tr>`).join('')}
+    </tbody></table></div></section>`;
+}
+
+/* Riwayat SolBot, bentuknya sama dengan "Riwayat posisi ditutup": pilihan
+ * periode per bulan, ringkasan hasil, dan halaman 20 baris. Alasan keluar
+ * ditulis pendek; ditekan → harga masuk/keluar, waktu, dan catatan bot. */
+const SB_EXIT = { TP: ['Take profit', 'pos'], STOP: ['Stop loss', 'neg'], HALT: ['Halt (batas rugi)', 'neg'], MANUAL: ['Manual', 'dim'] };
+function solbotClosedHtml(d) {
+  const all = d.closedTrades || [];
+  const head = (hint) => `<div class="card-head"><h2>Riwayat posisi ditutup</h2><span class="hint">${hint}</span></div>`;
+  if (!all.length) return `<section class="card" id="sbClosed">${head('')}<p class="dim">Belum ada posisi yang ditutup.</p></section>`;
+  const mon = (t) => new Date(t + 7 * 3600e3).toISOString().slice(0, 7);
+  const months = [...new Set(all.filter((c) => c.closedAt).map((c) => mon(c.closedAt)))].sort().reverse();
+  if (solbotView.month && !months.includes(solbotView.month)) solbotView.month = '';
+  const scope = all.filter((c) => !solbotView.month || (c.closedAt && mon(c.closedAt) === solbotView.month));
+  const pages = Math.max(1, Math.ceil(scope.length / CLOSED_PER_PAGE));
+  solbotView.page = Math.min(Math.max(0, solbotView.page || 0), pages - 1);
+  const label = (m) => `${M_SHORT[Number(m.slice(5)) - 1]} ${m.slice(0, 4)}`;
+  const sum = (list) => { const g = list.filter((c) => c.pnlUsd != null); return { n: list.length, usd: g.reduce((t, c) => t + c.pnlUsd, 0), w: g.filter((c) => c.pnlUsd > 0).length, l: g.filter((c) => c.pnlUsd < 0).length, sim: list.filter((c) => c.simulated).length }; };
+  const s = sum(scope);
+  // Kalau bot mengirim statistik seluruh riwayat (closed_trades bisa dipotong), jumlah totalnya ikut.
+  const t = d.totals || {};
+  const allLabel = t.trades != null && t.trades > all.length ? `Semua · ${t.trades} posisi (${all.length} terakhir)` : `Semua · ${all.length} posisi`;
+  const rows = scope.slice(solbotView.page * CLOSED_PER_PAGE, (solbotView.page + 1) * CLOSED_PER_PAGE);
+  const why = (c) => {
+    const [txt, k] = SB_EXIT[c.exitReason] || [c.exitReason || '—', 'dim'];
+    return `<details class="fx-det"><summary class="${k === 'dim' ? '' : k}">${esc(txt)}</summary>
+      <div class="sub2">${sbPx(c.entryPriceUsd)} → ${sbPx(c.exitPriceUsd)}</div>
+      <div class="sub2">buka ${esc(sbWib(c.openedAt))} · tutup ${esc(sbWib(c.closedAt))}</div>${c.exitNote ? `<p class="fx-why">${esc(c.exitNote)}</p>` : ''}</details>`;
+  };
+  return `<section class="card" id="sbClosed">${head(`halaman ${solbotView.page + 1} dari ${pages} · ${solbotView.month ? label(solbotView.month) : 'seluruh riwayat'}`)}
+    <div class="controls closed-ctl">
+      <label class="sel-wrap"><span>Periode</span><select id="sbMonth" aria-label="Pilih bulan"><option value="">${esc(allLabel)}</option>
+        ${months.map((m) => `<option value="${m}"${m === solbotView.month ? ' selected' : ''}>${label(m)} · ${all.filter((c) => c.closedAt && mon(c.closedAt) === m).length} posisi</option>`).join('')}</select></label>
+      <span class="closed-sum"><b>${s.n}</b> posisi · hasil <b class="${cls(s.usd)}">${signed(s.usd)}</b> · <span class="pos">${s.w} untung</span> · <span class="neg">${s.l} rugi</span>${s.w + s.l ? ` · win rate ${pct((s.w / (s.w + s.l)) * 100, 1)}` : ''}${s.sim ? ` · ${s.sim} simulasi` : ''}</span>
+    </div>
+    <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th>Mode</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+    ${rows.map((c) => `<tr${c.simulated ? ' class="sb-simrow"' : ''}>
+      <td class="mc-head"><span class="who"><span class="chip" style="background:${(c.pnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol)}</span></td>
+      <td data-k="Mode">${c.simulated ? '<span class="pill sb-sim">simulasi</span>' : '<span class="dim">uang asli</span>'}</td>
+      <td class="num dim" data-k="Lama">${c.openedAt && c.closedAt ? dur((c.closedAt - c.openedAt) / 60000) : '—'}</td>
+      <td class="num ${cls(c.pnlUsd ?? 0)}" data-k="Hasil">${sbUsd(c.pnlUsd)}</td>
+      <td class="num ${cls(c.pnlPct ?? 0)}" data-k="%">${sbPct(c.pnlPct)}</td>
+      <td data-k="Alasan">${why(c)}</td>
+      <td class="num dim" data-k="Ditutup" title="${esc(sbWib(c.closedAt))}">${c.closedAt ? esc(ago(c.closedAt)) : '—'}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${pages > 1 ? `<div class="pager" id="sbPager">${pagerHtml(solbotView.page, pages)}</div>` : ''}</section>`;
 }
 
 function showIndex() { showGlobal('index', 'Cashood Index — Cashood Headfund'); renderIndex().catch(() => {}); }

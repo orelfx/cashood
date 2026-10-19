@@ -1357,37 +1357,37 @@ td .fx-det summary { color: var(--text); font-weight: 500; }
    Semua kolom tampil dengan labelnya — tidak ada yang disembunyikan. Label
    duduk di kiri, nilainya (boleh beberapa baris) rata kanan. */
 @media (max-width: 640px) {
-  #lpTable.mcards td:nth-child(n), #closedTable.mcards td:nth-child(n) {
+  :is(#lpTable, .sb-tbl).mcards td:nth-child(n), :is(#closedTable, .sb-tbl).mcards td:nth-child(n) {
     display: block; position: relative; text-align: right; padding: 6px 0 6px 42%; min-height: 26px; white-space: normal; }
-  #lpTable.mcards td[data-k]::before, #closedTable.mcards td[data-k]::before {
+  :is(#lpTable, .sb-tbl).mcards td[data-k]::before, :is(#closedTable, .sb-tbl).mcards td[data-k]::before {
     position: absolute; left: 0; top: 7px; max-width: 40%; text-align: left; }
-  #lpTable.mcards td.mc-head, #closedTable.mcards td.mc-head { padding: 0 0 6px; text-align: left; grid-column: 1 / -1; }
-  #lpTable.mcards td.mc-wide, #closedTable.mcards td.mc-wide { grid-column: 1 / -1; text-align: left; padding-left: 0; padding-top: 22px; }
-  #lpTable.mcards td.mc-wide::before, #closedTable.mcards td.mc-wide::before { top: 4px; max-width: none; }
-  #lpTable.mcards tr, #closedTable.mcards tr { grid-template-columns: 1fr; gap: 0; padding: 14px 4px; }
-  #lpTable.mcards .m-only, #closedTable.mcards .m-only { display: none !important; }
-  #lpTable.mcards .fx-px { display: block; }
-  #lpTable.mcards .fx-pot span { display: inline; }
-  #lpTable.mcards .fx-pot i { display: inline; }
-  #lpTable.mcards .sub2.why, #closedTable.mcards .sub2.why, #lpTable.mcards .fx-why, #closedTable.mcards .fx-why { max-width: none; }
-  #lpTable.mcards .band { display: inline; margin-left: 6px; }
-  #lpTable.mcards td + td, #closedTable.mcards td + td { border-top: 1px dashed rgba(255,255,255,.05); }
+  :is(#lpTable, .sb-tbl).mcards td.mc-head, :is(#closedTable, .sb-tbl).mcards td.mc-head { padding: 0 0 6px; text-align: left; grid-column: 1 / -1; }
+  :is(#lpTable, .sb-tbl).mcards td.mc-wide, :is(#closedTable, .sb-tbl).mcards td.mc-wide { grid-column: 1 / -1; text-align: left; padding-left: 0; padding-top: 22px; }
+  :is(#lpTable, .sb-tbl).mcards td.mc-wide::before, :is(#closedTable, .sb-tbl).mcards td.mc-wide::before { top: 4px; max-width: none; }
+  :is(#lpTable, .sb-tbl).mcards tr, :is(#closedTable, .sb-tbl).mcards tr { grid-template-columns: 1fr; gap: 0; padding: 14px 4px; }
+  :is(#lpTable, .sb-tbl).mcards .m-only, :is(#closedTable, .sb-tbl).mcards .m-only { display: none !important; }
+  :is(#lpTable, .sb-tbl).mcards .fx-px { display: block; }
+  :is(#lpTable, .sb-tbl).mcards .fx-pot span { display: inline; }
+  :is(#lpTable, .sb-tbl).mcards .fx-pot i { display: inline; }
+  :is(#lpTable, .sb-tbl).mcards .sub2.why, :is(#closedTable, .sb-tbl).mcards .sub2.why, :is(#lpTable, .sb-tbl).mcards .fx-why, :is(#closedTable, .sb-tbl).mcards .fx-why { max-width: none; }
+  :is(#lpTable, .sb-tbl).mcards .band { display: inline; margin-left: 6px; }
+  :is(#lpTable, .sb-tbl).mcards td + td, :is(#closedTable, .sb-tbl).mcards td + td { border-top: 1px dashed rgba(255,255,255,.05); }
 }
 /* Kartu HP versi ringkas: label kecil di atas nilai, dua kolom per baris. */
 @media (max-width: 640px) {
-  #lpTable.mcards tr, #closedTable.mcards tr { grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 14px 4px; }
-  #lpTable.mcards td:nth-child(n), #closedTable.mcards td:nth-child(n) { padding: 0; text-align: left; min-height: 0; border-top: 0; }
-  #lpTable.mcards td[data-k]::before, #closedTable.mcards td[data-k]::before {
+  :is(#lpTable, .sb-tbl).mcards tr, :is(#closedTable, .sb-tbl).mcards tr { grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 14px 4px; }
+  :is(#lpTable, .sb-tbl).mcards td:nth-child(n), :is(#closedTable, .sb-tbl).mcards td:nth-child(n) { padding: 0; text-align: left; min-height: 0; border-top: 0; }
+  :is(#lpTable, .sb-tbl).mcards td[data-k]::before, :is(#closedTable, .sb-tbl).mcards td[data-k]::before {
     position: static; display: block; max-width: none; margin-bottom: 2px; font: 500 10.5px var(--sans); letter-spacing: .3px; text-transform: uppercase; }
-  #lpTable.mcards td.mc-wide, #closedTable.mcards td.mc-wide { padding-top: 0; }
-  #lpTable.mcards td .sub2, #closedTable.mcards td .sub2 { text-align: left; }
+  :is(#lpTable, .sb-tbl).mcards td.mc-wide, :is(#closedTable, .sb-tbl).mcards td.mc-wide { padding-top: 0; }
+  :is(#lpTable, .sb-tbl).mcards td .sub2, :is(#closedTable, .sb-tbl).mcards td .sub2 { text-align: left; }
   .mcards .wchips { display: flex; flex-wrap: wrap; gap: 4px; }
   .mcards .wchip, .mcards .fchip { display: inline-flex; align-items: center; gap: 3px; }
   #lpSummary.stats { grid-template-columns: 1fr 1fr; }
   #lpSummary.stats .stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
-  #closedTable.mcards td:nth-child(n) { max-width: none; min-width: 0; }
+  :is(#closedTable, .sb-tbl).mcards td:nth-child(n) { max-width: none; min-width: 0; }
 }
 .pd-tbl td .fx-why { display: block; max-width: 340px; white-space: normal; }
 @media (max-width: 640px) {
@@ -1534,3 +1534,8 @@ tr.sb-simrow td { opacity: .78; }
 }
 .sb-strat { margin: 4px 0 8px; font-size: 13.5px; color: var(--text); opacity: .88; line-height: 1.55; border-left: 3px solid #f43f5e; padding-left: 10px; }
 .sb-pnl b { font-family: var(--mono); }
+.pill.sb-plan { display: inline-block; margin-top: 4px; color: #4ade80; border-color: #166534; background: rgba(22, 101, 52, .14); font-size: 10.5px; }
+.lp-sum.n4 { grid-template-columns: repeat(4, 1fr); }
+.lp-sum.n3 { grid-template-columns: repeat(3, 1fr); }
+.lp-sum.n2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 860px) { .lp-sum.n4, .lp-sum.n3 { grid-template-columns: repeat(2, 1fr); } }

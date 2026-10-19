@@ -68,12 +68,14 @@ const position = (p) => ({
   openedAt: time(p.opened_at), entryPriceUsd: px(p.entry_price_usd), markPriceUsd: px(p.mark_price_usd),
   sizeUsd: r2(p.size_usd), valueUsd: r2(p.value_usd), pnlUsd: r2(p.pnl_usd), pnlPct: r2(p.pnl_pct),
   tpStage: num(p.tp_stage), tpStagesTotal: num(p.tp_stages_total), stopPriceUsd: px(p.stop_price_usd),
+  // Opsional: harga target TP berikutnya dan satu kalimat alasan masuk.
+  nextTpPriceUsd: px(p.next_tp_price_usd), entryNote: text(p.entry_note, 200),
 });
 const trade = (c) => ({
   symbol: text(c.symbol, 24) || '—', openedAt: time(c.opened_at), closedAt: time(c.closed_at),
   entryPriceUsd: px(c.entry_price_usd), exitPriceUsd: px(c.exit_price_usd), pnlUsd: r2(c.pnl_usd), pnlPct: r2(c.pnl_pct),
   exitReason: EXITS.includes(String(c.exit_reason).toUpperCase()) ? String(c.exit_reason).toUpperCase() : text(c.exit_reason, 16),
-  simulated: c.simulated === true,
+  simulated: c.simulated === true, exitNote: text(c.exit_note, 200),
 });
 const arr = (v) => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []);
 const positions = arr(src.positions).map(position).sort((a, b) => (b.valueUsd ?? 0) - (a.valueUsd ?? 0));
