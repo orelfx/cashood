@@ -107,3 +107,10 @@ test('solbot: field tambahan — arus dana, 24 jam, strategi', () => {
   assert.equal(d.totals.trades, 40);
   assert.ok(!d.strategy.includes(MINT));
 });
+
+test('solbot: flows dengan nama field at/amount_usd/amount_sol juga dihitung sebagai modal', () => {
+  const d = run(source({ equity_usd: 125.3, flows: [{ at: iso(30), type: 'deposit', amount_usd: 29, amount_sol: 0.27, note: 'modal masuk' }] }));
+  assert.equal(d.netFlowUsd, 29);
+  assert.equal(d.basisUsd, 136);
+  assert.equal(d.changeUsd, -10.7);
+});

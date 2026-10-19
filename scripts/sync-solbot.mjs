@@ -94,7 +94,8 @@ const closedStat = (list) => {
 };
 const startUsd = r2(src.start_capital_usd), equityUsd = r2(src.equity_usd);
 // Field tambahan (opsional, aditif di v1): arus dana, biaya, untung terealisasi.
-const flows = arr(src.flows).map((f) => ({ t: time(f.t), usd: r2(f.usd), sol: r4(f.sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null }))
+// Nama field t/usd/sol (spesifikasi) atau at/amount_usd/amount_sol (yang dikirim bot) sama-sama diterima.
+const flows = arr(src.flows).map((f) => ({ t: time(f.t ?? f.at), usd: r2(f.usd ?? f.amount_usd), sol: r4(f.sol ?? f.amount_sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null }))
   .filter((f) => f.t && f.usd != null && f.type).sort((a, b) => a.t - b.t);
 const netFlowUsd = flows.length ? r2(flows.reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0)) : 0;
 const basisUsd = startUsd > 0 ? r2(startUsd + netFlowUsd) : null;   // modal awal + setoran − penarikan
