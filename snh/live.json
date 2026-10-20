@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "a7a3906b-9042-41b3-be61-98080c925409",
-  "updatedAt": 1792473615369,
-  "generatedAt": "2026-10-20 12:20 WIB",
+  "generation": "4d6da917-a920-48d7-839f-cf90e2753c68",
+  "updatedAt": 1792473915660,
+  "generatedAt": "2026-10-20 12:25 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792473615369,
+    "heartbeatAt": 1792473915660,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792473606000,
+    "lastScanAt": 1792473908000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1349,7 +1349,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "451",
+        "v": "450",
         "n": "24 jam · 6 diveto LLM"
       },
       {
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792473615369,
+      "lastDecisionAt": 1792473915660,
       "lastAction": "keputusan",
-      "lastReason": "PUMP [big]: Dilewati: unsupported_extension."
+      "lastReason": "CR [degen]: Dilewati karena red flag: bundler pegang 75.51% supply."
     }
   },
   "strategy": {
@@ -1398,7 +1398,7 @@
       ],
       [
         "Label wallet",
-        "smart 13493 · bot 5015 · blacklist 426 · lp 1 · fresh 1192 · kol 203 · dolphin 304 · whale 7"
+        "smart 13493 · bot 5017 · blacklist 426 · lp 1 · fresh 1191 · kol 203 · dolphin 303 · whale 7"
       ]
     ],
     "requirements": [
@@ -1460,15 +1460,15 @@
         },
         {
           "key": "bot",
-          "total": 5015,
+          "total": 5017,
           "active": 0,
-          "passive": 5015
+          "passive": 5017
         },
         {
           "key": "fresh",
-          "total": 1192,
+          "total": 1191,
           "active": 0,
-          "passive": 1192
+          "passive": 1191
         },
         {
           "key": "blacklist",
@@ -1478,9 +1478,9 @@
         },
         {
           "key": "dolphin",
-          "total": 304,
+          "total": 303,
           "active": 20,
-          "passive": 284
+          "passive": 283
         },
         {
           "key": "kol",
@@ -1602,6 +1602,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792473711443,
+        "symbol": "CR",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 75.51% supply."
+      },
       {
         "at": 1792473405771,
         "symbol": "PUMP",
@@ -2388,48 +2398,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792460505883,
-        "symbol": "NEWS",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 220,
-            "note": "bundler pegang 15.6%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 1.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 578,
-            "note": "13.1% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2440,7 +2408,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 405,
+        "red_flag": 404,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2491,7 +2459,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792473731201,
+    "generatedAt": 1792474028966,
     "trades": {
       "count": 148,
       "wins": 60,
