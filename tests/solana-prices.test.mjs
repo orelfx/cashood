@@ -6,7 +6,7 @@ test('missing Jupiter price uses a quoted market; only a confirmed absent market
   const result = await solanaPrices(['SOL', 'extra', 'dead'], { fetchImpl: async url => {
     if (url.includes('jup.ag')) return response({ SOL: { usdPrice: 100 } });
     if (url.endsWith('/dead')) return response({ pairs: null });
-    return response({ pairs: [{ chainId: 'solana', baseToken: { address: 'extra' }, priceUsd: '2.5', liquidity: { usd: 1000 } }] });
+    return response({ pairs: [{ chainId: 'solana', baseToken: { address: 'extra' }, priceUsd: '2.5', liquidity: { usd: 1000 }, volume: { h24: 5000 } }] });
   } });
   assert.equal(result.prices.extra.usdPrice, 2.5);
   assert.equal(result.prices.SOL.usdPrice, 100);
@@ -26,4 +26,12 @@ test('source outage and malformed or unavailable market prices never become zero
     () => response({ pairs: [{ chainId: 'solana', baseToken: { address: 'extra' }, priceUsd: null }] })]) {
     await assert.rejects(solanaPrices(['extra'], { fetchImpl: async url => url.includes('jup.ag') ? response({}) : fallback() }));
   }
+});
+test('a DexScreener pair that is barely traded is not a price (fake liquidity)', async () => {
+  const result = await solanaPrices(['troll'], { fetchImpl: async url => {
+    if (url.includes('jup.ag')) return response({});
+    return response({ pairs: [{ chainId: 'solana', baseToken: { address: 'troll' }, priceUsd: '0.0444', liquidity: { usd: 177648200 }, volume: { h24: 14.59 } }] });
+  } });
+  assert.equal(result.prices.troll, undefined);
+  assert.deepEqual(result.noMarket, ['troll']);
 });

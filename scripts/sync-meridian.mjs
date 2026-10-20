@@ -100,19 +100,35 @@ if (unpricedTokens.length) {
     const hargaJup = Number(jup?.[t.mint]?.usdPrice);
     let harga = Number.isFinite(hargaJup) && hargaJup > 0 ? hargaJup : null;
     let sumber = harga ? 'jupiter' : null;
+    // Tanpa harga Jupiter, nilai token = hasil jual SEMUA saldonya menurut quote
+    // Jupiter (bisa dieksekusi), bukan harga DexScreener. 2026-10-20: pair palsu
+    // di DexScreener ("likuiditas $177 jt", volume 24 jam $14) membuat koin sisa
+    // yang tidak bisa dijual sama sekali dinilai $10.329 — NAV Meridian melompat
+    // +145% dan ikut menggelembungkan Cashood Index dan bunga Safe Box.
+    let unsellable = false;
     if (harga == null) {
-      const dex = await tanya(`https://api.dexscreener.com/latest/dex/tokens/${t.mint}`);
-      const pair = (dex?.pairs || [])
-        .filter((x) => x.chainId === 'solana' && x.baseToken?.address === t.mint)
-        .sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
-      const hargaDex = Number(pair?.priceUsd);
-      if (Number.isFinite(hargaDex) && hargaDex > 0) { harga = hargaDex; sumber = 'dexscreener'; }
+      const dec = Number.isInteger(Number(t.decimals)) ? Number(t.decimals) : null;
+      const units = dec == null ? null : BigInt(Math.floor(Core.number(t.balance, 'Saldo token', 0) * 10 ** Math.min(dec, 12))) * 10n ** BigInt(Math.max(0, dec - 12));
+      if (units && units > 0n) {
+        // API quote membatasi permintaan beruntun: jeda antar token, sekali coba ulang kalau 429.
+        const quoteUrl = `https://lite-api.jup.ag/swap/v1/quote?inputMint=${t.mint}&outputMint=${wrappedSolMint}&amount=${units}&slippageBps=5000`;
+        let res;
+        for (let i = 0; i < 3; i += 1) {
+          await new Promise((r) => setTimeout(r, i ? 4000 : 1200));
+          res = await fetch(quoteUrl, { headers: { 'user-agent': 'cashood' }, signal: AbortSignal.timeout(15000) });
+          if (res.status !== 429) break;
+        }
+        const q = await res.json().catch(() => null);
+        if (Number(q?.outAmount) > 0) { t.usd = Number((Number(q.outAmount) / 1e9 * solPrice).toFixed(2)); t.priceSource = 'jupiter-quote'; continue; }
+        if (q?.errorCode === 'NO_ROUTES_FOUND' || q?.errorCode === 'COULD_NOT_FIND_ANY_ROUTE' || q?.errorCode === 'TOKEN_NOT_TRADABLE') unsellable = true;
+        else throw new Error(`quote jual token tidak terbaca (HTTP ${res.status})`);
+      }
     }
     if (harga != null) {
       t.usd = Number((Core.number(t.balance, 'Saldo token', 0) * harga).toFixed(2));
       t.priceSource = sumber;
     } else {
-      // Kedua sumber menjawab dan tidak menemukan pasar.
+      // Tidak ada harga Jupiter dan tidak ada rute jual: tidak bisa diuangkan.
       t.usd = 0;
       t.noMarket = true;
       deadTokens.push({ mint: String(t.mint).slice(0, 8), amount: Number(t.balance) });

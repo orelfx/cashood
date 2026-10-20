@@ -22,6 +22,12 @@ export async function solanaPrices(mints, { fetchImpl = globalThis.fetch } = {})
     const priced = pairs.filter(p => Number.isFinite(Number(p.priceUsd)) && Number(p.priceUsd) > 0)
       .sort((a, b) => (Number(b.liquidity?.usd) || 0) - (Number(a.liquidity?.usd) || 0));
     if (!priced.length) throw new Error('Token memiliki pasar tetapi harganya belum terbaca');
+    // Pair palsu/mati: likuiditas besar di atas kertas tapi hampir tidak ada yang
+    // diperdagangkan (2026-10-20: "likuiditas $177 jt", volume 24 jam $14). Harga
+    // seperti itu tidak bisa diuangkan — diperlakukan sama dengan tanpa pasar.
+    const traded = priced.filter(p => (Number(p.volume?.h24) || 0) >= 1000);
+    if (!traded.length) { noMarket.push(mint); continue; }
+    priced.splice(0, priced.length, ...traded);
     prices[mint] = { usdPrice: Number(priced[0].priceUsd), source: 'dexscreener' };
   }
   return { prices, noMarket };
