@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "dbbcdc10-066a-4df2-980a-7d046dbf8f6e",
-  "updatedAt": 1792525133931,
-  "generatedAt": "2026-10-21 02:38 WIB",
+  "generation": "887ecb22-4a50-40d5-8e6a-05c21acd3143",
+  "updatedAt": 1792525433942,
+  "generatedAt": "2026-10-21 02:43 WIB",
   "usdIdr": null,
   "totalUsd": 923.5592206959575,
   "nativeSymbol": "SOL",
@@ -1311,12 +1311,12 @@
     "pnlUsd": -76.44077930404251,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792525133931,
+    "heartbeatAt": 1792525433942,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792525125000,
+    "lastScanAt": 1792525426000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1353,9 +1353,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792525133931,
+      "lastDecisionAt": 1792525433942,
       "lastAction": "keputusan",
-      "lastReason": "people [low]: Dilewati: explore: zone/cooldown/budget."
+      "lastReason": "GTA6 [low]: Dilewati karena red flag: insider/entrapment pegang 40%."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Label wallet",
-        "smart 14045 · bot 5921 · blacklist 434 · lp 1 · fresh 1217 · kol 214 · dolphin 297 · whale 7"
+        "smart 14046 · bot 5920 · blacklist 434 · lp 1 · fresh 1217 · kol 214 · dolphin 297 · whale 7"
       ]
     ],
     "requirements": [
@@ -1442,15 +1442,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14045,
+          "total": 14046,
           "active": 455,
-          "passive": 13590
+          "passive": 13591
         },
         {
           "key": "bot",
-          "total": 5921,
+          "total": 5920,
           "active": 0,
-          "passive": 5921
+          "passive": 5920
         },
         {
           "key": "fresh",
@@ -1591,6 +1591,51 @@
     },
     "decisions": [
       {
+        "at": 1792525409386,
+        "symbol": "GTA6",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 40%."
+      },
+      {
+        "at": 1792525299686,
+        "symbol": "PUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: unsupported_extension."
+      },
+      {
+        "at": 1792525148067,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 6,
+            "note": "6 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
         "at": 1792525018393,
         "symbol": "people",
         "action": "skip",
@@ -1715,41 +1760,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792524580370,
-        "symbol": "PUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: unsupported_extension."
-      },
-      {
-        "at": 1792524544730,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 7,
-            "note": "7 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792524103450,
@@ -2499,27 +2509,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1792518582442,
-        "symbol": "Dacity",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 21%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 47,
+        "below_entry": 46,
         "no_pullback": 0,
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 430,
+        "red_flag": 431,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2571,7 +2571,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792525346314,
+    "generatedAt": 1792525635810,
     "trades": {
       "count": 150,
       "wins": 62,
