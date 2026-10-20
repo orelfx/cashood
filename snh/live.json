@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f63d94b9-a678-4d3a-a53b-1959b014ca26",
-  "updatedAt": 1792475786848,
-  "generatedAt": "2026-10-20 12:56 WIB",
+  "generation": "81b477f0-ef96-46bb-b1b1-7580df9893f6",
+  "updatedAt": 1792476087189,
+  "generatedAt": "2026-10-20 13:01 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792475786848,
+    "heartbeatAt": 1792476087189,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792475777000,
+    "lastScanAt": 1792476081000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1349,13 +1349,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "453",
+        "v": "455",
         "n": "24 jam · 5 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "20721",
-        "n": "505 aktif"
+        "n": "506 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792475786848,
+      "lastDecisionAt": 1792476087189,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      "lastReason": "FORKIUS [low]: Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Wallet dipantau",
-        "20721 · 505 aktif"
+        "20721 · 506 aktif"
       ],
       [
         "Cadangan kas",
@@ -1398,7 +1398,7 @@
       ],
       [
         "Label wallet",
-        "smart 13543 · bot 5046 · blacklist 426 · lp 1 · fresh 1195 · kol 204 · dolphin 299 · whale 7"
+        "smart 13542 · bot 5051 · blacklist 426 · lp 1 · fresh 1193 · kol 204 · dolphin 297 · whale 7"
       ]
     ],
     "requirements": [
@@ -1447,28 +1447,28 @@
   "copyTrade": {
     "wallets": {
       "tracked": 20721,
-      "active": 505,
-      "passive": 20216,
+      "active": 506,
+      "passive": 20215,
       "trusted": 0,
       "promising": 41,
       "byLabel": [
         {
           "key": "smart",
-          "total": 13543,
-          "active": 473,
-          "passive": 13070
+          "total": 13542,
+          "active": 474,
+          "passive": 13068
         },
         {
           "key": "bot",
-          "total": 5046,
+          "total": 5051,
           "active": 0,
-          "passive": 5046
+          "passive": 5051
         },
         {
           "key": "fresh",
-          "total": 1195,
+          "total": 1193,
           "active": 0,
-          "passive": 1195
+          "passive": 1193
         },
         {
           "key": "blacklist",
@@ -1478,9 +1478,9 @@
         },
         {
           "key": "dolphin",
-          "total": 299,
+          "total": 297,
           "active": 20,
-          "passive": 279
+          "passive": 277
         },
         {
           "key": "kol",
@@ -1602,6 +1602,34 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792475916739,
+        "symbol": "FORKIUS",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792475882347,
+        "symbol": "CHAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792475741067,
         "symbol": "CARDS",
@@ -2348,54 +2376,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 21%."
-      },
-      {
-        "at": 1792463651923,
-        "symbol": "POKEMINER",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 43.73% supply."
-      },
-      {
-        "at": 1792462832888,
-        "symbol": "OPEQ",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 340,
-            "note": "bundler pegang 4.3%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 6.3%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 631,
-            "note": "8.3% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 33,
+        "below_entry": 35,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
@@ -2451,7 +2437,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792475796966,
+    "generatedAt": 1792476156047,
     "trades": {
       "count": 148,
       "wins": 60,
@@ -2491,7 +2477,7 @@
     },
     "equity": {
       "days": 14,
-      "spanDays": 14.2,
+      "spanDays": 14.3,
       "returnPct": -6.77,
       "maxDrawdownPct": 7.15,
       "maxDrawdownAt": 1792004333022,
