@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "144deabb-da0c-4ae5-930b-81a261d122f6",
-  "updatedAt": 1792475486848,
-  "generatedAt": "2026-10-20 12:51 WIB",
+  "generation": "f63d94b9-a678-4d3a-a53b-1959b014ca26",
+  "updatedAt": 1792475786848,
+  "generatedAt": "2026-10-20 12:56 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792475486848,
+    "heartbeatAt": 1792475786848,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792475473000,
+    "lastScanAt": 1792475777000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1354,8 +1354,8 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "20681",
-        "n": "504 aktif"
+        "v": "20721",
+        "n": "505 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792475486848,
+      "lastDecisionAt": 1792475786848,
       "lastAction": "keputusan",
-      "lastReason": "TSLAx [big]: Dilewati karena red flag: mint authority belum dilepas."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Wallet dipantau",
-        "20681 · 504 aktif"
+        "20721 · 505 aktif"
       ],
       [
         "Cadangan kas",
@@ -1398,7 +1398,7 @@
       ],
       [
         "Label wallet",
-        "smart 13518 · bot 5032 · blacklist 426 · lp 1 · fresh 1194 · kol 204 · dolphin 299 · whale 7"
+        "smart 13543 · bot 5046 · blacklist 426 · lp 1 · fresh 1195 · kol 204 · dolphin 299 · whale 7"
       ]
     ],
     "requirements": [
@@ -1446,29 +1446,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 20681,
-      "active": 504,
-      "passive": 20177,
+      "tracked": 20721,
+      "active": 505,
+      "passive": 20216,
       "trusted": 0,
       "promising": 41,
       "byLabel": [
         {
           "key": "smart",
-          "total": 13518,
-          "active": 472,
-          "passive": 13046
+          "total": 13543,
+          "active": 473,
+          "passive": 13070
         },
         {
           "key": "bot",
-          "total": 5032,
+          "total": 5046,
           "active": 0,
-          "passive": 5032
+          "passive": 5046
         },
         {
           "key": "fresh",
-          "total": 1194,
+          "total": 1195,
           "active": 0,
-          "passive": 1194
+          "passive": 1195
         },
         {
           "key": "blacklist",
@@ -1537,6 +1537,15 @@
           "trusted": false
         },
         {
+          "alias": "smart #14011",
+          "label": "smart",
+          "score": 100,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
           "alias": "whale #14035",
           "label": "whale",
           "score": 100,
@@ -1549,15 +1558,6 @@
           "alias": "smart #18866",
           "label": "smart",
           "score": 100,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
-        },
-        {
-          "alias": "smart #14011",
-          "label": "smart",
-          "score": 99.9,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1602,6 +1602,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792475741067,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 6
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 8,
+            "note": "8 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
       {
         "at": 1792475323883,
         "symbol": "TSLAx",
@@ -1664,23 +1681,6 @@
           }
         ],
         "reason": "Dilewati: biaya beli lalu jual 11,3% terlalu mahal (likuiditas tipis, batas 10%)."
-      },
-      {
-        "at": 1792475138038,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 6
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 8,
-            "note": "8 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792474961133,
@@ -2451,7 +2451,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792475533807,
+    "generatedAt": 1792475796966,
     "trades": {
       "count": 148,
       "wins": 60,
