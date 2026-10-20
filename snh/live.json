@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5f498f8b-124b-409a-87aa-e4b8686e7dcc",
-  "updatedAt": 1792500574974,
-  "generatedAt": "2026-10-20 19:49 WIB",
+  "generation": "ceb7c8e2-7f42-4049-a8f3-15b284dc02c9",
+  "updatedAt": 1792500874974,
+  "generatedAt": "2026-10-20 19:54 WIB",
   "usdIdr": null,
   "totalUsd": 922.6942828832152,
   "nativeSymbol": "SOL",
@@ -1310,12 +1310,12 @@
     "pnlUsd": -77.30571711678476,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792500574974,
+    "heartbeatAt": 1792500874974,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.59,
-    "lastScanAt": 1792500571000,
+    "lastScanAt": 1792500870000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1336,7 +1336,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "461",
+        "v": "463",
         "n": "24 jam · 5 diveto LLM"
       },
       {
@@ -1352,9 +1352,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792500574974,
+      "lastDecisionAt": 1792500874974,
       "lastAction": "keputusan",
-      "lastReason": "PI [low]: Dilewati: wallet yang diikuti sudah keluar sebelum harga kembali ke zona beli."
+      "lastReason": "XMR [mid]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1385,7 +1385,7 @@
       ],
       [
         "Label wallet",
-        "smart 14027 · bot 5632 · blacklist 431 · lp 1 · fresh 1201 · kol 210 · dolphin 301 · whale 7"
+        "smart 14023 · bot 5635 · blacklist 431 · lp 1 · fresh 1202 · kol 210 · dolphin 301 · whale 7"
       ]
     ],
     "requirements": [
@@ -1441,21 +1441,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14027,
+          "total": 14023,
           "active": 477,
-          "passive": 13550
+          "passive": 13546
         },
         {
           "key": "bot",
-          "total": 5632,
+          "total": 5635,
           "active": 0,
-          "passive": 5632
+          "passive": 5635
         },
         {
           "key": "fresh",
-          "total": 1201,
+          "total": 1202,
           "active": 0,
-          "passive": 1201
+          "passive": 1202
         },
         {
           "key": "blacklist",
@@ -1589,6 +1589,40 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792500756026,
+        "symbol": "XMR",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792500755351,
+        "symbol": "LUKE",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 17%."
+      },
       {
         "at": 1792500427854,
         "symbol": "PI",
@@ -2663,65 +2697,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -55% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792479384767,
-        "symbol": "DUST",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 165,
-            "note": "bundler pegang 12.4%"
-          },
-          {
-            "type": "rat",
-            "count": 6,
-            "note": "insider/entrapment pegang 4.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 465,
-            "note": "9.1% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792479365693,
-        "symbol": "MUTTS",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 340,
-            "note": "bundler pegang 21.5%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 6.7%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2732,7 +2707,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 407,
+        "red_flag": 409,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2783,7 +2758,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792500718021,
+    "generatedAt": 1792501018519,
     "trades": {
       "count": 149,
       "wins": 61,
