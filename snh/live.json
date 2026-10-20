@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "81b477f0-ef96-46bb-b1b1-7580df9893f6",
-  "updatedAt": 1792476087189,
-  "generatedAt": "2026-10-20 13:01 WIB",
+  "generation": "3d5ecbb8-bba5-4c46-a17f-cf67beab8e98",
+  "updatedAt": 1792476387207,
+  "generatedAt": "2026-10-20 13:06 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792476087189,
+    "heartbeatAt": 1792476387207,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792476081000,
+    "lastScanAt": 1792476379000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792476087189,
+      "lastDecisionAt": 1792476387207,
       "lastAction": "keputusan",
-      "lastReason": "FORKIUS [low]: Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
     }
   },
   "strategy": {
@@ -1398,7 +1398,7 @@
       ],
       [
         "Label wallet",
-        "smart 13542 · bot 5051 · blacklist 426 · lp 1 · fresh 1193 · kol 204 · dolphin 297 · whale 7"
+        "smart 13541 · bot 5050 · blacklist 427 · lp 1 · fresh 1194 · kol 204 · dolphin 297 · whale 7"
       ]
     ],
     "requirements": [
@@ -1454,27 +1454,27 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 13542,
+          "total": 13541,
           "active": 474,
-          "passive": 13068
+          "passive": 13067
         },
         {
           "key": "bot",
-          "total": 5051,
+          "total": 5050,
           "active": 0,
-          "passive": 5051
+          "passive": 5050
         },
         {
           "key": "fresh",
-          "total": 1193,
+          "total": 1194,
           "active": 0,
-          "passive": 1193
+          "passive": 1194
         },
         {
           "key": "blacklist",
-          "total": 426,
+          "total": 427,
           "active": 0,
-          "passive": 426
+          "passive": 427
         },
         {
           "key": "dolphin",
@@ -1603,6 +1603,23 @@
     },
     "decisions": [
       {
+        "at": 1792476347252,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 6
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 8,
+            "note": "8 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
         "at": 1792475916739,
         "symbol": "FORKIUS",
         "action": "skip",
@@ -1629,23 +1646,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792475741067,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 6
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 8,
-            "note": "8 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792475323883,
@@ -2437,7 +2437,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792476156047,
+    "generatedAt": 1792476416608,
     "trades": {
       "count": 148,
       "wins": 60,
