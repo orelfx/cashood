@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "91bf56aa-40be-4b69-88ff-e16e1e23b213",
-  "updatedAt": 1792536557597,
-  "generatedAt": "2026-10-21 05:49 WIB",
+  "generation": "3f89bf3b-fd1f-451b-b1c3-ed50e1e0f584",
+  "updatedAt": 1792536857622,
+  "generatedAt": "2026-10-21 05:54 WIB",
   "usdIdr": null,
   "totalUsd": 923.5592206959575,
   "nativeSymbol": "SOL",
@@ -1311,12 +1311,12 @@
     "pnlUsd": -76.44077930404251,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792536557597,
+    "heartbeatAt": 1792536857622,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792536551000,
+    "lastScanAt": 1792536847000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1337,7 +1337,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "533",
+        "v": "534",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1347,15 +1347,15 @@
       },
       {
         "k": "Buka · tutup",
-        "v": "3 · 3",
+        "v": "2 · 3",
         "n": "24 jam terakhir"
       }
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792536557597,
+      "lastDecisionAt": 1792536857622,
       "lastAction": "keputusan",
-      "lastReason": "swordcat [mid]: Dilewati karena red flag: insider/entrapment pegang 37%."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Label wallet",
-        "smart 14005 · bot 6047 · blacklist 436 · lp 1 · fresh 1208 · kol 215 · dolphin 292 · whale 9"
+        "smart 14000 · bot 6053 · blacklist 436 · lp 1 · fresh 1207 · kol 215 · dolphin 292 · whale 9"
       ]
     ],
     "requirements": [
@@ -1442,21 +1442,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14005,
+          "total": 14000,
           "active": 471,
-          "passive": 13534
+          "passive": 13529
         },
         {
           "key": "bot",
-          "total": 6047,
+          "total": 6053,
           "active": 0,
-          "passive": 6047
+          "passive": 6053
         },
         {
           "key": "fresh",
-          "total": 1208,
+          "total": 1207,
           "active": 0,
-          "passive": 1208
+          "passive": 1207
         },
         {
           "key": "blacklist",
@@ -1591,6 +1591,61 @@
     },
     "decisions": [
       {
+        "at": 1792536672513,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "kol": 1,
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 9,
+            "note": "9 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
+        "at": 1792536590113,
+        "symbol": "COMPUTE",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 636,
+            "note": "bundler pegang 7.9%"
+          },
+          {
+            "type": "rat",
+            "count": 9,
+            "note": "insider/entrapment pegang 9.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 1.3%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "7.1% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 1.3%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
         "at": 1792536548265,
         "symbol": "swordcat",
         "action": "skip",
@@ -1643,24 +1698,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: holder baru 3."
-      },
-      {
-        "at": 1792536062214,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "kol": 1,
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 8,
-            "note": "8 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792535579167,
@@ -2362,43 +2399,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 30%."
-      },
-      {
-        "at": 1792530157994,
-        "symbol": "nano",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 9.73% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 0.35%"
-          },
-          {
-            "type": "bundler",
-            "count": 91,
-            "note": "bundler pegang 26.7%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.2%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2409,7 +2409,7 @@
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 466,
+        "red_flag": 468,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2461,7 +2461,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792536734068,
+    "generatedAt": 1792537036912,
     "trades": {
       "count": 150,
       "wins": 62,
