@@ -25,7 +25,18 @@ import { closeKind, exitRuleText, isPartial, planText, stopCell } from './grokbo
   const stamp = (t) => (dayKey(t) === dayKey(Date.now()) ? hhmm(t) : wibDate(t).toISOString().slice(8, 10) + '/' + wibDate(t).toISOString().slice(5, 7) + ' ' + hhmm(t));
   const ago = (t) => { const m = Math.max(0, Math.round((Date.now() - t) / 60e3)); return m < 1 ? 'baru saja' : m < 60 ? `${m} mnt lalu` : m < 1440 ? `${Math.floor(m / 60)} jam ${m % 60} mnt lalu` : `${Math.floor(m / 1440)} hari lalu`; };
   const dur = (min) => (min == null ? '—' : min < 60 ? `${min} mnt` : min < 1440 ? `${Math.floor(min / 60)} jam ${min % 60} mnt` : `${Math.floor(min / 1440)} hr ${Math.floor((min % 1440) / 60)} jam`);
-  const get = async (path) => { const r = await fetch(`${RAW}${path}?t=${Math.floor(Date.now() / 60e3)}`, { cache: 'no-store' }); if (!r.ok) throw new Error(`${path} ${r.status}`); return r.json(); };
+  // CDN raw.githubusercontent mengabaikan query string dan menyimpan berkas 5
+  // menit; data dibaca dari commit terbaru branch `data` supaya reload selalu
+  // dapat angka terbaru. SHA ditanyakan paling sering sekali per 75 detik;
+  // kalau API GitHub menolak, alamat branch biasa dipakai.
+  let ref = { at: 0, job: null };
+  const sha = () => {
+    if (ref.job && Date.now() - ref.at < 75000) return ref.job;
+    ref = { at: Date.now(), job: fetch('https://api.github.com/repos/orelfx/cashood/commits/data', { headers: { Accept: 'application/vnd.github.sha' }, cache: 'no-store' })
+      .then((r) => (r.ok ? r.text() : null)).then((t) => (/^[0-9a-f]{40}$/.test(String(t).trim()) ? String(t).trim() : null)).catch(() => null) };
+    return ref.job;
+  };
+  const get = async (path) => { const s = await sha(); const base = s ? RAW.replace('/data/', `/${s}/`) : RAW; const r = await fetch(`${base}${path}?t=${Math.floor(Date.now() / 60e3)}`, { cache: 'no-store' }); if (!r.ok) throw new Error(`${path} ${r.status}`); return r.json(); };
   // Fakta desk diterbitkan sebagai pasangan kunci–nilai di strategy.system.
   const fact = (live, key) => { const row = (live?.strategy?.system || []).find((x) => Array.isArray(x) && x[0] === key); return row ? String(row[1]) : null; };
   const leadNum = (s) => { const m = s && s.match(/^\s*(\d+)/); return m ? Number(m[1]) : null; };

@@ -49,6 +49,29 @@ function tandaiSibuk(delta) {
 // sekali lagi oleh bagian yang menggambarnya begitu prefetch selesai.
 const recentJSON = new Map();
 const RECENT_MS = 20000;
+/* CDN raw.githubusercontent menyimpan tiap berkas 5 menit dan MENGABAIKAN
+ * query string, jadi "?t=" tidak memaksa data baru: setelah bot menerbitkan
+ * angka baru, reload bisa tetap menampilkan angka lama sampai 5 menit. Data
+ * dibaca dari commit terbaru branch `data` (URL per-commit tidak pernah basi);
+ * SHA-nya ditanyakan ke API GitHub paling sering sekali per 75 detik. Kalau
+ * API menolak (batas 60 permintaan/jam per IP) atau gagal, alamat branch
+ * biasa tetap dipakai. */
+const DATA_REF_RE = /^(https:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+))\/data\//;
+const dataRefs = new Map();
+function dataRef(owner, repo, force = false) {
+  const key = owner + '/' + repo, hit = dataRefs.get(key);
+  if (hit && !force && Date.now() - hit.at < 75000) return hit.job;
+  const job = fetch(`https://api.github.com/repos/${owner}/${repo}/commits/data`, { headers: { Accept: 'application/vnd.github.sha' }, cache: 'no-store', signal: AbortSignal.timeout(5000) })
+    .then((r) => (r.ok ? r.text() : null)).then((t) => (/^[0-9a-f]{40}$/.test(String(t).trim()) ? String(t).trim() : null)).catch(() => null);
+  dataRefs.set(key, { at: Date.now(), job });
+  return job;
+}
+async function pinDataUrl(url, force) {
+  const m = DATA_REF_RE.exec(url);
+  if (!m) return url;
+  const sha = await dataRef(m[2], m[3], force);
+  return sha ? url.replace(DATA_REF_RE, `$1/${sha}/`) : url;
+}
 function getJSON(url, { fresh = false } = {}) {
   if (!fresh) {
     if (inflight.has(url)) return inflight.get(url);
@@ -58,9 +81,8 @@ function getJSON(url, { fresh = false } = {}) {
   // New network reads need a new URL even in fund summaries; reusing the page's
   // startup timestamp lets a CDN return the same old balance after refresh.
   // Inflight deduplication and the short cache above still share nearby reads.
-  const full = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
   tandaiSibuk(1);
-  const job = fetch(full, { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) }).then((res) => {
+  const job = pinDataUrl(url, fresh).then((pinned) => fetch(pinned + (pinned.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) })).then((res) => {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return res.json();
   }).then((data) => { recentJSON.set(url, { at: Date.now(), data }); return data; })
@@ -392,7 +414,8 @@ async function resolveNav(cfg, { force = false, fund = state.fund } = {}) {
   }
 
   // 2. cache pendek — menahan reload beruntun, bukan menunda data
-  const ttl = (Number(cfg.app?.refreshMinutes) || 5) * 60000;
+  // Paling lama 1 menit: data terbit tiap 5 menit, dan reload harus bisa melihatnya.
+  const ttl = Math.min((Number(cfg.app?.refreshMinutes) || 5) * 60000, 60000);
   if (!force) {
     try {
       const hit = JSON.parse(localStorage.getItem(cacheKey(fund)) || 'null');
@@ -1642,7 +1665,8 @@ async function loadHeartbeat(cfg) {
   const urls = dataUrls(cfg, 'heartbeat.json', cfg?.app?.heartbeatUrl);
   for (const url of urls) {
     try {
-      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
+      const pinned = await pinDataUrl(url);
+      const res = await fetch(pinned + (pinned.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
       if (!res.ok) continue;
       const j = await res.json();
       if (j?.text) return j;
@@ -2951,7 +2975,7 @@ async function loadForecast(fund) {
     `data/${fund}/forecast.json`].filter(Boolean);
   for (const url of urls) {
     try {
-      const res = await fetch(url + '?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
+      const res = await fetch(await pinDataUrl(url) + '?t=' + Date.now(), { cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT) });
       if (!res.ok) continue;
       const j = await res.json();
       if (j && j.fund === fund) { forecastCache[fund] = { data: j, loadedAt: Date.now() }; return j; }

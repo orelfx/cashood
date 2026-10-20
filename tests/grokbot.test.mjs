@@ -13,7 +13,8 @@ test('setiap halaman rantai membaca satu buku saja dan berlabel PAPER', () => {
     assert.match(html, new RegExp(`data-fund="${fund}"`));
     assert.match(html, /PAPER TRADING MODE/);
     assert.match(html, /\/assets\/grokbot\.js\?v=__BUILD__/);
-    assert.match(html, /connect-src 'self' https:\/\/raw\.githubusercontent\.com;/);
+    // api.github.com hanya untuk SHA commit terbaru branch data (data tidak basi di CDN).
+    assert.match(html, /connect-src 'self' https:\/\/raw\.githubusercontent\.com https:\/\/api\.github\.com;/);
   }
 });
 
