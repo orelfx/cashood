@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4e414ebb-242d-4551-b0e4-e9367f013857",
-  "updatedAt": 1792478790616,
-  "generatedAt": "2026-10-20 13:46 WIB",
+  "generation": "7e89b816-3188-4fce-b63e-68e1e7f7a730",
+  "updatedAt": 1792479090672,
+  "generatedAt": "2026-10-20 13:51 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792478790616,
+    "heartbeatAt": 1792479090672,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792478780000,
+    "lastScanAt": 1792479077000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1349,13 +1349,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "461",
+        "v": "462",
         "n": "24 jam · 5 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "20841",
-        "n": "504 aktif"
+        "n": "505 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792478790616,
+      "lastDecisionAt": 1792479090672,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      "lastReason": "Bien [degen]: Dilewati: harga sudah -51% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Wallet dipantau",
-        "20841 · 504 aktif"
+        "20841 · 505 aktif"
       ],
       [
         "Cadangan kas",
@@ -1447,16 +1447,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 20841,
-      "active": 504,
-      "passive": 20337,
+      "active": 505,
+      "passive": 20336,
       "trusted": 0,
       "promising": 41,
       "byLabel": [
         {
           "key": "smart",
           "total": 13616,
-          "active": 473,
-          "passive": 13143
+          "active": 474,
+          "passive": 13142
         },
         {
           "key": "bot",
@@ -1602,6 +1602,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792479077952,
+        "symbol": "Bien",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -51% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792478788263,
         "symbol": "CARDS",
@@ -2462,29 +2479,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
-      },
-      {
-        "at": 1792465446627,
-        "symbol": "TM",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: rugcheck_danger:Top 10 holders high ownership."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 34,
+        "below_entry": 35,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
@@ -2540,7 +2540,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792478818982,
+    "generatedAt": 1792479117753,
     "trades": {
       "count": 148,
       "wins": 60,
