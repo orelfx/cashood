@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "44123b45-4244-464a-bbe6-6aefad16da7e",
-  "updatedAt": 1792501492269,
-  "generatedAt": "2026-10-20 20:04 WIB",
+  "generation": "be85abc3-58fa-47aa-bc1a-80120651f276",
+  "updatedAt": 1792501792286,
+  "generatedAt": "2026-10-20 20:09 WIB",
   "usdIdr": null,
   "totalUsd": 922.6942828832152,
   "nativeSymbol": "SOL",
@@ -1310,12 +1310,12 @@
     "pnlUsd": -77.30571711678476,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792501492269,
+    "heartbeatAt": 1792501792286,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.59,
-    "lastScanAt": 1792501485000,
+    "lastScanAt": 1792501782000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1336,7 +1336,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "466",
+        "v": "468",
         "n": "24 jam · 5 diveto LLM"
       },
       {
@@ -1352,9 +1352,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792501492269,
+      "lastDecisionAt": 1792501792286,
       "lastAction": "keputusan",
-      "lastReason": "PI [low]: Dilewati: wallet yang diikuti sudah keluar sebelum harga kembali ke zona beli."
+      "lastReason": "PI [low]: Menunggu pullback: harga sudah +175% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
     }
   },
   "strategy": {
@@ -1385,7 +1385,7 @@
       ],
       [
         "Label wallet",
-        "smart 14057 · bot 5638 · blacklist 432 · lp 1 · fresh 1204 · kol 210 · dolphin 301 · whale 7"
+        "smart 14056 · bot 5639 · blacklist 432 · lp 1 · fresh 1204 · kol 210 · dolphin 301 · whale 7"
       ]
     ],
     "requirements": [
@@ -1441,15 +1441,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14057,
+          "total": 14056,
           "active": 477,
-          "passive": 13580
+          "passive": 13579
         },
         {
           "key": "bot",
-          "total": 5638,
+          "total": 5639,
           "active": 0,
-          "passive": 5638
+          "passive": 5639
         },
         {
           "key": "fresh",
@@ -1542,6 +1542,15 @@
           "trusted": false
         },
         {
+          "alias": "smart #2753",
+          "label": "smart",
+          "score": 98,
+          "copied": 0,
+          "won": 0,
+          "pnlUsd": 0,
+          "trusted": false
+        },
+        {
           "alias": "smart #4791",
           "label": "smart",
           "score": 97.7,
@@ -1576,19 +1585,47 @@
           "won": 1,
           "pnlUsd": 5.0658222072215215,
           "trusted": false
-        },
-        {
-          "alias": "smart #3990",
-          "label": "smart",
-          "score": 96.8,
-          "copied": 0,
-          "won": 0,
-          "pnlUsd": 0,
-          "trusted": false
         }
       ]
     },
     "decisions": [
+      {
+        "at": 1792501745075,
+        "symbol": "PI",
+        "action": "wait",
+        "basket": "low",
+        "wallets": {
+          "smart": 26
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 368,
+            "note": "bundler pegang 24.0%"
+          },
+          {
+            "type": "sniper",
+            "count": 22,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 11x likuiditas"
+          }
+        ],
+        "reason": "Menunggu pullback: harga sudah +175% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
+      },
+      {
+        "at": 1792501593639,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
+      },
       {
         "at": 1792501122929,
         "symbol": "PI",
@@ -1642,16 +1679,6 @@
           }
         ],
         "reason": "Menunggu pullback: harga sudah +205% di atas harga beli wallet yang diikuti (zona masuk sampai +15%). Bot tidak mengejar; menunggu harga kembali ke zona beli mereka lalu memantul, maksimal 45 menit."
-      },
-      {
-        "at": 1792500989903,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.3% dari market cap."
       },
       {
         "at": 1792500955448,
@@ -2675,16 +2702,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792479544634,
-        "symbol": "Nihilism",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2695,7 +2712,7 @@
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 410,
+        "red_flag": 411,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2707,7 +2724,7 @@
         "entry_zone": 1
       },
       "wait": {
-        "jumlah": 2
+        "jumlah": 3
       },
       "add": {
         "jumlah": 0
@@ -2746,7 +2763,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792501599994,
+    "generatedAt": 1792501916955,
     "trades": {
       "count": 149,
       "wins": 61,
@@ -2786,7 +2803,7 @@
     },
     "equity": {
       "days": 14,
-      "spanDays": 14.5,
+      "spanDays": 14.6,
       "returnPct": -6.76,
       "maxDrawdownPct": 7.15,
       "maxDrawdownAt": 1792004333022,
