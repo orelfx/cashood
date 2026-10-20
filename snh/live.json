@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "eafc0898-87ed-46ec-a71d-06e1d7eb9949",
-  "updatedAt": 1792509662272,
-  "generatedAt": "2026-10-20 22:21 WIB",
+  "generation": "0b6ae646-9d3b-4056-89fc-44903d51251e",
+  "updatedAt": 1792509963293,
+  "generatedAt": "2026-10-20 22:26 WIB",
   "usdIdr": null,
   "totalUsd": 922.6942828832152,
   "nativeSymbol": "SOL",
@@ -1310,12 +1310,12 @@
     "pnlUsd": -77.30571711678476,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792509662272,
+    "heartbeatAt": 1792509963293,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.59,
-    "lastScanAt": 1792509649000,
+    "lastScanAt": 1792509953000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1336,7 +1336,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "457",
+        "v": "458",
         "n": "24 jam · 2 diveto LLM"
       },
       {
@@ -1352,9 +1352,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792509662272,
+      "lastDecisionAt": 1792509963293,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
     }
   },
   "strategy": {
@@ -1385,7 +1385,7 @@
       ],
       [
         "Label wallet",
-        "smart 14081 · bot 5717 · blacklist 432 · lp 1 · fresh 1208 · kol 215 · dolphin 300 · whale 7"
+        "smart 14078 · bot 5719 · blacklist 432 · lp 1 · fresh 1209 · kol 215 · dolphin 300 · whale 7"
       ]
     ],
     "requirements": [
@@ -1441,21 +1441,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14081,
+          "total": 14078,
           "active": 476,
-          "passive": 13605
+          "passive": 13602
         },
         {
           "key": "bot",
-          "total": 5717,
+          "total": 5719,
           "active": 0,
-          "passive": 5717
+          "passive": 5719
         },
         {
           "key": "fresh",
-          "total": 1208,
+          "total": 1209,
           "active": 0,
-          "passive": 1208
+          "passive": 1209
         },
         {
           "key": "blacklist",
@@ -1590,6 +1590,34 @@
     },
     "decisions": [
       {
+        "at": 1792509823843,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      },
+      {
+        "at": 1792509734169,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
+      },
+      {
         "at": 1792509218442,
         "symbol": "CARDS",
         "action": "skip",
@@ -1700,16 +1728,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 33.26% supply."
-      },
-      {
-        "at": 1792505224991,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
       },
       {
         "at": 1792505005609,
@@ -2141,7 +2159,7 @@
         "basket": "degen",
         "wallets": {
           "kol": 1,
-          "smart": 1
+          "fresh": 1
         },
         "flags": [
           {
@@ -2153,30 +2171,14 @@
         "reason": "Dilewati: harga sudah -53% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
-        "at": 1792495736862,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 7,
-            "note": "7 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
-      },
-      {
         "at": 1792495325908,
         "symbol": "LIFAS",
         "action": "skip",
         "basket": "low",
         "wallets": {
-          "smart": 4,
-          "kol": 1
+          "smart": 3,
+          "kol": 1,
+          "fresh": 1
         },
         "flags": [
           {
@@ -2534,7 +2536,7 @@
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 403,
+        "red_flag": 404,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2586,7 +2588,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792509729830,
+    "generatedAt": 1792510017845,
     "trades": {
       "count": 149,
       "wins": 61,
