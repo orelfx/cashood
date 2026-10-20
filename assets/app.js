@@ -3583,6 +3583,7 @@ async function renderDuel(key) {
       <p class="hint">Data diperbarui tiap 5 menit begitu mesin paper berjalan.</p></section>`);
     return;
   }
+  if (key === 'gm') { gmView.last = { d, nav }; paintGm(); return; }
   const COLOR = { mirror: '#60a5fa', challenger: cfg.chal };
   const paper = cfg.books.map(([k, n]) => [k, n, COLOR[k], d[k]]);
   const books = [...paper, ['live', cfg.liveName, '#4ade80', d.live]];
@@ -3716,7 +3717,8 @@ function solbotChartSvg(d) {
   const ref = modal > 0 && modal >= lo && modal <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${y(modal)}" y2="${y(modal)}" stroke="#8b97a8" stroke-width="1" stroke-dasharray="4 4"/><text x="${small ? W - m.r - 2 : W - m.r + 6}" y="${y(modal) + (small ? -4 : 3.5)}" text-anchor="${small ? 'end' : 'start'}" class="g-lbl">modal</text>` : '';
   const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
   const last = pts.at(-1), up = last.v >= modal, stroke = up ? 'var(--green)' : 'var(--red)';
-  const fmtT = (t) => { const z = new Date(t + 7 * 3600e3); return solbotView.hours && solbotView.hours <= 48 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()} ${M_SHORT[z.getUTCMonth()]}`; };
+  const shortSpan = pts.at(-1).t - pts[0].t < 36 * 3600e3;
+  const fmtT = (t) => { const z = new Date(t + 7 * 3600e3); return shortSpan ? z.toISOString().slice(11, 16) : `${z.getUTCDate()} ${M_SHORT[z.getUTCMonth()]}`; };
   let ticks = '';
   const xSteps = small ? 2 : 4;
   for (let i = 0; i <= xSteps; i += 1) { const t = pts[0].t + ((last.t - pts[0].t) / xSteps) * i; ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="${i === 0 ? 'start' : i === xSteps ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`; }
@@ -4057,6 +4059,209 @@ function solbotClosedHtml(d) {
       <td class="num dim" data-k="Ditutup" title="${esc(sbWib(c.closedAt))}">${c.closedAt ? esc(ago(c.closedAt)) : '—'}</td></tr>`).join('')}
     </tbody></table></div>
     ${pages > 1 ? `<div class="pager" id="sbPager">${pagerHtml(solbotView.page, pages)}</div>` : ''}</section>`;
+}
+
+/* ── Grok Meridian: tampilan setara halaman Meridian ─────────────────────
+ * Ringkasan nilai, duel Grok vs Meridian asli dengan grafik yang bisa
+ * ditekan, riwayat profit (kalender/grafik), isi wallet kertas, posisi LP,
+ * riwayat close, puncak & titik terendah, dan varian shadow. Bagian yang
+ * datanya belum dikirim mesin tampil dengan keterangan "belum dikirim
+ * mesin", tidak diisi angka karangan. */
+const gmView = { mode: 'pct', hours: 0, profit: 'cal', calMonth: '', month: '', page: 0, last: null, chart: null };
+function gmChartSvg(d, nav) {
+  const pctMode = gmView.mode === 'pct';
+  const cut = gmView.hours ? Date.now() - gmView.hours * 3600e3 : 0;
+  const series = pctMode ? [['challenger', 'Grok Meridian', '#38bdf8'], ['live', 'Meridian asli', '#4ade80']] : [['usd', 'Grok Meridian', '#38bdf8']];
+  const pts = (nav?.points || []).filter((p) => Number.isFinite(p.t) && p.t >= cut).sort((a, b) => a.t - b.t);
+  const small = narrow(), W = small ? 420 : 720, H = small ? 280 : 240, m = small ? { t: 18, r: 14, b: 30, l: 62 } : { t: 16, r: 54, b: 30, l: 64 };
+  if (pts.length < 2) return { W, H, svg: `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" class="g-lbl">Grafik muncul setelah beberapa titik terkumpul di rentang ini.</text>`, hint: '' };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const vals = pts.flatMap((p) => series.map(([k]) => p[k]).filter((v) => v != null));
+  const base = pctMode ? 0 : d.startCapitalUsd;
+  let lo = Math.min(...vals, base ?? Infinity), hi = Math.max(...vals, base ?? -Infinity);
+  const pad = (hi - lo) * 0.12 || (pctMode ? 0.5 : Math.max(1, hi * 0.002)); lo -= pad; hi += pad;
+  const x = (t) => m.l + ((t - pts[0].t) / ((pts.at(-1).t - pts[0].t) || 1)) * pw, y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph;
+  const fmt = (v) => (pctMode ? `${v > 0 ? '+' : ''}${v.toFixed(2)}%` : usdText(v, 0));
+  let grid = '';
+  for (let i = 0; i <= (small ? 2 : 3); i += 1) { const v = lo + ((hi - lo) / (small ? 2 : 3)) * i; grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/><text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${fmt(v)}</text>`; }
+  const ref = base != null && base >= lo && base <= hi ? `<line x1="${m.l}" x2="${W - m.r}" y1="${y(base)}" y2="${y(base)}" stroke="#8b97a8" stroke-width="1" stroke-dasharray="4 4"/><text x="${small ? W - m.r - 2 : W - m.r + 6}" y="${y(base) + (small ? -4 : 3.5)}" text-anchor="${small ? 'end' : 'start'}" class="g-lbl">${pctMode ? '0%' : 'modal'}</text>` : '';
+  const path = (k) => pts.filter((p) => p[k] != null).map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p[k]).toFixed(1)}`).join(' ');
+  const shortSpan = pts.at(-1).t - pts[0].t < 36 * 3600e3;
+  const fmtT = (t) => { const z = new Date(t + 7 * 3600e3); return shortSpan ? z.toISOString().slice(11, 16) : `${z.getUTCDate()} ${M_SHORT[z.getUTCMonth()]}`; };
+  let ticks = '';
+  const xs = small ? 2 : 4;
+  for (let i = 0; i <= xs; i += 1) { const t = pts[0].t + ((pts.at(-1).t - pts[0].t) / xs) * i; ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="${i === 0 ? 'start' : i === xs ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`; }
+  const last = pts.at(-1);
+  const svg = `${grid}${ref}${series.map(([k, , c]) => `<path d="${path(k)}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}
+    ${series.map(([k, , c]) => (last[k] == null ? '' : `<circle cx="${x(last.t)}" cy="${y(last[k])}" r="4" fill="${c}" stroke="var(--card)" stroke-width="2"/>`)).join('')}${ticks}
+    <line id="gmCross" x1="0" x2="0" y1="${m.t}" y2="${m.t + ph}" stroke="#3a4552" stroke-width="1" style="display:none"/>
+    <rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" id="gmHit"/>`;
+  gmView.chart = { pts, x, y, W, series, pctMode };
+  const k0 = series[0][0], first = pts.find((p) => p[k0] != null);
+  const delta = first && last[k0] != null ? last[k0] - first[k0] : null;
+  return { W, H, svg, hint: `${pts.length} titik${delta == null ? '' : ` · Grok ${pctMode ? `${delta >= 0 ? '+' : ''}${delta.toFixed(2)} poin` : signed(delta)} di rentang ini`}` };
+}
+function wireGmChart() {
+  const c = gmView.chart, wrap = $('#gmWrap'), tip = $('#gmTip'), svg = $('#gmChart');
+  if (!c || !wrap || !svg || !svg.querySelector('#gmHit')) return;
+  const hit = svg.querySelector('#gmHit'), cross = svg.querySelector('#gmCross');
+  hit.onpointermove = hit.onpointerdown = (ev) => {
+    const box = wrap.getBoundingClientRect(), ratio = c.W / (box.width || c.W), sx = (ev.clientX - box.left) * ratio;
+    let near = c.pts[0];
+    for (const p of c.pts) if (Math.abs(c.x(p.t) - sx) < Math.abs(c.x(near.t) - sx)) near = p;
+    cross.setAttribute('x1', c.x(near.t)); cross.setAttribute('x2', c.x(near.t)); cross.style.display = '';
+    const v = (k) => (near[k] == null ? '—' : c.pctMode ? `${near[k] > 0 ? '+' : ''}${pct(near[k], 2)}` : usd(near[k]));
+    setHTML(tip, `<div class="t-d">${esc(tglRingkas(near.t))} WIB</div>${c.series.map(([k, n, col]) => `<div class="t-n"><i class="dot" style="background:${col}"></i> ${esc(n)} <b>${v(k)}</b></div>`).join('')}${c.pctMode && near.usd != null ? `<div class="t-n">nilai kertas ${usd(near.usd)}</div>` : ''}`);
+    tip.hidden = false;
+    const yv = near[c.series[0][0]];
+    tip.style.left = (c.x(near.t) / ratio) + 'px';
+    tip.style.top = (((yv == null ? 40 : c.y(yv)) - 10) / ratio) + 'px';
+  };
+  hit.onpointerleave = (ev) => { if (ev.pointerType === 'mouse') { tip.hidden = true; cross.style.display = 'none'; } };
+}
+function paintGm() {
+  const { d, nav } = gmView.last || {};
+  const body = $('#gmBody');
+  if (!d || !body) return;
+  const cfg = DUELS.gm, ch = d.challenger || {}, lv = d.live || {};
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+  const pctTxt = (v) => (v == null ? '—' : `${v > 0 ? '+' : ''}${pct(v, 2)}`);
+  const missing = (what) => `<p class="dim">${what} — belum dikirim mesin.</p>`;
+  const seats = ch.openSeats || [];
+  const hist = (ch.closeHistory || []).length ? ch.closeHistory : (ch.last10Closes || []);
+  // Lengkap kalau mesin mengirim seluruh riwayat, atau 10 close terakhir sudah mencakup semua close.
+  const fullHist = (ch.closeHistory || []).length > 0 || (ch.closes != null && hist.length >= ch.closes);
+  const realized = ch.realizedUsd ?? (fullHist ? hist.reduce((t, c) => t + (c.netUsd || 0), 0) : null);
+  const pnlUsd = ch.equityUsd != null && d.startCapitalUsd ? ch.equityUsd - d.startCapitalUsd - (ch.netFlowsUsd || 0) : null;
+  const pr = d.preregistration;
+  const hashTxt = (h) => (h?.prereg12 ? ` · pra-registrasi ${esc(h.version || '')} <span class="dim">${esc(h.prereg12)}</span>${h.params12 ? ` · parameter <span class="dim">${esc(h.params12)}</span>` : ''}` : '');
+  const chart = gmChartSvg(d, nav);
+
+  // Riwayat profit per hari: dari mesin (dailyClosed) kalau ada, kalau tidak dijumlah dari riwayat close yang terkirim.
+  const days = (ch.dailyClosed || []).length ? ch.dailyClosed : (() => {
+    const map = new Map();
+    for (const c of hist) { if (!c.closedAt || c.netUsd == null) continue; const k = new Date(c.closedAt + 7 * 3600e3).toISOString().slice(0, 10); const r = map.get(k) || { date: k, usd: 0, closes: 0, wins: 0, losses: 0 }; r.usd += c.netUsd; r.closes += 1; if (c.netUsd > 0) r.wins += 1; else if (c.netUsd < 0) r.losses += 1; map.set(k, r); }
+    return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+  })();
+  const best = days.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
+  let profitBody = '<p class="dim">Belum ada posisi yang ditutup.</p>';
+  if (days.length && gmView.profit === 'chart') {
+    const W = 720, H = 220, m = { t: 14, r: 14, b: 28, l: 60 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+    const lo = Math.min(0, ...days.map((r) => r.usd)) * 1.15, hi = Math.max(0, ...days.map((r) => r.usd)) * 1.15 || 1, peak = Math.max(0.01, ...days.map((r) => Math.abs(r.usd)));
+    const y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph, bw = Math.min(46, (pw / days.length) * 0.7), xs = (i) => m.l + (pw / days.length) * (i + 0.5);
+    profitBody = `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hasil close per hari"><line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" class="g-base"/>
+      ${[hi, 0, lo].filter((v, i, a) => a.indexOf(v) === i).map((v) => `<text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usdText(v, 2)}</text>`).join('')}
+      ${days.map((r, i) => `<rect x="${(xs(i) - bw / 2).toFixed(1)}" y="${Math.min(y(r.usd), y(0)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1, Math.abs(y(r.usd) - y(0))).toFixed(1)}" rx="3" fill="${r.usd >= 0 ? '#4ade80' : '#f87171'}" opacity="${(0.45 + 0.55 * Math.abs(r.usd) / peak).toFixed(2)}"><title>${fmtDay(r.date)} · ${signedText(r.usd)} · ${r.closes} close</title></rect><text x="${xs(i)}" y="${H - m.b + 18}" text-anchor="middle" class="g-lbl">${fmtDay(r.date)}</text>`).join('')}</svg></div>`;
+  } else if (days.length) {
+    const months = [...new Set(days.map((r) => r.date.slice(0, 7)))].sort();
+    if (!gmView.calMonth || !months.includes(gmView.calMonth)) gmView.calMonth = months.at(-1);
+    const [yy, mm] = gmView.calMonth.split('-').map(Number), first = new Date(Date.UTC(yy, mm - 1, 1)), nDays = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
+    const map = new Map(days.map((r) => [r.date, r])), peak = Math.max(0.01, ...days.map((r) => Math.abs(r.usd)));
+    let cells = '', tot = 0, n = 0;
+    for (let i = 0; i < first.getUTCDay(); i += 1) cells += '<div class="cell void"></div>';
+    for (let dd = 1; dd <= nDays; dd += 1) {
+      const r = map.get(`${gmView.calMonth}-${String(dd).padStart(2, '0')}`);
+      if (!r) { cells += `<div class="cell void"><span class="d">${dd}</span></div>`; continue; }
+      tot += r.usd; n += r.closes;
+      const a = 0.12 + 0.42 * (Math.abs(r.usd) / peak), rgb = r.usd >= 0 ? '74,222,128' : '248,113,113';
+      cells += `<div class="cell" style="background:rgba(${rgb},${a.toFixed(3)});border-color:rgba(${rgb},.4)"><span class="d">${dd}</span><span class="a ${cls(r.usd)}">${narrow() ? signedCompact(r.usd) : signed(r.usd)}</span><span class="c">${r.closes} close</span></div>`;
+    }
+    const idx = months.indexOf(gmView.calMonth);
+    profitBody = `<div class="cal-head"><button class="btn ghost" data-gmcal="-1" aria-label="Bulan sebelumnya"${idx <= 0 ? ' disabled' : ''}>‹</button><strong>${M_SHORT[mm - 1]} ${yy}</strong><button class="btn ghost" data-gmcal="1" aria-label="Bulan berikutnya"${idx >= months.length - 1 ? ' disabled' : ''}>›</button></div>
+      <div class="cal-dow">${D_SHORT.map((x) => `<span>${x}</span>`).join('')}</div><div class="cal-grid">${cells}</div>
+      <div class="cal-foot"><span>${n} close bulan ini</span><span>Total <b class="${cls(tot)}">${signed(tot)}</b></span></div>`;
+  }
+
+  // Riwayat close: bulan + halaman 20.
+  const mon = (t) => new Date(t + 7 * 3600e3).toISOString().slice(0, 7);
+  const months = [...new Set(hist.filter((c) => c.closedAt).map((c) => mon(c.closedAt)))].sort().reverse();
+  if (gmView.month && !months.includes(gmView.month)) gmView.month = '';
+  const scope = hist.filter((c) => !gmView.month || (c.closedAt && mon(c.closedAt) === gmView.month));
+  const pages = Math.max(1, Math.ceil(scope.length / CLOSED_PER_PAGE));
+  gmView.page = Math.min(Math.max(0, gmView.page), pages - 1);
+  const rows = scope.slice(gmView.page * CLOSED_PER_PAGE, (gmView.page + 1) * CLOSED_PER_PAGE);
+  const sw = scope.filter((c) => (c.netUsd ?? 0) > 0).length, sl = scope.filter((c) => (c.netUsd ?? 0) < 0).length, susd = scope.reduce((t, c) => t + (c.netUsd || 0), 0);
+  const label = (mo) => `${M_SHORT[Number(mo.slice(5)) - 1]} ${mo.slice(0, 4)}`;
+  const peakRows = hist.filter((c) => c.peakPct != null || c.troughPct != null);
+
+  setHTML(body, `<section class="card">
+      <div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
+      <p class="lead">${cfg.lead(d)}</p>
+      <p class="hint">Diperbarui ${ago(d.updatedAt)}${d.stale ? ' · <span class="neg">data terlambat</span>' : ''}${d.phase === 'warmup' ? ' · <b>warmup</b> (belum dinilai)' : ''}${d.startedAt ? ` · T0 ${tglRingkas(d.startedAt)}${d.t0Pin ? ' (dipatok Cashood)' : ''}` : d.t0Wait ? ` · <b>${esc(d.t0Wait)}</b>` : ''}${hashTxt(d.t0Pin?.prereg12 ? d.t0Pin : pr)}${d.hashCheck && d.hashCheck !== 'set' ? ` · <span class="dim">${esc(d.hashCheck)}</span>` : ''}</p>
+      ${(d.warnings || []).length ? `<div role="alert">${d.warnings.map((w) => { const i = w.indexOf(':'); return `<p class="neg"><b>⚠ ${esc(i > 0 ? w.slice(0, i) : 'Peringatan')}:</b> ${esc(i > 0 ? w.slice(i + 1).trim() : w)}</p>`; }).join('')}</div>` : ''}
+    </section>
+    <div class="stats sb-top">${[
+      tile('Nilai sekarang', ch.equityUsd == null ? '—' : usd(ch.equityUsd), `${ch.equitySol == null ? '' : `${Number(ch.equitySol).toLocaleString('en-US', { maximumFractionDigits: 2 })} SOL · `}${ch.cashUsd != null && ch.lpUsd != null ? `${usd(ch.cashUsd, 0)} kas + ${usd(ch.lpUsd, 0)} di LP` : 'kertas'}`),
+      tile('Modal awal', d.startCapitalUsd == null ? '—' : usd(d.startCapitalUsd), `NAV Meridian di T0 · kertas${ch.netFlowsUsd ? ` · arus dana ${signed(ch.netFlowsUsd)}` : ''}`),
+      tile('Untung terkunci', realized == null ? '—' : signed(realized), `${ch.closes ?? 0} close · fee ${ch.feesUsd == null ? '—' : usd(ch.feesUsd)} · biaya ${ch.costsUsd == null ? '—' : usd(ch.costsUsd)}${realized == null ? ' · total belum dikirim mesin' : ''}`, cls(realized ?? 0)),
+      tile('Untung / rugi', pnlUsd == null ? '—' : signed(pnlUsd), `${pctTxt(ch.pctSinceStart)} dalam USD${ch.pctSinceStartSol != null ? ` · ${pctTxt(ch.pctSinceStartSol)} dalam SOL` : ''}`, cls(pnlUsd ?? 0)),
+    ].join('')}</div>
+    <section class="card"><div class="card-head"><div class="seg tabs2" id="gmMode" role="group" aria-label="Deret"><button data-m="pct" class="${gmView.mode === 'pct' ? 'on' : ''}">Grok vs Meridian</button><button data-m="usd" class="${gmView.mode === 'usd' ? 'on' : ''}">Nilai kertas</button></div><span class="hint">${chart.hint}</span></div>
+      <div class="grr-tiles n2">${[['challenger', 'Grok Meridian', '#38bdf8', ch], ['live', 'Meridian asli', '#4ade80', lv]].map(([k, name, c, b]) => `<div class="grr-tile" style="--c:${c}">
+        <div class="grr-k"><i></i>${esc(name)}</div>
+        <div class="grr-v ${cls(b?.pctSinceStart ?? 0)}">${b?.status === 'waiting_t0' ? '<span class="dim">menunggu T0</span>' : pctTxt(b?.pctSinceStart)}</div>
+        <div class="grr-n">${b?.equityUsd != null ? usd(b.equityUsd) : '—'}${k === 'live' ? ' · uang asli' : ' · kertas'}${b?.maxDrawdownPct != null ? ` · DD maks ${pct(b.maxDrawdownPct, 1)}` : ''}</div>
+        <div class="grr-n">${k === 'live' ? esc(b?.status === 'waiting_t0' ? (b.label || 'menunggu T0') : b?.asOf ? 'per ' + tglRingkas(b.asOf) : '') : `${b?.closes ?? 0} close · win ${b?.winRatePct == null ? '—' : pct(b.winRatePct, 0)} · ${seats.length} seat terbuka`}</div></div>`).join('')}</div>
+      <div class="controls"><div class="seg" id="gmRange" role="group" aria-label="Rentang grafik">${[[24, '24 jam'], [168, '7 hari'], [0, 'semua']].map(([h, l]) => `<button data-h="${h}" class="${gmView.hours === h ? 'on' : ''}">${l}</button>`).join('')}</div>
+        <div class="grr-legend">${(gmView.mode === 'pct' ? [['Grok Meridian', '#38bdf8'], ['Meridian asli', '#4ade80']] : [['Nilai kertas Grok Meridian', '#38bdf8']]).map(([n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join('')}</div></div>
+      <div class="chart-wrap" id="gmWrap"><svg id="gmChart" viewBox="0 0 ${chart.W} ${chart.H}" role="img" aria-label="Grok Meridian dari waktu ke waktu (WIB)">${chart.svg}</svg><div class="tip" id="gmTip" hidden></div></div>
+      ${ch.ddNote ? `<p class="hint">${esc(ch.ddNote)}</p>` : ''}
+    </section>
+    <section class="card" id="gmProfit"><div class="card-head"><h2>Riwayat profit</h2><span class="hint">${days.length} hari ada close · hasil kertas setelah fee dan biaya${(ch.dailyClosed || []).length || fullHist ? '' : ' · dari 10 close terakhir'}</span></div>
+      <div class="stats">${[
+        tile('Profit terkunci', realized == null ? '—' : signed(realized), 'dari posisi yang sudah ditutup', cls(realized ?? 0)),
+        tile('Win rate', ch.winRatePct == null ? '—' : pct(ch.winRatePct, 1), `${ch.closes ?? 0} close`),
+        tile('Rata² menang / kalah', `<span class="pos">${ch.avgWinUsd == null ? '—' : signed(ch.avgWinUsd)}</span> / <span class="neg">${ch.avgLossUsd == null ? '—' : signed(ch.avgLossUsd)}</span>`, 'per close'),
+        tile('Fee / biaya', `<span class="pos">${ch.feesUsd == null ? '—' : usd(ch.feesUsd)}</span> / <span class="neg">${ch.costsUsd == null ? '—' : usd(ch.costsUsd)}</span>`, 'fee terkumpul / biaya tx'),
+        best ? tile('Hari terbaik', signed(best.usd), fmtDay(best.date), cls(best.usd)) : tile('Hari terbaik', '—', 'belum ada data'),
+      ].join('')}</div>
+      <div class="controls"><div class="seg" id="gmProfitView" role="group" aria-label="Tampilan"><button data-v="chart" class="${gmView.profit === 'chart' ? 'on' : ''}">grafik</button><button data-v="cal" class="${gmView.profit !== 'chart' ? 'on' : ''}">kalender</button></div></div>
+      ${profitBody}</section>
+    <section class="card"><div class="card-head"><h2>Token di wallet kertas</h2><span class="hint">isi wallet simulasi Grok Meridian</span></div>
+      ${(ch.holdings || []).length ? `<div class="table-scroll"><table class="mcards"><thead><tr><th>Token</th><th class="num">Jumlah</th><th class="num">Nilai</th></tr></thead><tbody>${ch.holdings.map((h) => `<tr><td class="mc-head"><b>${esc(h.symbol)}</b></td><td class="num" data-k="Jumlah">${h.amount == null ? '—' : num(h.amount, 4)}</td><td class="num" data-k="Nilai">${h.usd == null ? '—' : usd(h.usd)}</td></tr>`).join('')}</tbody></table></div>` : missing('Rincian token (SOL, token LP) di wallet kertas')}</section>
+    <section class="card"><div class="card-head"><h2>Posisi LP <span class="count">(${seats.length})</span></h2><span class="hint">seat terbuka · kertas${ch.maxPositionsNow ? ` · maks ${ch.maxPositionsNow} posisi` : ''}${ch.deployedPctNow != null ? ` · terpakai ${pct(ch.deployedPctNow, 1)}` : ''}</span></div>
+      ${seats.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th>Buku</th><th class="num">Bin step · bin</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Fee</th><th class="num">Untung / rugi</th><th>Range</th></tr></thead><tbody>
+      ${seats.map((s) => `<tr><td class="mc-head"><span class="who"><span class="chip" style="background:${(s.pnlPct ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(s.symbol)}</span>${s.entryNote ? `<div class="sub2 why">${esc(s.entryNote)}</div>` : ''}</td>
+        <td data-k="Buku">${esc(s.book || '—')}</td><td class="num" data-k="Bin">${s.binStep ?? '—'}${s.bins != null ? ` · ${s.bins}` : ''}${s.shape ? ` <span class="dim">${esc(s.shape)}</span>` : ''}</td>
+        <td class="num" data-k="Umur">${s.openedAt ? `${dur((Date.now() - s.openedAt) / 60000)}<div class="sub2">sejak ${esc(tglRingkas(s.openedAt))}</div>` : '—'}</td>
+        <td class="num" data-k="Modal">${s.basisUsd == null ? '—' : usd(s.basisUsd)}${s.basisSol != null ? `<div class="sub2">${num(s.basisSol, 3)} SOL</div>` : ''}</td>
+        <td class="num" data-k="Nilai">${s.valueUsd == null ? '<span class="dim">—</span>' : `<b>${usd(s.valueUsd)}</b>`}</td>
+        <td class="num pos" data-k="Fee">${s.feesUsd == null ? '<span class="dim">—</span>' : usd(s.feesUsd)}</td>
+        <td class="num ${cls(s.pnlPct ?? 0)}" data-k="Untung / rugi">${s.pnlUsd == null ? '' : signed(s.pnlUsd)}<div class="sub2 ${cls(s.pnlPct ?? 0)}">${pctTxt(s.pnlPct)}</div></td>
+        <td data-k="Range">${s.inRange == null ? '—' : `<span class="pill ${s.inRange ? 'in' : 'out2'}">${s.inRange ? 'di dalam' : 'di luar'}</span>`}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada seat terbuka — mesin menunggu pool yang lolos aturan.</p>'}</section>
+    <section class="card" id="gmClosed"><div class="card-head"><h2>Riwayat posisi ditutup</h2><span class="hint">${fullHist ? `halaman ${gmView.page + 1} dari ${pages} · ${gmView.month ? label(gmView.month) : 'seluruh riwayat'}` : `${hist.length} close terakhir · seluruh riwayat belum dikirim mesin`}</span></div>
+      ${hist.length ? `<div class="controls closed-ctl">${fullHist ? `<label class="sel-wrap"><span>Periode</span><select id="gmMonth" aria-label="Pilih bulan"><option value="">Semua · ${hist.length} posisi</option>${months.map((mo) => `<option value="${mo}"${mo === gmView.month ? ' selected' : ''}>${label(mo)} · ${hist.filter((c) => c.closedAt && mon(c.closedAt) === mo).length} posisi</option>`).join('')}</select></label>` : ''}
+        <span class="closed-sum"><b>${scope.length}</b> posisi · hasil <b class="${cls(susd)}">${signed(susd)}</b> · <span class="pos">${sw} untung</span> · <span class="neg">${sl} rugi</span>${sw + sl ? ` · win rate ${pct((sw / (sw + sl)) * 100, 1)}` : ''}</span></div>
+      <div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th>Buku</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th class="num">Fee</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+      ${rows.map((c) => `<tr><td class="mc-head"><span class="who"><span class="chip" style="background:${(c.netUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol)}</span></td><td data-k="Buku">${esc(c.book || '—')}</td>
+        <td class="num dim" data-k="Lama">${c.openedAt && c.closedAt ? dur((c.closedAt - c.openedAt) / 60000) : '—'}</td>
+        <td class="num ${cls(c.netUsd ?? 0)}" data-k="Hasil">${c.netUsd == null ? '—' : signed(c.netUsd)}${c.netSol != null ? `<div class="sub2">${c.netSol > 0 ? '+' : ''}${num(c.netSol, 4)} SOL</div>` : ''}</td>
+        <td class="num ${cls(c.netPct ?? 0)}" data-k="%">${pctTxt(c.netPct)}</td><td class="num pos" data-k="Fee">${c.feesUsd == null ? '—' : usd(c.feesUsd)}</td>
+        <td data-k="Alasan">${c.closeNote || c.basisUsd != null ? `<details class="fx-det"><summary>${esc(c.reason ? shortReason(c.reason) : '—')}</summary>${c.basisUsd != null ? `<div class="sub2">modal ${usd(c.basisUsd)}</div>` : ''}${c.closeNote ? `<p class="fx-why">${esc(c.closeNote)}</p>` : ''}${c.reason ? `<div class="sub2">${esc(c.reason)}</div>` : ''}</details>` : esc(c.reason ? shortReason(c.reason) : '—')}</td>
+        <td class="num dim" data-k="Ditutup" title="${esc(tglRingkas(c.closedAt))} WIB">${c.closedAt ? esc(ago(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>
+      ${fullHist && pages > 1 ? `<div class="pager" id="gmPager">${pagerHtml(gmView.page, pages)}</div>` : ''}` : '<p class="dim">Belum ada posisi yang ditutup.</p>'}</section>
+    <section class="card"><div class="card-head"><h2>Puncak &amp; titik terendah posisi</h2><span class="hint">persen tertinggi dan terendah selama posisi terbuka</span></div>
+      ${peakRows.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Puncak</th><th class="num">Terendah</th><th class="num">Hasil akhir</th><th class="num">Ditutup</th></tr></thead><tbody>${peakRows.slice(0, 20).map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol)}</b></td><td class="num pos" data-k="Puncak">${pctTxt(c.peakPct)}</td><td class="num neg" data-k="Terendah">${pctTxt(c.troughPct)}</td><td class="num ${cls(c.netPct ?? 0)}" data-k="Hasil akhir">${pctTxt(c.netPct)}</td><td class="num dim" data-k="Ditutup">${c.closedAt ? esc(ago(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>` : missing('Puncak dan titik terendah tiap posisi')}</section>
+    ${(d.shadows || []).length ? `<section class="card"><div class="card-head"><h2>Varian shadow <span class="count">(${d.shadows.length})</span></h2><span class="hint">didaftarkan sebelum mulai · dilaporkan semua · tidak dinilai</span></div>
+      <div class="table-scroll"><table class="mcards"><thead><tr><th>Varian</th><th class="num">Hasil</th><th class="num">DD maks</th><th class="num">Close</th><th class="num">Win rate</th><th class="num">Fee</th><th class="num">Biaya</th></tr></thead><tbody>
+      ${d.shadows.map((s2) => `<tr><td class="mc-head"><b>${esc(s2.id || '—')}</b><div class="sub2">${esc(s2.label || '')}</div></td><td class="num ${cls(s2.pctSinceStart ?? 0)}" data-k="Hasil">${pctTxt(s2.pctSinceStart)}</td><td class="num" data-k="DD maks">${s2.maxDrawdownPct == null ? '—' : pct(s2.maxDrawdownPct, 1)}</td><td class="num" data-k="Close">${s2.closes ?? 0}</td><td class="num" data-k="Win rate">${s2.winRatePct == null ? '—' : pct(s2.winRatePct, 0)}</td><td class="num pos" data-k="Fee">${s2.feesUsd == null ? '—' : usd(s2.feesUsd)}</td><td class="num neg" data-k="Biaya">${s2.costsUsd == null ? '—' : usd(s2.costsUsd)}</td></tr>`).join('')}</tbody></table></div></section>` : ''}
+    ${lv?.note ? `<section class="card"><p class="hint"><b>Catatan pembanding live:</b> ${esc(lv.note)}</p></section>` : ''}`);
+  wireGmChart();
+  body.onclick = (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.disabled) return;
+    if (btn.closest('#gmRange')) { gmView.hours = Number(btn.getAttribute('data-h')) || 0; paintGm(); return; }
+    if (btn.closest('#gmMode')) { gmView.mode = btn.getAttribute('data-m'); paintGm(); return; }
+    if (btn.closest('#gmProfitView')) { gmView.profit = btn.getAttribute('data-v'); paintGm(); return; }
+    if (btn.hasAttribute('data-gmcal')) {
+      const ms = [...new Set(days.map((r) => r.date.slice(0, 7)))].sort(), i = ms.indexOf(gmView.calMonth) + Number(btn.getAttribute('data-gmcal'));
+      if (ms[i]) { gmView.calMonth = ms[i]; paintGm(); }
+      return;
+    }
+    if (btn.closest('#gmPager')) { gmView.page = Number(btn.getAttribute('data-p')) || 0; paintGm(); $('#gmClosed')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+  };
+  const sel = $('#gmMonth');
+  if (sel) sel.onchange = (e) => { gmView.month = e.target.value; gmView.page = 0; paintGm(); };
 }
 
 function showIndex() { showGlobal('index', 'Cashood Index — Cashood Headfund'); renderIndex().catch(() => {}); }

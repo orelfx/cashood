@@ -70,10 +70,15 @@ const seat = (s) => ({
   symbol: text(s.symbol, 24) || '—', book: text(s.book, 16), binStep: num(s.binStep), bins: num(s.bins), shape: text(s.shape ?? s.strategy, 16),
   openedAt: time(s.openedAt), basisUsd: r2(s.basisUsd), basisSol: r4(s.basisSol), pnlPct: r2(s.pnlPct),
   inRange: s.inRange === true ? true : s.inRange === false ? false : null,
+  // Opsional (tampilan setara Meridian): nilai sekarang, fee terkumpul, untung/rugi $, puncak/terendah.
+  valueUsd: r2(s.valueUsd), feesUsd: r2(s.feesUsd), pnlUsd: r2(s.pnlUsd), pnlSol: r4(s.pnlSol),
+  peakPct: r2(s.peakPct), troughPct: r2(s.troughPct), entryNote: text(s.entryNote, 200),
 });
 const close = (c) => ({
   symbol: text(c.symbol, 24) || '—', book: text(c.book, 16), openedAt: time(c.openedAt), closedAt: time(c.closedAt ?? c.at),
   netUsd: r2(c.netUsd ?? c.pnlUsd), netSol: r4(c.netSol), netPct: r2(c.netPct ?? c.pnlPct), feesUsd: r2(c.feesUsd), reason: text(c.reason ?? c.closeReason, 80),
+  // Opsional: modal posisi, puncak/terendah selama posisi terbuka, catatan alasan keluar.
+  basisUsd: r2(c.basisUsd), peakPct: r2(c.peakPct), troughPct: r2(c.troughPct), closeNote: text(c.closeNote, 200), shape: text(c.shape, 16), binStep: num(c.binStep),
 });
 const book = (b, id) => ({
   id: text(id ?? b.id, 32), label: text(b.label, 80), equityUsd: r2(b.equityUsd), equitySol: r4(b.equitySol), pctSinceStart: r2(b.pctSinceStart),
@@ -82,6 +87,12 @@ const book = (b, id) => ({
   feesUsd: r2(b.feesUsd), costsUsd: r2(b.costsUsd),
   openSeats: (Array.isArray(b.openSeats) ? b.openSeats : []).slice(0, 40).map(seat),
   last10Closes: (Array.isArray(b.last10Closes) ? b.last10Closes : []).slice(0, 10).map(close),
+  // Opsional: seluruh riwayat close (terbaru dulu, maks 500), hasil harian, dan isi wallet kertas.
+  closeHistory: (Array.isArray(b.closeHistory) ? b.closeHistory : []).map(close).filter((c) => c.closedAt).sort((x, y) => y.closedAt - x.closedAt).slice(0, 500),
+  dailyClosed: (Array.isArray(b.dailyClosed) ? b.dailyClosed : []).map((r) => ({ date: /^\d{4}-\d{2}-\d{2}$/.test(String(r.date)) ? String(r.date) : null, usd: r2(r.netUsd ?? r.usd), closes: num(r.closes) ?? 0, wins: num(r.wins) ?? 0, losses: num(r.losses) ?? 0 })).filter((r) => r.date && r.usd != null).slice(-400),
+  holdings: (Array.isArray(b.holdings) ? b.holdings : []).slice(0, 30).map((h) => ({ symbol: text(h.symbol, 16) || '—', amount: num(h.amount), usd: r2(h.usd ?? h.valueUsd) })),
+  cashUsd: r2(b.cashUsd), lpUsd: r2(b.lpUsd), realizedUsd: r2(b.realizedUsd), unrealizedUsd: r2(b.unrealizedUsd),
+  pctSinceStartSol: r2(b.pctSinceStartSol), deployedPctNow: r2(b.deployedPctNow), maxPositionsNow: num(b.maxPositionsNow),
 });
 // Shadow: varian yang didaftarkan sebelum T0 (mis. range 70 dan 100 bin).
 // Dilaporkan apa adanya; ringkas saja, tanpa daftar seat.
