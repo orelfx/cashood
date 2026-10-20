@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bce6adb8-dd13-4933-8b4f-abd0f1c8eb6f",
-  "updatedAt": 1792527535401,
-  "generatedAt": "2026-10-21 03:18 WIB",
+  "generation": "7712d147-a945-449b-aaa1-8ba8e8cd4eee",
+  "updatedAt": 1792527835412,
+  "generatedAt": "2026-10-21 03:23 WIB",
   "usdIdr": null,
   "totalUsd": 923.5592206959575,
   "nativeSymbol": "SOL",
@@ -1311,12 +1311,12 @@
     "pnlUsd": -76.44077930404251,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792527535401,
+    "heartbeatAt": 1792527835412,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792527530000,
+    "lastScanAt": 1792527829000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1337,13 +1337,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "492",
+        "v": "496",
         "n": "24 jam · 2 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "22158",
-        "n": "490 aktif"
+        "n": "491 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1353,9 +1353,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792527535401,
+      "lastDecisionAt": 1792527835412,
       "lastAction": "keputusan",
-      "lastReason": "GLOBE [degen]: Dilewati karena red flag: bundler pegang 40% supply."
+      "lastReason": "DUST [low]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1374,7 +1374,7 @@
       ],
       [
         "Wallet dipantau",
-        "22158 · 490 aktif"
+        "22158 · 491 aktif"
       ],
       [
         "Cadangan kas",
@@ -1386,7 +1386,7 @@
       ],
       [
         "Label wallet",
-        "smart 14043 · bot 5944 · blacklist 434 · lp 1 · fresh 1213 · kol 214 · dolphin 297 · whale 7 · unknown 5"
+        "smart 14041 · bot 5950 · blacklist 434 · lp 1 · fresh 1213 · kol 214 · dolphin 297 · whale 8"
       ]
     ],
     "requirements": [
@@ -1435,22 +1435,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 22158,
-      "active": 490,
-      "passive": 21668,
+      "active": 491,
+      "passive": 21667,
       "trusted": 0,
       "promising": 31,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14043,
-          "active": 461,
-          "passive": 13582
+          "total": 14041,
+          "active": 462,
+          "passive": 13579
         },
         {
           "key": "bot",
-          "total": 5944,
+          "total": 5950,
           "active": 0,
-          "passive": 5944
+          "passive": 5950
         },
         {
           "key": "fresh",
@@ -1478,15 +1478,9 @@
         },
         {
           "key": "whale",
-          "total": 7,
+          "total": 8,
           "active": 1,
-          "passive": 6
-        },
-        {
-          "key": "unknown",
-          "total": 5,
-          "active": 0,
-          "passive": 5
+          "passive": 7
         },
         {
           "key": "lp",
@@ -1597,6 +1591,90 @@
     },
     "decisions": [
       {
+        "at": 1792527760210,
+        "symbol": "DUST",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 186,
+            "note": "bundler pegang 14.1%"
+          },
+          {
+            "type": "rat",
+            "count": 6,
+            "note": "insider/entrapment pegang 5.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 595,
+            "note": "6.0% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792527694679,
+        "symbol": "COLLECT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: sniper awal masih pegang 32%."
+      },
+      {
+        "at": 1792527570957,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 6,
+            "note": "6 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
+        "at": 1792527545177,
+        "symbol": "ENERGY",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 13%."
+      },
+      {
         "at": 1792527528218,
         "symbol": "GLOBE",
         "action": "skip",
@@ -1625,41 +1703,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 47%."
-      },
-      {
-        "at": 1792526965998,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 6,
-            "note": "6 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
-      },
-      {
-        "at": 1792526941743,
-        "symbol": "ENERGY",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 13%."
       },
       {
         "at": 1792526941070,
@@ -2537,26 +2580,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -17% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792520859084,
-        "symbol": "Xitter",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -35% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792520826323,
-        "symbol": "ROCKET",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: holder baru 8."
       }
     ],
     "reasonStats": {
@@ -2567,7 +2590,7 @@
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 431,
+        "red_flag": 435,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2619,7 +2642,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792527745074,
+    "generatedAt": 1792528037581,
     "trades": {
       "count": 150,
       "wins": 62,
@@ -2659,7 +2682,7 @@
     },
     "equity": {
       "days": 15,
-      "spanDays": 14.8,
+      "spanDays": 14.9,
       "returnPct": -6.68,
       "maxDrawdownPct": 7.15,
       "maxDrawdownAt": 1792004333022,
