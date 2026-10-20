@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "3174b5d6-7c4b-4585-a234-bf45deabdb92",
-  "updatedAt": 1792480866828,
-  "generatedAt": "2026-10-20 14:21 WIB",
+  "generation": "0a27d54e-7967-4c34-b4fd-b34f999642eb",
+  "updatedAt": 1792481230715,
+  "generatedAt": "2026-10-20 14:27 WIB",
   "usdIdr": null,
   "totalUsd": 922.6440476740981,
   "nativeSymbol": "SOL",
@@ -1323,12 +1323,12 @@
     "pnlUsd": -77.35595232590185,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792480866828,
+    "heartbeatAt": 1792481230715,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.6,
-    "lastScanAt": 1792480857000,
+    "lastScanAt": 1792481117000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1354,7 +1354,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "20926",
+        "v": "20967",
         "n": "502 aktif"
       },
       {
@@ -1365,9 +1365,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792480866828,
+      "lastDecisionAt": 1792481230715,
       "lastAction": "keputusan",
-      "lastReason": "EVOLVE [degen]: Dilewati: harga sudah -34% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "Onion [low]: Dilewati: solo_test: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Wallet dipantau",
-        "20926 · 502 aktif"
+        "20967 · 502 aktif"
       ],
       [
         "Cadangan kas",
@@ -1398,7 +1398,7 @@
       ],
       [
         "Label wallet",
-        "smart 13659 · bot 5139 · blacklist 427 · lp 1 · fresh 1195 · kol 207 · dolphin 291 · whale 7"
+        "smart 13657 · bot 5141 · blacklist 427 · lp 1 · fresh 1196 · kol 207 · dolphin 291 · whale 7 · unknown 40"
       ]
     ],
     "requirements": [
@@ -1446,29 +1446,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 20926,
+      "tracked": 20967,
       "active": 502,
-      "passive": 20424,
+      "passive": 20465,
       "trusted": 0,
       "promising": 41,
       "byLabel": [
         {
           "key": "smart",
-          "total": 13659,
+          "total": 13657,
           "active": 474,
-          "passive": 13185
+          "passive": 13183
         },
         {
           "key": "bot",
-          "total": 5139,
+          "total": 5141,
           "active": 0,
-          "passive": 5139
+          "passive": 5141
         },
         {
           "key": "fresh",
-          "total": 1195,
+          "total": 1196,
           "active": 0,
-          "passive": 1195
+          "passive": 1196
         },
         {
           "key": "blacklist",
@@ -1487,6 +1487,12 @@
           "total": 207,
           "active": 10,
           "passive": 197
+        },
+        {
+          "key": "unknown",
+          "total": 40,
+          "active": 0,
+          "passive": 40
         },
         {
           "key": "whale",
@@ -1603,6 +1609,50 @@
     },
     "decisions": [
       {
+        "at": 1792481118025,
+        "symbol": "Onion",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 494,
+            "note": "bundler pegang 21.9%"
+          },
+          {
+            "type": "rat",
+            "count": 3,
+            "note": "insider/entrapment pegang 3.5%"
+          },
+          {
+            "type": "fresh",
+            "count": 815,
+            "note": "10.7% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
+      {
+        "at": 1792480957517,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 12,
+            "note": "12 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
         "at": 1792480502844,
         "symbol": "EVOLVE",
         "action": "skip",
@@ -1675,23 +1725,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 16%."
-      },
-      {
-        "at": 1792479937200,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 11,
-            "note": "11 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792479931633,
@@ -2557,23 +2590,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -60% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792470053570,
-        "symbol": "bien",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -56% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2635,7 +2651,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792480932372,
+    "generatedAt": 1792481518969,
     "trades": {
       "count": 148,
       "wins": 60,
