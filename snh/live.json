@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1fa4a9f4-3df0-442a-865c-912845247fca",
-  "updatedAt": 1792617856487,
-  "generatedAt": "2026-10-22 04:24 WIB",
+  "generation": "534fc79f-1934-44c1-9646-b2d514f09e19",
+  "updatedAt": 1792618156503,
+  "generatedAt": "2026-10-22 04:29 WIB",
   "usdIdr": null,
   "totalUsd": 923.7381329647544,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.00025487611730350503,
-      "ageMinutes": 107,
+      "ageMinutes": 112,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1387,12 +1387,12 @@
     "pnlUsd": -76.26186703524559,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792617856487,
+    "heartbeatAt": 1792618156503,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.49,
-    "lastScanAt": 1792617793000,
+    "lastScanAt": 1792618109000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1419,8 +1419,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "684",
-        "n": "24 jam · 4 diveto LLM"
+        "v": "680",
+        "n": "24 jam · 2 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1435,9 +1435,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792617856487,
+      "lastDecisionAt": 1792618156503,
       "lastAction": "keputusan",
-      "lastReason": "AgenC [low]: Dilewati karena red flag: 10 holder terbesar pegang 48%."
+      "lastReason": "offline [degen]: Dilewati karena red flag: bundler pegang 33.45% supply."
     }
   },
   "strategy": {
@@ -1663,7 +1663,7 @@
         {
           "alias": "smart #19162",
           "label": "smart",
-          "score": 98.8,
+          "score": 98.6,
           "copied": 0,
           "won": 0,
           "pnlUsd": 0,
@@ -1672,6 +1672,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792618155948,
+        "symbol": "offline",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 33.45% supply."
+      },
       {
         "at": 1792617737003,
         "symbol": "AgenC",
@@ -2580,24 +2590,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: volume cuci: volume 1 jam 44x likuiditas."
-      },
-      {
-        "at": 1792608972821,
-        "symbol": "PUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 9,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: unsupported_extension."
       }
     ],
     "reasonStats": {
@@ -2608,7 +2600,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 563,
+        "red_flag": 561,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2625,7 +2617,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 4
+        "llm": 2
       },
       "test": {
         "solo": 0,
@@ -2660,7 +2652,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792618038020,
+    "generatedAt": 1792618343263,
     "trades": {
       "count": 151,
       "wins": 63,
