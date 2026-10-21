@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e8d97861-baea-4761-9e50-e82fdc6aeb58",
-  "updatedAt": 1792546197057,
-  "generatedAt": "2026-10-21 08:29 WIB",
+  "generation": "ae861066-a147-4454-8dfa-4be648b6d095",
+  "updatedAt": 1792546497531,
+  "generatedAt": "2026-10-21 08:34 WIB",
   "usdIdr": null,
   "totalUsd": 923.5592206959575,
   "nativeSymbol": "SOL",
@@ -1311,12 +1311,12 @@
     "pnlUsd": -76.44077930404251,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792546197057,
+    "heartbeatAt": 1792546497531,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792546186000,
+    "lastScanAt": 1792546489000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1337,7 +1337,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "590",
+        "v": "593",
         "n": "24 jam · 3 diveto LLM"
       },
       {
@@ -1353,9 +1353,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792546197057,
+      "lastDecisionAt": 1792546497531,
       "lastAction": "keputusan",
-      "lastReason": "Trencher [degen]: Dilewati: harga sudah -40% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "JUP [big]: Dilewati karena red flag: likuiditas cuma 0.0% dari market cap."
     }
   },
   "strategy": {
@@ -1386,7 +1386,7 @@
       ],
       [
         "Label wallet",
-        "smart 13929 · bot 6124 · blacklist 440 · lp 1 · fresh 1205 · kol 213 · dolphin 293 · whale 9"
+        "smart 13926 · bot 6127 · blacklist 440 · lp 1 · fresh 1205 · kol 213 · dolphin 293 · whale 9"
       ]
     ],
     "requirements": [
@@ -1442,15 +1442,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 13929,
+          "total": 13926,
           "active": 480,
-          "passive": 13449
+          "passive": 13446
         },
         {
           "key": "bot",
-          "total": 6124,
+          "total": 6127,
           "active": 0,
-          "passive": 6124
+          "passive": 6127
         },
         {
           "key": "fresh",
@@ -1591,17 +1591,7 @@
     },
     "decisions": [
       {
-        "at": 1792545912065,
-        "symbol": "Trencher",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -40% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792545842299,
+        "at": 1792546453030,
         "symbol": "JUP",
         "action": "skip",
         "basket": "big",
@@ -1619,25 +1609,35 @@
         "reason": "Dilewati karena red flag: likuiditas cuma 0.0% dari market cap."
       },
       {
-        "at": 1792545791880,
+        "at": 1792546396140,
+        "symbol": "WSOLP",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 49%."
+      },
+      {
+        "at": 1792546395483,
         "symbol": "Kimchi",
         "action": "skip",
         "basket": "big",
         "wallets": {
-          "smart": 16,
+          "smart": 15,
           "dolphin": 1
         },
         "flags": [
           {
             "type": "blacklist",
-            "count": 30,
-            "note": "30 wallet blacklist kita ikut membeli (tidak dihitung)"
+            "count": 31,
+            "note": "31 wallet blacklist kita ikut membeli (tidak dihitung)"
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma 1.7% dari market cap."
       },
       {
-        "at": 1792545767699,
+        "at": 1792546374577,
         "symbol": "CARDS",
         "action": "skip",
         "basket": "big",
@@ -1654,7 +1654,7 @@
         "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
-        "at": 1792545746109,
+        "at": 1792546349575,
         "symbol": "TJR",
         "action": "skip",
         "basket": "mid",
@@ -1662,6 +1662,33 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: 10 holder terbesar pegang 83%."
+      },
+      {
+        "at": 1792546298036,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 5,
+            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -33% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792545912065,
+        "symbol": "Trencher",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -40% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
         "at": 1792545690249,
@@ -2395,44 +2422,17 @@
           "smart": 3
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 38%."
-      },
-      {
-        "at": 1792539710316,
-        "symbol": "ORACLE7",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
-      },
-      {
-        "at": 1792539615023,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -74% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 63,
+        "below_entry": 64,
         "no_pullback": 0,
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 513,
+        "red_flag": 515,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2484,7 +2484,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792546335432,
+    "generatedAt": 1792546633717,
     "trades": {
       "count": 150,
       "wins": 62,
