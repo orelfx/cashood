@@ -1,9 +1,9 @@
 {
   "fund": "dgsol",
   "schemaVersion": 2,
-  "generation": "5a20e6d5-2a5e-404c-9038-80c85a326381",
-  "updatedAt": 1792602925000,
-  "generatedAt": "2026-10-22 00:15 WIB",
+  "generation": "6ed49bbe-5e6a-4013-a62d-6c5ee1088056",
+  "updatedAt": 1792603230000,
+  "generatedAt": "2026-10-22 00:20 WIB",
   "usdIdr": null,
   "totalUsd": 529.773,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": -28.1,
       "entryPriceUsd": 0.00017551699762849014,
       "priceUsd": 0.0001262,
-      "ageMinutes": 2783,
+      "ageMinutes": 2788,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -60,7 +60,7 @@
       "pnlPct": -10.83,
       "entryPriceUsd": 0.00007214589045089647,
       "priceUsd": 0.00006433,
-      "ageMinutes": 1436,
+      "ageMinutes": 1441,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -86,7 +86,7 @@
       "pnlPct": -3.3,
       "entryPriceUsd": 0.0008045667502271757,
       "priceUsd": 0.000778,
-      "ageMinutes": 1220,
+      "ageMinutes": 1225,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -112,7 +112,7 @@
       "pnlPct": 22.01,
       "entryPriceUsd": 0.000024145356190138823,
       "priceUsd": 0.00002946,
-      "ageMinutes": 1060,
+      "ageMinutes": 1065,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -138,7 +138,7 @@
       "pnlPct": -8.09,
       "entryPriceUsd": 0.000030998077400942254,
       "priceUsd": 0.00002849,
-      "ageMinutes": 1040,
+      "ageMinutes": 1045,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -520,7 +520,7 @@
     "pnlUsd": -470.227,
     "paused": false,
     "startedAt": 1791029940000,
-    "heartbeatAt": 1792602925000,
+    "heartbeatAt": 1792603230000,
     "status": "running",
     "healthy": true,
     "peakUsd": 1806.3426,
@@ -591,7 +591,7 @@
       ],
       [
         "keputusan copydesk",
-        "48 copy · 661 skip sejak 17 Okt 16:02 WIB"
+        "48 copy · 664 skip sejak 17 Okt 16:02 WIB"
       ],
       [
         "ditolak judge",
@@ -599,7 +599,7 @@
       ],
       [
         "diblok cek aman",
-        "32 · terakhir MUSK4 21/10 23:50 WIB: mint authority open; danger: Creator history of rugged tokens; danger: M"
+        "34 · terakhir requests 22/10 00:17 WIB: top10 non-pool 30.3% > 30%"
       ],
       [
         "leader aktif",
@@ -607,7 +607,7 @@
       ],
       [
         "sinyal masuk",
-        "704 · 420 dari leader, 284 dari radar"
+        "707 · 423 dari leader, 284 dari radar"
       ]
     ],
     "requirements": [
@@ -625,6 +625,27 @@
   "copyTrade": {
     "wallets": null,
     "decisions": [
+      {
+        "at": 1792603069000,
+        "symbol": "requests",
+        "action": "skip",
+        "basket": "Leader R",
+        "reason": "safety: top10 non-pool 30.3% > 30%"
+      },
+      {
+        "at": 1792603048000,
+        "symbol": "tanpa simbol",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
+      },
+      {
+        "at": 1792603047000,
+        "symbol": "LCMM",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "safety: top10 non-pool 68.4% > 30%"
+      },
       {
         "at": 1792602011000,
         "symbol": "✋",
@@ -953,35 +974,14 @@
         "action": "skip",
         "basket": "Leader M",
         "reason": "fact cut: liquidity not reported (bonding curve?) - exits can't be modeled; market cap unknown"
-      },
-      {
-        "at": 1792590832000,
-        "symbol": "s/acc",
-        "action": "skip",
-        "basket": "radar",
-        "reason": "fact cut: pool age 0.23h < 0.25h"
-      },
-      {
-        "at": 1792590419000,
-        "symbol": "tanpa simbol",
-        "action": "skip",
-        "basket": "Leader P",
-        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
-      },
-      {
-        "at": 1792590418000,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "Leader O",
-        "reason": "fact cut: pump.fun coin mcap $7,305 outside $10k-$1M"
       }
     ],
     "reasonStats": {
       "skip": {
-        "fact cut": 97,
+        "fact cut": 96,
         "lainnya": 4,
         "jeda 24 jam": 9,
-        "cek aman gagal": 17,
+        "cek aman gagal": 19,
         "buku penuh": 98,
         "beli leader terlalu kecil": 2,
         "sudah pegang": 4
@@ -994,7 +994,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792603061144,
+    "generatedAt": 1792603337728,
     "trades": {
       "count": 74,
       "wins": 30,
