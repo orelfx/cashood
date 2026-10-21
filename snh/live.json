@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b0f67836-e5db-4a26-959a-8b4c10a4735b",
-  "updatedAt": 1792597292568,
-  "generatedAt": "2026-10-21 22:41 WIB",
+  "generation": "c21a2135-ac37-4b63-a252-5b7c431d5fee",
+  "updatedAt": 1792597593023,
+  "generatedAt": "2026-10-21 22:46 WIB",
   "usdIdr": null,
   "totalUsd": 923.8881329647544,
   "nativeSymbol": "SOL",
@@ -1318,12 +1318,12 @@
     "pnlUsd": -76.11186703524561,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792597292568,
+    "heartbeatAt": 1792597593023,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.47,
-    "lastScanAt": 1792597280000,
+    "lastScanAt": 1792597586000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1360,9 +1360,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792597292568,
+      "lastDecisionAt": 1792597593023,
       "lastAction": "keputusan",
-      "lastReason": "Kimchi [big]: Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
+      "lastReason": "SPCX [mid]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1393,7 +1393,7 @@
       ],
       [
         "Label wallet",
-        "smart 14429 · bot 6363 · blacklist 444 · lp 1 · fresh 1275 · kol 218 · dolphin 250 · whale 13 · unknown 40"
+        "smart 14456 · bot 6372 · blacklist 444 · lp 1 · fresh 1279 · kol 217 · dolphin 251 · whale 13"
       ]
     ],
     "requirements": [
@@ -1449,21 +1449,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14429,
+          "total": 14456,
           "active": 445,
-          "passive": 13984
+          "passive": 14011
         },
         {
           "key": "bot",
-          "total": 6363,
+          "total": 6372,
           "active": 0,
-          "passive": 6363
+          "passive": 6372
         },
         {
           "key": "fresh",
-          "total": 1275,
+          "total": 1279,
           "active": 0,
-          "passive": 1275
+          "passive": 1279
         },
         {
           "key": "blacklist",
@@ -1473,21 +1473,15 @@
         },
         {
           "key": "dolphin",
-          "total": 250,
+          "total": 251,
           "active": 25,
-          "passive": 225
+          "passive": 226
         },
         {
           "key": "kol",
-          "total": 218,
+          "total": 217,
           "active": 12,
-          "passive": 206
-        },
-        {
-          "key": "unknown",
-          "total": 40,
-          "active": 0,
-          "passive": 40
+          "passive": 205
         },
         {
           "key": "whale",
@@ -1604,6 +1598,40 @@
     },
     "decisions": [
       {
+        "at": 1792597582500,
+        "symbol": "SPCX",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792597473856,
+        "symbol": "PUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 6
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: unsupported_extension."
+      },
+      {
         "at": 1792597288144,
         "symbol": "Kimchi",
         "action": "skip",
@@ -1619,23 +1647,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
-      },
-      {
-        "at": 1792596868043,
-        "symbol": "PUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 5
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: unsupported_extension."
       },
       {
         "at": 1792596697433,
@@ -2390,16 +2401,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 32%."
-      },
-      {
-        "at": 1792583160526,
-        "symbol": "XMR",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
       }
     ],
     "reasonStats": {
@@ -2460,7 +2461,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792597342956,
+    "generatedAt": 1792597633715,
     "trades": {
       "count": 151,
       "wins": 63,
