@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d86f91c0-21be-40b5-bc37-ad82ea5a1c28",
-  "updatedAt": 1792611807961,
-  "generatedAt": "2026-10-22 02:43 WIB",
+  "generation": "85d58419-0160-47ae-9d0f-9f1efb93f7aa",
+  "updatedAt": 1792612110025,
+  "generatedAt": "2026-10-22 02:48 WIB",
   "usdIdr": null,
-  "totalUsd": 912.8851906024727,
+  "totalUsd": 909.4510237607279,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 912.8851906024727,
+  "botWalletUsd": 909.4510237607279,
   "walletUsd": 907.2652075539928,
-  "lpUsd": 5.61998305,
+  "lpUsd": 2.18581621,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 16.472925410761572,
       "investedUsd": 16.472925410761572,
-      "principalUsd": 5.61998305,
-      "valueUsd": 5.61998305,
+      "principalUsd": 2.18581621,
+      "valueUsd": 2.18581621,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -10.852942362281734,
-      "pnlPct": -65.88,
+      "pnlUsd": -14.287109204026466,
+      "pnlPct": -86.73,
       "entryPriceUsd": 0.00025487611730350503,
-      "priceUsd": 0.00009144836967469061,
-      "ageMinutes": 6,
+      "priceUsd": 0.00003703396444868435,
+      "ageMinutes": 11,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -86,7 +86,7 @@
       "firstWallet": "smart #5717",
       "llmScore": 76,
       "peakPct": 22.43,
-      "ddPct": -64.37,
+      "ddPct": -86.96,
       "stale": false
     }
   ],
@@ -1382,18 +1382,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 907.2652075539928,
-    "positionsUsd": 5.61998305,
+    "positionsUsd": 2.18581621,
     "realizedUsd": -76.26186704,
-    "unrealizedUsd": -10.85294236,
-    "pnlUsd": -87.11480939752732,
+    "unrealizedUsd": -14.2871092,
+    "pnlUsd": -90.54897623927206,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792611807961,
+    "heartbeatAt": 1792612110025,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 9.56,
-    "lastScanAt": 1792611796000,
+    "drawdownPct": 9.9,
+    "lastScanAt": 1792612054000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1408,13 +1408,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$10.8529",
+        "v": "−$14.2871",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "685",
+        "v": "684",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1430,9 +1430,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792611807961,
+      "lastDecisionAt": 1792612110025,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      "lastReason": "KIMCHI [low]: Dilewati karena red flag: bundler pegang 79.17% supply."
     }
   },
   "strategy": {
@@ -1473,7 +1473,7 @@
       ],
       [
         "low (core)",
-        "alokasi 20% · $183 · kursi 5–20% basket · maks 4% equity · 1 terbuka"
+        "alokasi 20% · $182 · kursi 5–20% basket · maks 4% equity · 1 terbuka"
       ],
       [
         "mid (core)",
@@ -1481,7 +1481,7 @@
       ],
       [
         "big (core)",
-        "alokasi 20% · $183 · kursi 7–25% basket · maks 5% equity · 0 terbuka"
+        "alokasi 20% · $182 · kursi 7–25% basket · maks 5% equity · 0 terbuka"
       ]
     ],
     "requirementsTitle": "Basket modal",
@@ -1667,6 +1667,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792612052054,
+        "symbol": "KIMCHI",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 79.17% supply."
+      },
       {
         "at": 1792611580145,
         "symbol": "CARDS",
@@ -2604,16 +2614,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -11% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792605114002,
-        "symbol": "YouTube",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "whale": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
       }
     ],
     "reasonStats": {
@@ -2624,7 +2624,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 574,
+        "red_flag": 573,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2674,7 +2674,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792612041472,
+    "generatedAt": 1792612351248,
     "trades": {
       "count": 151,
       "wins": 63,
@@ -2715,34 +2715,34 @@
     "equity": {
       "days": 16,
       "spanDays": 15.8,
-      "returnPct": -7.75,
-      "maxDrawdownPct": 7.75,
-      "maxDrawdownAt": 1792611807961,
-      "maxDrawdownUsd": 76.74,
+      "returnPct": -8.1,
+      "maxDrawdownPct": 8.1,
+      "maxDrawdownAt": 1792612110025,
+      "maxDrawdownUsd": 80.18,
       "maxDrawdownPeakUsd": 989.63,
-      "maxDrawdownTroughUsd": 912.89,
-      "currentDrawdownPct": 7.75,
-      "currentDrawdownUsd": 76.74,
+      "maxDrawdownTroughUsd": 909.45,
+      "currentDrawdownPct": 8.1,
+      "currentDrawdownUsd": 80.18,
       "positiveDaysPct": 43.75,
       "bestDayPct": 0.83,
       "worstDayPct": -3.87,
-      "sharpe": -7.79,
-      "sortino": -7.69,
+      "sharpe": -8.04,
+      "sortino": -7.88,
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -87.11,
-    "profitPct": -8.71,
-    "recoveryFactor": -1.14,
+    "profitUsd": -90.55,
+    "profitPct": -9.05,
+    "recoveryFactor": -1.13,
     "score": {
       "axes": {
         "winRate": 42.28,
         "profitFactor": 0,
-        "risk": 80.63,
+        "risk": 79.75,
         "recovery": 0,
         "consistency": 43.75
       },
-      "overall": 33.33,
+      "overall": 33.16,
       "complete": true
     }
   }
