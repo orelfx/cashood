@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f9743c08-f010-4709-bc1c-d04d1ce87185",
-  "updatedAt": 1792544693329,
-  "generatedAt": "2026-10-21 08:04 WIB",
+  "generation": "836a5baa-205b-401f-b9b7-89bfcb93d625",
+  "updatedAt": 1792544993406,
+  "generatedAt": "2026-10-21 08:09 WIB",
   "usdIdr": null,
   "totalUsd": 923.5592206959575,
   "nativeSymbol": "SOL",
@@ -1311,12 +1311,12 @@
     "pnlUsd": -76.44077930404251,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792544693329,
+    "heartbeatAt": 1792544993406,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.51,
-    "lastScanAt": 1792544690000,
+    "lastScanAt": 1792544981000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1343,7 +1343,7 @@
       {
         "k": "Wallet dipantau",
         "v": "22214",
-        "n": "514 aktif"
+        "n": "513 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1353,9 +1353,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792544693329,
+      "lastDecisionAt": 1792544993406,
       "lastAction": "keputusan",
-      "lastReason": "JUP [big]: Dilewati karena red flag: likuiditas cuma 0.0% dari market cap."
+      "lastReason": "CUPSEY [degen]: Dilewati: harga sudah -94% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1374,7 +1374,7 @@
       ],
       [
         "Wallet dipantau",
-        "22214 · 514 aktif"
+        "22214 · 513 aktif"
       ],
       [
         "Cadangan kas",
@@ -1386,7 +1386,7 @@
       ],
       [
         "Label wallet",
-        "smart 13930 · bot 6121 · blacklist 438 · lp 1 · fresh 1208 · kol 214 · dolphin 293 · whale 9"
+        "smart 13935 · bot 6118 · blacklist 438 · lp 1 · fresh 1207 · kol 214 · dolphin 292 · whale 9"
       ]
     ],
     "requirements": [
@@ -1435,28 +1435,28 @@
   "copyTrade": {
     "wallets": {
       "tracked": 22214,
-      "active": 514,
-      "passive": 21700,
+      "active": 513,
+      "passive": 21701,
       "trusted": 0,
       "promising": 30,
       "byLabel": [
         {
           "key": "smart",
-          "total": 13930,
-          "active": 481,
-          "passive": 13449
+          "total": 13935,
+          "active": 480,
+          "passive": 13455
         },
         {
           "key": "bot",
-          "total": 6121,
+          "total": 6118,
           "active": 0,
-          "passive": 6121
+          "passive": 6118
         },
         {
           "key": "fresh",
-          "total": 1208,
+          "total": 1207,
           "active": 0,
-          "passive": 1208
+          "passive": 1207
         },
         {
           "key": "blacklist",
@@ -1466,9 +1466,9 @@
         },
         {
           "key": "dolphin",
-          "total": 293,
+          "total": 292,
           "active": 22,
-          "passive": 271
+          "passive": 270
         },
         {
           "key": "kol",
@@ -1590,6 +1590,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792544789656,
+        "symbol": "CUPSEY",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -94% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792544713673,
+        "symbol": "NVIDIA",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1,
+          "whale": 1
+        },
+        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
+      },
       {
         "at": 1792544631157,
         "symbol": "JUP",
@@ -2440,86 +2461,17 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 3x."
-      },
-      {
-        "at": 1792539112714,
-        "symbol": "CHROME",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 127,
-            "note": "bundler pegang 18.6%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 3.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 78,
-            "note": "7.5% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792539057299,
-        "symbol": "FTR",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 26.7%"
-          },
-          {
-            "type": "rat",
-            "count": 9,
-            "note": "insider/entrapment pegang 11.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 58,
+        "below_entry": 59,
         "no_pullback": 0,
         "wallet_left": 2,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 509,
+        "red_flag": 508,
         "round_trip_cost": 2,
         "basket_full": 0,
         "slippage": 0,
@@ -2571,7 +2523,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792544833770,
+    "generatedAt": 1792545133942,
     "trades": {
       "count": 150,
       "wins": 62,
@@ -2611,7 +2563,7 @@
     },
     "equity": {
       "days": 15,
-      "spanDays": 15,
+      "spanDays": 15.1,
       "returnPct": -6.68,
       "maxDrawdownPct": 7.15,
       "maxDrawdownAt": 1792004333022,
