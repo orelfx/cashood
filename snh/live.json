@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "9e9af401-60b9-4052-b8a0-6771fbbab9c7",
-  "updatedAt": 1792616343800,
-  "generatedAt": "2026-10-22 03:59 WIB",
+  "generation": "b80d73ef-50f0-414a-b7b2-25575cabadb7",
+  "updatedAt": 1792616647739,
+  "generatedAt": "2026-10-22 04:04 WIB",
   "usdIdr": null,
   "totalUsd": 923.7381329647544,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.00025487611730350503,
-      "ageMinutes": 82,
+      "ageMinutes": 87,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1387,12 +1387,12 @@
     "pnlUsd": -76.26186703524559,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792616343800,
+    "heartbeatAt": 1792616647739,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.49,
-    "lastScanAt": 1792616337000,
+    "lastScanAt": 1792616632000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1419,7 +1419,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "679",
+        "v": "680",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1435,9 +1435,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792616343800,
+      "lastDecisionAt": 1792616647739,
       "lastAction": "keputusan",
-      "lastReason": "KIMCHI [low]: Dilewati karena red flag: bundler pegang 79.17% supply."
+      "lastReason": "MoonMe [low]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1673,6 +1673,109 @@
     },
     "decisions": [
       {
+        "at": 1792616530830,
+        "symbol": "MoonMe",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 371,
+            "note": "bundler pegang 28.9%"
+          },
+          {
+            "type": "rat",
+            "count": 4,
+            "note": "insider/entrapment pegang 1.1%"
+          },
+          {
+            "type": "fresh",
+            "count": 380,
+            "note": "11.5% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 10x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792616521387,
+        "symbol": "AgenC",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 48%."
+      },
+      {
+        "at": 1792616442864,
+        "symbol": "PCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792616436942,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
+        "at": 1792616425100,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 12,
+            "note": "12 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
         "at": 1792616156260,
         "symbol": "KIMCHI",
         "action": "skip",
@@ -1708,33 +1811,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792615910650,
-        "symbol": "AgenC",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 48%."
-      },
-      {
-        "at": 1792615834212,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792615818235,
@@ -2489,49 +2565,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 34%."
-      },
-      {
-        "at": 1792608369489,
-        "symbol": "Glow",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
-      },
-      {
-        "at": 1792608365360,
-        "symbol": "NEURALINK",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1792608358467,
-        "symbol": "SPCX",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 108,
+        "below_entry": 109,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
@@ -2588,7 +2627,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792616547935,
+    "generatedAt": 1792616843991,
     "trades": {
       "count": 151,
       "wins": 63,
