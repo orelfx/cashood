@@ -41,7 +41,7 @@ function wait(reason, asOf = null) { out({ ...base, status: 'waiting', reason, a
 try {
   if (!existsSync(SRC)) wait('menunggu data on-chain (uji $50 belum jalan)');
   // Tab tetap menunggu sampai Master menyatakan uji $50 lulus: operator membuat
-  // berkas data/gmsol/test-passed.local (tidak terbit) setelah konfirmasi itu.
+  // berkas data/gmsol/test-passed.local (tidak terbit) HANYA setelah uji $50 lulus DAN spec v2.2 + pin selesai (syarat Auditor).
   if (!existsSync(resolve(DIR, 'test-passed.local'))) wait('menunggu uji $50 lulus');
   let j; try { j = JSON.parse(readFileSync(SRC, 'utf8')); } catch { wait('berkas sumber rusak'); }
   if (j?.fund !== 'gmsol' || j?.mode !== 'live') wait('berkas sumber bukan mode live');
@@ -55,7 +55,7 @@ try {
     symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) }));
   const b = j.brakes || {};
   out({ ...base, status: 'ok', asOf, t0At: time(j.t0At), spec: text(j.spec, 40),
-    t0InfoUsd: r2(j.t0EquityUsd), brakeFloorUsd: 1020,
+    t0InfoUsd: r2(j.live_t0_measured ?? j.t0EquityUsd), brakeFloorUsd: 1020,
     equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
     walletUsd: r2(j.walletUsd), lpUsd: r2(j.lpUsd), tokensUsd: r2(j.tokensUsd),
     sizing: { sizeUsd: r2(j.sizing?.sizeUsd), maxOpen: num(j.sizing?.maxOpen) },
