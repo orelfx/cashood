@@ -2769,7 +2769,7 @@ function renderSafebox() {
       <section class="card">
         <div class="card-head">
           <h2>Safe Box</h2>
-          <span class="hint">${esc(d.venue || '')} · diperbarui ${ago(d.updatedAt)}${Date.now()-d.updatedAt > 45*60000 ? ' · data terlambat' : ''}</span>
+          <span class="hint">${[d.venue ? esc(d.venue) : '', `diperbarui ${ago(d.updatedAt)}`].filter(Boolean).join(' · ')}${Date.now()-d.updatedAt > 45*60000 ? ' · data terlambat' : ''}</span>
         </div>
         <div class="sb-head">
           <div class="sb-main">
@@ -2953,6 +2953,8 @@ function showSafebox() {
   $('#tab-analisa').hidden = true;
   $('#tab-update').hidden = true;
   $('#tab-safebox').hidden = false;
+  // Strip status milik dana (saldo token / nilai LP / bagi hasil) tidak berlaku untuk Safe Box.
+  if ($('#strip')) $('#strip').hidden = true;
   renderFundBar();
   if (location.hash !== '#safebox') history.replaceState(null, '', '#safebox');
   queueMicrotask(() => document.dispatchEvent(new Event('cashood:view-change')));
@@ -3584,6 +3586,14 @@ async function renderDuel(key) {
       <p class="hint">Data diperbarui tiap 5 menit begitu mesin paper berjalan.</p></section>`);
     return;
   }
+  // Data basi (> 20 menit, dari exporter atau dihitung di sini): tanpa angka —
+  // angka lama tidak boleh tampil seolah masih berjalan.
+  if (d.stale || !d.updatedAt || Date.now() - d.updatedAt > 20 * 60e3) {
+    setHTML(body, `<section class="card"><div class="card-head"><h2>${esc(cfg.title)}</h2><span class="pill sim">dry run · kertas</span></div>
+      <p class="miss" role="status"><b>Data tertunda.</b> Mesin paper terakhir mengirim data ${d.updatedAt ? `${esc(tglRingkas(d.updatedAt))} WIB (${esc(ago(d.updatedAt))})` : 'pada waktu yang tidak diketahui'}. Angka tidak ditampilkan sampai data baru masuk.</p>
+      <p class="hint">Data diperbarui tiap 5 menit begitu mesin paper berjalan lagi.</p></section>`);
+    return;
+  }
   if (key === 'gm') { gmView.last = { d, nav }; paintGm(); return; }
   const COLOR = { mirror: '#60a5fa', challenger: cfg.chal };
   const paper = cfg.books.map(([k, n]) => [k, n, COLOR[k], d[k]]);
@@ -3611,7 +3621,7 @@ async function renderDuel(key) {
     const tick = (t) => { const z = new Date(t + 7 * 3600e3); return t1 - t0 < 36 * 3600e3 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()}/${z.getUTCMonth() + 1}`; };
     chart = `<svg class="grr-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Persen sejak awal: ${esc(books.map(([, n]) => n).join(', '))}">
       <line x1="${m.l}" x2="${W - m.r}" y1="${y(0).toFixed(1)}" y2="${y(0).toFixed(1)}" class="g-base"/>
-      ${[hi - pad, 0, lo + pad].map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${v > 0 ? '+' : ''}${v.toFixed(2)}%</text>`).join('')}
+      ${[0, hi - pad, lo + pad].filter((v, i, a) => !a.slice(0, i).some((u) => Math.abs(y(u) - y(v)) < 14)).map((v) => `<text x="${W - m.r + 6}" y="${(y(v) + 4).toFixed(1)}" class="g-lbl">${v > 0 ? '+' : ''}${v.toFixed(2)}%</text>`).join('')}
       ${books.map(([k, , c]) => `<path d="${line(k)}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`).join('')}
       ${[t0, t1].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)}</text>`).join('')}
     </svg>`;
