@@ -1,21 +1,21 @@
 {
   "fund": "charon",
-  "updatedAt": 1792618607382,
-  "generatedAt": "2026-10-22 04:36 WIB",
+  "updatedAt": 1792618909053,
+  "generatedAt": "2026-10-22 04:41 WIB",
   "usdIdr": null,
   "nativeSymbol": "ETH",
   "nativePrice": 2497.67,
   "ethPrice": 2497.67,
-  "totalUsd": 1120.13,
-  "botWalletUsd": 1120.13,
-  "walletUsd": 1120.13,
-  "lpUsd": 0,
+  "totalUsd": 1120.31,
+  "botWalletUsd": 1120.31,
+  "walletUsd": 1117,
+  "lpUsd": 3.31,
   "holdings": [
     {
       "symbol": "USDG",
-      "amount": 1120.13,
+      "amount": 1117,
       "price": 1,
-      "usd": 1120.13
+      "usd": 1117
     }
   ],
   "positions": [
@@ -36,20 +36,52 @@
       "stopPct": 25,
       "targetPct": 40,
       "maxHoldHours": 1.5,
-      "ageMinutes": 690,
+      "ageMinutes": 695,
       "amount": 25456.219873393504,
       "priceUsd": 0,
       "entryPriceUsd": 0.00015496769334252757,
       "partialDone": false,
       "bestPct": 0.72,
       "worstPct": -100,
-      "markedAt": 1792618600124,
+      "markedAt": 1792618887942,
       "stale": false,
       "thesis": "106 independently scored wallets bought within the low consensus window; copy their entry.",
       "valueUsd": 0,
       "pnlUsd": -4.09,
       "totalFeesUsd": -0.15,
       "tokenId": "pos-248e220dab7308ffc584"
+    },
+    {
+      "symbol": "BOUNCE",
+      "band": "low",
+      "horizon": "scalp",
+      "bookLabel": "scalp · low cap",
+      "strategy": "copy_consensus",
+      "experimental": true,
+      "principalUsd": 3.31,
+      "feesUsd": 0,
+      "investedUsd": 3.16,
+      "collectedFeesUsd": 0.03,
+      "costUsd": 6.31,
+      "realizedUsd": 0.03,
+      "pnlPct": 2.88,
+      "stopPct": 25,
+      "targetPct": 40,
+      "maxHoldHours": 1.5,
+      "ageMinutes": 5,
+      "amount": 4738.531571975025,
+      "priceUsd": 0.0006988905633944471,
+      "entryPriceUsd": 0.0006658625698857388,
+      "partialDone": false,
+      "bestPct": 12.4,
+      "worstPct": -14.12,
+      "markedAt": 1792618888597,
+      "stale": false,
+      "thesis": "3 independently scored wallets bought within the low consensus window; copy their entry.",
+      "valueUsd": 3.31,
+      "pnlUsd": 0.18,
+      "totalFeesUsd": 0.03,
+      "tokenId": "pos-f627e930cb722c0e73a8"
     }
   ],
   "history": [
@@ -210,7 +242,7 @@
   "historyNote": "hasil trade simulasi yang sudah ditutup, bersih setelah biaya swap dan jaringan yang dimodelkan",
   "stats": {
     "closedCount": 278,
-    "openCount": 1,
+    "openCount": 2,
     "graded": 270,
     "wins": 51,
     "losses": 219,
@@ -453,40 +485,40 @@
     "paper": true,
     "mode": "dry_run",
     "initialUsd": 1500,
-    "cashUsd": 1120.13,
-    "positionsUsd": 0,
-    "realizedUsd": -375.92,
-    "unrealizedUsd": -3.94,
-    "modeledFeesUsd": 147.03,
+    "cashUsd": 1117,
+    "positionsUsd": 3.31,
+    "realizedUsd": -375.9,
+    "unrealizedUsd": -3.79,
+    "modeledFeesUsd": 147.12,
     "peakUsd": 1183.97,
-    "drawdownPct": 5.39,
+    "drawdownPct": 5.38,
     "dayStartUsd": 1128.01,
     "paused": false,
     "startedAt": 1790405776427,
-    "status": "healthy",
+    "status": "attention",
     "processStatus": "online",
-    "heartbeatAt": 1792618601694,
+    "heartbeatAt": 1792618903629,
     "lastScanAt": 1792618533088,
     "cashPeg": 0.9993408603,
     "llm": {
       "model": "MiniMax-M3",
       "calls24h": 135,
       "dailyBudget": 96,
-      "lastDecisionAt": 1792617990224,
+      "lastDecisionAt": 1792618676214,
       "lastAction": "WAIT",
-      "lastReason": "No candidate clears the 65-confidence threshold with a testable setup. PONS shows decelerating volume (volumeAccelH1 0.78x, volumeAccel15m 0.75x) despite positive price drift. HOOKR is a falling knife (h1 -2.96%, h6 -9.27%) with only a short-window bounce, not a confirmed recovery. CASHCAT is range-bound with m5=0 trades. ORBIO is INELIGIBLE — dangerousActi…"
+      "lastReason": "No candidate meets 65+ confidence: ORBIO has dangerous wallets active + whale_selling -$60k (veto); HOOKR shows falling-knife (-10.33% h6, net wallet outflow -$23.5k); CASHCAT h1 volume collapsed -65.7% on weak recovery; PONS multi-window uptrend but volume/buyer growth decelerating (h1 volGrowth -7.2%, buyersGrowth -13.5%) - net target 12.75% requires ~17%…"
     },
     "activity24h": {
       "scans": 142,
       "decisions": 90,
       "quotesRejected": 63,
       "entriesRejected": 3,
-      "buys": 3,
-      "sells": 4
+      "buys": 4,
+      "sells": 5
     }
   },
   "schemaVersion": 2,
-  "generation": "4890aeba-925e-4e03-9dd7-43a383231424",
+  "generation": "8d767e21-3ecf-4c7c-9319-92563bac4f77",
   "treasuryUsd": 0,
   "quality": {
     "complete": true,
@@ -494,7 +526,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792618607897,
+    "generatedAt": 1792618909527,
     "trades": {
       "count": 278,
       "wins": 51,
@@ -542,8 +574,8 @@
       "maxDrawdownPeakUsd": 500,
       "maxDrawdownTroughUsd": 1120.13,
       "currentDrawdownPct": 69.66,
-      "currentDrawdownUsd": 2572.11,
-      "positiveDaysPct": 8,
+      "currentDrawdownUsd": 2571.93,
+      "positiveDaysPct": 12,
       "bestDayPct": 0.07,
       "worstDayPct": -27.69,
       "sharpe": -10.64,
@@ -551,8 +583,8 @@
       "calmar": null,
       "since": 1790467193741
     },
-    "profitUsd": -379.87,
-    "profitPct": -25.32,
+    "profitUsd": -379.69,
+    "profitPct": -25.31,
     "recoveryFactor": -1.09,
     "score": {
       "axes": {
@@ -560,9 +592,9 @@
         "profitFactor": 0,
         "risk": 0,
         "recovery": 0,
-        "consistency": 8
+        "consistency": 12
       },
-      "overall": 5.38,
+      "overall": 6.18,
       "complete": true
     }
   },
