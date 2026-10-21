@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "def74822-f42f-439a-8dc3-f34be47064e3",
-  "updatedAt": 1792591482331,
-  "generatedAt": "2026-10-21 21:04 WIB",
+  "generation": "09d9e411-300d-47e8-8d80-7313d0ab3a15",
+  "updatedAt": 1792591756096,
+  "generatedAt": "2026-10-21 21:09 WIB",
   "usdIdr": null,
   "totalUsd": 923.8881329647544,
   "nativeSymbol": "SOL",
@@ -1318,12 +1318,12 @@
     "pnlUsd": -76.11186703524561,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792591482331,
+    "heartbeatAt": 1792591756096,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.47,
-    "lastScanAt": 1792591474000,
+    "lastScanAt": 1792591748000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1344,13 +1344,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "666",
+        "v": "669",
         "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "22751",
-        "n": "492 aktif"
+        "v": "22792",
+        "n": "489 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1360,9 +1360,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792591482331,
+      "lastDecisionAt": 1792591756096,
       "lastAction": "keputusan",
-      "lastReason": "ALPENGLOW [low]: Dilewati: harga sudah -48% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "MSTRx [big]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1381,7 +1381,7 @@
       ],
       [
         "Wallet dipantau",
-        "22751 · 492 aktif"
+        "22792 · 489 aktif"
       ],
       [
         "Cadangan kas",
@@ -1393,7 +1393,7 @@
       ],
       [
         "Label wallet",
-        "smart 14286 · bot 6274 · blacklist 442 · lp 1 · fresh 1257 · kol 216 · dolphin 263 · whale 12"
+        "smart 14285 · bot 6275 · blacklist 442 · lp 1 · fresh 1257 · kol 217 · dolphin 263 · whale 12 · unknown 40"
       ]
     ],
     "requirements": [
@@ -1441,23 +1441,23 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 22751,
-      "active": 492,
-      "passive": 22259,
+      "tracked": 22792,
+      "active": 489,
+      "passive": 22303,
       "trusted": 0,
       "promising": 23,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14286,
-          "active": 450,
-          "passive": 13836
+          "total": 14285,
+          "active": 447,
+          "passive": 13838
         },
         {
           "key": "bot",
-          "total": 6274,
+          "total": 6275,
           "active": 0,
-          "passive": 6274
+          "passive": 6275
         },
         {
           "key": "fresh",
@@ -1479,9 +1479,15 @@
         },
         {
           "key": "kol",
-          "total": 216,
+          "total": 217,
           "active": 12,
-          "passive": 204
+          "passive": 205
+        },
+        {
+          "key": "unknown",
+          "total": 40,
+          "active": 0,
+          "passive": 40
         },
         {
           "key": "whale",
@@ -1598,17 +1604,17 @@
     },
     "decisions": [
       {
-        "at": 1792591263779,
-        "symbol": "ALPENGLOW",
+        "at": 1792591749932,
+        "symbol": "MSTRx",
         "action": "skip",
-        "basket": "low",
+        "basket": "big",
         "wallets": {
           "smart": 1
         },
-        "reason": "Dilewati: harga sudah -48% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
       },
       {
-        "at": 1792591192742,
+        "at": 1792591749177,
         "symbol": "Kimchi",
         "action": "skip",
         "basket": "big",
@@ -1618,11 +1624,95 @@
         "flags": [
           {
             "type": "blacklist",
-            "count": 15,
-            "note": "15 wallet blacklist kita ikut membeli (tidak dihitung)"
+            "count": 18,
+            "note": "18 wallet blacklist kita ikut membeli (tidak dihitung)"
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
+      },
+      {
+        "at": 1792591632521,
+        "symbol": "459653008",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 17%."
+      },
+      {
+        "at": 1792591594142,
+        "symbol": "KIMCHICOLL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 70.18% supply."
+      },
+      {
+        "at": 1792591487187,
+        "symbol": "459653000",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 20.1% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 446,
+            "note": "bundler pegang 46.8%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 6.3%"
+          },
+          {
+            "type": "fresh",
+            "count": 329,
+            "note": "11.1% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
+      {
+        "at": 1792591263779,
+        "symbol": "ALPENGLOW",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -48% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
         "at": 1792590668610,
@@ -2046,16 +2136,6 @@
         "reason": "Dilewati karena red flag: mint authority belum dilepas."
       },
       {
-        "at": 1792582657861,
-        "symbol": "MSTRx",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
         "at": 1792582657724,
         "symbol": "Laura",
         "action": "skip",
@@ -2363,43 +2443,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792573390382,
-        "symbol": "Charlie",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 77.57% supply."
-      },
-      {
-        "at": 1792573025480,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
-      },
-      {
-        "at": 1792572466768,
-        "symbol": "TILLY",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
       }
     ],
     "reasonStats": {
@@ -2410,7 +2453,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 574,
+        "red_flag": 577,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2460,7 +2503,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792591641174,
+    "generatedAt": 1792591939389,
     "trades": {
       "count": 151,
       "wins": 63,
