@@ -685,12 +685,15 @@ function renderDonut(rows) {
   const svg = $('#donut');
   const R = 78, C = 100, W = 22, circ = 2 * Math.PI * R;
   let offset = 0;
-  const parts = rows.filter((r) => r.share > 0);
+  // Pemilik yang sudah keluar bisa menyisakan pecahan unit super kecil dari
+  // pembulatan. Panjang busurnya (len − 1,5) jadi negatif → dasharray tidak
+  // valid → browser menggambar lingkaran PENUH dengan warna pemilik itu.
+  const parts = rows.filter((r) => (r.share / 100) * circ > 2);
   const bg = `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#1a1f27" stroke-width="${W}"/>`;
   const arcs = parts.map((r) => {
     const len = (r.share / 100) * circ;
     const seg = `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${r.color || '#4ade80'}"
-        stroke-width="${W}" stroke-dasharray="${len - 1.5} ${circ - len + 1.5}"
+        stroke-width="${W}" stroke-dasharray="${Math.max(0, len - 1.5)} ${circ - Math.max(0, len - 1.5)}"
         stroke-dashoffset="${-offset}" transform="rotate(-90 ${C} ${C})" stroke-linecap="butt"><title>${esc(r.name)} ${pct(r.share, 1)}</title></circle>`;
     offset += len;
     return seg;
