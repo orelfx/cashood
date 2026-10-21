@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e0eb8407-11d6-459a-8d5f-ec54bbc80246",
-  "updatedAt": 1792621177515,
-  "generatedAt": "2026-10-22 05:19 WIB",
+  "generation": "4aeb2f33-9154-408a-9e03-9c7a2376f77e",
+  "updatedAt": 1792621478608,
+  "generatedAt": "2026-10-22 05:24 WIB",
   "usdIdr": null,
   "totalUsd": 923.7381329647544,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.00025487611730350503,
-      "ageMinutes": 162,
+      "ageMinutes": 167,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1387,12 +1387,12 @@
     "pnlUsd": -76.26186703524559,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792621177515,
+    "heartbeatAt": 1792621478608,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.49,
-    "lastScanAt": 1792621144000,
+    "lastScanAt": 1792621466000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1435,9 +1435,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792621177515,
+      "lastDecisionAt": 1792621478608,
       "lastAction": "keputusan",
-      "lastReason": "PHP2SHELL [low]: Dilewati: explore: isolated virtual capital."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
     }
   },
   "strategy": {
@@ -1673,6 +1673,41 @@
     },
     "decisions": [
       {
+        "at": 1792621282266,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 5
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      },
+      {
+        "at": 1792621265984,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 11,
+            "note": "11 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
         "at": 1792620976572,
         "symbol": "PHP2SHELL",
         "action": "skip",
@@ -1724,23 +1759,6 @@
           "smart": 3
         },
         "reason": "Dilewati: rugcheck_danger:Large Amount of LP Unlocked."
-      },
-      {
-        "at": 1792620676433,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 5
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
       },
       {
         "at": 1792620660264,
@@ -2171,23 +2189,6 @@
         "reason": "Dilewati karena red flag: mint authority belum dilepas."
       },
       {
-        "at": 1792616425100,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 12,
-            "note": "12 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
         "at": 1792616156260,
         "symbol": "KIMCHI",
         "action": "skip",
@@ -2543,12 +2544,12 @@
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 113,
+        "below_entry": 114,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 552,
+        "red_flag": 551,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2600,7 +2601,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792621340840,
+    "generatedAt": 1792621632643,
     "trades": {
       "count": 151,
       "wins": 63,
