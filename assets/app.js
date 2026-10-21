@@ -5171,6 +5171,7 @@ function renderVisible() {
   else if (state.view === 'pemegang') renderPemegang().catch(() => {});
   else if (state.view === 'index') renderIndex().catch(() => {});
   else if (state.view === 'solbot') renderSolbot().catch(() => {});
+  else if (state.view === 'gmsol') renderGmsol().catch(() => {});
   else if (state.view === 'safebox') renderSafebox();
   else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
   else if (state.view === 'update') renderUpdates();
@@ -5208,6 +5209,7 @@ async function init() {
     if (view === 'grr') { showGrr(); return; }
     if (view === 'gm') { showGm(); return; }
     if (view === 'solbot') { showSolbot(); return; }
+    if (view === 'gmsol') { showGmsol(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
     if (view === 'update') { showUpdate(); return; }
@@ -5298,6 +5300,7 @@ async function init() {
     else if (state.view === 'pemegang') renderPemegang().catch(() => {});
     else if (state.view === 'index') renderIndex().catch(() => {});
     else if (state.view === 'solbot') renderSolbot().catch(() => {});
+    else if (state.view === 'gmsol') renderGmsol().catch(() => {});
     else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
     else if (state.view === 'safebox') renderSafebox();
     else if (state.view === 'update') renderUpdates();
