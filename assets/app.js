@@ -3142,14 +3142,31 @@ async function solbotBrief() {
   };
 }
 
+/* GMSOL (uang asli, medium risk, modal $1.200) ikut total aset begitu saldonya
+ * terbit (status ok, atau "pretest" = saldo saja sebelum uji $50 lulus).
+ * Data lebih dari 15 menit → tidak dijumlahkan, total ditandai sebagian. */
+async function gmsolBrief() {
+  if (!state.gmsol) return null;
+  const d = await loadGmsol().catch(() => null);
+  if (!d || !['ok', 'pretest'].includes(d.status) || !d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS || !(d.equityUsd >= 0)) return null;
+  const f = state.gmsol;
+  return {
+    id: 'gmsol', label: f.label, chain: f.chain || 'Solana', accent: f.accent, totalUsd: d.equityUsd,
+    depositedUsd: Number(d.capitalUsd) || 1200, pnlUsd: d.pnlUsd ?? null, updatedAt: d.asOf, risk: f.risk, paper: false,
+    flows: [], series: (d.equityCurve || []).map((p) => ({ t: p.t, usd: p.usd })),
+    owners: [], openCount: (d.openSeats || []).length, closedCount: (d.closes || []).length, winRate: null, gmsol: d,
+  };
+}
+
 /** Angka global yang sama untuk halaman Portofolio dan Beranda. */
 async function portoTotals() {
   const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
   const boxJob = state.safebox ? loadSafebox().catch(() => null) : Promise.resolve(null);   // bersamaan dengan dana
-  const sbJob = solbotBrief();
+  const sbJob = solbotBrief(), gsJob = gmsolBrief();
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
-  const sb = await sbJob;
+  const sb = await sbJob, gs = await gsJob;
   if (state.solbot) { ids.push('solbot'); loaded.push(sb); }
+  if (state.gmsol) { ids.push('gmsol'); loaded.push(gs); }
   const briefs = loaded.filter(Boolean);
   const box = await boxJob;
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
@@ -3167,9 +3184,10 @@ async function renderPortofolio() {
   // akan membuat total itu bohong.
   const ids = (state.funds || []).filter((f) => !f.paper).map((f) => f.id);
   const boxJob = state.safebox ? loadSafebox().catch(() => null) : Promise.resolve(null);
-  const sbJob = solbotBrief();
+  const sbJob = solbotBrief(), gsJob = gmsolBrief();
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
   if (state.solbot) { ids.push('solbot'); loaded.push(await sbJob); }
+  if (state.gmsol) { ids.push('gmsol'); loaded.push(await gsJob); }
   const missing = ids.filter((id, i) => !loaded[i]);
   const briefs = loaded.filter(Boolean);
   const box = await boxJob;
@@ -3198,7 +3216,7 @@ async function renderPortofolio() {
     tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham${pokokBox > 0 ? ` · termasuk ${usd(pokokBox, 0)} Safe Box` : ''}`),
     tile('Untung / rugi', signed(untung), setoran ? pct((untung / setoran) * 100) + ' dari modal' : '—', cls(untung)),
   ].join(''));
-  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
+  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id === 'gmsol' ? 'GMSOL (menunggu data)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
 
   setHTML($('#portoList'), briefs.map((b) => `
     <div class="porto-fund">
@@ -3208,7 +3226,7 @@ async function renderPortofolio() {
         <span class="porto-val">${usd(b.totalUsd)}<span class="n ${cls(b.pnlUsd)}">${signed(b.pnlUsd)}</span></span>
       </div>
       <div class="table-scroll"><table class="porto-tbl"><tbody>
-        ${b.id === 'solbot' ? `<tr><td colspan="3" class="dim">Uang asli · ekuitas bot trading, bukan saham investor · <a href="#solbot">buka SolBot</a></td></tr>` : ''}${b.owners.map((o) => `<tr>
+        ${b.id === 'solbot' || b.id === 'gmsol' ? `<tr><td colspan="3" class="dim">Uang asli · ekuitas bot, bukan saham investor · <a href="#${b.id}">buka ${esc(b.label)}</a></td></tr>` : ''}${b.owners.map((o) => `<tr>
           <td><span class="who"><span class="chip" style="background:${o.color || '#4ade80'}"></span>${esc(o.name)}</span></td>
           <td class="num">${pct(o.share)}</td>
           <td class="num">${usd(o.value)}</td></tr>`).join('')}
@@ -3701,7 +3719,22 @@ async function renderGmsol() {
   const d = await loadGmsol();
   if (state.view !== 'gmsol') return;
   const body = $('#gmsolBody');
-  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait('Menunggu data on-chain', d?.asOf || null)); return; }
+  if (d?.status === 'pretest' && d.asOf && Date.now() - d.asOf <= GMSOL_STALE_MS) {
+    // Sebelum uji $50 lulus: saldo dompet GMSOL saja (keputusan pemilik 2026-10-21).
+    const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
+    setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode sb-m-dry"><i></i>Menunggu uji $50</span></div>
+      <p class="hint">Saldo sudah ada di dompet GMSOL, tetapi bot <b>belum mulai trading</b>: uji posisi pertama $50 belum berjalan. Statistik trading muncul setelah uji lulus.</p>
+      <div class="stats sb-top">${[
+        tile('Ekuitas on-chain', usd(d.equityUsd), `${d.walletUsd != null ? usd(d.walletUsd) + ' di dompet' : ''}${d.lpUsd ? ' · ' + usd(d.lpUsd) + ' di LP' : ''}`),
+        tile('Modal', usd(d.capitalUsd || 1200), 'baseline resmi'),
+        tile('Selisih vs modal', sbUsd(d.pnlUsd), sbPct(d.pnlPct), cls(d.pnlUsd ?? 0)),
+        tile('Rem total', usd(d.brakeFloorUsd || 1020), 'semua posisi ditutup kalau ekuitas di bawah ini'),
+      ].join('')}</div>
+      <p class="hint">Data per ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))})${d.t0At ? ` · T0 ${esc(sbWib(d.t0At))}` : ''} · selisih vs modal = ekuitas on-chain − $1.200.</p></section>
+      <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`);
+    return;
+  }
+  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(d?.status === 'pretest' ? 'Data tertunda' : 'Menunggu data on-chain', d?.asOf || null)); return; }
   if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Data tertunda', d.asOf || null)); return; }
   const cl = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
   const seats = d.openSeats || [], closes = d.closes || [];
@@ -4883,6 +4916,26 @@ async function renderHome() {
   };
   const sbData = state.solbot ? await loadSolbot().catch(() => null) : null;
   if (epoch !== homeEpoch || state.view !== 'home') return;
+  const gsData = state.gmsol ? await loadGmsol().catch(() => null) : null;
+  if (epoch !== homeEpoch || state.view !== 'home') return;
+  const gmsolCard = () => {
+    const f = state.gmsol, d = gsData && ['ok', 'pretest'].includes(gsData.status) && gsData.asOf && Date.now() - gsData.asOf <= GMSOL_STALE_MS ? gsData : null;
+    const status = !d ? 'menunggu data on-chain' : d.status === 'pretest' ? 'menunggu uji $50' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
+    return `<a class="prod" href="#gmsol" style="--c:${f.accent}">
+      <div class="prod-top">${iconTile('orbit', f.accent)}
+        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${esc(status)}</div></div></div>
+      <p class="prod-desc">${esc(f.blurb || '')}</p>
+      <div class="prod-nums">
+        <div><span class="k">Ekuitas</span><span class="v">${d ? usd(d.equityUsd, 0) : '—'}</span></div>
+        <div><span class="k">Untung / rugi</span><span class="v ${cls(d?.pnlUsd ?? 0)}">${d?.pnlUsd == null ? '—' : `${signed(d.pnlUsd)}<small>${d.pnlPct >= 0 ? '+' : ''}${pct(d.pnlPct, 1)}</small>`}</span></div>
+        <div><span class="k">Modal</span><span class="v">${usd(Number(f.capitalUsd) || 1200, 0)}</span></div>
+        <div><span class="k">Posisi terbuka</span><span class="v">${d && d.status === 'ok' ? String((d.openSeats || []).length) : '—'}</span></div>
+        <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || 'LP')}</span></div>
+        <div><span class="k">Rem total</span><span class="v txt">ekuitas &lt; $1.020</span></div>
+      </div>
+      ${!d ? '<p class="hint">Menunggu data on-chain — angka muncul begitu saldo masuk.</p>' : d.status === 'pretest' ? '<p class="hint">Saldo sudah di dompet GMSOL; trading belum mulai (menunggu uji posisi pertama $50).</p>' : ''}
+      <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
+  };
   const solbotCard = () => {
     const f = state.solbot, d = sbData && sbData.status === 'ok' && sbData.asOf && Date.now() - sbData.asOf <= SOLBOT_STALE_MS ? sbData : null;
     const MODE = { LIVE: 'live', DRY_RUN: 'dry run', HALTED: 'dihentikan' };
@@ -4908,7 +4961,7 @@ async function renderHome() {
   setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
     // Low risk: Safe Box & Index (kartu khusus) ditambah dana biasa berisiko rendah (Staking).
     const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : []), ...state.funds.filter((f) => f.risk === 'low').map(card)]
-      : [...state.funds.filter((f) => f.risk === r.key).map(card), ...(state.solbot && (state.solbot.risk || 'high') === r.key ? [solbotCard()] : [])];
+      : [...state.funds.filter((f) => f.risk === r.key).map(card), ...(state.solbot && (state.solbot.risk || 'high') === r.key ? [solbotCard()] : []), ...(state.gmsol && (state.gmsol.risk || 'medium') === r.key ? [gmsolCard()] : [])];
     if (!items.length) return '';
     return `<div class="risk-group" style="--rc:${r.color}">
       <div class="rg-head"><span class="rg-badge">${r.title}</span><span class="rg-note">${r.note}</span></div>
