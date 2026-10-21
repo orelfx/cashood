@@ -3671,8 +3671,8 @@ function showGmsol() {
   gmsolTimer = setInterval(() => { if (state.view === 'gmsol') renderGmsol().catch(() => {}); else clearInterval(gmsolTimer); }, 60e3);
 }
 const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL</div>
-  <div class="sb-sub">Grok Meridian · LP Meteora DLMM, Solana · uang asli · <span class="sb-risk">Medium risk</span> · modal $1.200</div></div>`;
-const GMSOL_WARN = '<b>Uang asli.</b> GMSOL memasang likuiditas di pool Meteora DLMM memakai dana sungguhan, mulai kecil ($50 per posisi, maks. 3 posisi). Rem otomatis: rugi 5% sehari menghentikan posisi baru hari itu; rugi $180 dari modal menutup semua posisi. <b>Profit tidak dijamin.</b> Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
+  <div class="sb-sub">Grok Meridian · LP Meteora DLMM, Solana · uang asli · <span class="sb-risk">Medium risk</span> · modal $1.200 (baseline resmi)</div></div>`;
+const GMSOL_WARN = '<b>Uang asli.</b> GMSOL memasang likuiditas di pool Meteora DLMM memakai dana sungguhan, mulai kecil ($50 per posisi, maks. 3 posisi). Rem otomatis: rugi 5% sehari menghentikan posisi baru hari itu; ekuitas di bawah $1.020 (rugi $180) menutup semua posisi. <b>Profit tidak dijamin.</b> Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
 function gmsolWait(msg, asOf) {
   return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode sb-m-wait">${esc(msg)}</span></div>
     <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Uji posisi pertama $50 belum berjalan. '}Angka tidak ditampilkan sampai ekuitas on-chain masuk.</p></section>
@@ -3696,6 +3696,7 @@ async function renderGmsol() {
     <div class="sb-kpis"><div><small>Ekuitas on-chain</small><b>${usd(d.equityUsd)}</b></div>
     <div><small>Untung/rugi vs modal $1.200</small><b class="${cl(d.pnlUsd)}">${sbUsd(d.pnlUsd)} (${sbPct(d.pnlPct)})</b></div>
     <div><small>Posisi terbuka</small><b>${seats.length}${d.sizing?.maxOpen ? ' / ' + d.sizing.maxOpen : ''}</b></div></div>
+    <p class="hint">PnL = ekuitas on-chain GMSOL − $1.200 (hanya aset yang dibuka GMSOL).${d.t0InfoUsd != null ? ` Info: T0 tercatat mesin ${usd(d.t0InfoUsd)}.` : ""}</p>
     <p class="hint">Diperbarui ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}).</p></section>
     <section class="card"><h3>Posisi terbuka</h3>${seats.length ? `<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Fee</th><th class="num">%</th><th>Range</th></tr></thead><tbody>
       ${seats.map((p) => `<tr><td><b>${esc(p.symbol || '—')}</b></td><td class="num">${p.basisUsd == null ? '—' : usd(p.basisUsd)}</td><td class="num">${p.valueUsd == null ? '—' : usd(p.valueUsd)}</td><td class="num">${p.feesUsd == null ? '—' : usd(p.feesUsd)}</td><td class="num ${cl(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</td><td>${p.inRange == null ? '—' : p.inRange ? 'di dalam' : 'di luar'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi terbuka.</p>'}</section>
