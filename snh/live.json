@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ee439f9a-2f17-4224-8ce3-4fb1205dc23a",
-  "updatedAt": 1792587878352,
-  "generatedAt": "2026-10-21 20:04 WIB",
+  "generation": "7db86509-9970-4c85-9aea-b0ae3eaf2bf9",
+  "updatedAt": 1792588178369,
+  "generatedAt": "2026-10-21 20:09 WIB",
   "usdIdr": null,
   "totalUsd": 923.8881329647544,
   "nativeSymbol": "SOL",
@@ -1318,12 +1318,12 @@
     "pnlUsd": -76.11186703524561,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792587878352,
+    "heartbeatAt": 1792588178369,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.47,
-    "lastScanAt": 1792587871000,
+    "lastScanAt": 1792588166000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1349,7 +1349,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "22590",
+        "v": "22630",
         "n": "492 aktif"
       },
       {
@@ -1360,9 +1360,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792587878352,
+      "lastDecisionAt": 1792588178369,
       "lastAction": "keputusan",
-      "lastReason": "PUMP [big]: Dilewati: unsupported_extension."
+      "lastReason": "Kimchi [big]: Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
     }
   },
   "strategy": {
@@ -1381,7 +1381,7 @@
       ],
       [
         "Wallet dipantau",
-        "22590 · 492 aktif"
+        "22630 · 492 aktif"
       ],
       [
         "Cadangan kas",
@@ -1393,7 +1393,7 @@
       ],
       [
         "Label wallet",
-        "smart 14179 · bot 6233 · blacklist 441 · lp 1 · fresh 1239 · kol 217 · dolphin 268 · whale 12"
+        "smart 14205 · bot 6233 · blacklist 441 · lp 1 · fresh 1242 · kol 217 · dolphin 267 · whale 12 · unknown 12"
       ]
     ],
     "requirements": [
@@ -1441,17 +1441,17 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 22590,
+      "tracked": 22630,
       "active": 492,
-      "passive": 22098,
+      "passive": 22138,
       "trusted": 0,
       "promising": 23,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14179,
+          "total": 14205,
           "active": 450,
-          "passive": 13729
+          "passive": 13755
         },
         {
           "key": "bot",
@@ -1461,9 +1461,9 @@
         },
         {
           "key": "fresh",
-          "total": 1239,
+          "total": 1242,
           "active": 0,
-          "passive": 1239
+          "passive": 1242
         },
         {
           "key": "blacklist",
@@ -1473,9 +1473,9 @@
         },
         {
           "key": "dolphin",
-          "total": 268,
+          "total": 267,
           "active": 25,
-          "passive": 243
+          "passive": 242
         },
         {
           "key": "kol",
@@ -1488,6 +1488,12 @@
           "total": 12,
           "active": 5,
           "passive": 7
+        },
+        {
+          "key": "unknown",
+          "total": 12,
+          "active": 0,
+          "passive": 12
         },
         {
           "key": "lp",
@@ -1598,6 +1604,33 @@
     },
     "decisions": [
       {
+        "at": 1792588163867,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 14,
+            "note": "14 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
+      },
+      {
+        "at": 1792588125297,
+        "symbol": "KIMSLEAZE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati: harga sudah -89% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
         "at": 1792587834117,
         "symbol": "PUMP",
         "action": "skip",
@@ -1613,24 +1646,6 @@
           }
         ],
         "reason": "Dilewati: unsupported_extension."
-      },
-      {
-        "at": 1792587558220,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "dolphin": 1,
-          "smart": 4
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 14,
-            "note": "14 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 1.8% dari market cap."
       },
       {
         "at": 1792587549085,
@@ -2453,49 +2468,12 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792566403588,
-        "symbol": "NORMIE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 8.5% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 0.88%"
-          },
-          {
-            "type": "bundler",
-            "count": 25,
-            "note": "bundler pegang 19.1%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 4.5%"
-          },
-          {
-            "type": "fresh",
-            "count": 11,
-            "note": "7.8% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 82,
+        "below_entry": 83,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2512,7 +2490,7 @@
         "position_risk": 1
       },
       "wait": {
-        "jumlah": 1
+        "jumlah": 0
       },
       "add": {
         "jumlah": 0
@@ -2551,7 +2529,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792588035506,
+    "generatedAt": 1792588339067,
     "trades": {
       "count": 151,
       "wins": 63,
@@ -2591,7 +2569,7 @@
     },
     "equity": {
       "days": 15,
-      "spanDays": 15.5,
+      "spanDays": 15.6,
       "returnPct": -6.64,
       "maxDrawdownPct": 7.15,
       "maxDrawdownAt": 1792004333022,
