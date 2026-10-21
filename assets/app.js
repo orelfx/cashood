@@ -2620,6 +2620,7 @@ function parseHash() {
   if (parts[0] === 'grr') return { grr: true, tab: 'portfolio' };
   if (parts[0] === 'gm') return { gm: true, tab: 'portfolio' };
   if (parts[0] === 'solbot') return { solbot: true, tab: 'portfolio' };
+  if (parts[0] === 'gmsol') return { gmsol: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
     return { analisa: true, fund: state.funds.some((f) => f.id === parts[1]) ? parts[1] : (state.fund || state.funds[0]?.id), tab: 'portfolio' };
@@ -2653,7 +2654,7 @@ function navItems(key) {
     .map((f) => ({ attr: `data-fund="${esc(f.id)}"`, name: f.label, sub: f.chain, accent: f.accent, on: state.view === 'fund' && f.id === state.fund }));
   if (state.safebox && (state.safebox.risk || 'low') === key) items.push({ attr: 'data-view="safebox"', name: state.safebox.label, sub: state.safebox.subtitle, accent: state.safebox.accent, on: state.view === 'safebox' });
   if (state.index && (state.index.risk || 'low') === key) items.push({ attr: 'data-view="index"', name: state.index.label, sub: state.index.subtitle, accent: state.index.accent, on: state.view === 'index' });
-  for (const k of ['solbot', 'grr', 'gm']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, badge: state[k].badge, on: state.view === k });
+  for (const k of ['solbot', 'gmsol', 'grr', 'gm']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, badge: state[k].badge, on: state.view === k });
   return items;
 }
 function renderFundBar() {
@@ -3492,7 +3493,7 @@ const RISK = [
 ];
 
 function leaveHome() {
-  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm', '#tab-solbot']) if ($(id)) $(id).hidden = true;
+  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm', '#tab-gmsol', '#tab-solbot']) if ($(id)) $(id).hidden = true;
   if ($('#strip')) $('#strip').hidden = false;
   if (document.body.classList.contains('at-home')) {
     document.body.classList.remove('at-home');
@@ -3503,7 +3504,7 @@ function leaveHome() {
   }
 }
 
-const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm', 'solbot'];
+const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm', 'gmsol', 'solbot'];
 function showGlobal(view, title) {
   state.view = view;
   banner('');
@@ -3655,6 +3656,52 @@ async function renderDuel(key) {
       ${closes.map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol)}</b></td><td data-k="Buku">${esc(c.bookName)}</td><td class="num ${cls(c.netUsd ?? 0)}" data-k="Hasil">${c.netUsd == null ? '—' : signed(c.netUsd)}</td>
         <td class="num ${cls(c.netPct ?? 0)}" data-k="%">${pctTxt(c.netPct)}</td><td data-k="Alasan">${esc(c.reason ? shortReason(c.reason) : '—')}</td><td class="num dim" data-k="Ditutup">${c.closedAt ? tglRingkas(c.closedAt) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi yang ditutup.</p>'}</section>
     ${d.live?.note ? `<section class="card"><p class="hint"><b>Catatan pembanding live:</b> ${esc(d.live.note)}</p></section>` : ''}`);
+}
+
+/* ── GMSOL: Grok Meridian LIVE, UANG ASLI (medium risk, modal $1.200) ──────
+ * Data dari sync-gmsol.mjs (sumber tunggal gmsol-live.json, mode live, tanpa
+ * alamat/tx). PnL = ekuitas on-chain − $1.200. Belum ada data / tertunda →
+ * tanpa angka. Arsip dry run Grok Meridian (#gm) terpisah, tidak digabung. */
+const GMSOL_STALE_MS = 15 * 60e3;
+let gmsolTimer = null;
+function showGmsol() {
+  showGlobal('gmsol', 'GMSOL — Cashood Headfund');
+  renderGmsol().catch(() => setHTML($('#gmsolBody'), gmsolWait('Menunggu data on-chain', null)));
+  clearInterval(gmsolTimer);
+  gmsolTimer = setInterval(() => { if (state.view === 'gmsol') renderGmsol().catch(() => {}); else clearInterval(gmsolTimer); }, 60e3);
+}
+const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL</div>
+  <div class="sb-sub">Grok Meridian · LP Meteora DLMM, Solana · uang asli · <span class="sb-risk">Medium risk</span> · modal $1.200</div></div>`;
+const GMSOL_WARN = '<b>Uang asli.</b> GMSOL memasang likuiditas di pool Meteora DLMM memakai dana sungguhan, mulai kecil ($50 per posisi, maks. 3 posisi). Rem otomatis: rugi 5% sehari menghentikan posisi baru hari itu; rugi $180 dari modal menutup semua posisi. <b>Profit tidak dijamin.</b> Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
+function gmsolWait(msg, asOf) {
+  return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode sb-m-wait">${esc(msg)}</span></div>
+    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Uji posisi pertama $50 belum berjalan. '}Angka tidak ditampilkan sampai ekuitas on-chain masuk.</p></section>
+    <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`;
+}
+async function loadGmsol() {
+  for (const url of [(rawDataBase('gmsol') || RAW_BASE + 'gmsol/') + 'live.json', 'data/gmsol/live.json']) {
+    try { const j = await getJSON(url); if (j?.fund === 'gmsol') return j; } catch { /* sumber berikutnya */ }
+  }
+  return null;
+}
+async function renderGmsol() {
+  const d = await loadGmsol();
+  if (state.view !== 'gmsol') return;
+  const body = $('#gmsolBody');
+  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait('Menunggu data on-chain', d?.asOf || null)); return; }
+  if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Data tertunda', d.asOf || null)); return; }
+  const cl = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
+  const seats = d.openSeats || [], closes = d.closes || [];
+  setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode">${d.brakes?.halted ? 'BERHENTI (rem total)' : d.brakes?.dailyBlocked ? 'Rem harian aktif' : 'LIVE'}</span></div>
+    <div class="sb-kpis"><div><small>Ekuitas on-chain</small><b>${usd(d.equityUsd)}</b></div>
+    <div><small>Untung/rugi vs modal $1.200</small><b class="${cl(d.pnlUsd)}">${sbUsd(d.pnlUsd)} (${sbPct(d.pnlPct)})</b></div>
+    <div><small>Posisi terbuka</small><b>${seats.length}${d.sizing?.maxOpen ? ' / ' + d.sizing.maxOpen : ''}</b></div></div>
+    <p class="hint">Diperbarui ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}).</p></section>
+    <section class="card"><h3>Posisi terbuka</h3>${seats.length ? `<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Fee</th><th class="num">%</th><th>Range</th></tr></thead><tbody>
+      ${seats.map((p) => `<tr><td><b>${esc(p.symbol || '—')}</b></td><td class="num">${p.basisUsd == null ? '—' : usd(p.basisUsd)}</td><td class="num">${p.valueUsd == null ? '—' : usd(p.valueUsd)}</td><td class="num">${p.feesUsd == null ? '—' : usd(p.feesUsd)}</td><td class="num ${cl(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</td><td>${p.inRange == null ? '—' : p.inRange ? 'di dalam' : 'di luar'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi terbuka.</p>'}</section>
+    <section class="card"><h3>Posisi ditutup</h3>${closes.length ? `<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+      ${closes.map((c) => `<tr><td><b>${esc(c.symbol || '—')}</b></td><td class="num ${cl(c.netUsd ?? 0)}">${c.netUsd == null ? '—' : sbUsd(c.netUsd)}</td><td class="num ${cl(c.netPct ?? 0)}">${sbPct(c.netPct)}</td><td>${esc(c.reason || '—')}</td><td class="num dim">${c.closedAt ? esc(sbWib(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi yang ditutup.</p>'}</section>
+    <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`);
 }
 
 /* ── SolBot: trading meme coin Solana dengan UANG ASLI (high risk) ──────────
@@ -5073,6 +5120,7 @@ async function init() {
     state.grr = list.grr || null;
     state.gm = list.gm || null;
     state.solbot = list.solbot || null;
+    state.gmsol = list.gmsol || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -5204,6 +5252,7 @@ async function init() {
     if (route.grr) { showGrr(); return; }
     if (route.gm) { showGm(); return; }
     if (route.solbot) { showSolbot(); return; }
+    if (route.gmsol) { showGmsol(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }

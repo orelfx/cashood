@@ -45,6 +45,9 @@ run_snapshot scripts/sync-gm.mjs
 # di kotak masuk server ini (tulis lokal, atau kirim lewat receive-live-solana.sh).
 # Tidak ditarik dari VPS lain. Data basi (>15 menit) → halaman tanpa angka.
 run_snapshot scripts/sync-solbot.mjs
+# GMSOL (UANG ASLI, medium risk $1.200): mesin gmsol-live menulis gmsol-live.json
+# langsung di kotak masuk server ini (mode live saja). Tidak ditarik dari VPS lain.
+run_snapshot scripts/sync-gmsol.mjs
 # Cashood Index dihitung terakhir, dari snapshot dana yang baru saja ditulis.
 run_snapshot scripts/sync-index.mjs
 # Bunga Safe Box mengikuti gerak harian index, jadi dihitung sesudahnya.
@@ -54,7 +57,7 @@ run_snapshot scripts/sync-safebox.mjs
 cd "$WORK"
 if [ -n "$(git status --porcelain)" ]; then
   git add -- reborn meridian ferari robsol staking grr charon forex binance safebox index
-  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh; [ -d gm ] && git add -- gm; [ -d solbot ] && git add -- solbot
+  [ -d dgrh ] && git add -- dgrh; [ -d dgsol ] && git add -- dgsol; [ -d snh ] && git add -- snh; [ -d gm ] && git add -- gm; [ -d solbot ] && git add -- solbot; [ -d gmsol ] && git add -- gmsol
   git commit -q -m "data: validated snapshots $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 # Retry an earlier unpushed commit even when there are no file changes this run.

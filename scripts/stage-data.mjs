@@ -58,5 +58,10 @@ try{
  const live=readJSON(resolve(ROOT,'data','solbot','live.json'));
  if(live){assertPublic(live);if(/[1-9A-HJ-NP-Za-km-z]{32,}/.test(JSON.stringify(live)))throw new Error('string mirip alamat');atomicJSON(resolve(destination,'solbot','live.json'),live);}
 }catch(err){console.error(`[stage] solbot: ${err.message}`);failed=true;}
+// GMSOL (uang asli, medium risk): satu berkas, sudah disaring sync-gmsol.mjs.
+try{
+ const live=readJSON(resolve(ROOT,'data','gmsol','live.json'));
+ if(live){assertPublic(live);if(/[1-9A-HJ-NP-Za-km-z]{32,}/.test(JSON.stringify(live)))throw new Error('string mirip alamat');atomicJSON(resolve(destination,'gmsol','live.json'),live);}
+}catch(err){console.error(`[stage] gmsol: ${err.message}`);failed=true;}
 // Valid other funds may still publish, but the operator gets a nonzero status.
 if(failed)process.exitCode=2;
