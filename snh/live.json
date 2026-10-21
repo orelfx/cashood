@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f3323810-5cc7-4355-9819-7a3d100b89bc",
-  "updatedAt": 1792608656188,
-  "generatedAt": "2026-10-22 01:50 WIB",
+  "generation": "b6440f1a-e1a3-45b9-a663-c26686d871ec",
+  "updatedAt": 1792608956342,
+  "generatedAt": "2026-10-22 01:55 WIB",
   "usdIdr": null,
   "totalUsd": 923.8881329647544,
   "nativeSymbol": "SOL",
@@ -1318,12 +1318,12 @@
     "pnlUsd": -76.11186703524561,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792608656188,
+    "heartbeatAt": 1792608956342,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.47,
-    "lastScanAt": 1792608652000,
+    "lastScanAt": 1792608948000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1344,7 +1344,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "678",
+        "v": "679",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1360,9 +1360,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792608656188,
+      "lastDecisionAt": 1792608956342,
       "lastAction": "keputusan",
-      "lastReason": "CHOO [low]: Dilewati karena red flag: 10 holder terbesar pegang 85%."
+      "lastReason": "PULLBACK [degen]: Dilewati karena red flag: bundler pegang 28% supply."
     }
   },
   "strategy": {
@@ -1393,7 +1393,7 @@
       ],
       [
         "Label wallet",
-        "smart 14699 · bot 6469 · blacklist 447 · lp 1 · fresh 1307 · kol 221 · dolphin 244 · whale 14"
+        "smart 14698 · bot 6469 · blacklist 447 · lp 1 · fresh 1308 · kol 221 · dolphin 244 · whale 14"
       ]
     ],
     "requirements": [
@@ -1449,9 +1449,9 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14699,
+          "total": 14698,
           "active": 463,
-          "passive": 14236
+          "passive": 14235
         },
         {
           "key": "bot",
@@ -1461,9 +1461,9 @@
         },
         {
           "key": "fresh",
-          "total": 1307,
+          "total": 1308,
           "active": 0,
-          "passive": 1307
+          "passive": 1308
         },
         {
           "key": "blacklist",
@@ -1597,6 +1597,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792608816112,
+        "symbol": "PULLBACK",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 28% supply."
+      },
+      {
+        "at": 1792608737749,
+        "symbol": "TIT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
+      },
       {
         "at": 1792608605764,
         "symbol": "CHOO",
@@ -2345,26 +2372,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 25% supply."
-      },
-      {
-        "at": 1792602363315,
-        "symbol": "COZNIGHT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 73.07% supply."
-      },
-      {
-        "at": 1792602260298,
-        "symbol": "LORE",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: holder baru 122."
       }
     ],
     "reasonStats": {
@@ -2375,7 +2382,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 569,
+        "red_flag": 570,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2425,7 +2432,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792608740667,
+    "generatedAt": 1792609039222,
     "trades": {
       "count": 151,
       "wins": 63,
