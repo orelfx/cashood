@@ -195,7 +195,7 @@ async function walletShared(engineState) {
       totalAssetsUsd: walletTotal({ solUsd, lpUsd: lp, unclaimedUsd: unc }), // token selalu $0 (lihat wallet.tokens)
       openCount: pos.length, positions: pos,
       closedCount: { manualTracked: m2closed.length, engine: Array.isArray(engineState?.closes) ? engineState.closes.length : null },
-      winRatePct: null, pnlHistory: null, gaps: 'posisi DAMM v2 dan token SPL lain di wallet tidak dibaca → tidak dihitung. Fee klaim kini dari on-chain kedua sisi (dulu $4,66 = hanya sisi SOL); dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.' };
+      winRatePct: null, pnlHistory: null, gaps: 'Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.' };
   } catch (e) { return { label: 'Aset GMSOL (wallet)', asOf: now, totalAssetsUsd: null, positions: [], error: text(e.message, 80) }; }
 }
 const goLive = (j) => time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At) ?? time(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.created);
