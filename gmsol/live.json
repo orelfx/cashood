@@ -3,12 +3,171 @@
   "system": "GMSOL",
   "realMoney": true,
   "risk": "high",
-  "capitalUsd": null,
-  "checkedAt": 1792677456075,
-  "status": "waiting",
-  "reason": "Mesin berhenti, menunggu restart",
-  "asOf": 1792667618215,
-  "haltNote": null,
+  "capitalUsd": 961.86,
+  "checkedAt": 1792677693288,
+  "status": "ok",
+  "asOf": 1792677663281,
+  "t0At": 1792677371712,
+  "spec": "gmsol-live-v3.2 r4.3.2",
+  "specStatus": "live_pinned",
+  "capitalUsdAtDeploy": 961.86,
+  "capitalLockedAt": "2026-10-22T13:56:11.712Z",
+  "capitalSolUsdAtLock": 104.41,
+  "capitalFreeSolAtLock": 9.512677,
+  "capitalReserveSol": 0.3,
+  "flowsDeclaredNetUsd": 0,
+  "preDeployHistory": [
+    {
+      "atWib": "2026-10-22 00:03:28 WIB",
+      "type": "withdrawal",
+      "sol": 2,
+      "by": "Orel",
+      "note": "penarikan Orel sebelum deploy r4; tidak memengaruhi modal r4",
+      "historyOnly": true
+    },
+    {
+      "atWib": "2026-10-22 18:15-18:18 WIB",
+      "type": "pre_deploy_close",
+      "sol": null,
+      "by": null,
+      "note": null,
+      "historyOnly": true
+    },
+    {
+      "atWib": "2026-10-22 20:50 WIB (finalize",
+      "type": "pre_deploy_swap",
+      "sol": null,
+      "by": null,
+      "note": "token lama >= $1 di gate lock, di-swap ke SOL atas izin Orel sebelum lock; sebelum deploy, BUKAN PnL GMSOL",
+      "historyOnly": true
+    }
+  ],
+  "execErrors": 0,
+  "screening": {
+    "scannedAt": 1792677571375,
+    "solPools": 335,
+    "inactive1h": 99,
+    "checked": 236,
+    "passed": 0,
+    "topReasons": [
+      {
+        "reason": "pool.fee_active_tvl_ratio",
+        "pools": 235
+      },
+      {
+        "reason": "pool.unique_traders",
+        "pools": 183
+      },
+      {
+        "reason": "pool.volume",
+        "pools": 175
+      },
+      {
+        "reason": "pool.dlmm_params.bin_step",
+        "pools": 167
+      },
+      {
+        "reason": "base.market_cap",
+        "pools": 159
+      },
+      {
+        "reason": "pool.tvl",
+        "pools": 117
+      }
+    ],
+    "closest": [
+      {
+        "symbol": "PHP-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.4125 !>=2"
+        ]
+      },
+      {
+        "symbol": "pill-SOL",
+        "binStep": 200,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.1945 !>=2"
+        ]
+      },
+      {
+        "symbol": "PANGEA-SOL",
+        "binStep": 100,
+        "reasons": [
+          "derived.age_h=21.419 !>=24",
+          "pool.fee_active_tvl_ratio=0.9126 !>=2"
+        ]
+      },
+      {
+        "symbol": "CYBER-SOL",
+        "binStep": 100,
+        "reasons": [
+          "derived.age_h=15.5712 !>=24",
+          "pool.fee_active_tvl_ratio=1.8371 !>=2"
+        ]
+      },
+      {
+        "symbol": "pill-SOL",
+        "binStep": 50,
+        "reasons": [
+          "pool.dlmm_params.bin_step=50 !in[100,125,200,250]",
+          "pool.fee_active_tvl_ratio=0.1572 !>=2"
+        ]
+      }
+    ]
+  },
+  "equityStatus": "ok",
+  "walletSolShared": null,
+  "sizing": {
+    "sizeUsd": 50,
+    "maxOpen": 5,
+    "maxOpenCap": 5
+  },
+  "brakes": {
+    "dailyPct": 25,
+    "totalFloorUsd": 480.93,
+    "dailyBlocked": false,
+    "dailyBlockedUntil": null,
+    "dayChangePct": 0,
+    "dayStartLedgerUsd": null,
+    "dayFloorUsd": 721.39,
+    "gateUnknownBlock": false,
+    "halted": false
+  },
+  "equityUsd": 961.86,
+  "pnlUsd": 0,
+  "pnlPct": 0,
+  "realizedUsd": 0,
+  "unrealizedUsd": 0,
+  "openSeats": [],
+  "closes": [],
+  "equityCurve": [
+    {
+      "t": 1792677663281,
+      "usd": 961.86
+    }
+  ],
+  "engine": {
+    "label": "Buku internal mesin r4.1",
+    "note": "Buku internal mesin GMSOL r4.1 (modal dikunci saat deploy, dasar rem mesin). BUKAN angka utama; angka utama = wallet.totalAssetsUsd.",
+    "capitalUsd": 961.86,
+    "equityUsd": 961.86,
+    "pnlUsd": 0,
+    "pnlPct": 0,
+    "realizedUsd": 0,
+    "unrealizedUsd": 0,
+    "totalFloorUsd": 480.93,
+    "dayFloorUsd": 721.39,
+    "maxOpen": 5,
+    "openCount": 0,
+    "closedCount": 0,
+    "winRatePct": null
+  },
+  "ledger": {
+    "flows": [],
+    "owners": [],
+    "costs": null
+  },
   "history": {
     "closes": [],
     "preDeployHistory": [
@@ -20,20 +179,22 @@
         "note": "penarikan Orel sebelum deploy r4; tidak memengaruhi modal r4"
       },
       {
-        "atWib": "2026-10-22 ~08:10 WIB",
-        "type": "foreign_position",
-        "sol": 8.23,
+        "atWib": "2026-10-22 18:15-18:18 WIB",
+        "type": "pre_deploy_close",
+        "sol": null,
         "by": null,
-        "note": "posisi DLMM milik meridian2 di wallet bersama; bukan withdrawal, bukan rugi GMSOL; dikecualikan"
+        "note": "posisi dibuka meridian2 08:10 WIB (8,23 SOL), ditutup Master sebelum deploy r4.3.x + PANGEA di-swap ke SOL; sebelum deploy, BUKAN PnL GMSOL"
+      },
+      {
+        "atWib": "2026-10-22 20:50 WIB (finalized)",
+        "type": "pre_deploy_swap",
+        "sol": null,
+        "by": null,
+        "note": "token lama >= $1 di gate lock, di-swap ke SOL atas izin Orel sebelum lock; sebelum deploy, BUKAN PnL GMSOL"
       }
     ],
-    "spec": "gmsol-live-v3.2 r4.1",
-    "t0At": 1792657533144
-  },
-  "ledger": {
-    "flows": [],
-    "owners": [],
-    "costs": null
+    "spec": "gmsol-live-v3.2 r4.3.2",
+    "t0At": 1792677371712
   },
   "wallet": {
     "label": "Aset GMSOL (wallet)",
@@ -697,5 +858,12 @@
       "usd": 998.83,
       "sol": 9.5127
     }
-  ]
+  ],
+  "headline": {
+    "label": "Aset GMSOL",
+    "usd": 998.83,
+    "source": "wallet.totalAssetsUsd",
+    "rule": "saldo wallet sekarang = acuan utama (Orel, 22 Okt)",
+    "pnlNote": "Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy."
+  }
 }
