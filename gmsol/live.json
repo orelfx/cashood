@@ -3,31 +3,127 @@
   "system": "GMSOL",
   "realMoney": true,
   "risk": "high",
-  "capitalUsd": 1200,
-  "checkedAt": 1792657637474,
+  "capitalUsd": 84.67,
+  "checkedAt": 1792657831228,
   "status": "ok",
-  "asOf": 1792657628280,
-  "t0At": 1792640069332,
+  "asOf": 1792657808125,
+  "t0At": 1792657533144,
   "spec": "gmsol-live-v3.2 r4.1",
+  "specStatus": "live_pinned",
+  "specHash": {
+    "spec-v3.2.json": "e0abb56e61d7",
+    "spec-v3.2.md": "e85e4ed5411e",
+    "preregistration-v3.2.md": "d63ebea75e34"
+  },
+  "capitalUsdAtDeploy": 84.67,
+  "capitalLockedAt": "2026-10-22T08:25:33.144Z",
+  "capitalSolUsdAtLock": 103.8,
+  "capitalFreeSolAtLock": 1.115736,
+  "capitalReserveSol": 0.3,
+  "flowsDeclaredNetUsd": 0,
+  "preDeployHistory": [
+    {
+      "atWib": "2026-10-22 00:03:28 WIB",
+      "type": "withdrawal",
+      "sol": 2,
+      "by": "Orel",
+      "note": "penarikan Orel sebelum deploy r4; tidak memengaruhi modal r4",
+      "historyOnly": true
+    },
+    {
+      "atWib": "2026-10-22 ~08:10 WIB",
+      "type": "foreign_position",
+      "sol": 8.23,
+      "by": null,
+      "note": "posisi DLMM milik meridian2 di wallet bersama; bukan withdrawal, bukan rugi GMSOL; dikecualikan",
+      "historyOnly": true
+    }
+  ],
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792657444129,
-    "solPools": null,
-    "inactive1h": null,
-    "checked": 0,
+    "scannedAt": 1792657774112,
+    "solPools": 315,
+    "inactive1h": 140,
+    "checked": 175,
     "passed": 0,
-    "topReasons": [],
-    "closest": []
+    "topReasons": [
+      {
+        "reason": "pool.fee_active_tvl_ratio",
+        "pools": 173
+      },
+      {
+        "reason": "pool.volume",
+        "pools": 134
+      },
+      {
+        "reason": "pool.unique_traders",
+        "pools": 132
+      },
+      {
+        "reason": "pool.dlmm_params.bin_step",
+        "pools": 129
+      },
+      {
+        "reason": "base.market_cap",
+        "pools": 102
+      },
+      {
+        "reason": "pool.tvl",
+        "pools": 75
+      }
+    ],
+    "closest": [
+      {
+        "symbol": "PHP-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.4117 !>=2"
+        ]
+      },
+      {
+        "symbol": "PANGEA-SOL",
+        "binStep": 100,
+        "reasons": [
+          "derived.age_h=15.9197 !>=24",
+          "pool.fee_active_tvl_ratio=0.2185 !>=2"
+        ]
+      },
+      {
+        "symbol": "Dacity-SOL",
+        "binStep": 80,
+        "reasons": [
+          "pool.dlmm_params.bin_step=80 !in[100,125,200,250]",
+          "pool.fee_active_tvl_ratio=0.0499 !>=2"
+        ]
+      },
+      {
+        "symbol": "SI-SOL",
+        "binStep": 30,
+        "reasons": [
+          "pool.dlmm_params.bin_step=30 !in[100,125,200,250]",
+          "pool.fee_active_tvl_ratio=0.0197 !>=2"
+        ]
+      },
+      {
+        "symbol": "Dacity-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.unique_traders=24 !>=50",
+          "pool.fee_active_tvl_ratio=0.1244 !>=2"
+        ]
+      }
+    ]
   },
   "equityStatus": "ok",
   "walletSolShared": {
     "sol": 1.1157,
-    "usd": 115.82,
+    "usd": 115.88,
     "label": "dipakai bersama Meridian2"
   },
   "sizing": {
     "sizeUsd": 50,
-    "maxOpen": 1
+    "maxOpen": 1,
+    "maxOpenCap": 5
   },
   "brakes": {
     "dailyPct": 25,
@@ -41,239 +137,23 @@
     "halted": false
   },
   "equityUsd": 84.67,
-  "pnlUsd": -1115.33,
-  "pnlPct": -92.944,
+  "pnlUsd": 0,
+  "pnlPct": 0,
   "realizedUsd": 0,
   "unrealizedUsd": 0,
   "openSeats": [],
   "closes": [],
   "equityCurve": [
     {
-      "t": 1792640198576,
-      "usd": 1200
-    },
-    {
-      "t": 1792640349234,
-      "usd": 1200
-    },
-    {
-      "t": 1792640528545,
-      "usd": 1200
-    },
-    {
-      "t": 1792640828905,
-      "usd": 1200
-    },
-    {
-      "t": 1792641128575,
-      "usd": 1200
-    },
-    {
-      "t": 1792641428713,
-      "usd": 1200
-    },
-    {
-      "t": 1792641730152,
-      "usd": 1200
-    },
-    {
-      "t": 1792642028565,
-      "usd": 1200
-    },
-    {
-      "t": 1792642328768,
-      "usd": 1200
-    },
-    {
-      "t": 1792642628962,
-      "usd": 1200
-    },
-    {
-      "t": 1792642928622,
-      "usd": 1200
-    },
-    {
-      "t": 1792643228888,
-      "usd": 1200
-    },
-    {
-      "t": 1792643528973,
-      "usd": 1200
-    },
-    {
-      "t": 1792643828595,
-      "usd": 1200
-    },
-    {
-      "t": 1792643918627,
-      "usd": 1200
-    },
-    {
-      "t": 1792645924471,
-      "usd": 1200
-    },
-    {
-      "t": 1792646222324,
-      "usd": 1200
-    },
-    {
-      "t": 1792646517657,
-      "usd": 1200
-    },
-    {
-      "t": 1792646817565,
-      "usd": 1200
-    },
-    {
-      "t": 1792647119889,
-      "usd": 1200
-    },
-    {
-      "t": 1792647417911,
-      "usd": 1200
-    },
-    {
-      "t": 1792647718645,
-      "usd": 1200
-    },
-    {
-      "t": 1792648017578,
-      "usd": 1200
-    },
-    {
-      "t": 1792648318115,
-      "usd": 1200
-    },
-    {
-      "t": 1792648617576,
-      "usd": 1200
-    },
-    {
-      "t": 1792648917609,
-      "usd": 1200
-    },
-    {
-      "t": 1792649217589,
-      "usd": 1200
-    },
-    {
-      "t": 1792649517614,
-      "usd": 1200
-    },
-    {
-      "t": 1792649847589,
-      "usd": 1200
-    },
-    {
-      "t": 1792650118059,
-      "usd": 1200
-    },
-    {
-      "t": 1792650417649,
-      "usd": 1200
-    },
-    {
-      "t": 1792650717607,
-      "usd": 1200
-    },
-    {
-      "t": 1792651019079,
-      "usd": 1200
-    },
-    {
-      "t": 1792651317617,
-      "usd": 1200
-    },
-    {
-      "t": 1792651617631,
-      "usd": 1200
-    },
-    {
-      "t": 1792651917670,
-      "usd": 1200
-    },
-    {
-      "t": 1792652217638,
-      "usd": 1200
-    },
-    {
-      "t": 1792652517662,
-      "usd": 1200
-    },
-    {
-      "t": 1792652818054,
-      "usd": 1200
-    },
-    {
-      "t": 1792653147875,
-      "usd": 1200
-    },
-    {
-      "t": 1792653447895,
-      "usd": 1200
-    },
-    {
-      "t": 1792653721273,
-      "usd": 1200
-    },
-    {
-      "t": 1792654017667,
-      "usd": 1200
-    },
-    {
-      "t": 1792654287666,
-      "usd": 1200
-    },
-    {
-      "t": 1792654617675,
-      "usd": 1200
-    },
-    {
-      "t": 1792654917676,
-      "usd": 1200
-    },
-    {
-      "t": 1792655187691,
-      "usd": 1200
-    },
-    {
-      "t": 1792655217682,
-      "usd": 1200
-    },
-    {
-      "t": 1792655458071,
-      "usd": 1200
-    },
-    {
-      "t": 1792655517728,
-      "usd": 1200
-    },
-    {
-      "t": 1792655817892,
-      "usd": 1200
-    },
-    {
-      "t": 1792656147936,
-      "usd": 1200
-    },
-    {
-      "t": 1792656417695,
-      "usd": 1200
-    },
-    {
-      "t": 1792656717994,
-      "usd": 1200
-    },
-    {
-      "t": 1792657017724,
-      "usd": 1200
-    },
-    {
-      "t": 1792657318107,
-      "usd": 1200
-    },
-    {
       "t": 1792657628280,
+      "usd": 84.67
+    },
+    {
+      "t": 1792657688153,
+      "usd": 84.67
+    },
+    {
+      "t": 1792657808125,
       "usd": 84.67
     }
   ]
