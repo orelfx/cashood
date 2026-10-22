@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "aadbcd30-b462-4fc4-a03f-27d060aef11f",
-  "updatedAt": 1792660921213,
-  "generatedAt": "2026-10-22 16:22 WIB",
+  "generation": "f8321215-25a4-43e7-8903-f6a0792201b5",
+  "updatedAt": 1792661224862,
+  "generatedAt": "2026-10-22 16:27 WIB",
   "usdIdr": null,
-  "totalUsd": 902.2732239648258,
+  "totalUsd": 902.0615067028715,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 902.2732239648258,
+  "botWalletUsd": 902.0615067028715,
   "walletUsd": 899.6247844152517,
-  "lpUsd": 2.64843955,
+  "lpUsd": 2.43672229,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 7.43458074750882,
       "investedUsd": 7.43458074750882,
-      "principalUsd": 2.64843955,
-      "valueUsd": 2.64843955,
+      "principalUsd": 2.43672229,
+      "valueUsd": 2.43672229,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -4.786141197934732,
-      "pnlPct": -64.38,
+      "pnlUsd": -4.997858459889079,
+      "pnlPct": -67.22,
       "entryPriceUsd": 0.0002923837125811098,
-      "priceUsd": 0.00011267151532786159,
-      "ageMinutes": 264,
+      "priceUsd": 0.00010414662046651018,
+      "ageMinutes": 269,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1410,18 +1410,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 899.6247844152517,
-    "positionsUsd": 2.64843955,
+    "positionsUsd": 2.43672229,
     "realizedUsd": -92.94063484,
-    "unrealizedUsd": -4.7861412,
-    "pnlUsd": -97.72677603517423,
+    "unrealizedUsd": -4.99785846,
+    "pnlUsd": -97.9384932971285,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792660921213,
+    "heartbeatAt": 1792661224862,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 10.61,
-    "lastScanAt": 1792660886000,
+    "drawdownPct": 10.64,
+    "lastScanAt": 1792661219000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1436,13 +1436,13 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$4.7861",
+        "v": "−$4.9979",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "585",
+        "v": "586",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1458,9 +1458,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792660921213,
+      "lastDecisionAt": 1792661224862,
       "lastAction": "keputusan",
-      "lastReason": "Kimchi [big]: Dilewati karena red flag: 10 holder terbesar pegang 78%."
+      "lastReason": "SKATESEAL [degen]: Dilewati karena red flag: bundler pegang 75% supply."
     }
   },
   "strategy": {
@@ -1491,7 +1491,7 @@
       ],
       [
         "Label wallet",
-        "smart 14667 · bot 6614 · blacklist 464 · lp 1 · fresh 1297 · kol 220 · dolphin 226 · whale 16"
+        "smart 14668 · bot 6613 · blacklist 464 · lp 1 · fresh 1297 · kol 220 · dolphin 226 · whale 16"
       ]
     ],
     "requirements": [
@@ -1547,15 +1547,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14667,
+          "total": 14668,
           "active": 470,
-          "passive": 14197
+          "passive": 14198
         },
         {
           "key": "bot",
-          "total": 6614,
+          "total": 6613,
           "active": 0,
-          "passive": 6614
+          "passive": 6613
         },
         {
           "key": "fresh",
@@ -1695,6 +1695,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792661110120,
+        "symbol": "SKATESEAL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 75% supply."
+      },
       {
         "at": 1792660832018,
         "symbol": "Kimchi",
@@ -2489,16 +2506,6 @@
           "bot": 1
         },
         "reason": "Dilewati karena red flag: holder baru 13."
-      },
-      {
-        "at": 1792638480120,
-        "symbol": "ATR",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 31%."
       }
     ],
     "reasonStats": {
@@ -2509,7 +2516,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 471,
+        "red_flag": 472,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2559,7 +2566,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792660949312,
+    "generatedAt": 1792661238434,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2600,30 +2607,30 @@
     "equity": {
       "days": 16,
       "spanDays": 16.4,
-      "returnPct": -8.83,
-      "maxDrawdownPct": 8.84,
-      "maxDrawdownAt": 1792658202716,
-      "maxDrawdownUsd": 87.45,
+      "returnPct": -8.85,
+      "maxDrawdownPct": 8.85,
+      "maxDrawdownAt": 1792661224862,
+      "maxDrawdownUsd": 87.57,
       "maxDrawdownPeakUsd": 989.63,
-      "maxDrawdownTroughUsd": 902.18,
-      "currentDrawdownPct": 8.83,
-      "currentDrawdownUsd": 87.36,
+      "maxDrawdownTroughUsd": 902.06,
+      "currentDrawdownPct": 8.85,
+      "currentDrawdownUsd": 87.57,
       "positiveDaysPct": 43.75,
       "bestDayPct": 0.83,
       "worstDayPct": -3.87,
-      "sharpe": -8.4,
+      "sharpe": -8.41,
       "sortino": -8.15,
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -97.73,
-    "profitPct": -9.77,
+    "profitUsd": -97.94,
+    "profitPct": -9.79,
     "recoveryFactor": -1.12,
     "score": {
       "axes": {
         "winRate": 42,
         "profitFactor": 0,
-        "risk": 77.9,
+        "risk": 77.88,
         "recovery": 0,
         "consistency": 43.75
       },
