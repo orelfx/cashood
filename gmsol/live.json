@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792704143483,
+  "checkedAt": 1792704444039,
   "status": "ok",
-  "asOf": 1792704066619,
+  "asOf": 1792704394534,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.6.1",
   "specDocStatus": "audited_pass",
@@ -218,38 +218,45 @@
   },
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792704142105,
-    "solPools": 325,
-    "inactive1h": 118,
-    "checked": 207,
+    "scannedAt": 1792704442720,
+    "solPools": 331,
+    "inactive1h": 110,
+    "checked": 221,
     "passed": 0,
     "topReasons": [
       {
         "reason": "pool.fee_active_tvl_ratio",
-        "pools": 183
+        "pools": 200
       },
       {
         "reason": "pool.dlmm_params.bin_step",
-        "pools": 145
+        "pools": 156
       },
       {
         "reason": "pool.volume",
+        "pools": 153
+      },
+      {
+        "reason": "pool.unique_traders",
         "pools": 140
       },
       {
         "reason": "base.market_cap",
-        "pools": 127
-      },
-      {
-        "reason": "pool.unique_traders",
-        "pools": 124
+        "pools": 136
       },
       {
         "reason": "pool.tvl",
-        "pools": 92
+        "pools": 99
       }
     ],
     "closest": [
+      {
+        "symbol": "Dacity-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.3709 !>=0.4"
+        ]
+      },
       {
         "symbol": "Kimchi-SOL",
         "binStep": 50,
@@ -272,17 +279,10 @@
         ]
       },
       {
-        "symbol": "PHP-SOL",
-        "binStep": 200,
-        "reasons": [
-          "blacklist_after_loss"
-        ]
-      },
-      {
-        "symbol": "PHP-SOL",
+        "symbol": "PANGEA-SOL",
         "binStep": 100,
         "reasons": [
-          "blacklist_after_loss"
+          "pool.fee_active_tvl_ratio=0.3698 !>=0.4"
         ]
       }
     ]
@@ -702,6 +702,10 @@
     {
       "t": 1792704066619,
       "usd": 961.83
+    },
+    {
+      "t": 1792704394534,
+      "usd": 961.83
     }
   ],
   "engine": {
@@ -947,17 +951,17 @@
   "wallet": {
     "label": "Isi wallet, termasuk cadangan 0,3 SOL",
     "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
-    "asOf": 1792704143483,
+    "asOf": 1792704444039,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 103.86,
+    "solPriceUsd": 103.76,
     "freeSol": 9.5128,
-    "freeSolUsd": 988.04,
+    "freeSolUsd": 987.02,
     "tokens": [
       {
         "id": "token#14",
         "symbol": "MET",
         "amount": 0.000635,
-        "priceUsd": 0.333721,
+        "priceUsd": 0.33369,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -967,7 +971,7 @@
         "id": "token#2",
         "symbol": "GTA6",
         "amount": 0.051100149,
-        "priceUsd": 0.00228029,
+        "priceUsd": 0.00232791,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1017,7 +1021,7 @@
         "id": "token#7",
         "symbol": "Jimothy",
         "amount": 0.000001,
-        "priceUsd": 0.00219676,
+        "priceUsd": 0.00222195,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1132,7 +1136,7 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 988.04,
+    "totalAssetsUsd": 987.02,
     "openCount": 0,
     "positions": [],
     "closedCount": {
@@ -1146,17 +1150,17 @@
   "walletShared": {
     "label": "Isi wallet, termasuk cadangan 0,3 SOL",
     "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
-    "asOf": 1792704143483,
+    "asOf": 1792704444039,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 103.86,
+    "solPriceUsd": 103.76,
     "freeSol": 9.5128,
-    "freeSolUsd": 988.04,
+    "freeSolUsd": 987.02,
     "tokens": [
       {
         "id": "token#14",
         "symbol": "MET",
         "amount": 0.000635,
-        "priceUsd": 0.333721,
+        "priceUsd": 0.33369,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1166,7 +1170,7 @@
         "id": "token#2",
         "symbol": "GTA6",
         "amount": 0.051100149,
-        "priceUsd": 0.00228029,
+        "priceUsd": 0.00232791,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1216,7 +1220,7 @@
         "id": "token#7",
         "symbol": "Jimothy",
         "amount": 0.000001,
-        "priceUsd": 0.00219676,
+        "priceUsd": 0.00222195,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1331,7 +1335,7 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 988.04,
+    "totalAssetsUsd": 987.02,
     "openCount": 0,
     "positions": [],
     "closedCount": {
@@ -2056,6 +2060,11 @@
     {
       "t": 1792704143483,
       "usd": 988.04,
+      "sol": 9.5128
+    },
+    {
+      "t": 1792704444039,
+      "usd": 987.02,
       "sol": 9.5128
     }
   ],
