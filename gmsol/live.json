@@ -4,15 +4,89 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 1200,
-  "checkedAt": 1792654926133,
+  "checkedAt": 1792655234674,
   "status": "ok",
-  "asOf": 1792654917676,
-  "t0At": null,
+  "asOf": 1792655217682,
+  "t0At": 1792640069332,
   "spec": "gmsol-live-v3.2 r3",
+  "execErrors": 0,
+  "screening": {
+    "scannedAt": 1792654973742,
+    "solPools": 330,
+    "inactive1h": 122,
+    "checked": 208,
+    "passed": 0,
+    "topReasons": [
+      {
+        "reason": "pool.fee_active_tvl_ratio",
+        "pools": 206
+      },
+      {
+        "reason": "pool.unique_traders",
+        "pools": 165
+      },
+      {
+        "reason": "pool.volume",
+        "pools": 162
+      },
+      {
+        "reason": "pool.dlmm_params.bin_step",
+        "pools": 154
+      },
+      {
+        "reason": "base.market_cap",
+        "pools": 134
+      },
+      {
+        "reason": "pool.tvl",
+        "pools": 93
+      }
+    ],
+    "closest": [
+      {
+        "symbol": "PHP-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.3876 !>=2"
+        ]
+      },
+      {
+        "symbol": "Macca-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.1176 !>=2"
+        ]
+      },
+      {
+        "symbol": "PANGEA-SOL",
+        "binStep": 100,
+        "reasons": [
+          "derived.age_h=15.1419 !>=24",
+          "pool.fee_active_tvl_ratio=0.0913 !>=2"
+        ]
+      },
+      {
+        "symbol": "ANTHROPIC-SOL",
+        "binStep": 80,
+        "reasons": [
+          "pool.dlmm_params.bin_step=80 !in[100,125,200,250]",
+          "pool.fee_active_tvl_ratio=0.0363 !>=2"
+        ]
+      },
+      {
+        "symbol": "Dacity-SOL",
+        "binStep": 80,
+        "reasons": [
+          "pool.dlmm_params.bin_step=80 !in[100,125,200,250]",
+          "pool.fee_active_tvl_ratio=0.0421 !>=2"
+        ]
+      }
+    ]
+  },
   "equityStatus": "ok",
   "walletSolShared": {
     "sol": 1.1157,
-    "usd": 116.29,
+    "usd": 116.36,
     "label": "dipakai bersama Meridian"
   },
   "sizing": {
@@ -25,6 +99,9 @@
     "dailyBlocked": false,
     "dailyBlockedUntil": null,
     "dayChangePct": 0,
+    "dayStartLedgerUsd": 1200,
+    "dayFloorUsd": 900,
+    "gateUnknownBlock": false,
     "halted": false
   },
   "equityUsd": 1200,
@@ -217,6 +294,14 @@
     },
     {
       "t": 1792654917676,
+      "usd": 1200
+    },
+    {
+      "t": 1792655187691,
+      "usd": 1200
+    },
+    {
+      "t": 1792655217682,
       "usd": 1200
     }
   ]
