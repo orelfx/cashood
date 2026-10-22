@@ -41,3 +41,20 @@ export function walletTotal({ solUsd, lpUsd, unclaimedUsd }) {
   const ok = [solUsd, lpUsd, unclaimedUsd].every(fin);
   return ok ? Number((Number(solUsd) + Number(lpUsd) + Number(unclaimedUsd)).toFixed(2)) : null;
 }
+
+/**
+ * Nomor token tunggal = label mesin di excludedTokens (token#N). Cocokkan per token wallet
+ * dengan item spl_token mesin lewat simbol + jumlah unit (toleransi relatif 1e-6), lalu unit saja.
+ * Token tanpa pasangan: id null, inExcluded false (tetap $0). Tidak ada alamat yang dipakai/keluar.
+ */
+export function mapExcluded(tokens, items) {
+  const pool = (Array.isArray(items) ? items : []).filter((i) => i && ((i.kind === 'spl_token' && /^token#\d+$/.test(String(i.label))) || /nft/.test(String(i.kind))));
+  const used = new Set();
+  const near = (a, b) => fin(a) && fin(b) && Math.abs(Number(a) - Number(b)) <= Math.max(1e-12, Math.abs(Number(b)) * 1e-6);
+  const pick = (f) => pool.find((i) => !used.has(i.label) && f(i));
+  return (tokens || []).map((t) => {
+    const m = (t.symbol && pick((i) => i.symbol === t.symbol && near(t.amount, i.units))) || pick((i) => near(t.amount, i.units) && (!i.symbol || !t.symbol || i.symbol === t.symbol));
+    if (m) used.add(m.label);
+    return { ...t, id: m ? m.label : null, inExcluded: !!m };
+  });
+}

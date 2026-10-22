@@ -13,7 +13,7 @@
  * dibersihkan dari string mirip alamat.
  */
 import { createRequire } from 'node:module';
-import { buildTokens, walletTotal } from './lib/gmsol-tokens.mjs';
+import { buildTokens, walletTotal, mapExcluded } from './lib/gmsol-tokens.mjs';
 import { readFileSync, existsSync, readdirSync, openSync, readSync, fstatSync, closeSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -92,9 +92,21 @@ const ledgerFields = (j) => ({
   costs: j.costs && typeof j.costs === 'object' ? { gasUsd: r2(j.costs.gasUsd), swapFeesUsd: r2(j.costs.swapFeesUsd),
     items: (Array.isArray(j.costs.items) ? j.costs.items : []).slice(0, 20).map((i) => ({ label: text(i.label, 60), usdPerMonth: r2(i.usdPerMonth) })).filter((i) => i.label) } : null,
 });
+// Riwayat sebelum deploy: HANYA label riwayat, tidak pernah masuk PnL/equity/rem.
+const preDeploy = (j) => (Array.isArray(j.preDeployHistory) ? j.preDeployHistory : []).slice(0, 20).map((h) => ({ atWib: text(h.atWib, 40), type: text(h.type, 30), symbol: text(h.symbol, 30),
+  sol: num(h.sol), units: num(h.units), depositUsd: r2(h.depositUsd), returnedSol: num(h.returnedSol), returnedUsd: r2(h.returnedUsd), resultUsd: r2(h.resultUsd), resultPct: r3(h.resultPct),
+  by: text(h.by, 30), note: /meridian2|bersama/i.test(String(h.note || '')) ? null : text(h.note, 160), historyOnly: true, inPnl: false }));
+// Token/posisi lama yang dibekukan mesin saat lock (nilai $0, label saja).
+const excluded = (j) => { const e = j.excludedTokens; if (!e || typeof e !== 'object') return null;
+  const items = (Array.isArray(e.items) ? e.items : []).slice(0, 60).map((i) => ({ label: text(i.label, 40), symbol: text(i.symbol, 16), kind: text(i.kind, 40), status: text(i.status, 30), units: num(i.units), valueUsd: 0 })).filter((i) => i.label);
+  return { frozenAt: time(e.frozenAt), valueUsd: 0, count: items.length, note: text(e.note, 200), items }; };
+let EXCL_ITEMS = [];
+const GAPS = (j) => ['Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.',
+  /pending_audit/i.test(String(j?.specDocStatus || '')) ? 'Dokumen spec mesin masih pending_audit.' : null].filter(Boolean).join(' ');
+const withGaps = (W, j) => (W ? { ...W, gaps: GAPS(j), tokens: Array.isArray(W.tokens) ? mapExcluded(W.tokens, EXCL_ITEMS) : W.tokens } : W); // juga untuk pembacaan cache
 const historyFields = (j) => ({
   closes: (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow),
-  preDeployHistory: (Array.isArray(j.preDeployHistory) ? j.preDeployHistory : []).slice(0, 20).map((h) => ({ atWib: text(h.atWib, 40), type: text(h.type, 30), sol: num(h.sol), by: text(h.by, 30), note: text(h.note, 160) })),
+  preDeployHistory: preDeploy(j), excludedTokens: excluded(j),
   spec: text(j.spec, 40), t0At: time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At),
 });
 function wait(reason, asOf = null) { out({ ...base, status: 'waiting', reason, asOf }); console.log(`[gmsol] waiting: ${reason}`); release(); process.exit(0); }
@@ -162,7 +174,7 @@ async function walletShared(engineState) {
         const meta = {}; const ms = tk.mints.length ? await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${tk.mints.join(',')}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json()).catch(() => []) : [];
         for (const m of Array.isArray(ms) ? ms : []) if (m?.id) meta[m.id] = { symbol: m.symbol };
         const idF = resolve(DIR, 'tokens.local.json'), idMap = readJSON(idF, {});
-        tk = { ...buildTokens(tk.accs, pr || {}, meta, idMap, [WSOL]), tokensError: null };
+        tk = { ...buildTokens(tk.accs, pr || {}, meta, idMap, [WSOL]), tokensError: null }; tk.tokens = mapExcluded(tk.tokens, EXCL_ITEMS); // nomor = label excludedTokens mesin
         atomicJSON(idF, idMap);
       } catch (e) { tk = { tokens: null, tokensUsd: 0, tokensQuotedUsd: null, tokensUnpriced: null, tokensError: text(e.message, 80) }; }
     }
@@ -206,8 +218,7 @@ const v3Fields = (j) => {
     capitalUsd: CAPITAL, capitalUsdAtDeploy: num(j.capitalUsdAtDeploy?.usd) == null ? null : r2(j.capitalUsdAtDeploy.usd), capitalLockedAt: j.capitalUsdAtDeploy?.lockedAt && time(j.capitalUsdAtDeploy.lockedAt) ? new Date(time(j.capitalUsdAtDeploy.lockedAt)).toISOString() : null,
     capitalSolUsdAtLock: r2(j.capitalUsdAtDeploy?.solUsd), capitalFreeSolAtLock: num(j.capitalUsdAtDeploy?.freeSol), capitalReserveSol: num(j.capitalUsdAtDeploy?.reserveSol),
     flowsDeclaredNetUsd: r2(j.flowsDeclaredNetUsd),
-    preDeployHistory: (Array.isArray(j.preDeployHistory) ? j.preDeployHistory : []).slice(0, 10).map((h) => ({ atWib: text(h.atWib, 30), type: text(h.type, 30), sol: num(h.sol), by: text(h.by, 20), note: /meridian2|bersama/i.test(String(h.note || '')) ? null : text(h.note, 160), historyOnly: true })), execErrors: num(j.execErrors), screening: screening(), equityStatus: text(j.equityStatus, 80),
-    walletSolShared: num(j.walletSolShared?.sol) == null ? null : { sol: Number(Number(j.walletSolShared.sol).toFixed(4)), usd: num(j.solPriceUsd) == null ? null : r2(j.walletSolShared.sol * j.solPriceUsd), label: 'saldo SOL bebas wallet GMSOL' },
+    preDeployHistory: preDeploy(j), excludedTokens: excluded(j), execErrors: num(j.execErrors), screening: screening(), equityStatus: text(j.equityStatus, 80),
     sizing: { sizeUsd: r2(j.sizing?.sizeUsd), maxOpen: num(j.sizing?.maxOpen), maxOpenCap: num(j.sizing?.maxOpenCap) },
     brakes: { dailyPct: num(b.dailyPct), totalFloorUsd: r2(b.totalFloorUsd), dailyBlocked: b.dailyBlocked === true,
       dailyBlockedUntil: time(b.dailyBlockedUntil), dayChangePct: r3(b.dayChangePct), dayStartLedgerUsd: r2(b.dayStartLedgerUsd), dayFloorUsd: r2(b.dayFloorUsd), gateUnknownBlock: b.gateUnknownBlock === true, halted: b.halted === true },
@@ -220,8 +231,8 @@ try {
   if (j?.fund !== 'gmsol' || j?.mode !== 'live') wait('belum jalan — sumber bukan mode live');
   // Berkas lama v2.x (rem lama, ekuitas wallet) tidak dipakai lagi.
   if (!('equityLedgerUsd' in j)) wait('belum jalan — menunggu mesin v3.2 (data v2 lama diabaikan)');
-  CAPITAL = r2(j.capitalUsd); CAP_LOCK = time(j.capitalUsdAtDeploy?.lockedAt);
-  if (CAPITAL == null || !CAP_LOCK) wait('menunggu modal r4.1 dikunci mesin');
+  CAPITAL = r2(j.capitalUsd); CAP_LOCK = time(j.capitalUsdAtDeploy?.lockedAt); EXCL_ITEMS = Array.isArray(j.excludedTokens?.items) ? j.excludedTokens.items : [];
+  if (CAPITAL == null || !CAP_LOCK) wait('menunggu modal dikunci mesin');
   const asOf = time(j.updatedAt);
   const eq = r2(j.equityLedgerUsd);
   if (!asOf) wait('belum jalan — menunggu data live');
@@ -230,7 +241,7 @@ try {
     // (aturan Auditor). Saldo wallet dibaca langsung dari blockchain oleh
     // Cashood saat ini juga — itu bukan data mesin dan tetap segar, jadi ikut
     // terbit supaya uang nyata GMSOL tidak hilang dari Total aset (Orel, 22 Okt).
-    const W = walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})));
+    const W = withGaps(walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {}))), j);
     let halt = null; try { halt = text(readFileSync(resolve(ENGINE, 'state', 'HALTED'), 'utf8'), 120); } catch { /* tidak ada berkas HALTED */ }
     const extra = W && num(W.totalAssetsUsd) != null ? { wallet: W, walletShared: W, walletCurve: walletCurve(W) } : {};
     out({ ...base, status: 'waiting', reason: 'Mesin berhenti, menunggu restart', asOf, haltNote: halt, ...(extra.wallet ? { history: historyFields(j), ledger: ledgerFields(j) } : {}), ...extra });
@@ -248,12 +259,12 @@ try {
       valueUsd: m ? r2((Number(m.l.valueL) + Number(m.l.unclaimedL) + (num(m.s.rentL) || 0)) / 1e9 * px) : null,
       feesUsd: m ? r2(Number(m.l.unclaimedL) / 1e9 * px + (num(m.s.claimedUsd) || 0)) : null }; });
   const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow);
-  const WALLET = walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})));
+  const WALLET = withGaps(walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {}))), j);
   out({ ...base, status: 'ok', asOf, ...v3Fields(j),
     equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
     realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd),
     openSeats: seats, closes, equityCurve: curve(asOf, eq),
-    engine: { label: 'Buku internal mesin r4.1', note: 'Buku internal mesin GMSOL r4.1 (modal dikunci saat deploy, dasar rem mesin). BUKAN angka utama; angka utama = wallet.totalAssetsUsd.', capitalUsd: CAPITAL, equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
+    engine: { label: `Buku mesin ${text(j.spec, 40) || ''}`.trim(), note: 'Buku mesin GMSOL: modal dikunci saat deploy; PnL = equity - modal kunci, hanya sejak lock. Riwayat sebelum deploy tidak masuk PnL.', capitalLockedAt: CAP_LOCK ? new Date(CAP_LOCK).toISOString() : null, capitalUsd: CAPITAL, equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
       realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd), totalFloorUsd: r2(j.brakes?.totalFloorUsd), dayFloorUsd: r2(j.brakes?.dayFloorUsd), maxOpen: num(j.sizing?.maxOpen), openCount: seats.length, closedCount: closes.length,
       winRatePct: closes.length ? r2(closes.filter((c) => c.netUsd > 0).length / closes.length * 100) : null },
     ledger: ledgerFields(j), history: historyFields(j),

@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { buildTokens, walletTotal } from '../scripts/lib/gmsol-tokens.mjs';
+import { buildTokens, walletTotal, mapExcluded } from '../scripts/lib/gmsol-tokens.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const NOW = Date.parse('2026-10-21T12:00:00Z');
@@ -23,11 +23,12 @@ function run(source, { passed = false, now = NOW, engine = '/nonexistent-gmsol' 
 }
 
 test('gmsol v3: kinerja dari equityLedgerUsd, wallet hanya info bersama', () => {
-  const d = run(src({ equityUsd: 900, specStatus: 'DRAFT', solPriceUsd: 100 }));
-  assert.ok(!JSON.stringify(d).includes('DRAFT')); assert.equal(d.walletSolShared.usd, 870);
+  const d = run(src({ preDeployHistory: [{ atWib: 'x', type: 'pre_deploy_close', symbol: 'PANGEA/SOL', resultUsd: -17.6, note: 'dibuka meridian2' }], excludedTokens: { valueUsd: 0, items: [{ label: 'token#0', kind: 'spl_token', symbol: 'A', units: 1, readUsd: 5 }] }, equityUsd: 900, specStatus: 'DRAFT', solPriceUsd: 100 }));
+  assert.ok(!JSON.stringify(d).includes('DRAFT')); assert.equal(d.walletSolShared, undefined);
   assert.equal(d.status, 'ok'); assert.equal(d.risk, 'high');
   assert.equal(d.equityUsd, 1195.5); assert.equal(d.pnlUsd, -4.5);
-  assert.equal(d.walletSolShared.label, 'saldo SOL bebas wallet GMSOL');
+  assert.equal(d.preDeployHistory[0].resultUsd, -17.6); assert.equal(d.preDeployHistory[0].inPnl, false); assert.equal(d.preDeployHistory[0].note, null); assert.equal(d.pnlUsd, -4.5);
+  assert.equal(d.excludedTokens.count, 1); assert.equal(d.excludedTokens.items[0].valueUsd, 0); assert.equal(d.excludedTokens.items[0].readUsd, undefined);
   assert.equal(d.brakes.totalFloorUsd, 600); assert.equal(d.sizing.maxOpen, 5);
   assert.equal(d.openSeats.length, 1); assert.equal(d.closes.length, 1);
 });
@@ -81,4 +82,14 @@ test('gmsol wallet.tokens: token tidak pernah mengubah nilai/headline/PnL', () =
   assert.equal(big.tokensQuotedUsd, 5e9); assert.equal(big.tokensUsd, 0); assert.ok(big.tokens.every((t) => t.usd === 0 && t.countedUsd === 0));
   assert.equal(walletTotal({ ...base, tokens: big.tokens, tokensUsd: big.tokensQuotedUsd }), 151.25);
   assert.equal(walletTotal(base), 151.25); assert.equal(walletTotal({ ...base, lpUsd: null }), null);
+});
+
+test('gmsol wallet.tokens: nomor token = label excludedTokens mesin (satu sumber)', () => {
+  const items = [{ label: 'damm_v2_position_permanent_lock', kind: 'damm_v2_position_permanent_lock', symbol: 'NITA' },
+    { label: 'token#0', kind: 'spl_token', symbol: 'AAA', units: 1e-6 }, { label: 'token#1', kind: 'spl_token', symbol: 'AAA', units: 500 }, { label: 'token#6', kind: 'spl_token', symbol: null, units: 2003 }];
+  const out = mapExcluded([{ id: 'token#9', symbol: 'AAA', amount: 500, usd: 0 }, { id: 'token#2', symbol: 'ZZZ', amount: 2003, usd: 0 }, { id: 'token#3', symbol: 'AAA', amount: 0.000001, usd: 0 }, { id: 'token#4', symbol: 'NEW', amount: 7, usd: 0 }], items);
+  assert.deepEqual(out.map((t) => t.id), ['token#1', 'token#6', 'token#0', null]);
+  assert.deepEqual(out.map((t) => t.inExcluded), [true, true, true, false]);
+  assert.ok(out.every((t) => t.usd === 0));
+  assert.deepEqual(mapExcluded([], items), []);
 });
