@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "73682b0e-9e3f-4998-96e1-3da6dd2f5c27",
-  "updatedAt": 1792685708333,
-  "generatedAt": "2026-10-22 23:15 WIB",
+  "generation": "41986a17-8c29-40a4-8ab3-e300bc0a7d1e",
+  "updatedAt": 1792686320805,
+  "generatedAt": "2026-10-22 23:25 WIB",
   "usdIdr": null,
-  "totalUsd": 901.7240106555178,
+  "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 901.7240106555178,
+  "botWalletUsd": 907.0593651627605,
   "walletUsd": 899.6247844152517,
-  "lpUsd": 2.09922624,
+  "lpUsd": 7.43458075,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,14 @@
       "bookLabel": "low",
       "costUsd": 7.43458074750882,
       "investedUsd": 7.43458074750882,
-      "principalUsd": 2.09922624,
-      "valueUsd": 2.09922624,
+      "principalUsd": 7.43458075,
+      "valueUsd": 7.43458075,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -5.335354507242778,
-      "pnlPct": -71.76,
+      "pnlUsd": 0,
+      "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "priceUsd": 0.00009055714583205224,
-      "ageMinutes": 677,
+      "ageMinutes": 688,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -87,7 +86,7 @@
       "llmScore": 76,
       "peakPct": 75.57,
       "ddPct": -81.03,
-      "stale": false
+      "stale": true
     }
   ],
   "history": [
@@ -1410,18 +1409,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 899.6247844152517,
-    "positionsUsd": 2.09922624,
-    "realizedUsd": -92.94063483,
-    "unrealizedUsd": -5.33535451,
-    "pnlUsd": -98.27598934448224,
+    "positionsUsd": 7.43458075,
+    "realizedUsd": -92.94063484,
+    "unrealizedUsd": 0,
+    "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792685708333,
+    "heartbeatAt": 1792686320805,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 10.67,
-    "lastScanAt": 1792685674000,
+    "drawdownPct": 10.14,
+    "lastScanAt": 1792686282000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1436,13 +1435,19 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$5.3354",
+        "v": "+$0.0000",
         "n": "dari posisi terbuka",
+        "tone": "pos"
+      },
+      {
+        "k": "Harga belum tersedia",
+        "v": "1",
+        "n": "posisi ditandai belum terverifikasi",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "509",
+        "v": "507",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1458,9 +1463,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792685708333,
+      "lastDecisionAt": 1792686320805,
       "lastAction": "keputusan",
-      "lastReason": "LOAD [mid]: Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
+      "lastReason": "KIMWHALE [degen]: Dilewati: harga sudah -49% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1487,7 +1492,7 @@
       ],
       [
         "Wallet tepercaya",
-        "0 · menjanjikan 19"
+        "0 · menjanjikan 20"
       ],
       [
         "Label wallet",
@@ -1505,7 +1510,7 @@
       ],
       [
         "mid (core)",
-        "alokasi 15% · $68 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
+        "alokasi 15% · $67 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
       ],
       [
         "big (core)",
@@ -1543,13 +1548,13 @@
       "active": 500,
       "passive": 23010,
       "trusted": 0,
-      "promising": 19,
+      "promising": 20,
       "byLabel": [
         {
           "key": "smart",
           "total": 14613,
-          "active": 459,
-          "passive": 14154
+          "active": 460,
+          "passive": 14153
         },
         {
           "key": "bot",
@@ -1578,8 +1583,8 @@
         {
           "key": "dolphin",
           "total": 203,
-          "active": 23,
-          "passive": 180
+          "active": 22,
+          "passive": 181
         },
         {
           "key": "whale",
@@ -1696,7 +1701,17 @@
     },
     "decisions": [
       {
-        "at": 1792685565045,
+        "at": 1792686169322,
+        "symbol": "KIMWHALE",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -49% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792686167998,
         "symbol": "LOAD",
         "action": "skip",
         "basket": "mid",
@@ -1704,6 +1719,44 @@
           "kol": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
+      },
+      {
+        "at": 1792685757554,
+        "symbol": "BLACKTOBER",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 338,
+            "note": "bundler pegang 19.3%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 14.2%"
+          },
+          {
+            "type": "fresh",
+            "count": 950,
+            "note": "15.8% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 11x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
       },
       {
         "at": 1792685151203,
@@ -1749,39 +1802,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -17% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792684145721,
-        "symbol": "BLACKTOBER",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 2,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 294,
-            "note": "bundler pegang 7.3%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 11.8%"
-          },
-          {
-            "type": "fresh",
-            "count": 791,
-            "note": "14.4% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 12x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       },
       {
         "at": 1792683749345,
@@ -2330,24 +2350,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 73.94% supply."
-      },
-      {
-        "at": 1792654781807,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1,
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 2.4% dari market cap."
       }
     ],
     "reasonStats": {
@@ -2358,7 +2360,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 420,
+        "red_flag": 418,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2403,12 +2405,14 @@
     }
   },
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "1 posisi tanpa harga masuk/mark; nilainya dari catatan paper"
+    ]
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792685849064,
+    "generatedAt": 1792686432314,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2449,25 +2453,25 @@
     "equity": {
       "days": 16,
       "spanDays": 16.7,
-      "returnPct": -8.88,
+      "returnPct": -8.34,
       "maxDrawdownPct": 8.95,
       "maxDrawdownAt": 1792677528487,
       "maxDrawdownUsd": 88.56,
       "maxDrawdownPeakUsd": 989.63,
       "maxDrawdownTroughUsd": 901.07,
-      "currentDrawdownPct": 8.88,
-      "currentDrawdownUsd": 87.91,
+      "currentDrawdownPct": 8.34,
+      "currentDrawdownUsd": 82.57,
       "positiveDaysPct": 43.75,
       "bestDayPct": 0.83,
       "worstDayPct": -3.87,
-      "sharpe": -8.42,
-      "sortino": -8.16,
+      "sharpe": -8.18,
+      "sortino": -7.99,
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -98.28,
-    "profitPct": -9.83,
-    "recoveryFactor": -1.11,
+    "profitUsd": -92.94,
+    "profitPct": -9.29,
+    "recoveryFactor": -1.05,
     "score": {
       "axes": {
         "winRate": 42,
