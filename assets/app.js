@@ -3730,21 +3730,91 @@ const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL <s
 const GMSOL_WARN = '<b>Uang asli · uji eksekusi.</b> GMSOL memasang likuiditas di pool Meteora DLMM dengan dana sungguhan. Ukuran posisi, jumlah posisi maksimal, dan rem otomatis (harian dan total, dikonfirmasi 2× berjarak 60 detik) mengikuti angka mesin di atas; kena rem total → semua posisi GMSOL ditutup dan mesin berhenti sampai diizinkan Orel. <b>Profit belum terbukti.</b> Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
 // Pernah live lalu data basi (>15 menit) → mesin berhenti, bukan "menunggu live".
 const gmsolStopped = (d) => !!d?.asOf && (d.status !== 'ok' || Date.now() - d.asOf > GMSOL_STALE_MS);
+// ── bagian halaman GMSOL yang dipakai mode live maupun mesin berhenti ──
+const gmsolHas = (v) => v !== null && v !== undefined && Number.isFinite(Number(v));
+// Grafik aset nyata: pembacaan blockchain oleh Cashood (bukan data mesin).
+function gmsolWalletChart(curve) {
+  const pts = (curve || []).filter((p) => Number.isFinite(p.t) && Number.isFinite(p.usd)).sort((a, b) => a.t - b.t);
+  if (pts.length < 2) return '<p class="hint">Grafik muncul setelah beberapa pembacaan wallet terkumpul (tiap 5 menit).</p>';
+  const small = narrow(), W = small ? 420 : 720, H = small ? 240 : 200, m = small ? { t: 16, r: 14, b: 28, l: 60 } : { t: 16, r: 20, b: 28, l: 64 };
+  const vals = pts.map((p) => p.usd); let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.15 || Math.max(1, hi * 0.01); lo -= pad; hi += pad;
+  const x = (t) => m.l + ((t - pts[0].t) / Math.max(1, pts.at(-1).t - pts[0].t)) * (W - m.l - m.r), y = (v) => m.t + ((hi - v) / (hi - lo)) * (H - m.t - m.b);
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join(''), last = pts.at(-1);
+  const c = last.usd >= pts[0].usd ? 'var(--green)' : 'var(--red)';
+  const tick = (t) => { const z = new Date(t + 7 * 3600e3); return last.t - pts[0].t < 36 * 3600e3 ? z.toISOString().slice(11, 16) : `${z.getUTCDate()} ${M_SHORT[z.getUTCMonth()]}`; };
+  return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Aset nyata GMSOL dari blockchain (WIB)">
+    <defs><linearGradient id="gsWFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".2"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/></linearGradient></defs>
+    ${[hi - pad, (hi + lo) / 2, lo + pad].map((v) => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" class="g-grid"/><text x="${m.l - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" class="g-lbl">${usdText(v, 0)}</text>`).join('')}
+    <path d="${line}L${x(last.t).toFixed(1)},${H - m.b}L${x(pts[0].t).toFixed(1)},${H - m.b}Z" fill="url(#gsWFill)"/>
+    <path d="${line}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${x(last.t).toFixed(1)}" cy="${y(last.usd).toFixed(1)}" r="4" fill="${c}" stroke="var(--card)" stroke-width="2"/>
+    ${[pts[0].t, last.t].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)} WIB</text>`).join('')}
+  </svg></div>`;
+}
+function gmsolPosTable(all, ws) {
+  if (!all.length) return '<p class="dim">Tidak ada posisi LP di wallet saat ini.</p>';
+  return `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Fee</th><th class="num">uPnL</th><th>Range</th></tr></thead><tbody>
+    ${all.map((p) => `<tr><td class="mc-head"><span class="who"><span class="chip" style="background:${(p.uPnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(p.symbol || '—')}</span>${p.protocol ? `<div class="sub2">${esc(p.protocol)}</div>` : ''}</td>
+      <td class="num" data-k="Umur">${gmsolHas(p.ageH) ? dur(p.ageH * 60) : '—'}</td>
+      <td class="num" data-k="Modal">${gmsolHas(p.investedUsd) ? usd(p.investedUsd) : '—'}</td>
+      <td class="num" data-k="Nilai"><b>${gmsolHas(p.valueUsd) ? usd(p.valueUsd) : '—'}</b></td>
+      <td class="num pos" data-k="Fee">${gmsolHas(p.feesUsd) ? usd(p.feesUsd) : '—'}${gmsolHas(p.unclaimedFeesUsd) ? `<div class="sub2">${usd(p.unclaimedFeesUsd)} belum diklaim</div>` : ''}</td>
+      <td class="num ${cls(p.uPnlUsd ?? 0)}" data-k="uPnL">${gmsolHas(p.uPnlUsd) ? sbUsd(p.uPnlUsd) : '—'}${gmsolHas(p.pct) ? `<div class="sub2">${sbPct(p.pct)}</div>` : ''}</td>
+      <td data-k="Range">${p.inRange == null ? '—' : `<span class="pill ${p.inRange ? 'in' : 'out2'}">${p.inRange ? 'di dalam' : 'di luar'}</span>`}</td></tr>`).join('')}</tbody></table></div>
+    ${ws?.gaps ? `<p class="hint">Catatan data: ${esc(ws.gaps)}${gmsolHas(ws.tokensUnpriced) && ws.tokensUnpriced ? ` (${ws.tokensUnpriced} token tanpa harga)` : ''}.</p>` : ''}`;
+}
+function gmsolClosesTable(closes) {
+  if (!closes.length) return '<p class="dim">Belum ada posisi yang ditutup mesin.</p>';
+  return `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th class="num">Fee</th><th>Hasil akhir</th><th class="num">Ditutup</th></tr></thead><tbody>
+    ${closes.map((c) => `<tr><td class="mc-head"><span class="who"><span class="chip" style="background:${(c.netUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol || '—')}</span>${c.reason ? `<div class="sub2">${esc(shortReason(c.reason))}</div>` : ''}</td>
+      <td class="num dim" data-k="Lama">${c.openedAt && c.closedAt ? dur((c.closedAt - c.openedAt) / 60000) : '—'}</td>
+      <td class="num ${cls(c.netUsd ?? 0)}" data-k="Hasil">${gmsolHas(c.netUsd) ? sbUsd(c.netUsd) : '—'}</td><td class="num ${cls(c.netPct ?? 0)}" data-k="%">${gmsolHas(c.netPct) ? sbPct(c.netPct) : '—'}</td>
+      <td class="num pos" data-k="Fee">${gmsolHas(c.feesUsd) ? usd(c.feesUsd) : '—'}</td>
+      <td data-k="Hasil akhir">${!gmsolHas(c.netUsd) ? '—' : `<span class="pill ${c.netUsd > 0 ? 'in' : 'out2'}">${c.netUsd > 0 ? 'menang' : c.netUsd < 0 ? 'kalah' : 'impas'}</span>`}</td>
+      <td class="num dim" data-k="Ditutup">${c.closedAt ? esc(sbWib(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>`;
+}
+// Kejadian penting (fakta yang sudah terjadi). Teks ditulis Cashood dari jenis
+// kejadiannya — catatan mentah mesin tidak dipakai (seluruh wallet milik GMSOL).
+function gmsolEvents(d, extra = []) {
+  const T = { withdrawal: (h) => `Penarikan ${gmsolHas(h.sol) ? fmtNum(h.sol, 4) + ' SOL' : ''}${h.by ? ` oleh ${h.by}` : ''}`, foreign_position: (h) => `Posisi LP ${gmsolHas(h.sol) ? fmtNum(h.sol, 2) + ' SOL ' : ''}dibuka di wallet di luar buku mesin` };
+  // "2026-10-22 00:03:28 WIB" → "22 Okt 00:03 WIB" (sama dengan format waktu lain di halaman).
+  const wib = (v) => { const m = /(\d{4})-(\d{2})-(\d{2}) (~?)(\d{2}:\d{2})/.exec(String(v || '')); return m ? `${Number(m[3])} ${M_SHORT[Number(m[2]) - 1]} ${m[4]}${m[5]} WIB` : (v || '—'); };
+  const rows = [...((d.history?.preDeployHistory || d.preDeployHistory || []).map((h) => [wib(h.atWib), (T[h.type] || ((x) => x.type || 'kejadian'))(h)])), ...extra];
+  if (!rows.length) return '';
+  return `<section class="card"><div class="card-head"><h2>Kejadian penting</h2><span class="hint">riwayat, bukan angka live</span></div>
+    <ul class="gs-events">${rows.map(([t, txt]) => `<li><span class="dim">${esc(t)}</span><span>${esc(txt)}</span></li>`).join('')}</ul></section>`;
+}
 function gmsolWait(msg, asOf, d = null) {
   // Angka MESIN disembunyikan (aturan Auditor). Saldo wallet yang dibaca Cashood
-  // langsung dari blockchain (bukan data mesin) tetap tampil kalau segar.
+  // langsung dari blockchain (bukan data mesin) tetap tampil kalau segar, dengan
+  // grafik, posisi, dan riwayat — supaya halaman tetap lengkap tanpa memoles angka.
   const w = gmsolWalletFresh(d) ? (d.wallet || d.walletShared) : null;
-  const tile = (k, v, n) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`;
+  const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
   const pos = w && Array.isArray(w.positions) ? w.positions : [];
-  return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${/berhenti/i.test(msg) ? 'sb-m-halt' : 'sb-m-wait'}"><i></i>${esc(msg)}</span></div>
-    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir dari mesin: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL belum mengirim data live. '}Angka mesin (buku, untung/rugi, rem, posisi mesin) disembunyikan sampai mesin jalan lagi.</p>
-    ${d?.haltNote ? `<p class="hint">Catatan berhenti: ${esc(d.haltNote)}</p>` : ''}</section>
+  const curve = d?.walletCurve || [];
+  const first = curve.find((p) => Number.isFinite(p.usd));
+  const chg = w && first ? Number(w.totalAssetsUsd) - first.usd : null;
+  const stopped = /berhenti/i.test(msg);
+  // "Thu Oct 22 13:14:01 CEST 2026" → waktu (CEST = UTC+2, CET = UTC+1).
+  const hm = /\w{3} (\w{3}) (\d+) ([\d:]+) (CEST|CET|UTC) (\d{4})/.exec(d?.haltNote || '');
+  const haltAt = hm ? Date.parse(`${hm[1]} ${hm[2]} ${hm[5]} ${hm[3]} GMT${hm[4] === 'CEST' ? '+0200' : hm[4] === 'CET' ? '+0100' : '+0000'}`) : null;
+  const events = [...(asOf && stopped ? [[sbWib(asOf), 'Mesin berhenti mengirim data']] : []), ...(d?.haltNote ? [[Number.isFinite(haltAt) ? sbWib(haltAt) : '—', 'Dihentikan manual untuk menutup posisi PANGEA']] : [])];
+  return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${stopped ? 'sb-m-halt' : 'sb-m-wait'}"><i></i>${esc(msg)}</span></div>
+      <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir dari mesin: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL belum mengirim data live. '}Angka mesin (buku, untung/rugi, rem, screening) disembunyikan sampai mesin jalan lagi; uang di wallet tetap dipantau langsung dari blockchain.</p>
+      ${d?.haltNote ? `<p class="hint">Catatan berhenti: ${esc(d.haltNote)}</p>` : ''}
+      <p class="hint">${d?.history?.spec ? `${esc(d.history.spec)} · ` : ''}${d?.history?.t0At ? `live sejak ${esc(sbWib(d.history.t0At))}` : ''}</p></section>
     ${w ? `<div class="stats sb-top">${[
-      tile('Aset nyata GMSOL', usd(Number(w.totalAssetsUsd)), `dibaca Cashood langsung dari blockchain · ${esc(sbWib(w.asOf))}`),
-      tile('SOL lepas', Number.isFinite(Number(w.freeSol)) ? `${fmtNum(w.freeSol, 4)} SOL` : '—', Number.isFinite(Number(w.freeSolUsd)) ? usd(Number(w.freeSolUsd)) : ''),
-      tile('Posisi LP di wallet', String(pos.length), Number.isFinite(Number(w.lpValueUsd)) ? `nilai ${usd(Number(w.lpValueUsd))}` : ''),
+      tile('Aset nyata GMSOL', usd(Number(w.totalAssetsUsd)), `seluruh wallet · dibaca dari blockchain ${esc(ago(w.asOf))}`),
+      tile('SOL lepas', gmsolHas(w.freeSol) ? `${fmtNum(w.freeSol, 4)} SOL` : '—', gmsolHas(w.freeSolUsd) ? `${usd(Number(w.freeSolUsd))}${gmsolHas(w.solPriceUsd) ? ` · 1 SOL = ${usd(Number(w.solPriceUsd))}` : ''}` : ''),
+      tile('Posisi LP', String(pos.length), gmsolHas(w.lpValueUsd) ? `nilai ${usd(Number(w.lpValueUsd))}${gmsolHas(w.unclaimedFeesUsd) && Number(w.unclaimedFeesUsd) ? ` · fee ${usd(Number(w.unclaimedFeesUsd))}` : ''}` : ''),
+      tile('Perubahan aset', chg == null ? '—' : sbUsd(chg), first ? `sejak ${esc(sbWib(first.t))} · termasuk naik-turun harga SOL` : '', cls(chg ?? 0)),
     ].join('')}</div>
-    <p class="hint gs-note">Aset nyata tetap dihitung di Total aset beranda selama mesin berhenti, karena dibaca langsung dari blockchain — bukan angka mesin.</p>` : ''}
+    <section class="card"><div class="card-head"><h2>Aset nyata dari waktu ke waktu</h2><span class="hint">pembacaan blockchain tiap 5 menit · bukan kinerja mesin</span></div>${gmsolWalletChart(curve)}</section>
+    <section class="card"><div class="card-head"><h2>Posisi LP di wallet <span class="count">(${pos.length})</span></h2><span class="hint">dari blockchain</span></div>${gmsolPosTable(pos, w)}</section>` : ''}
+    <section class="card gs-off"><div class="card-head"><h2>Mesin, rem risiko &amp; screening</h2><span class="pill sb-sim">tidak aktif</span></div>
+      <p class="dim">Mesin GMSOL ${stopped ? 'sedang berhenti' : 'belum mengirim data live'}: tidak membuka posisi baru, rem harian/total tidak berjalan, dan screening pool tidak dilakukan. Buku mesin dan untung/rugi tampil lagi begitu mesin jalan.</p></section>
+    ${d?.history ? `<section class="card"><div class="card-head"><h2>Riwayat posisi ditutup mesin <span class="count">(${(d.history.closes || []).length})</span></h2><span class="hint">riwayat, bukan angka live</span></div>${gmsolClosesTable(d.history.closes || [])}</section>` : ''}
+    ${gmsolEvents(d || {}, events)}
     <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`;
 }
 async function loadGmsol() {
@@ -3847,30 +3917,16 @@ async function renderGmsol() {
     <section class="card"><div class="card-head"><h2>Ekuitas buku</h2><span class="hint">sejak live · garis modal ${$u(cap)}, rem harian ${$u(dayFloor)}, rem total ${$u(totFloor)}</span></div>
       ${none ? '<p class="hint">Mesin belum membuka posisi sejak modalnya dikunci, jadi buku mesin masih tepat di modal — garis datar ini data asli, bukan contoh.</p>' : ''}
       ${gmsolChart(d)}</section>
-    <section class="card"><div class="card-head"><h2>Posisi LP <span class="count">(${all.length})</span></h2><span class="hint">semua posisi di wallet GMSOL${has(ws?.uPnlUsd) ? ` · uPnL total ${sbUsd(ws.uPnlUsd)}` : ''}</span></div>
-      ${all.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Fee</th><th class="num">uPnL</th><th>Range</th></tr></thead><tbody>
-      ${all.map((p) => `<tr><td class="mc-head"><span class="who"><span class="chip" style="background:${(p.uPnlUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(p.symbol || '—')}</span>${p.protocol ? `<div class="sub2">${esc(p.protocol)}</div>` : ''}</td>
-        <td class="num" data-k="Umur">${has(p.ageH) ? dur(p.ageH * 60) : '—'}</td>
-        <td class="num" data-k="Modal">${has(p.investedUsd) ? usd(p.investedUsd) : '—'}</td>
-        <td class="num" data-k="Nilai"><b>${has(p.valueUsd) ? usd(p.valueUsd) : '—'}</b></td>
-        <td class="num pos" data-k="Fee">${has(p.feesUsd) ? usd(p.feesUsd) : '—'}${has(p.unclaimedFeesUsd) ? `<div class="sub2">${usd(p.unclaimedFeesUsd)} belum diklaim</div>` : ''}</td>
-        <td class="num ${cls(p.uPnlUsd ?? 0)}" data-k="uPnL">${has(p.uPnlUsd) ? sbUsd(p.uPnlUsd) : '—'}${has(p.pct) ? `<div class="sub2">${sbPct(p.pct)}</div>` : ''}</td>
-        <td data-k="Range">${p.inRange == null ? '—' : `<span class="pill ${p.inRange ? 'in' : 'out2'}">${p.inRange ? 'di dalam' : 'di luar'}</span>`}</td></tr>`).join('')}</tbody></table></div>
-        ${ws?.gaps ? `<p class="hint">Catatan data: ${esc(ws.gaps)}${has(ws.tokensUnpriced) && ws.tokensUnpriced ? ` (${ws.tokensUnpriced} token tanpa harga)` : ''}.</p>` : ''}` : '<p class="dim">Belum ada posisi.</p>'}</section>
-    <section class="card"><div class="card-head"><h2>Riwayat posisi ditutup <span class="count">(${closes.length})</span></h2></div>
-      ${closes.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Lama</th><th class="num">Hasil</th><th class="num">%</th><th class="num">Fee</th><th>Hasil akhir</th><th class="num">Ditutup</th></tr></thead><tbody>
-      ${closes.map((c) => `<tr><td class="mc-head"><span class="who"><span class="chip" style="background:${(c.netUsd ?? 0) >= 0 ? '#4ade80' : '#f87171'}"></span>${esc(c.symbol || '—')}</span>${c.reason ? `<div class="sub2">${esc(shortReason(c.reason))}</div>` : ''}</td>
-        <td class="num dim" data-k="Lama">${c.openedAt && c.closedAt ? dur((c.closedAt - c.openedAt) / 60000) : '—'}</td>
-        <td class="num ${cls(c.netUsd ?? 0)}" data-k="Hasil">${has(c.netUsd) ? sbUsd(c.netUsd) : '—'}</td><td class="num ${cls(c.netPct ?? 0)}" data-k="%">${has(c.netPct) ? sbPct(c.netPct) : '—'}</td>
-        <td class="num pos" data-k="Fee">${has(c.feesUsd) ? usd(c.feesUsd) : '—'}</td>
-        <td data-k="Hasil akhir">${!has(c.netUsd) ? '—' : `<span class="pill ${c.netUsd > 0 ? 'in' : 'out2'}">${c.netUsd > 0 ? 'menang' : c.netUsd < 0 ? 'kalah' : 'impas'}</span>`}</td>
-        <td class="num dim" data-k="Ditutup">${c.closedAt ? esc(sbWib(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi.</p>'}</section>
+    <section class="card"><div class="card-head"><h2>Aset nyata dari waktu ke waktu</h2><span class="hint">pembacaan blockchain tiap 5 menit · bukan kinerja mesin</span></div>${gmsolWalletChart(d.walletCurve)}</section>
+    <section class="card"><div class="card-head"><h2>Posisi LP <span class="count">(${all.length})</span></h2><span class="hint">semua posisi di wallet GMSOL${has(ws?.uPnlUsd) ? ` · uPnL total ${sbUsd(ws.uPnlUsd)}` : ''}</span></div>${gmsolPosTable(all, ws)}</section>
+    <section class="card"><div class="card-head"><h2>Riwayat posisi ditutup <span class="count">(${closes.length})</span></h2></div>${gmsolClosesTable(closes)}</section>
     ${sc ? `<section class="card"><div class="card-head"><h2>Screening pool</h2><span class="hint">${openCount ? 'pencarian pool baru' : 'kenapa mesin belum membuka posisi'} · scan terakhir ${sc.scannedAt ? `${esc(sbWib(sc.scannedAt))} (${esc(ago(sc.scannedAt))})` : 'menunggu data'}</span></div>
       <div class="gs-funnel">${[['Pool SOL', sc.solPools], ['Tidak aktif 1 jam', sc.inactive1h], ['Dicek', sc.checked], ['Lolos', sc.passed]].map(([k, v], i) => `<div class="gs-step${i === 3 && has(v) ? (v ? ' ok' : ' zero') : ''}"><b>${has(v) ? v : '—'}</b><span>${k}</span></div>`).join('<i aria-hidden="true">›</i>')}</div>
       ${(sc.topReasons || []).length ? `<h3 class="gs-h3">Alasan ditolak terbanyak</h3><div class="gs-reasons">${sc.topReasons.map((r) => { const g = gmsolReason(r.reason); const f = sc.checked ? r.pools / sc.checked : 0; return `<div class="gs-rrow"><span>${esc(g.label)}</span><div class="gs-rbar"><i style="width:${(f * 100).toFixed(0)}%"></i></div><b>${r.pools}</b></div>`; }).join('')}</div>` : ''}
       ${(sc.closest || []).length ? `<h3 class="gs-h3">Paling dekat lolos</h3><div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Bin step</th><th>Kurang di</th></tr></thead><tbody>
         ${sc.closest.map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol || '—')}</b></td><td class="num" data-k="Bin step">${c.binStep ?? '—'}</td><td data-k="Kurang di">${(c.reasons || []).map((r) => { const g = gmsolReason(r); return `<div><b>${esc(g.label)}</b> <span class="dim">${esc(g.text)}</span></div>`; }).join('')}</td></tr>`).join('')}</tbody></table></div>` : ''}
     </section>` : ''}
+    ${gmsolEvents(d)}
     <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`);
 }
 

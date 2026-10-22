@@ -52,6 +52,38 @@ function curve(asOf, eq) {
   const step = Math.max(1, Math.ceil(h.points.length / 400));
   return h.points.filter((_, i) => i % step === 0 || i === h.points.length - 1);
 }
+// Riwayat nilai wallet (pembacaan blockchain oleh Cashood, bukan data mesin):
+// satu titik per siklus, 30 hari, disimpan lokal dan terbit sebagai walletCurve.
+// Pembacaan wallet yang tiba-tiba ≤10% dari pembacaan sebelumnya (mis. RPC
+// menjawab kosong sesaat) dianggap gagal baca: tidak dipakai, tidak disimpan.
+// Pembacaan gagal sesaat → pakai pembacaan bagus terakhir selama ≤15 menit
+// (asOf aslinya tetap, jadi umurnya terlihat); lebih tua → tidak ada.
+function walletSane(W) {
+  const lastF = resolve(DIR, 'wallet-last.local.json');
+  const prev = readJSON(resolve(DIR, 'wallet-nav.local.json'), { points: [] }).points.at(-1)?.usd;
+  let ok = W && num(W.totalAssetsUsd) != null ? W : null;
+  if (ok && prev > 20 && Number(ok.totalAssetsUsd) <= prev * 0.1) { console.warn(`[gmsol] pembacaan wallet ${ok.totalAssetsUsd} vs sebelumnya ${prev}: dianggap gagal baca`); ok = null; }
+  if (ok) { atomicJSON(lastF, ok); return ok; }
+  const last = readJSON(lastF, null);
+  return last && now - (time(last.asOf) ?? 0) <= STALE_MS ? last : null;
+}
+function walletCurve(W) {
+  if (!W || num(W.totalAssetsUsd) == null) return null;
+  const f = resolve(DIR, 'wallet-nav.local.json'), h = readJSON(f, { points: [] });
+  const t = time(W.asOf) ?? now;
+  if (!h.points.length || t > h.points.at(-1).t) h.points.push({ t, usd: r2(W.totalAssetsUsd), sol: num(W.freeSol) == null ? null : Number(Number(W.freeSol).toFixed(4)) });
+  h.points = h.points.filter((p) => p.t > now - 30 * 86400e3).slice(-9000);
+  atomicJSON(f, h);
+  const step = Math.max(1, Math.ceil(h.points.length / 400));
+  return h.points.filter((_, i) => i % step === 0 || i === h.points.length - 1);
+}
+// Riwayat (fakta yang sudah terjadi, bukan angka live): posisi ditutup dan kejadian sebelum deploy.
+const historyFields = (j) => ({
+  closes: (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map((c) => ({
+    symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) })),
+  preDeployHistory: (Array.isArray(j.preDeployHistory) ? j.preDeployHistory : []).slice(0, 20).map((h) => ({ atWib: text(h.atWib, 40), type: text(h.type, 30), sol: num(h.sol), by: text(h.by, 30), note: text(h.note, 160) })),
+  spec: text(j.spec, 40), t0At: time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At),
+});
 function wait(reason, asOf = null) { out({ ...base, status: 'waiting', reason, asOf }); console.log(`[gmsol] waiting: ${reason}`); release(); process.exit(0); }
 
 // Ringkasan screening dari scan terakhir logs/screen-*.jsonl (baris satu scan berbagi ts).
@@ -164,10 +196,10 @@ try {
     // (aturan Auditor). Saldo wallet dibaca langsung dari blockchain oleh
     // Cashood saat ini juga — itu bukan data mesin dan tetap segar, jadi ikut
     // terbit supaya uang nyata GMSOL tidak hilang dari Total aset (Orel, 22 Okt).
-    const W = await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {}));
+    const W = walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})));
     let halt = null; try { halt = text(readFileSync(resolve(ENGINE, 'state', 'HALTED'), 'utf8'), 120); } catch { /* tidak ada berkas HALTED */ }
-    const extra = W && num(W.totalAssetsUsd) != null ? { wallet: W, walletShared: W, haltNote: halt } : {};
-    out({ ...base, status: 'waiting', reason: 'Mesin berhenti, menunggu restart', asOf, ...extra });
+    const extra = W && num(W.totalAssetsUsd) != null ? { wallet: W, walletShared: W, walletCurve: walletCurve(W) } : {};
+    out({ ...base, status: 'waiting', reason: 'Mesin berhenti, menunggu restart', asOf, haltNote: halt, ...(extra.wallet ? { history: historyFields(j) } : {}), ...extra });
     console.log(`[gmsol] waiting: Mesin berhenti${extra.wallet ? ` · wallet ${W.totalAssetsUsd}` : ''}`); release(); process.exit(0);
   }
   if (eq == null) { out({ ...base, status: 'waiting', reason: 'ekuitas buku belum diketahui', asOf, ...v3Fields(j) }); console.log('[gmsol] waiting: ledger unknown'); release(); process.exit(0); }
@@ -183,7 +215,7 @@ try {
       feesUsd: m ? r2(Number(m.l.unclaimedL) / 1e9 * px + (num(m.s.claimedUsd) || 0)) : null }; });
   const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map((c) => ({
     symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) }));
-  const WALLET = await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {}));
+  const WALLET = walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})));
   out({ ...base, status: 'ok', asOf, ...v3Fields(j),
     equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
     realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd),
@@ -191,6 +223,6 @@ try {
     engine: { label: 'Buku internal mesin r4.1', note: 'Buku internal mesin GMSOL r4.1 (modal dikunci saat deploy, dasar rem mesin). BUKAN angka utama; angka utama = wallet.totalAssetsUsd.', capitalUsd: CAPITAL, equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
       realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd), totalFloorUsd: r2(j.brakes?.totalFloorUsd), dayFloorUsd: r2(j.brakes?.dayFloorUsd), maxOpen: num(j.sizing?.maxOpen), openCount: seats.length, closedCount: closes.length,
       winRatePct: closes.length ? r2(closes.filter((c) => c.netUsd > 0).length / closes.length * 100) : null },
-    ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, headline: { label: 'Aset GMSOL', usd: w?.totalAssetsUsd ?? null, source: 'wallet.totalAssetsUsd', rule: 'saldo wallet sekarang = acuan utama (Orel, 22 Okt)', pnlNote: 'Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy.' } }; })() });
+    ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, walletCurve: walletCurve(w), headline: { label: 'Aset GMSOL', usd: w?.totalAssetsUsd ?? null, source: 'wallet.totalAssetsUsd', rule: 'saldo wallet sekarang = acuan utama (Orel, 22 Okt)', pnlNote: 'Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy.' } }; })() });
   console.log(`[gmsol] ok ledger ${eq}`);
 } finally { release(); }
