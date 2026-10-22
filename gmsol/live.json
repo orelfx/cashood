@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792678509957,
+  "checkedAt": 1792678785262,
   "status": "ok",
-  "asOf": 1792678484338,
+  "asOf": 1792678763960,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.3.2",
   "specStatus": "live_pinned",
@@ -212,15 +212,15 @@
   },
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792678182614,
-    "solPools": 333,
-    "inactive1h": 100,
-    "checked": 233,
+    "scannedAt": 1792678671964,
+    "solPools": 329,
+    "inactive1h": 93,
+    "checked": 236,
     "passed": 0,
     "topReasons": [
       {
         "reason": "pool.fee_active_tvl_ratio",
-        "pools": 232
+        "pools": 235
       },
       {
         "reason": "pool.unique_traders",
@@ -228,7 +228,7 @@
       },
       {
         "reason": "pool.volume",
-        "pools": 173
+        "pools": 175
       },
       {
         "reason": "pool.dlmm_params.bin_step",
@@ -236,11 +236,11 @@
       },
       {
         "reason": "base.market_cap",
-        "pools": 158
+        "pools": 159
       },
       {
         "reason": "pool.tvl",
-        "pools": 115
+        "pools": 117
       }
     ],
     "closest": [
@@ -248,37 +248,37 @@
         "symbol": "PHP-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.5076 !>=2"
+          "pool.fee_active_tvl_ratio=0.5109 !>=2"
         ]
       },
       {
         "symbol": "pill-SOL",
         "binStep": 200,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.2025 !>=2"
+          "pool.fee_active_tvl_ratio=0.2185 !>=2"
         ]
       },
       {
         "symbol": "Macca-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.4488 !>=2"
+          "pool.fee_active_tvl_ratio=0.3831 !>=2"
         ]
       },
       {
         "symbol": "PANGEA-SOL",
         "binStep": 100,
         "reasons": [
-          "derived.age_h=21.5888 !>=24",
-          "pool.fee_active_tvl_ratio=0.9375 !>=2"
+          "derived.age_h=21.7247 !>=24",
+          "pool.fee_active_tvl_ratio=0.7184 !>=2"
         ]
       },
       {
         "symbol": "CYBER-SOL",
         "binStep": 100,
         "reasons": [
-          "derived.age_h=15.741 !>=24",
-          "pool.fee_active_tvl_ratio=1.1919 !>=2"
+          "derived.age_h=15.8769 !>=24",
+          "pool.fee_active_tvl_ratio=1.1751 !>=2"
         ]
       }
     ]
@@ -338,6 +338,10 @@
     },
     {
       "t": 1792678484338,
+      "usd": 961.86
+    },
+    {
+      "t": 1792678763960,
       "usd": 961.86
     }
   ],
@@ -567,8 +571,8 @@
     "t0At": 1792677371712
   },
   "wallet": {
-    "label": "Aset GMSOL (wallet)",
-    "note": "Seluruh isi wallet GMSOL: SOL bebas + posisi LP + fee belum diklaim. Angka utama (headline) GMSOL.",
+    "label": "Isi wallet, termasuk cadangan 0,3 SOL",
+    "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
     "asOf": 1792678509957,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
     "solPriceUsd": 104.77,
@@ -766,8 +770,8 @@
     "gaps": "Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim. Status dokumen spec mesin belum diterbitkan: menunggu perbaikan pemetaan status. costs.gasUsd hanya mencakup posisi yang sudah ditutup (gas posisi terbuka dan bacaan null tidak dihitung)."
   },
   "walletShared": {
-    "label": "Aset GMSOL (wallet)",
-    "note": "Seluruh isi wallet GMSOL: SOL bebas + posisi LP + fee belum diklaim. Angka utama (headline) GMSOL.",
+    "label": "Isi wallet, termasuk cadangan 0,3 SOL",
+    "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
     "asOf": 1792678509957,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
     "solPriceUsd": 104.77,
@@ -1293,9 +1297,11 @@
   ],
   "headline": {
     "label": "Aset GMSOL",
-    "usd": 996.69,
-    "source": "wallet.totalAssetsUsd",
-    "rule": "saldo wallet sekarang = acuan utama (Orel, 22 Okt)",
-    "pnlNote": "Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy."
+    "usd": 961.86,
+    "pnlUsd": 0,
+    "pnlPct": 0,
+    "capitalUsd": 961.86,
+    "source": "engine.equityUsd",
+    "pnlNote": "Headline = equity mesin; PnL = equity - modal kunci, hanya sejak lock. Isi wallet (wallet.totalAssetsUsd, termasuk cadangan 0,3 SOL) dan riwayat sebelum deploy hanya info, tidak masuk PnL."
   }
 }
