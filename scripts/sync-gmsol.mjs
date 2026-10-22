@@ -102,7 +102,8 @@ const excluded = (j) => { const e = j.excludedTokens; if (!e || typeof e !== 'ob
   return { frozenAt: time(e.frozenAt), valueUsd: 0, count: items.length, note: text(e.note, 200), items }; };
 let EXCL_ITEMS = [];
 const GAPS = (j) => ['Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.',
-  /pending_audit/i.test(String(j?.specDocStatus || '')) ? 'Dokumen spec mesin masih pending_audit.' : null].filter(Boolean).join(' ');
+  'Status dokumen spec mesin belum diterbitkan: menunggu perbaikan pemetaan status.',
+  num(j?.costs?.gasUsd) != null ? 'costs.gasUsd hanya mencakup posisi yang sudah ditutup (gas posisi terbuka dan bacaan null tidak dihitung).' : null].filter(Boolean).join(' ');
 const withGaps = (W, j) => (W ? { ...W, gaps: GAPS(j), tokens: Array.isArray(W.tokens) ? mapExcluded(W.tokens, EXCL_ITEMS) : W.tokens } : W); // juga untuk pembacaan cache
 const historyFields = (j) => ({
   closes: (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow),
