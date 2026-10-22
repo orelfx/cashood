@@ -4,6 +4,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { buildTokens, walletTotal } from '../scripts/lib/gmsol-tokens.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const NOW = Date.parse('2026-10-21T12:00:00Z');
@@ -56,4 +57,28 @@ test('gmsol: ringkasan screening dari scan terakhir, t0 dari state engine, tanpa
   assert.equal(sc.scannedAt, Date.parse(last)); assert.equal(sc.solPools, 330); assert.equal(sc.checked, 2); assert.equal(sc.passed, 0);
   assert.deepEqual(sc.topReasons[0], { reason: 'pool.fee_active_tvl_ratio', pools: 2 });
   assert.equal(sc.closest[0].symbol, 'AAA-SOL'); assert.ok(!JSON.stringify(d).includes(addr)); assert.ok(!JSON.stringify(d).includes('OLD-SOL'));
+});
+test('gmsol wallet.tokens: simbol + jumlah + harga, tanpa alamat, id stabil, tanpa harga → null', () => {
+  const A = '7b6dX3nE25xrfNViEKZHL9wVJFcBxQYuWPpmzHUxx28H', B = 'EHPugw1ghE46BeySAa7cHvoZHwYometbp1aK1Q7jpump', W = 'So11111111111111111111111111111111111111112';
+  const ids = {};
+  const r = buildTokens([{ mint: A, amount: 100 }, { mint: W, amount: 1 }, { mint: B, amount: 5 }, { mint: A, amount: 20 }, { mint: B, amount: 0 }],
+    { [A]: { usdPrice: 0.5 } }, { [A]: { symbol: 'NITA' }, [B]: { symbol: `x${A}` } }, ids, [W]);
+  assert.deepEqual(r.tokens[0], { id: 'token#1', symbol: 'NITA', amount: 120, priceUsd: 0.5, usd: 0, quotedUsd: 60, countedUsd: 0 });
+  assert.deepEqual(r.tokens[1], { id: 'token#2', symbol: null, amount: 5, priceUsd: null, usd: 0, quotedUsd: null, countedUsd: 0 });
+  assert.equal(r.tokens.length, 2); assert.equal(r.tokensUsd, 0); assert.equal(r.tokensQuotedUsd, 60); assert.equal(r.tokensUnpriced, 1);
+  assert.ok(!/[1-9A-HJ-NP-Za-km-z]{32,}/.test(JSON.stringify(r)));
+  // nomor tetap antar run, token baru dapat nomor berikutnya
+  const r2 = buildTokens([{ mint: B, amount: 1 }, { mint: 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC', amount: 2 }], {}, {}, ids, [W]);
+  assert.deepEqual(r2.tokens.map((t) => t.id), ['token#2', 'token#3']);
+  assert.deepEqual(buildTokens([], {}, {}, {}, []), { tokens: [], tokensUsd: 0, tokensQuotedUsd: 0, tokensUnpriced: 0 });
+  // token yang hilang (mis. di-swap ke SOL) cukup tidak muncul; nomor token lain tetap
+  const r3 = buildTokens([{ mint: 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC', amount: 2 }], {}, {}, ids, [W]);
+  assert.deepEqual(r3.tokens.map((t) => t.id), ['token#3']);
+});
+test('gmsol wallet.tokens: token tidak pernah mengubah nilai/headline/PnL', () => {
+  const base = { solUsd: 100, lpUsd: 50, unclaimedUsd: 1.25 };
+  const big = buildTokens([{ mint: 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD', amount: 1e9 }], { DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: { usdPrice: 5 } }, {}, {}, []);
+  assert.equal(big.tokensQuotedUsd, 5e9); assert.equal(big.tokensUsd, 0); assert.ok(big.tokens.every((t) => t.usd === 0 && t.countedUsd === 0));
+  assert.equal(walletTotal({ ...base, tokens: big.tokens, tokensUsd: big.tokensQuotedUsd }), 151.25);
+  assert.equal(walletTotal(base), 151.25); assert.equal(walletTotal({ ...base, lpUsd: null }), null);
 });

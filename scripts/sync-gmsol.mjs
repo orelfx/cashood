@@ -13,6 +13,7 @@
  * dibersihkan dari string mirip alamat.
  */
 import { createRequire } from 'node:module';
+import { buildTokens, walletTotal } from './lib/gmsol-tokens.mjs';
 import { readFileSync, existsSync, readdirSync, openSync, readSync, fstatSync, closeSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -140,6 +141,26 @@ async function walletShared(engineState) {
     }
     const ow = new PublicKey(owner);
     const solBal = (await c.getBalance(ow)) / 1e9;
+    // wallet.tokens[] (field 5): saldo token on-chain (SPL + Token-2022), simbol+harga Jupiter publik. Gagal → null, wallet tetap jalan.
+    let tk = { tokens: null, tokensUsd: 0, tokensQuotedUsd: null, tokensUnpriced: null, tokensError: null };
+    try {
+      const accs = [];
+      for (const prog of ['TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA', 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb']) {
+        const r = await c.getParsedTokenAccountsByOwner(ow, { programId: new PublicKey(prog) });
+        for (const a of r.value) { const i = a.account.data?.parsed?.info; if (i) accs.push({ mint: i.mint, amount: Number(i.tokenAmount?.uiAmountString ?? i.tokenAmount?.uiAmount) }); }
+      }
+      const tm = [...new Set(accs.filter((a) => a.mint !== WSOL && a.amount > 0).map((a) => a.mint))];
+      const prices = {}, meta = {};
+      for (let i = 0; i < tm.length; i += 50) {
+        const ids = tm.slice(i, i + 50).join(',');
+        Object.assign(prices, await fetch(`https://lite-api.jup.ag/price/v3?ids=${ids}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json()).catch(() => ({})));
+        const ms = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${ids}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json()).catch(() => []);
+        for (const m of Array.isArray(ms) ? ms : []) if (m?.id) meta[m.id] = { symbol: m.symbol };
+      }
+      const idF = resolve(DIR, 'tokens.local.json'), idMap = readJSON(idF, {});
+      tk = { ...buildTokens(accs, prices, meta, idMap, [WSOL]), tokensError: null };
+      atomicJSON(idF, idMap);
+    } catch (e) { tk.tokensError = text(e.message, 80); }
     const map = await DLMM.getAllLbPairPositionsByUser(c, ow);
     const rows = []; for (const [, v] of map) for (const p of v.lbPairPositionsData) rows.push({ v, p });
     const mints = [...new Set(rows.flatMap(({ v }) => [String(v.tokenX.publicKey), String(v.tokenY.publicKey)]).concat([WSOL]))];
@@ -168,9 +189,10 @@ async function walletShared(engineState) {
     const m2closed = Object.values(m2s).filter((x) => x.closed);
     return { label: 'Aset GMSOL (wallet)', note: 'Seluruh isi wallet GMSOL: SOL bebas + posisi LP + fee belum diklaim. Angka utama (headline) GMSOL.',
       asOf: now, source: 'RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)', solPriceUsd: r2(solPx), freeSol: Number(solBal.toFixed(4)), freeSolUsd: solUsd,
+      tokens: tk.tokens, tokensUsd: tk.tokensUsd, tokensQuotedUsd: tk.tokensQuotedUsd ?? null, tokensUnpriced: tk.tokensUnpriced, tokensNote: 'semua token dihitung $0 untuk nilai/PnL/grafik; quotedUsd hanya info', tokensError: tk.tokensError,
       lpValueUsd: lp, unclaimedFeesUsd: unc, claimedFeesUsd: sum('claimedFeesUsd'), uPnlUsd: sum('uPnlUsd'), uPnlExclFeesUsd: sum('uPnlExclFeesUsd'),
       definitions: { uPnlUsd: 'valueUsd + unclaimedFeesUsd + claimedFeesUsd - investedUsd (fee ikut; konvensi utama yang diaudit)', uPnlExclFeesUsd: 'valueUsd - investedUsd (tanpa fee; konvensi uPnL tracker)', investedUsd: 'openedBy engine: openSpentUsd mesin; openedBy manual: nilai USD awal saat posisi dibuka (state pembuka posisi)', valueUsd: 'jumlah token X+Y posisi on-chain x harga Jupiter sekarang', unclaimedFeesUsd: 'fee X+Y belum diklaim on-chain x harga sekarang', claimedFeesUsd: 'totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim' },
-      totalAssetsUsd: solUsd == null || lp == null || unc == null ? null : r2(solUsd + lp + unc),
+      totalAssetsUsd: walletTotal({ solUsd, lpUsd: lp, unclaimedUsd: unc }), // token selalu $0 (lihat wallet.tokens)
       openCount: pos.length, positions: pos,
       closedCount: { manualTracked: m2closed.length, engine: Array.isArray(engineState?.closes) ? engineState.closes.length : null },
       winRatePct: null, pnlHistory: null, gaps: 'posisi DAMM v2 dan token SPL lain di wallet tidak dibaca → tidak dihitung. Fee klaim kini dari on-chain kedua sisi (dulu $4,66 = hanya sisi SOL); dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.' };
