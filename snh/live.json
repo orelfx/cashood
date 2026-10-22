@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "90335473-1774-4c4e-a2da-3327d3070523",
-  "updatedAt": 1792704798672,
-  "generatedAt": "2026-10-23 04:33 WIB",
+  "generation": "b6bba0e5-48cc-423c-877f-16782871f8a7",
+  "updatedAt": 1792705100598,
+  "generatedAt": "2026-10-23 04:38 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 996,
+      "ageMinutes": 1001,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1415,12 +1415,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792704798672,
+    "heartbeatAt": 1792705100598,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792704769000,
+    "lastScanAt": 1792705082000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1463,9 +1463,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792704798672,
+      "lastDecisionAt": 1792705100598,
       "lastAction": "keputusan",
-      "lastReason": "SHYFT [degen]: Dilewati: solo_test: isolated virtual capital."
+      "lastReason": "SHYFT [degen]: Dilewati: harga sudah -27% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1700,6 +1700,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792704828146,
+        "symbol": "SHYFT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -27% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792704742865,
         "symbol": "SHYFT",
@@ -2588,34 +2605,17 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -27% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792690246329,
-        "symbol": "pwn",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 76,
+        "below_entry": 77,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 346,
+        "red_flag": 345,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2668,7 +2668,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792705035471,
+    "generatedAt": 1792705336300,
     "trades": {
       "count": 152,
       "wins": 63,
