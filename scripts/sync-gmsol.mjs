@@ -70,7 +70,7 @@ try {
   const asOf = time(j.updatedAt);
   const eq = r2(j.equityLedgerUsd);
   if (!asOf) wait('belum jalan — menunggu data live');
-  if (now - asOf > STALE_MS) wait('data tertunda', asOf);
+  if (now - asOf > STALE_MS) wait('Mesin berhenti, menunggu restart', asOf);
   if (eq == null) { out({ ...base, status: 'waiting', reason: 'ekuitas buku belum diketahui', asOf, ...v3Fields(j) }); console.log('[gmsol] waiting: ledger unknown'); release(); process.exit(0); }
   const seats = (Array.isArray(j.openSeats) ? j.openSeats : []).slice(0, 10).map((p) => ({
     symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), pnlUsd: r2(p.pnlUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null }));

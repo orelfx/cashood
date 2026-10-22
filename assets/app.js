@@ -3216,7 +3216,7 @@ async function renderPortofolio() {
     tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham${pokokBox > 0 ? ` · termasuk ${usd(pokokBox, 0)} Safe Box` : ''}`),
     tile('Untung / rugi', signed(untung), setoran ? pct((untung / setoran) * 100) + ' dari modal' : '—', cls(untung)),
   ].join(''));
-  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id === 'gmsol' ? 'GMSOL (Menunggu live)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
+  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id === 'gmsol' ? 'GMSOL (mesin berhenti / menunggu live)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
 
   setHTML($('#portoList'), briefs.map((b) => `
     <div class="porto-fund">
@@ -3706,6 +3706,8 @@ const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL</d
 const gmsolFunds = (d) => { const w = d?.walletSolShared; if (!w || w.sol == null) return '';
   return `<p class="miss" role="note"><b>Catatan dana:</b> buku $1.200 hanya modal acuan untuk menghitung kinerja dan rem. Dana nyata yang tersedia adalah saldo wallet <b>~${esc(String(w.sol))} SOL</b>${w.usd != null ? ` (≈ ${usd(w.usd)})` : ''}, dipakai bersama Meridian. Dengan saldo ini kapasitas hanya sekitar 1–2 posisi $50, bukan 5, sampai Orel menambah SOL atau memakai wallet terpisah.</p>`; };
 const GMSOL_WARN = '<b>Uang asli · uji eksekusi.</b> GMSOL v3.2 memasang likuiditas di pool Meteora DLMM dengan dana sungguhan: <b>$50 per posisi, maks. 5 posisi</b>. Rem otomatis (dihitung dari buku GMSOL, dikonfirmasi 2× berjarak 60 detik): <b>rem harian −25%</b> → tidak ada posisi baru selama 24 jam; <b>rem total $600</b> (−50% dari $1.200) → semua posisi GMSOL ditutup, mesin BERHENTI (HALTED), dan hanya bisa jalan lagi atas izin Orel. Ini <b>tes eksekusi — profitnya belum terbukti</b>. Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
+// Pernah live lalu data basi (>15 menit) → mesin berhenti, bukan "menunggu live".
+const gmsolStopped = (d) => !!d?.asOf && (d.status !== 'ok' || Date.now() - d.asOf > GMSOL_STALE_MS);
 function gmsolWait(msg, asOf) {
   return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode sb-m-wait">${esc(msg)}</span></div>
     <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL v3.2 belum live, belum ada posisi. '}Kinerja (PnL, %, posisi) baru tampil setelah mesin live.</p>
@@ -3722,8 +3724,8 @@ async function renderGmsol() {
   const d = await loadGmsol();
   if (state.view !== 'gmsol') return;
   const body = $('#gmsolBody');
-  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(d?.reason === 'data tertunda' ? 'Data tertunda' : 'Menunggu live', d?.asOf || null)); return; }
-  if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Data tertunda', d.asOf || null)); return; }
+  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(gmsolStopped(d) ? 'Mesin berhenti, menunggu restart' : 'Menunggu live', d?.asOf || null)); return; }
+  if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Mesin berhenti, menunggu restart', d.asOf || null)); return; }
   const cl = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
   const seats = d.openSeats || [], closes = d.closes || [];
   setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode">${d.brakes?.halted ? 'BERHENTI (rem total)' : d.brakes?.dailyBlocked ? 'Rem harian aktif' : (seats.length ? 'Live' : 'Live, belum ada posisi')}</span></div>
@@ -4909,7 +4911,7 @@ async function renderHome() {
   if (epoch !== homeEpoch || state.view !== 'home') return;
   const gmsolCard = () => {
     const f = state.gmsol, d = gsData && gsData.status === 'ok' && gsData.asOf && Date.now() - gsData.asOf <= GMSOL_STALE_MS ? gsData : null;
-    const status = !d ? 'Menunggu live' : !(d.openSeats || []).length && !d.brakes?.halted ? 'Live, belum ada posisi' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
+    const status = !d ? (gmsolStopped(gsData) ? `Mesin berhenti, menunggu restart · data terakhir ${sbWib(gsData.asOf)}` : 'Menunggu live') : !(d.openSeats || []).length && !d.brakes?.halted ? 'Live, belum ada posisi' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
     return `<a class="prod" href="#gmsol" style="--c:${f.accent}">
       <div class="prod-top">${iconTile('orbit', f.accent)}
         <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${esc(status)}</div></div></div>
@@ -4922,7 +4924,7 @@ async function renderHome() {
         <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || 'LP')}</span></div>
         <div><span class="k">Rem</span><span class="v txt">−25%/hari · $600 total</span></div>
       </div>
-      <p class="hint">${!d ? 'Menunggu live — ekuitas buku = modal $1.200, belum ada kinerja. ' : ''}Uji eksekusi $50/posisi (maks. 5); profit belum terbukti.${d?.walletSolShared?.sol != null ? ` Buku $1.200 = modal acuan; dana nyata ~${esc(String(d.walletSolShared.sol))} SOL (dipakai bersama Meridian), cukup untuk sekitar 1–2 posisi.` : ''}</p>
+      <p class="hint">${!d ? (gmsolStopped(gsData) ? `Mesin berhenti, menunggu restart — angka tidak ditampilkan; data terakhir ${esc(sbWib(gsData.asOf))}. ` : 'Menunggu live — ekuitas buku = modal $1.200, belum ada kinerja. ') : ''}Uji eksekusi $50/posisi (maks. 5); profit belum terbukti.${d?.walletSolShared?.sol != null ? ` Buku $1.200 = modal acuan; dana nyata ~${esc(String(d.walletSolShared.sol))} SOL (dipakai bersama Meridian), cukup untuk sekitar 1–2 posisi.` : ''}</p>
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   const solbotCard = () => {

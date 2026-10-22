@@ -34,3 +34,8 @@ test('gmsol: v2 lama, basi, bukan live, tanpa berkas, ledger null → tanpa angk
     assert.equal(d.status, 'waiting'); assert.equal(d.equityUsd, undefined); assert.equal(d.pnlUsd, undefined);
   }
 });
+test('gmsol: data live basi → mesin berhenti, tanpa angka, waktu terakhir tetap ada', () => {
+  const at = NOW - 30 * 60e3, d = run(src({ updatedAt: new Date(at).toISOString() }));
+  assert.equal(d.status, 'waiting'); assert.equal(d.reason, 'Mesin berhenti, menunggu restart');
+  assert.equal(d.asOf, at); assert.equal(d.equityUsd, undefined); assert.equal(d.openSeats, undefined);
+});
