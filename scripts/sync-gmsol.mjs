@@ -150,22 +150,22 @@ async function walletShared(engineState) {
         for (const a of r.value) { const i = a.account.data?.parsed?.info; if (i) accs.push({ mint: i.mint, amount: Number(i.tokenAmount?.uiAmountString ?? i.tokenAmount?.uiAmount) }); }
       }
       const tm = [...new Set(accs.filter((a) => a.mint !== WSOL && a.amount > 0).map((a) => a.mint))];
-      const prices = {}, meta = {};
-      for (let i = 0; i < tm.length; i += 50) {
-        const ids = tm.slice(i, i + 50).join(',');
-        Object.assign(prices, await fetch(`https://lite-api.jup.ag/price/v3?ids=${ids}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json()).catch(() => ({})));
-        const ms = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${ids}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json()).catch(() => []);
-        for (const m of Array.isArray(ms) ? ms : []) if (m?.id) meta[m.id] = { symbol: m.symbol };
-      }
-      const idF = resolve(DIR, 'tokens.local.json'), idMap = readJSON(idF, {});
-      tk = { ...buildTokens(accs, prices, meta, idMap, [WSOL]), tokensError: null };
-      atomicJSON(idF, idMap);
+      tk.accs = accs; tk.mints = tm.slice(0, 40); // harga diambil bersama harga SOL/LP (satu panggilan Jupiter, hindari limit)
     } catch (e) { tk.tokensError = text(e.message, 80); }
     const map = await DLMM.getAllLbPairPositionsByUser(c, ow);
     const rows = []; for (const [, v] of map) for (const p of v.lbPairPositionsData) rows.push({ v, p });
-    const mints = [...new Set(rows.flatMap(({ v }) => [String(v.tokenX.publicKey), String(v.tokenY.publicKey)]).concat([WSOL]))];
+    const mints = [...new Set(rows.flatMap(({ v }) => [String(v.tokenX.publicKey), String(v.tokenY.publicKey)]).concat([WSOL]).concat(tk.mints || []))].slice(0, 50);
     const pr = await fetch(`https://lite-api.jup.ag/price/v3?ids=${mints.join(',')}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json());
     const price = (m) => num(pr?.[m]?.usdPrice);
+    if (tk.accs) {
+      try {
+        const meta = {}; const ms = tk.mints.length ? await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${tk.mints.join(',')}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json()).catch(() => []) : [];
+        for (const m of Array.isArray(ms) ? ms : []) if (m?.id) meta[m.id] = { symbol: m.symbol };
+        const idF = resolve(DIR, 'tokens.local.json'), idMap = readJSON(idF, {});
+        tk = { ...buildTokens(tk.accs, pr || {}, meta, idMap, [WSOL]), tokensError: null };
+        atomicJSON(idF, idMap);
+      } catch (e) { tk = { tokens: null, tokensUsd: 0, tokensQuotedUsd: null, tokensUnpriced: null, tokensError: text(e.message, 80) }; }
+    }
     const solPx = price(WSOL); if (solPx == null) throw new Error('harga SOL tidak terbaca');
     const mine = new Set(Object.keys(engineState?.positions || {}));
     const pos = rows.slice(0, 20).map(({ v, p }) => {
