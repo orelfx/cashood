@@ -159,7 +159,17 @@ try {
   const asOf = time(j.updatedAt);
   const eq = r2(j.equityLedgerUsd);
   if (!asOf) wait('belum jalan — menunggu data live');
-  if (now - asOf > STALE_MS) wait('Mesin berhenti, menunggu restart', asOf);
+  if (now - asOf > STALE_MS) {
+    // Mesin berhenti: angka mesin (buku, PnL, rem, posisi mesin) TIDAK terbit
+    // (aturan Auditor). Saldo wallet dibaca langsung dari blockchain oleh
+    // Cashood saat ini juga — itu bukan data mesin dan tetap segar, jadi ikut
+    // terbit supaya uang nyata GMSOL tidak hilang dari Total aset (Orel, 22 Okt).
+    const W = await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {}));
+    let halt = null; try { halt = text(readFileSync(resolve(ENGINE, 'state', 'HALTED'), 'utf8'), 120); } catch { /* tidak ada berkas HALTED */ }
+    const extra = W && num(W.totalAssetsUsd) != null ? { wallet: W, walletShared: W, haltNote: halt } : {};
+    out({ ...base, status: 'waiting', reason: 'Mesin berhenti, menunggu restart', asOf, ...extra });
+    console.log(`[gmsol] waiting: Mesin berhenti${extra.wallet ? ` · wallet ${W.totalAssetsUsd}` : ''}`); release(); process.exit(0);
+  }
   if (eq == null) { out({ ...base, status: 'waiting', reason: 'ekuitas buku belum diketahui', asOf, ...v3Fields(j) }); console.log('[gmsol] waiting: ledger unknown'); release(); process.exit(0); }
   // valueUsd/feesUsd per posisi: dari state mesin (HANYA DIBACA), pembacaan on-chain terakhir p.last.
   // valueUsd = (likuiditas + fee belum diklaim + rent) x harga SOL; feesUsd = fee belum diklaim + fee sudah diklaim (USD saat klaim).

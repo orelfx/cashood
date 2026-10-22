@@ -3151,8 +3151,9 @@ const gmsolPositions = (d) => {
   if (Array.isArray(ws)) return ws;
   return (d?.openSeats || []).map((p) => ({ symbol: p.symbol, ageH: p.openedAt ? (Date.now() - p.openedAt) / 3600e3 : null, investedUsd: p.basisUsd, valueUsd: p.valueUsd, feesUsd: p.feesUsd, uPnlUsd: p.pnlUsd, pct: p.pnlPct, inRange: p.inRange }));
 };
+const gmsolWalletFresh = (d) => { const w = d?.wallet || d?.walletShared; return !!w && Number.isFinite(Number(w.totalAssetsUsd)) && Number.isFinite(Number(w.asOf)) && Date.now() - w.asOf <= GMSOL_STALE_MS; };
 const gmsolReal = (d) => {
-  const total = Number(d?.walletShared?.totalAssetsUsd);
+  const total = Number((d?.wallet || d?.walletShared)?.totalAssetsUsd);
   if (Number.isFinite(total)) return Number(total.toFixed(2));
   const free = Number(d?.walletSolShared?.usd);
   if (!Number.isFinite(free)) return null;
@@ -3163,15 +3164,20 @@ const gmsolReal = (d) => {
 async function gmsolBrief() {
   if (!state.gmsol) return null;
   const d = await loadGmsol().catch(() => null);
-  if (!d || d.status !== 'ok' || !d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) return null;
+  if (!d) return null;
+  // Mesin jalan & segar → pakai data lengkap; mesin berhenti → tetap hitung saldo
+  // wallet yang dibaca Cashood langsung dari blockchain (wallet.asOf segar).
+  const engineOk = d.status === 'ok' && d.asOf && Date.now() - d.asOf <= GMSOL_STALE_MS;
+  const walletOk = gmsolWalletFresh(d);
+  if (!engineOk && !walletOk) return null;
   const real = gmsolReal(d);
   if (real == null) return null;
   const f = state.gmsol;
   return {
     id: 'gmsol', label: f.label, chain: f.chain || 'Solana', accent: f.accent, totalUsd: real,
     // Bukan dana investor dan tanpa modal nyata yang tercatat: tidak menambah "modal masuk" dan tidak dihitung untung/rugi.
-    depositedUsd: 0, pnlUsd: null, updatedAt: d.asOf, risk: f.risk, paper: false,
-    flows: [], series: [{ t: d.asOf, usd: real }],
+    depositedUsd: 0, pnlUsd: null, updatedAt: engineOk ? d.asOf : (d.wallet || d.walletShared).asOf, risk: f.risk, paper: false,
+    flows: [], series: [{ t: engineOk ? d.asOf : (d.wallet || d.walletShared).asOf, usd: real }],
     owners: [], openCount: (d.openSeats || []).length, closedCount: (d.closes || []).length, winRate: null, gmsol: d,
   };
 }
@@ -3724,10 +3730,21 @@ const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL <s
 const GMSOL_WARN = '<b>Uang asli · uji eksekusi.</b> GMSOL memasang likuiditas di pool Meteora DLMM dengan dana sungguhan. Ukuran posisi, jumlah posisi maksimal, dan rem otomatis (harian dan total, dikonfirmasi 2× berjarak 60 detik) mengikuti angka mesin di atas; kena rem total → semua posisi GMSOL ditutup dan mesin berhenti sampai diizinkan Orel. <b>Profit belum terbukti.</b> Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
 // Pernah live lalu data basi (>15 menit) → mesin berhenti, bukan "menunggu live".
 const gmsolStopped = (d) => !!d?.asOf && (d.status !== 'ok' || Date.now() - d.asOf > GMSOL_STALE_MS);
-function gmsolWait(msg, asOf) {
-  // Tanpa angka sama sekali (aturan Auditor): hanya status dan waktu data terakhir.
+function gmsolWait(msg, asOf, d = null) {
+  // Angka MESIN disembunyikan (aturan Auditor). Saldo wallet yang dibaca Cashood
+  // langsung dari blockchain (bukan data mesin) tetap tampil kalau segar.
+  const w = gmsolWalletFresh(d) ? (d.wallet || d.walletShared) : null;
+  const tile = (k, v, n) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`;
+  const pos = w && Array.isArray(w.positions) ? w.positions : [];
   return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${/berhenti/i.test(msg) ? 'sb-m-halt' : 'sb-m-wait'}"><i></i>${esc(msg)}</span></div>
-    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir dari mesin: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL belum mengirim data live. '}Angka disembunyikan sampai data baru masuk.</p></section>
+    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir dari mesin: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL belum mengirim data live. '}Angka mesin (buku, untung/rugi, rem, posisi mesin) disembunyikan sampai mesin jalan lagi.</p>
+    ${d?.haltNote ? `<p class="hint">Catatan berhenti: ${esc(d.haltNote)}</p>` : ''}</section>
+    ${w ? `<div class="stats sb-top">${[
+      tile('Aset nyata GMSOL', usd(Number(w.totalAssetsUsd)), `dibaca Cashood langsung dari blockchain · ${esc(sbWib(w.asOf))}`),
+      tile('SOL lepas', Number.isFinite(Number(w.freeSol)) ? `${fmtNum(w.freeSol, 4)} SOL` : '—', Number.isFinite(Number(w.freeSolUsd)) ? usd(Number(w.freeSolUsd)) : ''),
+      tile('Posisi LP di wallet', String(pos.length), Number.isFinite(Number(w.lpValueUsd)) ? `nilai ${usd(Number(w.lpValueUsd))}` : ''),
+    ].join('')}</div>
+    <p class="hint gs-note">Aset nyata tetap dihitung di Total aset beranda selama mesin berhenti, karena dibaca langsung dari blockchain — bukan angka mesin.</p>` : ''}
     <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`;
 }
 async function loadGmsol() {
@@ -3783,8 +3800,8 @@ async function renderGmsol() {
   const d = await loadGmsol();
   if (state.view !== 'gmsol') return;
   const body = $('#gmsolBody');
-  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(gmsolStopped(d) ? 'Mesin berhenti' : 'Menunggu live', d?.asOf || null)); return; }
-  if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Mesin berhenti', d.asOf || null)); return; }
+  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(gmsolStopped(d) ? 'Mesin berhenti' : 'Menunggu live', d?.asOf || null, d)); return; }
+  if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Mesin berhenti', d.asOf || null, d)); return; }
   // Field kosong → "menunggu data", tidak pernah angka cadangan.
   const NA = '<span class="dim">menunggu data</span>';
   const has = (v) => v !== null && v !== undefined && Number.isFinite(Number(v));
@@ -5027,7 +5044,7 @@ async function renderHome() {
   const gmsolCard = () => {
     const f = state.gmsol, d = gsData && gsData.status === 'ok' && gsData.asOf && Date.now() - gsData.asOf <= GMSOL_STALE_MS ? gsData : null;
     const stopped = !d && gmsolStopped(gsData);
-    const seats = d?.openSeats || [], real = d ? gmsolReal(d) : null;
+    const seats = d?.openSeats || [], real = d ? gmsolReal(d) : gmsolWalletFresh(gsData) ? gmsolReal(gsData) : null;
     const status = !d ? (stopped ? 'mesin berhenti' : 'menunggu live') : d.brakes?.halted ? 'berhenti (rem total)' : d.brakes?.dailyBlocked ? 'rem harian aktif' : seats.length ? 'live' : 'live, belum ada posisi';
     return `<a class="prod" href="#gmsol" style="--c:${f.accent}">
       <div class="prod-top">${iconTile('orbit', f.accent)}
@@ -5041,7 +5058,7 @@ async function renderHome() {
         <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || 'LP')}</span></div>
         <div><span class="k">Rem</span><span class="v txt">${d?.brakes?.dailyPct != null && d?.brakes?.totalFloorUsd != null ? `−${d.brakes.dailyPct}%/hari · ${usd(d.brakes.totalFloorUsd, 0)}` : '—'}</span></div>
       </div>
-      <p class="hint">${stopped ? `Mesin berhenti — angka disembunyikan; data terakhir ${esc(sbWib(gsData.asOf))}. ` : !d ? 'Menunggu live. ' : ''}Tes eksekusi${d?.sizing?.sizeUsd != null ? ` ${usd(d.sizing.sizeUsd, 0)}/posisi` : ''}; profit belum terbukti (backtest masih minus).</p>
+      <p class="hint">${stopped ? `Mesin berhenti — angka mesin disembunyikan (data terakhir ${esc(sbWib(gsData.asOf))})${real != null ? '; aset nyata dibaca langsung dari blockchain' : ''}. ` : !d ? 'Menunggu live. ' : ''}Tes eksekusi${d?.sizing?.sizeUsd != null ? ` ${usd(d.sizing.sizeUsd, 0)}/posisi` : ''}; profit belum terbukti (backtest masih minus).</p>
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   const solbotCard = () => {
