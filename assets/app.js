@@ -3807,13 +3807,13 @@ async function renderGmsol() {
       tile('Realisasi / berjalan', none ? '—' : `<span class="${cls(d.realizedUsd ?? 0)}">${sbUsd(d.realizedUsd)}</span> / <span class="${cls(d.unrealizedUsd ?? 0)}">${sbUsd(d.unrealizedUsd)}</span>`, `${closes.length} close · ${seats.length} terbuka`),
       tile('Posisi · error', `${seats.length}/${max} · <span class="${d.execErrors ? 'neg' : ''}">${d.execErrors ?? 0}</span>`, `${usd(d.sizing?.sizeUsd ?? 50, 0)} per posisi · error eksekusi`),
     ].join('')}</div>
-    <p class="hint gs-note">Kinerja dihitung dari <b>buku GMSOL</b> (modal acuan $1.200 + hasil posisi). <b>Aset nyata</b> = SOL di wallet GMSOL${w?.label ? ` (${esc(w.label)})` : ''} ditambah nilai posisi; itu saldo, bukan untung. Hanya aset nyata yang masuk Total aset di beranda.</p>
+    <p class="hint gs-note">Kinerja dihitung dari <b>buku GMSOL</b> (modal ${d.capitalUsd == null ? '—' : usd(d.capitalUsd, 2)} dikunci saat deploy + hasil posisi GMSOL). <b>Aset nyata</b> = SOL di wallet GMSOL${w?.label ? ` (${esc(w.label)})` : ''} ditambah nilai posisi; itu saldo, bukan untung. Hanya aset nyata yang masuk Total aset di beranda.</p>
     <section class="card sb-guard"><div class="card-head"><h2>Rem risiko</h2><span class="hint">dikonfirmasi 2× berjarak 60 detik</span></div>
       <div class="sb-grid gs-brakes">
         <div class="sb-g${b.dailyBlocked ? ' gs-hot' : ''}"><div class="k">Rem harian (−${b.dailyPct ?? 25}%)</div><div class="v ${cls(b.dayChangePct ?? 0)}">${sbPct(b.dayChangePct)}</div>${bar(dayUsed, b.dailyBlocked)}<div class="n">hari ini dari ${usd(b.dayStartLedgerUsd ?? d.capitalUsd, 0)} · batas ${b.dayFloorUsd == null ? '—' : usd(b.dayFloorUsd, 0)}${b.dailyBlocked ? ' · <b class="neg">AKTIF</b>' : ''}</div></div>
         <div class="sb-g${b.halted ? ' gs-hot' : ''}"><div class="k">Rem total (${usd(b.totalFloorUsd ?? 600, 0)})</div><div class="v">${d.equityUsd == null ? '—' : `${usd(d.equityUsd - (b.totalFloorUsd ?? 600), 0)} <small class="dim">di atas batas</small>`}</div>${bar(totUsed, b.halted)}<div class="n">buku ${d.equityUsd == null ? '—' : usd(d.equityUsd, 0)} · kena = semua posisi ditutup, mesin berhenti${b.halted ? ' · <b class="neg">AKTIF</b>' : ''}</div></div>
       </div></section>
-    <section class="card"><div class="card-head"><h2>Ekuitas buku</h2><span class="hint">sejak live · garis modal $1.200, rem total $600</span></div>
+    <section class="card"><div class="card-head"><h2>Ekuitas buku</h2><span class="hint">sejak live · garis modal ${d.capitalUsd == null ? '—' : usd(d.capitalUsd, 2)}, rem total ${b.totalFloorUsd == null ? '—' : usd(b.totalFloorUsd, 2)}</span></div>
       ${seats.length || closes.length ? '' : '<p class="hint">Belum ada posisi, jadi buku masih tepat di modal — garis datar ini data asli, bukan contoh.</p>'}
       ${gmsolChart(d)}</section>
     <section class="card"><div class="card-head"><h2>Posisi terbuka <span class="count">(${seats.length}/${max})</span></h2></div>
