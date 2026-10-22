@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 84.67,
-  "checkedAt": 1792659437898,
+  "checkedAt": 1792659740912,
   "status": "ok",
-  "asOf": 1792659429364,
+  "asOf": 1792659729768,
   "t0At": 1792657533144,
   "spec": "gmsol-live-v3.2 r4.1",
   "specStatus": "live_pinned",
@@ -175,6 +175,67 @@
     {
       "t": 1792659429364,
       "usd": 84.67
+    },
+    {
+      "t": 1792659729768,
+      "usd": 84.67
     }
-  ]
+  ],
+  "engine": {
+    "label": "Buku GMSOL",
+    "note": "Satu-satunya dasar PnL/perbandingan GMSOL (modal dikunci saat deploy r4.1).",
+    "capitalUsd": 84.67,
+    "equityUsd": 84.67,
+    "pnlUsd": 0,
+    "pnlPct": 0,
+    "realizedUsd": 0,
+    "unrealizedUsd": 0,
+    "totalFloorUsd": 42.34,
+    "dayFloorUsd": 63.51,
+    "maxOpen": 1,
+    "openCount": 0,
+    "closedCount": 0,
+    "winRatePct": null
+  },
+  "walletShared": {
+    "label": "Nilai wallet bersama",
+    "note": "Seluruh wallet (posisi GMSOL + meridian2). BUKAN dasar PnL/perbandingan GMSOL; itu blok engine (Buku GMSOL).",
+    "asOf": 1792659740912,
+    "source": "on-chain (RPC) via CLI baca meridian2",
+    "solPriceUsd": 103.71,
+    "freeSol": 1.1157,
+    "freeSolUsd": 115.72,
+    "tokensUsd": 0,
+    "tokensUnpriced": 12,
+    "lpValueUsd": 859.89,
+    "unclaimedFeesUsd": 8.79,
+    "claimedFeesUsd": 8.82,
+    "uPnlUsd": -5,
+    "totalAssetsUsd": 984.4,
+    "openCount": 1,
+    "positions": [
+      {
+        "symbol": "PANGEA-SOL",
+        "protocol": "DLMM",
+        "owner": "meridian2",
+        "ageH": 7.85,
+        "investedUsd": 881,
+        "valueUsd": 859.89,
+        "unclaimedFeesUsd": 8.79,
+        "claimedFeesUsd": 8.82,
+        "feesUsd": 17.61,
+        "uPnlUsd": -5,
+        "pct": 2.71,
+        "inRange": true,
+        "outOfRangeMin": 0
+      }
+    ],
+    "closedCount": {
+      "meridian2Tracked": 0,
+      "gmsol": 0
+    },
+    "winRatePct": null,
+    "pnlHistory": null,
+    "gaps": "posisi non-DLMM (mis. DAMM v2) dan token tanpa harga tidak terbaca → tidak dihitung"
+  }
 }
