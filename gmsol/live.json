@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792696347502,
+  "checkedAt": 1792696646617,
   "status": "ok",
-  "asOf": 1792696319860,
+  "asOf": 1792696620217,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.6.1",
   "specDocStatus": "audited_pass",
@@ -218,35 +218,35 @@
   },
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792696277650,
-    "solPools": 309,
-    "inactive1h": 112,
-    "checked": 197,
+    "scannedAt": 1792696571451,
+    "solPools": 318,
+    "inactive1h": 109,
+    "checked": 209,
     "passed": 0,
     "topReasons": [
       {
         "reason": "pool.fee_active_tvl_ratio",
-        "pools": 181
-      },
-      {
-        "reason": "pool.dlmm_params.bin_step",
-        "pools": 146
+        "pools": 195
       },
       {
         "reason": "pool.volume",
-        "pools": 139
+        "pools": 152
+      },
+      {
+        "reason": "pool.dlmm_params.bin_step",
+        "pools": 149
       },
       {
         "reason": "base.market_cap",
-        "pools": 128
+        "pools": 135
       },
       {
         "reason": "pool.unique_traders",
-        "pools": 121
+        "pools": 132
       },
       {
         "reason": "pool.tvl",
-        "pools": 91
+        "pools": 98
       }
     ],
     "closest": [
@@ -254,35 +254,35 @@
         "symbol": "SI-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.3422 !>=0.4"
-        ]
-      },
-      {
-        "symbol": "PHP-SOL",
-        "binStep": 100,
-        "reasons": [
-          "pool.volume=1598.238 !>=5000"
-        ]
-      },
-      {
-        "symbol": "pill-SOL",
-        "binStep": 200,
-        "reasons": [
-          "pool.fee_active_tvl_ratio=0.0396 !>=0.4"
+          "pool.fee_active_tvl_ratio=0.3365 !>=0.4"
         ]
       },
       {
         "symbol": "Dacity-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.3363 !>=0.4"
+          "pool.fee_active_tvl_ratio=0.3302 !>=0.4"
+        ]
+      },
+      {
+        "symbol": "pill-SOL",
+        "binStep": 200,
+        "reasons": [
+          "pool.fee_active_tvl_ratio=0.0335 !>=0.4"
         ]
       },
       {
         "symbol": "Kimchi-SOL",
-        "binStep": 30,
+        "binStep": 100,
         "reasons": [
-          "pool.dlmm_params.bin_step=30 !in[100,125,200,250]"
+          "pool.fee_active_tvl_ratio=0.3135 !>=0.4"
+        ]
+      },
+      {
+        "symbol": "PHP-SOL",
+        "binStep": 100,
+        "reasons": [
+          "pool.volume=1637.8693 !>=5000"
         ]
       }
     ]
@@ -598,6 +598,10 @@
     {
       "t": 1792696319860,
       "usd": 961.83
+    },
+    {
+      "t": 1792696620217,
+      "usd": 961.83
     }
   ],
   "engine": {
@@ -843,17 +847,17 @@
   "wallet": {
     "label": "Isi wallet, termasuk cadangan 0,3 SOL",
     "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
-    "asOf": 1792696347502,
+    "asOf": 1792696646617,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 103.16,
+    "solPriceUsd": 103.29,
     "freeSol": 9.5128,
-    "freeSolUsd": 981.36,
+    "freeSolUsd": 982.59,
     "tokens": [
       {
         "id": "token#14",
         "symbol": null,
         "amount": 0.000635,
-        "priceUsd": 0.332276,
+        "priceUsd": 0.332484,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -863,7 +867,7 @@
         "id": "token#2",
         "symbol": null,
         "amount": 0.051100149,
-        "priceUsd": 0.00228912,
+        "priceUsd": 0.00229017,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -893,7 +897,7 @@
         "id": "token#0",
         "symbol": null,
         "amount": 0.000001,
-        "priceUsd": 0.000555083,
+        "priceUsd": 0.000570862,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -903,7 +907,7 @@
         "id": "token#9",
         "symbol": null,
         "amount": 0.980853,
-        "priceUsd": 0.0000405352,
+        "priceUsd": 0.0000404421,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -913,7 +917,7 @@
         "id": "token#4",
         "symbol": null,
         "amount": 0.000001,
-        "priceUsd": 0.00233208,
+        "priceUsd": 0.00231134,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1028,7 +1032,7 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 981.36,
+    "totalAssetsUsd": 982.59,
     "openCount": 0,
     "positions": [],
     "closedCount": {
@@ -1042,17 +1046,17 @@
   "walletShared": {
     "label": "Isi wallet, termasuk cadangan 0,3 SOL",
     "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
-    "asOf": 1792696347502,
+    "asOf": 1792696646617,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 103.16,
+    "solPriceUsd": 103.29,
     "freeSol": 9.5128,
-    "freeSolUsd": 981.36,
+    "freeSolUsd": 982.59,
     "tokens": [
       {
         "id": "token#14",
         "symbol": null,
         "amount": 0.000635,
-        "priceUsd": 0.332276,
+        "priceUsd": 0.332484,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1062,7 +1066,7 @@
         "id": "token#2",
         "symbol": null,
         "amount": 0.051100149,
-        "priceUsd": 0.00228912,
+        "priceUsd": 0.00229017,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1092,7 +1096,7 @@
         "id": "token#0",
         "symbol": null,
         "amount": 0.000001,
-        "priceUsd": 0.000555083,
+        "priceUsd": 0.000570862,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1102,7 +1106,7 @@
         "id": "token#9",
         "symbol": null,
         "amount": 0.980853,
-        "priceUsd": 0.0000405352,
+        "priceUsd": 0.0000404421,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1112,7 +1116,7 @@
         "id": "token#4",
         "symbol": null,
         "amount": 0.000001,
-        "priceUsd": 0.00233208,
+        "priceUsd": 0.00231134,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -1227,7 +1231,7 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 981.36,
+    "totalAssetsUsd": 982.59,
     "openCount": 0,
     "positions": [],
     "closedCount": {
@@ -1837,6 +1841,11 @@
     {
       "t": 1792696347502,
       "usd": 981.36,
+      "sol": 9.5128
+    },
+    {
+      "t": 1792696646617,
+      "usd": 982.59,
       "sol": 9.5128
     }
   ],
