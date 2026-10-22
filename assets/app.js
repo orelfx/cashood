@@ -3216,7 +3216,7 @@ async function renderPortofolio() {
     tile('Modal masuk', usd(setoran, 0), `${orang} pemegang saham${pokokBox > 0 ? ` · termasuk ${usd(pokokBox, 0)} Safe Box` : ''}`),
     tile('Untung / rugi', signed(untung), setoran ? pct((untung / setoran) * 100) + ' dari modal' : '—', cls(untung)),
   ].join(''));
-  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id === 'gmsol' ? 'GMSOL (belum jalan)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
+  $('#portoHint').textContent = `${briefs.length} dana${box ? ' + Safe Box' : ''}${missing.length ? ' · belum terbaca: ' + missing.map((id) => (id === 'solbot' ? 'SolBot (data tertunda)' : id === 'gmsol' ? 'GMSOL (Menunggu live)' : id)).join(', ') : ''} · sumber tertua ${ago(Math.min(...briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || 0), ...(box ? [box.updatedAt || 0] : [])))}`;
 
   setHTML($('#portoList'), briefs.map((b) => `
     <div class="porto-fund">
@@ -3706,7 +3706,8 @@ const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL</d
 const GMSOL_WARN = '<b>Uang asli · uji eksekusi.</b> GMSOL v3.2 memasang likuiditas di pool Meteora DLMM dengan dana sungguhan: <b>$50 per posisi, maks. 5 posisi</b>. Rem otomatis (dihitung dari buku GMSOL, dikonfirmasi 2× berjarak 60 detik): <b>rem harian −25%</b> → tidak ada posisi baru selama 24 jam; <b>rem total $600</b> (−50% dari $1.200) → semua posisi GMSOL ditutup, mesin BERHENTI (HALTED), dan hanya bisa jalan lagi atas izin Orel. Ini <b>tes eksekusi — profitnya belum terbukti</b>. Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
 function gmsolWait(msg, asOf) {
   return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode sb-m-wait">${esc(msg)}</span></div>
-    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL v3.2 belum jalan, belum ada posisi. '}Angka tidak ditampilkan sampai mesin mengirim buku GMSOL.</p></section>
+    <p class="miss" role="status"><b>${esc(msg)}.</b> ${asOf ? `Data terakhir: ${esc(sbWib(asOf))} (${esc(ago(asOf))}). ` : 'Mesin GMSOL v3.2 belum live, belum ada posisi. '}Kinerja (PnL, %, posisi) baru tampil setelah mesin live.</p>
+    <div class="sb-kpis"><div><small>Ekuitas buku GMSOL</small><b>${usd(1200)}</b></div><div><small>Ukuran</small><b>$50 × maks. 5</b></div><div><small>Rem</small><b>−25%/hari · $600</b></div></div></section>
     <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`;
 }
 async function loadGmsol() {
@@ -3719,7 +3720,7 @@ async function renderGmsol() {
   const d = await loadGmsol();
   if (state.view !== 'gmsol') return;
   const body = $('#gmsolBody');
-  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(d?.reason === 'data tertunda' ? 'Data tertunda' : 'Belum jalan / menunggu', d?.asOf || null)); return; }
+  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(d?.reason === 'data tertunda' ? 'Data tertunda' : 'Menunggu live', d?.asOf || null)); return; }
   if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Data tertunda', d.asOf || null)); return; }
   const cl = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
   const seats = d.openSeats || [], closes = d.closes || [];
@@ -4906,20 +4907,20 @@ async function renderHome() {
   if (epoch !== homeEpoch || state.view !== 'home') return;
   const gmsolCard = () => {
     const f = state.gmsol, d = gsData && gsData.status === 'ok' && gsData.asOf && Date.now() - gsData.asOf <= GMSOL_STALE_MS ? gsData : null;
-    const status = !d ? 'belum jalan / menunggu' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
+    const status = !d ? 'Menunggu live' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
     return `<a class="prod" href="#gmsol" style="--c:${f.accent}">
       <div class="prod-top">${iconTile('orbit', f.accent)}
         <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${esc(status)}</div></div></div>
       <p class="prod-desc">${esc(f.blurb || '')}</p>
       <div class="prod-nums">
-        <div><span class="k">Ekuitas</span><span class="v">${d ? usd(d.equityUsd, 0) : '—'}</span></div>
+        <div><span class="k">Ekuitas</span><span class="v">${usd(d ? d.equityUsd : 1200, 0)}</span></div>
         <div><span class="k">Untung / rugi</span><span class="v ${cls(d?.pnlUsd ?? 0)}">${d?.pnlUsd == null ? '—' : `${signed(d.pnlUsd)}<small>${d.pnlPct >= 0 ? '+' : ''}${pct(d.pnlPct, 1)}</small>`}</span></div>
         <div><span class="k">Modal</span><span class="v">${usd(Number(f.capitalUsd) || 1200, 0)}</span></div>
         <div><span class="k">Posisi terbuka</span><span class="v">${d && d.status === 'ok' ? String((d.openSeats || []).length) : '—'}</span></div>
         <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || 'LP')}</span></div>
         <div><span class="k">Rem</span><span class="v txt">−25%/hari · $600 total</span></div>
       </div>
-      <p class="hint">${!d ? 'Mesin v3.2 belum jalan — angka muncul begitu buku GMSOL masuk. ' : ''}Uji eksekusi $50/posisi (maks. 5); profit belum terbukti.</p>
+      <p class="hint">${!d ? 'Menunggu live — ekuitas buku = modal $1.200, belum ada kinerja. ' : ''}Uji eksekusi $50/posisi (maks. 5); profit belum terbukti.</p>
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   const solbotCard = () => {
