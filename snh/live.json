@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bd54d246-fb55-4ec7-ac56-e0ead22f454d",
-  "updatedAt": 1792672397085,
-  "generatedAt": "2026-10-22 19:33 WIB",
+  "generation": "91300234-40ef-498b-845d-9ed47aa41c6a",
+  "updatedAt": 1792672700035,
+  "generatedAt": "2026-10-22 19:38 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 455,
+      "ageMinutes": 461,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1415,12 +1415,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792672397085,
+    "heartbeatAt": 1792672700035,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792672366000,
+    "lastScanAt": 1792672676000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1447,7 +1447,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "575",
+        "v": "576",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1463,9 +1463,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792672397085,
+      "lastDecisionAt": 1792672700035,
       "lastAction": "keputusan",
-      "lastReason": "Kimchi [big]: Dilewati karena red flag: 10 holder terbesar pegang 78%."
+      "lastReason": "udream [degen]: Dilewati karena red flag: bundler pegang 74.27% supply."
     }
   },
   "strategy": {
@@ -1496,7 +1496,7 @@
       ],
       [
         "Label wallet",
-        "smart 14635 · bot 6658 · blacklist 464 · lp 1 · fresh 1307 · kol 221 · dolphin 204 · whale 16"
+        "smart 14637 · bot 6656 · blacklist 464 · lp 1 · fresh 1307 · kol 221 · dolphin 204 · whale 16"
       ]
     ],
     "requirements": [
@@ -1552,15 +1552,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14635,
+          "total": 14637,
           "active": 468,
-          "passive": 14167
+          "passive": 14169
         },
         {
           "key": "bot",
-          "total": 6658,
+          "total": 6656,
           "active": 0,
-          "passive": 6658
+          "passive": 6656
         },
         {
           "key": "fresh",
@@ -1700,6 +1700,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792672418667,
+        "symbol": "udream",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 74.27% supply."
+      },
       {
         "at": 1792672303943,
         "symbol": "Kimchi",
@@ -2395,53 +2412,6 @@
           }
         ],
         "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1792644657391,
-        "symbol": "SURY",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 852,
-            "note": "bundler pegang 29.0%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 7.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 1.4%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "8.2% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 1.4%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 26x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: explore: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2452,7 +2422,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 469,
+        "red_flag": 470,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2504,7 +2474,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792672639928,
+    "generatedAt": 1792672796716,
     "trades": {
       "count": 152,
       "wins": 63,
