@@ -21,7 +21,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'gmsol');
 const SRC = process.env.GMSOL_SRC || '/root/cashood-inbox/gmsol-live.json';
 const ENGINE = process.env.GMSOL_ENGINE_DIR || '/root/grok-meridian-live-v3'; // HANYA DIBACA
-const CAPITAL = 1200;
+let CAPITAL = null; // r4.1: modal dikunci mesin saat deploy (state.capital), dibaca dari sumber; bukan lagi $1.200
 const STALE_MS = 15 * 60e3;
 const release = lock(resolve(DIR, 'sync.lock.local'));
 const now = Number(process.env.GMSOL_NOW) || Date.now();
@@ -31,7 +31,7 @@ const r3 = (v) => (num(v) == null ? null : Number(Number(v).toFixed(3)));
 const time = (v) => { if (v == null) return null; const t = typeof v === 'number' ? v : Date.parse(v); return Number.isFinite(t) ? t : null; };
 const ADDR = /0x[0-9a-fA-F]{16,}|[1-9A-HJ-NP-Za-km-z]{32,}/g;
 const text = (v, max = 160) => (v == null || typeof v === 'object' ? null : String(v).replace(ADDR, '…').replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim().slice(0, max) || null);
-const base = { fund: 'gmsol', system: 'GMSOL', realMoney: true, risk: 'high', capitalUsd: CAPITAL, checkedAt: now };
+const base = { fund: 'gmsol', system: 'GMSOL', realMoney: true, risk: 'high', capitalUsd: null, checkedAt: now };
 
 function out(o) {
   const s = JSON.stringify(o);
@@ -43,6 +43,8 @@ function out(o) {
 // dan perubahan 24 jam di beranda; disimpan lokal, terbit di dalam live.json.
 function curve(asOf, eq) {
   const f = resolve(DIR, 'nav.local.json'), h = readJSON(f, { points: [] });
+  const lockT = CAP_LOCK; // titik sebelum kunci modal r4.1 (buku lama $1.200) diarsip, tidak dicampur
+  if (lockT && h.points.some((p) => p.t < lockT)) { atomicJSON(resolve(DIR, `nav-pre-r4-${lockT}.local.json`), { archivedAt: now, before: lockT, points: h.points.filter((p) => p.t < lockT) }); h.points = h.points.filter((p) => p.t >= lockT); }
   if (!h.points.length || asOf > h.points.at(-1).t) h.points.push({ t: asOf, usd: eq });
   h.points = h.points.filter((p) => p.t > now - 30 * 86400e3).slice(-4000);
   atomicJSON(f, h);
@@ -69,14 +71,19 @@ function screening(dir = resolve(ENGINE, 'logs')) {
       closest: pools.filter((p) => (p.reasons || []).length).sort((a, b) => a.reasons.length - b.reasons.length).slice(0, 5).map((p) => ({ symbol: text(p.pool_symbol, 24), binStep: num(p.bs), reasons: p.reasons.slice(0, 4).map((x) => text(x, 90)) })) };
   } catch { return null; }
 }
-const goLive = (j) => time(j.t0At) ?? time(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.created);
+let CAP_LOCK = null;
+const goLive = (j) => time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At) ?? time(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.created);
 const v3Fields = (j) => {
   const b = j.brakes || {};
   return {
-    t0At: goLive(j), spec: text(j.spec, 40), execErrors: num(j.execErrors), screening: screening(), equityStatus: text(j.equityStatus, 80),
+    t0At: goLive(j), spec: text(j.spec, 40), specStatus: text(j.specStatus, 30), specHash: j.spec12 && typeof j.spec12 === 'object' ? Object.fromEntries(Object.entries(j.spec12).slice(0, 5).map(([k, v]) => [text(k, 40), text(v, 16)])) : null,
+    capitalUsd: CAPITAL, capitalUsdAtDeploy: num(j.capitalUsdAtDeploy?.usd) == null ? null : r2(j.capitalUsdAtDeploy.usd), capitalLockedAt: j.capitalUsdAtDeploy?.lockedAt && time(j.capitalUsdAtDeploy.lockedAt) ? new Date(time(j.capitalUsdAtDeploy.lockedAt)).toISOString() : null,
+    capitalSolUsdAtLock: r2(j.capitalUsdAtDeploy?.solUsd), capitalFreeSolAtLock: num(j.capitalUsdAtDeploy?.freeSol), capitalReserveSol: num(j.capitalUsdAtDeploy?.reserveSol),
+    flowsDeclaredNetUsd: r2(j.flowsDeclaredNetUsd),
+    preDeployHistory: (Array.isArray(j.preDeployHistory) ? j.preDeployHistory : []).slice(0, 10).map((h) => ({ atWib: text(h.atWib, 30), type: text(h.type, 30), sol: num(h.sol), by: text(h.by, 20), note: text(h.note, 160), historyOnly: true })), execErrors: num(j.execErrors), screening: screening(), equityStatus: text(j.equityStatus, 80),
     walletSolShared: num(j.walletSolShared?.sol) == null ? null : { sol: Number(Number(j.walletSolShared.sol).toFixed(4)), usd: num(j.solPriceUsd) == null ? null : r2(j.walletSolShared.sol * j.solPriceUsd), label: 'dipakai bersama Meridian2' },
-    sizing: { sizeUsd: r2(j.sizing?.sizeUsd) ?? 50, maxOpen: num(j.sizing?.maxOpen) ?? 5 },
-    brakes: { dailyPct: num(b.dailyPct) ?? 25, totalFloorUsd: r2(b.totalFloorUsd) ?? 600, dailyBlocked: b.dailyBlocked === true,
+    sizing: { sizeUsd: r2(j.sizing?.sizeUsd), maxOpen: num(j.sizing?.maxOpen), maxOpenCap: num(j.sizing?.maxOpenCap) },
+    brakes: { dailyPct: num(b.dailyPct), totalFloorUsd: r2(b.totalFloorUsd), dailyBlocked: b.dailyBlocked === true,
       dailyBlockedUntil: time(b.dailyBlockedUntil), dayChangePct: r3(b.dayChangePct), dayStartLedgerUsd: r2(b.dayStartLedgerUsd), dayFloorUsd: r2(b.dayFloorUsd), gateUnknownBlock: b.gateUnknownBlock === true, halted: b.halted === true },
   };
 };
@@ -87,6 +94,8 @@ try {
   if (j?.fund !== 'gmsol' || j?.mode !== 'live') wait('belum jalan — sumber bukan mode live');
   // Berkas lama v2.x (rem lama, ekuitas wallet) tidak dipakai lagi.
   if (!('equityLedgerUsd' in j)) wait('belum jalan — menunggu mesin v3.2 (data v2 lama diabaikan)');
+  CAPITAL = r2(j.capitalUsd); CAP_LOCK = time(j.capitalUsdAtDeploy?.lockedAt);
+  if (CAPITAL == null || !CAP_LOCK) wait('menunggu modal r4.1 dikunci mesin');
   const asOf = time(j.updatedAt);
   const eq = r2(j.equityLedgerUsd);
   if (!asOf) wait('belum jalan — menunggu data live');
