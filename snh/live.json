@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "de0430cb-7a57-4f4a-9fde-bc2088974e04",
-  "updatedAt": 1792685401938,
-  "generatedAt": "2026-10-22 23:10 WIB",
+  "generation": "73682b0e-9e3f-4998-96e1-3da6dd2f5c27",
+  "updatedAt": 1792685708333,
+  "generatedAt": "2026-10-22 23:15 WIB",
   "usdIdr": null,
-  "totalUsd": 901.814420410528,
+  "totalUsd": 901.7240106555178,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 901.814420410528,
+  "botWalletUsd": 901.7240106555178,
   "walletUsd": 899.6247844152517,
-  "lpUsd": 2.189636,
+  "lpUsd": 2.09922624,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 7.43458074750882,
       "investedUsd": 7.43458074750882,
-      "principalUsd": 2.189636,
-      "valueUsd": 2.189636,
+      "principalUsd": 2.09922624,
+      "valueUsd": 2.09922624,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -5.244944752232537,
-      "pnlPct": -70.55,
+      "pnlUsd": -5.335354507242778,
+      "pnlPct": -71.76,
       "entryPriceUsd": 0.0002923837125811098,
-      "priceUsd": 0.00009419744560461513,
-      "ageMinutes": 672,
+      "priceUsd": 0.00009055714583205224,
+      "ageMinutes": 677,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1410,18 +1410,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 899.6247844152517,
-    "positionsUsd": 2.189636,
-    "realizedUsd": -92.94063484,
-    "unrealizedUsd": -5.24494475,
-    "pnlUsd": -98.18557958947201,
+    "positionsUsd": 2.09922624,
+    "realizedUsd": -92.94063483,
+    "unrealizedUsd": -5.33535451,
+    "pnlUsd": -98.27598934448224,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792685401938,
+    "heartbeatAt": 1792685708333,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 10.66,
-    "lastScanAt": 1792685373000,
+    "drawdownPct": 10.67,
+    "lastScanAt": 1792685674000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1436,14 +1436,14 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$5.2449",
+        "v": "−$5.3354",
         "n": "dari posisi terbuka",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "517",
-        "n": "24 jam · 1 diveto LLM"
+        "v": "509",
+        "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1458,9 +1458,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792685401938,
+      "lastDecisionAt": 1792685708333,
       "lastAction": "keputusan",
-      "lastReason": "BLACKTOBER [low]: Dilewati: harga sudah -30% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "LOAD [mid]: Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
     }
   },
   "strategy": {
@@ -1505,7 +1505,7 @@
       ],
       [
         "mid (core)",
-        "alokasi 15% · $67 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
+        "alokasi 15% · $68 · kursi 7–25% basket · maks 3.75% equity · 0 terbuka"
       ],
       [
         "big (core)",
@@ -1696,6 +1696,16 @@
     },
     "decisions": [
       {
+        "at": 1792685565045,
+        "symbol": "LOAD",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
+      },
+      {
         "at": 1792685151203,
         "symbol": "BLACKTOBER",
         "action": "skip",
@@ -1705,16 +1715,6 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -30% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792684960804,
-        "symbol": "LOAD",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "kol": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
       },
       {
         "at": 1792684761382,
@@ -2353,12 +2353,12 @@
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 85,
+        "below_entry": 83,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 425,
+        "red_flag": 420,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2375,7 +2375,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 1
+        "llm": 0
       },
       "test": {
         "solo": 0,
@@ -2408,7 +2408,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792685532178,
+    "generatedAt": 1792685849064,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2449,14 +2449,14 @@
     "equity": {
       "days": 16,
       "spanDays": 16.7,
-      "returnPct": -8.87,
+      "returnPct": -8.88,
       "maxDrawdownPct": 8.95,
       "maxDrawdownAt": 1792677528487,
       "maxDrawdownUsd": 88.56,
       "maxDrawdownPeakUsd": 989.63,
       "maxDrawdownTroughUsd": 901.07,
-      "currentDrawdownPct": 8.87,
-      "currentDrawdownUsd": 87.82,
+      "currentDrawdownPct": 8.88,
+      "currentDrawdownUsd": 87.91,
       "positiveDaysPct": 43.75,
       "bestDayPct": 0.83,
       "worstDayPct": -3.87,
@@ -2465,8 +2465,8 @@
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -98.19,
-    "profitPct": -9.82,
+    "profitUsd": -98.28,
+    "profitPct": -9.83,
     "recoveryFactor": -1.11,
     "score": {
       "axes": {
