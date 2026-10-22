@@ -12,7 +12,7 @@
  * angka ("menunggu data on-chain"). Hanya field allowlist yang terbit; teks bebas
  * dibersihkan dari string mirip alamat.
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, openSync, readSync, fstatSync, closeSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { atomicJSON, assertPublic, lock, readJSON } from './lib/io.mjs';
@@ -20,6 +20,7 @@ import { atomicJSON, assertPublic, lock, readJSON } from './lib/io.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'gmsol');
 const SRC = process.env.GMSOL_SRC || '/root/cashood-inbox/gmsol-live.json';
+const ENGINE = process.env.GMSOL_ENGINE_DIR || '/root/grok-meridian-live-v3'; // HANYA DIBACA
 const CAPITAL = 1200;
 const STALE_MS = 15 * 60e3;
 const release = lock(resolve(DIR, 'sync.lock.local'));
@@ -50,14 +51,33 @@ function curve(asOf, eq) {
 }
 function wait(reason, asOf = null) { out({ ...base, status: 'waiting', reason, asOf }); console.log(`[gmsol] waiting: ${reason}`); release(); process.exit(0); }
 
+// Ringkasan screening dari scan terakhir logs/screen-*.jsonl (baris satu scan berbagi ts).
+// Hanya simbol pasangan + jumlah; teks alasan dibersihkan dari string mirip alamat.
+function tailText(f, max = 3e6) { const fd = openSync(f, 'r'); try { const n = fstatSync(fd).size, len = Math.min(n, max), b = Buffer.alloc(len); readSync(fd, b, 0, len, n - len); return b.toString('utf8'); } finally { closeSync(fd); } }
+function screening(dir = resolve(ENGINE, 'logs')) {
+  try {
+    const f = readdirSync(dir).filter((x) => /^screen-\d{4}-\d{2}-\d{2}\.jsonl$/.test(x)).sort().at(-1); if (!f) return null;
+    const rows = []; for (const l of tailText(resolve(dir, f)).split('\n')) { try { const o = JSON.parse(l); if (o && o.ts) rows.push(o); } catch { /* baris terpotong */ } }
+    const lastTs = rows.at(-1)?.ts; if (!lastTs) return null;
+    const scan = rows.filter((r) => r.ts === lastTs), sum = scan.find((r) => r.pool_symbol === '*'), pools = scan.filter((r) => r.pool_symbol !== '*');
+    const m = /sol_dlmm=(\d+) inactive_1h=(\d+)/.exec(sum?.reasons?.[0] || '');
+    const key = (s) => String(s).split(/[ =!<>]/)[0];
+    const cnt = {}; for (const p of pools) for (const k of new Set((p.reasons || []).map(key))) cnt[k] = (cnt[k] || 0) + 1;
+    const rejected = pools.filter((p) => (p.reasons || []).length).length;
+    return { scannedAt: time(lastTs), solPools: m ? Number(m[1]) : null, inactive1h: m ? Number(m[2]) : null, checked: pools.length, passed: pools.length - rejected,
+      topReasons: Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, n]) => ({ reason: text(k, 60), pools: n })),
+      closest: pools.filter((p) => (p.reasons || []).length).sort((a, b) => a.reasons.length - b.reasons.length).slice(0, 5).map((p) => ({ symbol: text(p.pool_symbol, 24), binStep: num(p.bs), reasons: p.reasons.slice(0, 4).map((x) => text(x, 90)) })) };
+  } catch { return null; }
+}
+const goLive = (j) => time(j.t0At) ?? time(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.created);
 const v3Fields = (j) => {
   const b = j.brakes || {};
   return {
-    t0At: time(j.t0At), spec: text(j.spec, 40), equityStatus: text(j.equityStatus, 80),
+    t0At: goLive(j), spec: text(j.spec, 40), execErrors: num(j.execErrors), screening: screening(), equityStatus: text(j.equityStatus, 80),
     walletSolShared: num(j.walletSolShared?.sol) == null ? null : { sol: Number(Number(j.walletSolShared.sol).toFixed(4)), usd: num(j.solPriceUsd) == null ? null : r2(j.walletSolShared.sol * j.solPriceUsd), label: 'dipakai bersama Meridian' },
     sizing: { sizeUsd: r2(j.sizing?.sizeUsd) ?? 50, maxOpen: num(j.sizing?.maxOpen) ?? 5 },
     brakes: { dailyPct: num(b.dailyPct) ?? 25, totalFloorUsd: r2(b.totalFloorUsd) ?? 600, dailyBlocked: b.dailyBlocked === true,
-      dailyBlockedUntil: time(b.dailyBlockedUntil), dayChangePct: r3(b.dayChangePct), halted: b.halted === true },
+      dailyBlockedUntil: time(b.dailyBlockedUntil), dayChangePct: r3(b.dayChangePct), dayStartLedgerUsd: r2(b.dayStartLedgerUsd), dayFloorUsd: r2(b.dayFloorUsd), gateUnknownBlock: b.gateUnknownBlock === true, halted: b.halted === true },
   };
 };
 

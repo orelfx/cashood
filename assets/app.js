@@ -3705,6 +3705,36 @@ const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL</d
   <div class="sb-sub">Grok Meridian v3.2 · LP Meteora DLMM, Solana · uang asli · <span class="sb-risk">High risk</span> · modal buku $1.200</div></div>`;
 const gmsolFunds = (d) => { const w = d?.walletSolShared; if (!w || w.sol == null) return '';
   return `<p class="miss" role="note"><b>Catatan dana:</b> buku $1.200 hanya modal acuan untuk menghitung kinerja dan rem. Dana nyata yang tersedia adalah saldo wallet <b>~${esc(String(w.sol))} SOL</b>${w.usd != null ? ` (≈ ${usd(w.usd)})` : ''}, dipakai bersama Meridian. Dengan saldo ini kapasitas hanya sekitar 1–2 posisi $50, bukan 5, sampai Orel menambah SOL atau memakai wallet terpisah.</p>`; };
+const GMSOL_REASON = { 'pool.fee_active_tvl_ratio': 'fee/TVL aktif < 2%', 'pool.tvl': 'TVL terlalu kecil', 'pool.volume': 'volume 1 jam terlalu kecil', 'pool.unique_traders': 'trader unik terlalu sedikit', 'base.market_cap': 'market cap di luar batas', 'active_tvl_share': 'posisi $50 > batas % TVL aktif', 'detail.f24': 'fee/TVL 24 jam terlalu kecil', sol_on_x_disabled: 'SOL di sisi X (nonaktif)', 'pool.dlmm_params.bin_step': 'bin step di luar 100/125/200/250', 'derived.age_h': 'umur pool < 24 jam' };
+const gmsolReason = (k) => GMSOL_REASON[k] || k;
+function gmsolChart(pts) {
+  if (!pts || pts.length < 2) return '<p class="dim">Kurva ekuitas muncul setelah ada 2 titik data.</p>';
+  const W = 640, H = 140, t0 = pts[0].t, t1 = pts.at(-1).t || t0 + 1, vs = pts.map((p) => p.usd);
+  let lo = Math.min(...vs, 1200), hi = Math.max(...vs, 1200); if (hi - lo < 2) { lo -= 1; hi += 1; }
+  const x = (t) => ((t - t0) / Math.max(1, t1 - t0)) * W, y = (v) => H - ((v - lo) / (hi - lo)) * H;
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.usd).toFixed(1)}`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="Kurva ekuitas buku GMSOL"><line x1="0" x2="${W}" y1="${y(1200).toFixed(1)}" y2="${y(1200).toFixed(1)}" stroke="#666" stroke-dasharray="4 4"/><path d="${d}" fill="none" stroke="#38bdf8" stroke-width="2"/></svg>
+    <p class="hint">${esc(sbWib(t0))} → ${esc(sbWib(t1))} · ${pts.length} titik · min ${usd(Math.min(...vs))} · maks ${usd(Math.max(...vs))} · garis putus = modal $1.200</p>`;
+}
+function gmsolScreen(sc) {
+  if (!sc) return '<section class="card"><h3>Screening pool</h3><p class="dim">Log screening belum terbaca.</p></section>';
+  return `<section class="card"><h3>Screening pool (scan terakhir)</h3>
+    <p class="hint">Scan ${esc(sbWib(sc.scannedAt))} (${esc(ago(sc.scannedAt))}) · ${sc.solPools ?? '—'} pool SOL DLMM ditemukan, ${sc.inactive1h ?? '—'} tanpa aktivitas 1 jam · <b>${sc.checked}</b> dicek · <b>${sc.passed}</b> lolos semua syarat.</p>
+    ${sc.topReasons?.length ? `<div class="tbl-wrap"><table><thead><tr><th>Alasan ditolak teratas</th><th class="num">Pool</th></tr></thead><tbody>${sc.topReasons.map((r) => `<tr><td>${esc(gmsolReason(r.reason))}</td><td class="num">${r.pools}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${sc.closest?.length ? `<h4>5 pool paling dekat lolos</h4><div class="tbl-wrap"><table><thead><tr><th>Pasangan</th><th class="num">Bin step</th><th>Kenapa ditolak</th></tr></thead><tbody>${sc.closest.map((p) => `<tr><td><b>${esc(p.symbol || '—')}</b></td><td class="num">${p.binStep ?? '—'}</td><td class="dim">${p.reasons.map(esc).join('<br>')}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    <p class="hint">${sc.passed ? '' : 'Belum ada pool yang lolos, jadi belum ada posisi. '}Syarat entry mengikuti spec v3.2; tidak ada trade yang dipaksakan.</p></section>`;
+}
+function gmsolBrakes(d) {
+  const b = d.brakes || {};
+  const li = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
+  return `<section class="card"><h3>Status rem</h3><div class="tbl-wrap"><table><tbody>
+    ${li(`Rem harian −${b.dailyPct ?? 25}%`, b.dailyBlocked ? `<b class="neg">AKTIF</b> — posisi baru diblokir${b.dailyBlockedUntil ? ' sampai ' + esc(sbWib(b.dailyBlockedUntil)) : ''}` : `tidak aktif · awal hari ${b.dayStartLedgerUsd == null ? '—' : usd(b.dayStartLedgerUsd)} · batas ${b.dayFloorUsd == null ? '—' : usd(b.dayFloorUsd)} · hari ini ${sbPct(b.dayChangePct)}`)}
+    ${li(`Rem total ${usd(b.totalFloorUsd ?? 600)}`, b.halted ? '<b class="neg">HALTED</b> — semua posisi ditutup; jalan lagi hanya atas izin Orel' : `tidak aktif · ekuitas buku ${usd(d.equityUsd)} (jarak ${usd(d.equityUsd - (b.totalFloorUsd ?? 600))})`)}
+    ${li('Blokir data gate', b.gateUnknownBlock ? 'aktif (5 menit setelah data gate tidak diketahui)' : 'tidak aktif')}
+    ${li('Ukuran', `${usd(d.sizing?.sizeUsd ?? 50)} per posisi · maks. ${d.sizing?.maxOpen ?? 5} posisi`)}
+    ${li('Error eksekusi', String(d.execErrors ?? '—'))}
+  </tbody></table></div></section>`;
+}
 const GMSOL_WARN = '<b>Uang asli · uji eksekusi.</b> GMSOL v3.2 memasang likuiditas di pool Meteora DLMM dengan dana sungguhan: <b>$50 per posisi, maks. 5 posisi</b>. Rem otomatis (dihitung dari buku GMSOL, dikonfirmasi 2× berjarak 60 detik): <b>rem harian −25%</b> → tidak ada posisi baru selama 24 jam; <b>rem total $600</b> (−50% dari $1.200) → semua posisi GMSOL ditutup, mesin BERHENTI (HALTED), dan hanya bisa jalan lagi atas izin Orel. Ini <b>tes eksekusi — profitnya belum terbukti</b>. Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
 // Pernah live lalu data basi (>15 menit) → mesin berhenti, bukan "menunggu live".
 const gmsolStopped = (d) => !!d?.asOf && (d.status !== 'ok' || Date.now() - d.asOf > GMSOL_STALE_MS);
@@ -3734,11 +3764,14 @@ async function renderGmsol() {
     <div><small>Posisi terbuka</small><b>${seats.length}${d.sizing?.maxOpen ? ' / ' + d.sizing.maxOpen : ''}</b></div></div>
     <p class="hint">Kinerja = buku GMSOL ($1.200 + PnL realisasi ${sbUsd(d.realizedUsd)} + belum realisasi ${sbUsd(d.unrealizedUsd)}), bukan saldo wallet. Rem: harian −${d.brakes?.dailyPct ?? 25}% · total ${usd(d.brakes?.totalFloorUsd ?? 600)} · ukuran ${usd(d.sizing?.sizeUsd ?? 50)}/posisi.${d.brakes?.dailyBlocked && d.brakes?.dailyBlockedUntil ? ` Posisi baru diblokir sampai ${esc(sbWib(d.brakes.dailyBlockedUntil))}.` : ''}</p>
     ${gmsolFunds(d)}
-    <p class="hint">Diperbarui ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}).</p></section>
-    <section class="card"><h3>Posisi terbuka</h3>${seats.length ? `<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Modal</th><th class="num">PnL</th><th class="num">%</th><th>Range</th></tr></thead><tbody>
-      ${seats.map((p) => `<tr><td><b>${esc(p.symbol || '—')}</b></td><td class="num">${p.basisUsd == null ? '—' : usd(p.basisUsd)}</td><td class="num ${cl(p.pnlUsd ?? 0)}">${p.pnlUsd == null ? '—' : sbUsd(p.pnlUsd)}</td><td class="num ${cl(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</td><td>${p.inRange == null ? '—' : p.inRange ? 'di dalam' : 'di luar'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi terbuka.</p>'}</section>
-    <section class="card"><h3>Posisi ditutup</h3>${closes.length ? `<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
-      ${closes.map((c) => `<tr><td><b>${esc(c.symbol || '—')}</b></td><td class="num ${cl(c.netUsd ?? 0)}">${c.netUsd == null ? '—' : sbUsd(c.netUsd)}</td><td class="num ${cl(c.netPct ?? 0)}">${sbPct(c.netPct)}</td><td>${esc(c.reason || '—')}</td><td class="num dim">${c.closedAt ? esc(sbWib(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi yang ditutup.</p>'}</section>
+    <p class="hint">Diperbarui ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}) · spec ${esc(d.spec || '—')}${d.t0At ? ` · live sejak ${esc(sbWib(d.t0At))}` : ''}.</p></section>
+    <section class="card"><h3>Kurva ekuitas buku sejak live</h3>${gmsolChart(d.equityCurve)}</section>
+    ${gmsolBrakes(d)}
+    ${gmsolScreen(d.screening)}
+    <section class="card"><h3>Posisi terbuka</h3>${`<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Modal</th><th class="num">PnL</th><th class="num">%</th><th>Range</th></tr></thead><tbody>
+      ${seats.map((p) => `<tr><td><b>${esc(p.symbol || '—')}</b></td><td class="num">${p.basisUsd == null ? '—' : usd(p.basisUsd)}</td><td class="num ${cl(p.pnlUsd ?? 0)}">${p.pnlUsd == null ? '—' : sbUsd(p.pnlUsd)}</td><td class="num ${cl(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</td><td>${p.inRange == null ? '—' : p.inRange ? 'di dalam' : 'di luar'}</td></tr>`).join('') || '<tr><td colspan="5" class="dim">Belum ada posisi terbuka.</td></tr>'}</tbody></table></div>`}</section>
+    <section class="card"><h3>Posisi ditutup</h3>${`<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Hasil</th><th class="num">%</th><th>Alasan</th><th class="num">Ditutup</th></tr></thead><tbody>
+      ${closes.map((c) => `<tr><td><b>${esc(c.symbol || '—')}</b></td><td class="num ${cl(c.netUsd ?? 0)}">${c.netUsd == null ? '—' : sbUsd(c.netUsd)}</td><td class="num ${cl(c.netPct ?? 0)}">${sbPct(c.netPct)}</td><td>${esc(c.reason || '—')}</td><td class="num dim">${c.closedAt ? esc(sbWib(c.closedAt)) : '—'}</td></tr>`).join('') || '<tr><td colspan="5" class="dim">Belum ada posisi yang ditutup.</td></tr>'}</tbody></table></div>`}</section>
     <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`);
 }
 
