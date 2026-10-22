@@ -1587,3 +1587,23 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-
 .risk-med .sb-disc { border-color: #78350f !important; background: rgba(120, 53, 15, .14); }
 .risk-med .sb-disc p:first-child { color: #fde68a; }
 .risk-med .sb-g { border-color: #3d3216; background: linear-gradient(170deg, rgba(251, 191, 36, .06), transparent 70%); }
+
+/* GMSOL */
+.pill.sb-tag-real { font: 800 10.5px var(--sans); letter-spacing: .1em; color: #fff; background: #e11d48; border-color: #e11d48; vertical-align: 4px; }
+.gs-note { margin: -6px 2px 16px; line-height: 1.6; }
+.gs-brakes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sb-g.gs-hot { border-color: #991b1b; background: rgba(153, 27, 27, .2); }
+.gs-funnel { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; margin: 6px 0 14px; }
+.gs-funnel > i { align-self: center; color: var(--muted); font-style: normal; }
+.gs-step { flex: 1 1 110px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; background: rgba(255,255,255,.02); }
+.gs-step b { font: 700 20px var(--mono); }
+.gs-step span { font-size: 12px; color: var(--muted); }
+.gs-step.ok { border-color: #166534; } .gs-step.ok b { color: var(--green); }
+.gs-step.zero { border-color: #7f1d1d; } .gs-step.zero b { color: var(--red); }
+.gs-h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 14px 0 8px; }
+.gs-reasons { display: grid; gap: 6px; }
+.gs-rrow { display: grid; grid-template-columns: minmax(110px, 180px) 1fr 40px; gap: 10px; align-items: center; font-size: 13px; }
+.gs-rrow b { font-family: var(--mono); text-align: right; }
+.gs-rbar { height: 8px; background: #1f2630; border-radius: 99px; overflow: hidden; }
+.gs-rbar i { display: block; height: 100%; background: linear-gradient(90deg, #f97316, #ef4444); border-radius: 99px; }
+@media (max-width: 640px) { .gs-brakes { grid-template-columns: 1fr; } .gs-funnel > i { display: none; } .gs-step { flex-basis: calc(50% - 4px); } }
