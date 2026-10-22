@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "bfad3b11-a9cf-491f-b89f-ec9cdf00944f",
-  "updatedAt": 1792634173301,
-  "generatedAt": "2026-10-22 08:56 WIB",
+  "generation": "5b2efd2b-f3e9-4d04-aa97-c6903741f10b",
+  "updatedAt": 1792634476389,
+  "generatedAt": "2026-10-22 09:01 WIB",
   "usdIdr": null,
   "totalUsd": 923.7381329647544,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.00025487611730350503,
-      "ageMinutes": 379,
+      "ageMinutes": 384,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1387,12 +1387,12 @@
     "pnlUsd": -76.26186703524559,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792634173301,
+    "heartbeatAt": 1792634476389,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 8.49,
-    "lastScanAt": 1792634139000,
+    "lastScanAt": 1792634444000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1435,9 +1435,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792634173301,
+      "lastDecisionAt": 1792634476389,
       "lastAction": "keputusan",
-      "lastReason": "lmeow [degen]: Dilewati: solo_test: isolated virtual capital."
+      "lastReason": "RAY [big]: Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
     }
   },
   "strategy": {
@@ -1468,7 +1468,7 @@
       ],
       [
         "Label wallet",
-        "smart 14716 · bot 6554 · blacklist 458 · lp 1 · fresh 1300 · kol 219 · dolphin 233 · whale 16"
+        "smart 14715 · bot 6554 · blacklist 458 · lp 1 · fresh 1301 · kol 219 · dolphin 233 · whale 16"
       ]
     ],
     "requirements": [
@@ -1524,9 +1524,9 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14716,
+          "total": 14715,
           "active": 464,
-          "passive": 14252
+          "passive": 14251
         },
         {
           "key": "bot",
@@ -1536,9 +1536,9 @@
         },
         {
           "key": "fresh",
-          "total": 1300,
+          "total": 1301,
           "active": 0,
-          "passive": 1300
+          "passive": 1301
         },
         {
           "key": "blacklist",
@@ -1672,6 +1672,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792634319871,
+        "symbol": "RAY",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.6% dari market cap."
+      },
+      {
+        "at": 1792634269435,
+        "symbol": "Memebers",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 34.3% supply."
+      },
       {
         "at": 1792634040524,
         "symbol": "lmeow",
@@ -2342,43 +2362,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -35% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792625089526,
-        "symbol": "JONATHAN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
-      },
-      {
-        "at": 1792625065621,
-        "symbol": "FTR",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 26.0%"
-          },
-          {
-            "type": "rat",
-            "count": 9,
-            "note": "insider/entrapment pegang 12.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
@@ -2441,7 +2424,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792634238524,
+    "generatedAt": 1792634538231,
     "trades": {
       "count": 151,
       "wins": 63,
