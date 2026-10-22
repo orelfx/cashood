@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7d2a80eb-a895-4dcc-966a-cd038962dd06",
-  "updatedAt": 1792646405376,
-  "generatedAt": "2026-10-22 12:20 WIB",
+  "generation": "571260be-872a-4afa-bda5-35cc089e4f08",
+  "updatedAt": 1792646707943,
+  "generatedAt": "2026-10-22 12:25 WIB",
   "usdIdr": null,
-  "totalUsd": 908.8440969856092,
+  "totalUsd": 908.4699221830311,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 908.8440969856092,
+  "botWalletUsd": 908.4699221830311,
   "walletUsd": 899.6247844152517,
-  "lpUsd": 9.21931257,
+  "lpUsd": 8.84513777,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,15 @@
       "bookLabel": "low",
       "costUsd": 7.43458074750882,
       "investedUsd": 7.43458074750882,
-      "principalUsd": 9.21931257,
-      "valueUsd": 9.21931257,
+      "principalUsd": 8.84513777,
+      "valueUsd": 8.84513777,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 1.7847318228486895,
-      "pnlPct": 24.01,
+      "pnlUsd": 1.4105570202706375,
+      "pnlPct": 18.97,
       "entryPriceUsd": 0.0002923837125811098,
-      "priceUsd": 0.00037671202430643487,
-      "ageMinutes": 22,
+      "priceUsd": 0.00036166641907278636,
+      "ageMinutes": 27,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1410,18 +1410,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 899.6247844152517,
-    "positionsUsd": 9.21931257,
-    "realizedUsd": -92.94063483,
-    "unrealizedUsd": 1.78473182,
-    "pnlUsd": -91.15590301439079,
+    "positionsUsd": 8.84513777,
+    "realizedUsd": -92.94063484,
+    "unrealizedUsd": 1.41055702,
+    "pnlUsd": -91.53007781696886,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792646405376,
+    "heartbeatAt": 1792646707943,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 9.96,
-    "lastScanAt": 1792646378000,
+    "drawdownPct": 10,
+    "lastScanAt": 1792646623000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1436,7 +1436,7 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$1.7847",
+        "v": "+$1.4106",
         "n": "dari posisi terbuka",
         "tone": "pos"
       },
@@ -1458,9 +1458,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792646405376,
+      "lastDecisionAt": 1792646707943,
       "lastAction": "keputusan",
-      "lastReason": "Kimchi [big]: Dilewati karena red flag: 10 holder terbesar pegang 78%."
+      "lastReason": "Kimchi [big]: Dilewati: harga sudah -16% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1695,6 +1695,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792646416721,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 10,
+            "note": "10 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -16% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792645811121,
         "symbol": "Kimchi",
@@ -2536,27 +2553,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 41%."
-      },
-      {
-        "at": 1792633848794,
-        "symbol": "OPAIUM",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 25%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 114,
+        "below_entry": 115,
         "no_pullback": 0,
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 495,
+        "red_flag": 494,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2606,7 +2613,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792646540550,
+    "generatedAt": 1792646838653,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2647,25 +2654,25 @@
     "equity": {
       "days": 16,
       "spanDays": 16.2,
-      "returnPct": -8.16,
+      "returnPct": -8.2,
       "maxDrawdownPct": 8.36,
       "maxDrawdownAt": 1792645193747,
       "maxDrawdownUsd": 82.74,
       "maxDrawdownPeakUsd": 989.63,
       "maxDrawdownTroughUsd": 906.89,
-      "currentDrawdownPct": 8.16,
-      "currentDrawdownUsd": 80.79,
+      "currentDrawdownPct": 8.2,
+      "currentDrawdownUsd": 81.16,
       "positiveDaysPct": 43.75,
       "bestDayPct": 0.83,
       "worstDayPct": -3.87,
-      "sharpe": -8.08,
-      "sortino": -7.91,
+      "sharpe": -8.1,
+      "sortino": -7.93,
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -91.16,
-    "profitPct": -9.12,
-    "recoveryFactor": -1.1,
+    "profitUsd": -91.53,
+    "profitPct": -9.15,
+    "recoveryFactor": -1.11,
     "score": {
       "axes": {
         "winRate": 42,
