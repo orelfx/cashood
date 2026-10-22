@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 84.67,
-  "checkedAt": 1792662439211,
+  "checkedAt": 1792662740236,
   "status": "ok",
-  "asOf": 1792662428171,
+  "asOf": 1792662733395,
   "t0At": 1792657533144,
   "spec": "gmsol-live-v3.2 r4.1",
   "specStatus": "live_pinned",
@@ -36,7 +36,7 @@
   ],
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792662394597,
+    "scannedAt": 1792662728424,
     "solPools": 309,
     "inactive1h": 124,
     "checked": 185,
@@ -51,16 +51,16 @@
         "pools": 144
       },
       {
-        "reason": "pool.volume",
-        "pools": 139
-      },
-      {
         "reason": "pool.dlmm_params.bin_step",
         "pools": 138
       },
       {
+        "reason": "pool.volume",
+        "pools": 137
+      },
+      {
         "reason": "base.market_cap",
-        "pools": 116
+        "pools": 118
       },
       {
         "reason": "pool.tvl",
@@ -72,14 +72,14 @@
         "symbol": "PHP-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.1993 !>=2"
+          "pool.fee_active_tvl_ratio=0.1942 !>=2"
         ]
       },
       {
         "symbol": "SI-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.0889 !>=2"
+          "pool.fee_active_tvl_ratio=0.0804 !>=2"
         ]
       },
       {
@@ -87,7 +87,7 @@
         "binStep": 8,
         "reasons": [
           "pool.dlmm_params.bin_step=8 !in[100,125,200,250]",
-          "pool.fee_active_tvl_ratio=1.4598 !>=2"
+          "pool.fee_active_tvl_ratio=1.4102 !>=2"
         ]
       },
       {
@@ -95,15 +95,15 @@
         "binStep": 20,
         "reasons": [
           "pool.dlmm_params.bin_step=20 !in[100,125,200,250]",
-          "pool.fee_active_tvl_ratio=1.8012 !>=2"
+          "pool.fee_active_tvl_ratio=1.1644 !>=2"
         ]
       },
       {
         "symbol": "PANGEA-SOL",
         "binStep": 100,
         "reasons": [
-          "derived.age_h=17.2032 !>=24",
-          "pool.fee_active_tvl_ratio=0.707 !>=2"
+          "derived.age_h=17.296 !>=24",
+          "pool.fee_active_tvl_ratio=0.6414 !>=2"
         ]
       }
     ]
@@ -111,7 +111,7 @@
   "equityStatus": "ok",
   "walletSolShared": {
     "sol": 1.2185,
-    "usd": 126.4,
+    "usd": 126.66,
     "label": "dipakai bersama Meridian2"
   },
   "sizing": {
@@ -221,6 +221,10 @@
     {
       "t": 1792662428171,
       "usd": 84.67
+    },
+    {
+      "t": 1792662733395,
+      "usd": 84.67
     }
   ],
   "engine": {
@@ -242,16 +246,16 @@
   "walletShared": {
     "label": "Nilai wallet bersama",
     "note": "Seluruh wallet (posisi GMSOL + meridian2). BUKAN dasar PnL/perbandingan GMSOL; itu blok engine (Buku GMSOL).",
-    "asOf": 1792662439211,
+    "asOf": 1792662740236,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 103.73,
+    "solPriceUsd": 103.93,
     "freeSol": 1.2185,
-    "freeSolUsd": 126.39,
-    "lpValueUsd": 846.43,
-    "unclaimedFeesUsd": 0.13,
-    "claimedFeesUsd": 18.92,
-    "uPnlUsd": -15.51,
-    "uPnlExclFeesUsd": -34.57,
+    "freeSolUsd": 126.64,
+    "lpValueUsd": 847.02,
+    "unclaimedFeesUsd": 0.2,
+    "claimedFeesUsd": 18.78,
+    "uPnlUsd": -15,
+    "uPnlExclFeesUsd": -33.98,
     "definitions": {
       "uPnlUsd": "valueUsd + unclaimedFeesUsd + claimedFeesUsd - investedUsd (fee ikut; konvensi utama yang diaudit)",
       "uPnlExclFeesUsd": "valueUsd - investedUsd (tanpa fee; konvensi uPnL tracker)",
@@ -260,23 +264,23 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 972.95,
+    "totalAssetsUsd": 973.86,
     "openCount": 1,
     "positions": [
       {
         "symbol": "PANGEA-SOL",
         "protocol": "DLMM",
         "owner": "meridian2",
-        "ageH": 8.61,
+        "ageH": 8.69,
         "investedUsd": 881,
-        "valueUsd": 846.43,
-        "unclaimedFeesUsd": 0.13,
-        "claimedFeesUsd": 18.92,
-        "feesUsd": 19.06,
-        "uPnlUsd": -15.51,
-        "pct": -1.761,
-        "uPnlExclFeesUsd": -34.57,
-        "pctExclFees": -3.924,
+        "valueUsd": 847.02,
+        "unclaimedFeesUsd": 0.2,
+        "claimedFeesUsd": 18.78,
+        "feesUsd": 18.98,
+        "uPnlUsd": -15,
+        "pct": -1.702,
+        "uPnlExclFeesUsd": -33.98,
+        "pctExclFees": -3.857,
         "inRange": true
       }
     ],
