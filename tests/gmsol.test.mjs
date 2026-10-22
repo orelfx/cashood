@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 const ROOT = resolve(import.meta.dirname, '..');
 const NOW = Date.parse('2026-10-21T12:00:00Z');
 const src = (over = {}) => ({ fund: 'gmsol', mode: 'live', updatedAt: new Date(NOW - 60e3).toISOString(), t0At: new Date(NOW - 3600e3).toISOString(),
-  equityUsd: 1195.5, walletUsd: 1195.5, lpUsd: 0, tokensUsd: 0, openSeats: [{ symbol: 'ABC-SOL', basisUsd: 50 }], closeHistory: [{ symbol: 'XYZ-SOL', netUsd: 1 }], ...over });
+  equityLedgerUsd: 1195.5, walletSolShared: { sol: 8.7, label: 'dipakai bersama Meridian' }, sizing: { sizeUsd: 50, maxOpen: 5 }, brakes: { dailyPct: 25, totalFloorUsd: 600, halted: false }, openSeats: [{ symbol: 'ABC-SOL', basisUsd: 50 }], closeHistory: [{ symbol: 'XYZ-SOL', netUsd: 1 }], ...over });
 function run(source, { passed = false, now = NOW } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'gmsol-')), data = join(dir, 'data'), file = join(dir, 'src.json');
   mkdirSync(join(data, 'gmsol'), { recursive: true });
@@ -19,26 +19,17 @@ function run(source, { passed = false, now = NOW } = {}) {
   return JSON.parse(readFileSync(join(data, 'gmsol', 'live.json'), 'utf8'));
 }
 
-test('gmsol: sebelum uji $50 lulus hanya saldo yang terbit (pretest), tanpa statistik trading', () => {
-  const d = run(src());
-  assert.equal(d.status, 'pretest');
-  assert.equal(d.equityUsd, 1195.5);
-  assert.equal(d.pnlUsd, -4.5);
-  assert.equal(d.openSeats, undefined);
-  assert.equal(d.closes, undefined);
-  assert.equal(d.equityCurve.length, 1);
+test('gmsol v3: kinerja dari equityLedgerUsd, wallet hanya info bersama', () => {
+  const d = run(src({ equityUsd: 900 }));
+  assert.equal(d.status, 'ok'); assert.equal(d.risk, 'high');
+  assert.equal(d.equityUsd, 1195.5); assert.equal(d.pnlUsd, -4.5);
+  assert.equal(d.walletSolShared.label, 'dipakai bersama Meridian');
+  assert.equal(d.brakes.totalFloorUsd, 600); assert.equal(d.sizing.maxOpen, 5);
+  assert.equal(d.openSeats.length, 1); assert.equal(d.closes.length, 1);
 });
-
-test('gmsol: data basi, bukan mode live, atau tanpa berkas → menunggu tanpa angka', () => {
-  for (const d of [run(src({ updatedAt: new Date(NOW - 20 * 60e3).toISOString() })), run(src({ mode: 'paper' })), run(undefined)]) {
-    assert.equal(d.status, 'waiting');
-    assert.equal(d.equityUsd, undefined);
+test('gmsol: v2 lama, basi, bukan live, tanpa berkas, ledger null → tanpa angka', () => {
+  const { equityLedgerUsd, ...v2 } = src();
+  for (const d of [run({ ...v2, equityUsd: 942 }), run(src({ updatedAt: new Date(NOW - 20 * 60e3).toISOString() })), run(src({ mode: 'dry_run' })), run(undefined), run(src({ equityLedgerUsd: null }))]) {
+    assert.equal(d.status, 'waiting'); assert.equal(d.equityUsd, undefined); assert.equal(d.pnlUsd, undefined);
   }
-});
-
-test('gmsol: setelah uji lulus semua bagian terbit (ok)', () => {
-  const d = run(src(), { passed: true });
-  assert.equal(d.status, 'ok');
-  assert.equal(d.openSeats.length, 1);
-  assert.equal(d.closes.length, 1);
 });

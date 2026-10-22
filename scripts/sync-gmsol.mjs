@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /*
- * GMSOL — Grok Meridian LIVE (UANG ASLI), medium risk, modal $1.200.
+ * GMSOL — Grok Meridian LIVE (UANG ASLI), HIGH RISK, modal buku $1.200 (v3.2).
  * Terpisah total dari arsip dry run Grok Meridian (data/gm): angka tidak digabung.
  *
  * Sumber: HANYA /root/cashood-inbox/gmsol-live.json, ditulis mesin gmsol-live
- * (spec gmsol-live-v2) di server ini, mode LIVE saja. HANYA DIBACA.
- * PnL = ekuitas on-chain − $1.200 (modal). Tidak ada angka lain yang dihitung.
+ * gmsol-live-v3 (spec v3.2 r2) di server ini, mode LIVE saja. HANYA DIBACA.
+ * Kinerja = equityLedgerUsd (buku GMSOL: 1200 + PnL realisasi + belum realisasi
+ * posisi engine), BUKAN saldo wallet. walletSolShared hanya info sekunder
+ * (wallet dipakai bersama Meridian). Berkas v2.x (tanpa equityLedgerUsd) → menunggu.
  * Berkas belum ada / rusak / bukan mode live / basi (>15 menit) → status tanpa
  * angka ("menunggu data on-chain"). Hanya field allowlist yang terbit; teks bebas
  * dibersihkan dari string mirip alamat.
@@ -28,7 +30,7 @@ const r3 = (v) => (num(v) == null ? null : Number(Number(v).toFixed(3)));
 const time = (v) => { if (v == null) return null; const t = typeof v === 'number' ? v : Date.parse(v); return Number.isFinite(t) ? t : null; };
 const ADDR = /0x[0-9a-fA-F]{16,}|[1-9A-HJ-NP-Za-km-z]{32,}/g;
 const text = (v, max = 160) => (v == null || typeof v === 'object' ? null : String(v).replace(ADDR, '…').replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim().slice(0, max) || null);
-const base = { fund: 'gmsol', system: 'GMSOL', realMoney: true, risk: 'medium', capitalUsd: CAPITAL, checkedAt: now };
+const base = { fund: 'gmsol', system: 'GMSOL', realMoney: true, risk: 'high', capitalUsd: CAPITAL, checkedAt: now };
 
 function out(o) {
   const s = JSON.stringify(o);
@@ -48,37 +50,35 @@ function curve(asOf, eq) {
 }
 function wait(reason, asOf = null) { out({ ...base, status: 'waiting', reason, asOf }); console.log(`[gmsol] waiting: ${reason}`); release(); process.exit(0); }
 
+const v3Fields = (j) => {
+  const b = j.brakes || {};
+  return {
+    t0At: time(j.t0At), spec: text(j.spec, 40), equityStatus: text(j.equityStatus, 80),
+    walletSolShared: num(j.walletSolShared?.sol) == null ? null : { sol: Number(Number(j.walletSolShared.sol).toFixed(4)), label: 'dipakai bersama Meridian' },
+    sizing: { sizeUsd: r2(j.sizing?.sizeUsd) ?? 50, maxOpen: num(j.sizing?.maxOpen) ?? 5 },
+    brakes: { dailyPct: num(b.dailyPct) ?? 25, totalFloorUsd: r2(b.totalFloorUsd) ?? 600, dailyBlocked: b.dailyBlocked === true,
+      dailyBlockedUntil: time(b.dailyBlockedUntil), dayChangePct: r3(b.dayChangePct), halted: b.halted === true },
+  };
+};
+
 try {
-  if (!existsSync(SRC)) wait('menunggu data on-chain (uji $50 belum jalan)');
-  // Tab tetap menunggu sampai Master menyatakan uji $50 lulus: operator membuat
-  // berkas data/gmsol/test-passed.local (tidak terbit) HANYA setelah uji $50 lulus DAN spec v2.2 + pin selesai (syarat Auditor).
+  if (!existsSync(SRC)) wait('belum jalan — menunggu mesin v3.2 menulis data live');
   let j; try { j = JSON.parse(readFileSync(SRC, 'utf8')); } catch { wait('berkas sumber rusak'); }
-  if (j?.fund !== 'gmsol' || j?.mode !== 'live') wait('berkas sumber bukan mode live');
+  if (j?.fund !== 'gmsol' || j?.mode !== 'live') wait('belum jalan — sumber bukan mode live');
+  // Berkas lama v2.x (rem lama, ekuitas wallet) tidak dipakai lagi.
+  if (!('equityLedgerUsd' in j)) wait('belum jalan — menunggu mesin v3.2 (data v2 lama diabaikan)');
   const asOf = time(j.updatedAt);
-  const eq = r2(j.equityUsd);
-  if (!asOf || eq == null) wait('ekuitas on-chain belum diketahui', asOf);
+  const eq = r2(j.equityLedgerUsd);
+  if (!asOf) wait('belum jalan — menunggu data live');
   if (now - asOf > STALE_MS) wait('data tertunda', asOf);
-  if (!existsSync(resolve(DIR, 'test-passed.local'))) {
-    // Pemilik (2026-10-21): selama uji $50 belum lulus, SALDO wallet GMSOL sudah
-    // ditampilkan dan ikut Total aset — hanya saldo (ekuitas, kas, LP, selisih
-    // terhadap modal $1.200). Statistik trading tetap tidak terbit sampai lulus.
-    out({ ...base, status: 'pretest', reason: 'menunggu uji $50 lulus', asOf, t0At: time(j.t0At),
-      equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
-      walletUsd: r2(j.walletUsd), lpUsd: r2(j.lpUsd), tokensUsd: r2(j.tokensUsd), brakeFloorUsd: 1020, equityCurve: curve(asOf, eq) });
-    console.log(`[gmsol] pretest equity ${eq}`);
-    release(); process.exit(0);
-  }
+  if (eq == null) { out({ ...base, status: 'waiting', reason: 'ekuitas buku belum diketahui', asOf, ...v3Fields(j) }); console.log('[gmsol] waiting: ledger unknown'); release(); process.exit(0); }
   const seats = (Array.isArray(j.openSeats) ? j.openSeats : []).slice(0, 10).map((p) => ({
-    symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), valueUsd: r2(p.valueUsd), feesUsd: r2(p.feesUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null }));
+    symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), pnlUsd: r2(p.pnlUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null }));
   const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map((c) => ({
     symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) }));
-  const b = j.brakes || {};
-  out({ ...base, status: 'ok', asOf, t0At: time(j.t0At), spec: text(j.spec, 40),
-    t0InfoUsd: r2(j.live_t0_measured ?? j.t0EquityUsd), brakeFloorUsd: 1020,
+  out({ ...base, status: 'ok', asOf, ...v3Fields(j),
     equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
-    walletUsd: r2(j.walletUsd), lpUsd: r2(j.lpUsd), tokensUsd: r2(j.tokensUsd),
-    sizing: { sizeUsd: r2(j.sizing?.sizeUsd), maxOpen: num(j.sizing?.maxOpen) },
-    brakes: { dailyBlocked: b.dailyBlocked === true, halted: b.halted === true, dayLossUsd: r2(b.dayLossUsd), totalLossUsd: r2(b.totalLossUsd) },
+    realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd),
     openSeats: seats, closes, equityCurve: curve(asOf, eq) });
-  console.log(`[gmsol] ok equity ${eq}`);
+  console.log(`[gmsol] ok ledger ${eq}`);
 } finally { release(); }
