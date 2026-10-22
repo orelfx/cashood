@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "d1a3be6d-9569-46ee-a6b8-c5991a423683",
-  "updatedAt": 1792653373965,
-  "generatedAt": "2026-10-22 14:16 WIB",
+  "generation": "09b322bc-0ca2-43bb-99f9-47c84c47493d",
+  "updatedAt": 1792653677556,
+  "generatedAt": "2026-10-22 14:21 WIB",
   "usdIdr": null,
-  "totalUsd": 907.0593651627605,
+  "totalUsd": 902.3837247018452,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 907.0593651627605,
+  "botWalletUsd": 902.3837247018452,
   "walletUsd": 899.6247844152517,
-  "lpUsd": 7.43458075,
+  "lpUsd": 2.75894029,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,14 +26,15 @@
       "bookLabel": "low",
       "costUsd": 7.43458074750882,
       "investedUsd": 7.43458074750882,
-      "principalUsd": 7.43458075,
-      "valueUsd": 7.43458075,
+      "principalUsd": 2.75894029,
+      "valueUsd": 2.75894029,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": 0,
-      "pnlPct": 0,
+      "pnlUsd": -4.67564046091537,
+      "pnlPct": -62.89,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 138,
+      "priceUsd": 0.0001171208748109422,
+      "ageMinutes": 143,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -86,7 +87,7 @@
       "llmScore": 76,
       "peakPct": 75.57,
       "ddPct": -71.02,
-      "stale": true
+      "stale": false
     }
   ],
   "history": [
@@ -1409,18 +1410,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 899.6247844152517,
-    "positionsUsd": 7.43458075,
+    "positionsUsd": 2.75894029,
     "realizedUsd": -92.94063484,
-    "unrealizedUsd": 0,
-    "pnlUsd": -92.94063483723949,
+    "unrealizedUsd": -4.67564046,
+    "pnlUsd": -97.61627529815485,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792653373965,
+    "heartbeatAt": 1792653677556,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 10.14,
-    "lastScanAt": 1792653339000,
+    "drawdownPct": 10.6,
+    "lastScanAt": 1792653652000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1435,14 +1436,8 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "+$0.0000",
+        "v": "−$4.6756",
         "n": "dari posisi terbuka",
-        "tone": "pos"
-      },
-      {
-        "k": "Harga belum tersedia",
-        "v": "1",
-        "n": "posisi ditandai belum terverifikasi",
         "tone": "neg"
       },
       {
@@ -1453,7 +1448,7 @@
       {
         "k": "Wallet dipantau",
         "v": "23500",
-        "n": "504 aktif"
+        "n": "505 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1463,9 +1458,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792653373965,
+      "lastDecisionAt": 1792653677556,
       "lastAction": "keputusan",
-      "lastReason": "Kimchi [big]: Dilewati karena red flag: 10 holder terbesar pegang 78%."
+      "lastReason": "Kimchi [big]: Dilewati: harga sudah -10% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1484,7 +1479,7 @@
       ],
       [
         "Wallet dipantau",
-        "23500 · 504 aktif"
+        "23500 · 505 aktif"
       ],
       [
         "Cadangan kas",
@@ -1496,7 +1491,7 @@
       ],
       [
         "Label wallet",
-        "smart 14681 · bot 6592 · blacklist 462 · lp 1 · fresh 1298 · kol 219 · dolphin 231 · whale 16"
+        "smart 14679 · bot 6594 · blacklist 462 · lp 1 · fresh 1298 · kol 219 · dolphin 231 · whale 16"
       ]
     ],
     "requirements": [
@@ -1545,22 +1540,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23500,
-      "active": 504,
-      "passive": 22996,
+      "active": 505,
+      "passive": 22995,
       "trusted": 0,
       "promising": 21,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14681,
-          "active": 462,
-          "passive": 14219
+          "total": 14679,
+          "active": 463,
+          "passive": 14216
         },
         {
           "key": "bot",
-          "total": 6592,
+          "total": 6594,
           "active": 0,
-          "passive": 6592
+          "passive": 6594
         },
         {
           "key": "fresh",
@@ -1700,6 +1695,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792653576487,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 5,
+            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -10% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792652974729,
         "symbol": "Kimchi",
@@ -2565,16 +2578,6 @@
           }
         ],
         "reason": "Dilewati: explore: zone/cooldown/budget."
-      },
-      {
-        "at": 1792634986940,
-        "symbol": "AIC",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -74% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2630,14 +2633,12 @@
     }
   },
   "quality": {
-    "complete": false,
-    "reasons": [
-      "1 posisi tanpa harga masuk/mark; nilainya dari catatan paper"
-    ]
+    "complete": true,
+    "reasons": []
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792653448071,
+    "generatedAt": 1792653745630,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2678,25 +2679,25 @@
     "equity": {
       "days": 16,
       "spanDays": 16.3,
-      "returnPct": -8.34,
+      "returnPct": -8.82,
       "maxDrawdownPct": 8.83,
       "maxDrawdownAt": 1792652763397,
       "maxDrawdownUsd": 87.37,
       "maxDrawdownPeakUsd": 989.63,
       "maxDrawdownTroughUsd": 902.26,
-      "currentDrawdownPct": 8.34,
-      "currentDrawdownUsd": 82.57,
+      "currentDrawdownPct": 8.82,
+      "currentDrawdownUsd": 87.25,
       "positiveDaysPct": 43.75,
       "bestDayPct": 0.83,
       "worstDayPct": -3.87,
-      "sharpe": -8.18,
-      "sortino": -7.99,
+      "sharpe": -8.4,
+      "sortino": -8.15,
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -92.94,
-    "profitPct": -9.29,
-    "recoveryFactor": -1.06,
+    "profitUsd": -97.62,
+    "profitPct": -9.76,
+    "recoveryFactor": -1.12,
     "score": {
       "axes": {
         "winRate": 42,
