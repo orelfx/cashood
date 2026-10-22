@@ -12,9 +12,7 @@
  * angka ("menunggu data on-chain"). Hanya field allowlist yang terbit; teks bebas
  * dibersihkan dari string mirip alamat.
  */
-import { spawnSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
-import { cashoodSolanaEnv } from './lib/rpc-env.mjs';
+import { createRequire } from 'node:module';
 import { readFileSync, existsSync, readdirSync, openSync, readSync, fstatSync, closeSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -75,42 +73,61 @@ function screening(dir = resolve(ENGINE, 'logs')) {
   } catch { return null; }
 }
 let CAP_LOCK = null;
-// ---- Nilai wallet bersama (GMSOL + meridian2): pembacaan on-chain lewat CLI baca meridian2 (balance/positions),
-// pola sama dengan sync-meridian.mjs. HANYA DIBACA; alamat tidak pernah keluar dari fungsi ini.
+// ---- Nilai wallet bersama (GMSOL + meridian2), TANPA .env / key / CLI bot.
+// Pubkey wallet diturunkan dari akun posisi DLMM publik (field owner) yang alamatnya ada di state non-rahasia
+// (state mesin GMSOL atau state.json meridian2), lalu di-cache lokal (owner.local.json, tidak terbit).
+// Saldo + posisi dibaca lewat RPC publik + SDK DLMM (node_modules mesin, hanya di-require), harga via Jupiter publik.
+// Pubkey, pool, mint, tx, URL RPC tidak pernah terbit.
 const M2 = process.env.MERIDIAN2_HOME || '/root/meridian2/main/meridian2';
-function m2cli(command) {
-  const entry = resolve(M2, 'cli.js');
-  const w = `process.argv = ${JSON.stringify([process.execPath, entry, command])}; await import(${JSON.stringify(pathToFileURL(entry).href)}); await new Promise(r => process.stdout.write('', r)); process.exit(0);`;
-  const r = spawnSync(process.execPath, ['--input-type=module', '-e', w], { cwd: M2, env: cashoodSolanaEnv(), encoding: 'utf8', timeout: 180000, maxBuffer: 32 << 20 });
-  const o = r.stdout || '', i = o.indexOf('{'); if (r.error || r.signal || i < 0) throw new Error(`cli ${command} gagal`);
-  return JSON.parse(o.slice(i));
-}
-function walletShared(engineState) {
+const PUBLIC_RPC = 'https://api.mainnet-beta.solana.com';
+const WSOL = 'So11111111111111111111111111111111111111112';
+async function walletShared(engineState) {
   try {
-    const bal = m2cli('balance'), book = m2cli('positions');
-    if (bal.error || book.error || !Array.isArray(book.positions) || num(bal.sol) == null) throw new Error('data parsial');
+    const req = createRequire(resolve(ENGINE, 'package.json'));
+    const { Connection, PublicKey } = req('@solana/web3.js'); const dm = req('@meteora-ag/dlmm'); const DLMM = dm.DLMM || dm.default || dm;
+    const c = new Connection(PUBLIC_RPC, 'confirmed');
     const m2s = readJSON(resolve(M2, 'state.json'), {})?.positions || {};
+    const cacheF = resolve(DIR, 'owner.local.json'); let owner = readJSON(cacheF, {})?.owner || null;
+    if (!owner) {
+      const cands = [...Object.keys(engineState?.positions || {}), ...Object.values(m2s).filter((x) => !x.closed).map((x) => x.position)].filter(Boolean);
+      for (const k of cands) { const ai = await c.getAccountInfo(new PublicKey(k)); if (ai?.data?.length >= 72) { owner = new PublicKey(ai.data.slice(40, 72)).toBase58(); break; } }
+      if (!owner) throw new Error('pubkey wallet belum bisa diturunkan (tidak ada posisi terlacak)');
+      atomicJSON(cacheF, { owner, note: 'pubkey publik, dari field owner akun posisi; jangan terbit' });
+    }
+    const ow = new PublicKey(owner);
+    const solBal = (await c.getBalance(ow)) / 1e9;
+    const map = await DLMM.getAllLbPairPositionsByUser(c, ow);
+    const rows = []; for (const [, v] of map) for (const p of v.lbPairPositionsData) rows.push({ v, p });
+    const mints = [...new Set(rows.flatMap(({ v }) => [String(v.tokenX.publicKey), String(v.tokenY.publicKey)]).concat([WSOL]))];
+    const pr = await fetch(`https://lite-api.jup.ag/price/v3?ids=${mints.join(',')}`, { signal: AbortSignal.timeout(20000) }).then((r) => r.json());
+    const price = (m) => num(pr?.[m]?.usdPrice);
+    const solPx = price(WSOL); if (solPx == null) throw new Error('harga SOL tidak terbaca');
     const mine = new Set(Object.keys(engineState?.positions || {}));
-    const pos = book.positions.slice(0, 20).map((p) => {
-      const own = mine.has(p.position) ? 'gmsol' : 'meridian2', st = m2s[p.position] || null, eng = engineState?.positions?.[p.position] || null;
-      const value = r2(p.total_value_true_usd), unc = r2(p.unclaimed_fees_true_usd), clm = r2(p.collected_fees_true_usd);
+    const pos = rows.slice(0, 20).map(({ v, p }) => {
+      const k = String(p.publicKey), d = p.positionData, xm = String(v.tokenX.publicKey), ym = String(v.tokenY.publicKey);
+      const dx = 10 ** (v.tokenX.mint?.decimals ?? 0), dy = 10 ** (v.tokenY.mint?.decimals ?? 0), px = price(xm), py = price(ym);
+      const usdOf = (ax, ay) => (px == null || py == null ? null : (Number(ax) / dx) * px + (Number(ay) / dy) * py);
+      const value = usdOf(d.totalXAmount, d.totalYAmount), unc = usdOf(d.feeX, d.feeY);
+      const own = mine.has(k) ? 'gmsol' : 'meridian2', st = m2s[k] || null, eng = engineState?.positions?.[k] || null;
+      const clm = own === 'gmsol' ? num(eng?.claimedUsd) : num(st?.total_fees_claimed_sol) == null ? null : st.total_fees_claimed_sol * solPx;
       const invested = own === 'gmsol' ? r2(eng?.openSpentUsd) : r2(st?.initial_value_usd);
-      return { symbol: text(p.pair, 24), protocol: 'DLMM', owner: own, ageH: num(p.age_minutes) == null ? null : r2(p.age_minutes / 60), investedUsd: invested, valueUsd: value,
-        unclaimedFeesUsd: unc, claimedFeesUsd: clm, feesUsd: unc == null && clm == null ? null : r2((unc || 0) + (clm || 0)),
-        uPnlUsd: r2(p.pnl_true_usd), pct: r3(p.pnl_pct), inRange: typeof p.in_range === 'boolean' ? p.in_range : null, outOfRangeMin: num(p.minutes_out_of_range) };
+      const opened = own === 'gmsol' ? time(eng?.openedAt) : time(st?.deployed_at);
+      const upnl = invested == null || value == null || unc == null ? null : value + unc + (clm || 0) - invested;
+      const sx = text(v.tokenX.mint?.symbol || st?.pool_name?.split('-')[0] || eng?.name?.split('-')[0], 16), sym = st?.pool_name || eng?.name || (sx ? `${sx}-SOL` : null);
+      return { symbol: text(sym, 24), protocol: 'DLMM', owner: own, ageH: opened ? r2((now - opened) / 3600e3) : null, investedUsd: invested, valueUsd: r2(value),
+        unclaimedFeesUsd: r2(unc), claimedFeesUsd: r2(clm), feesUsd: unc == null ? null : r2(unc + (clm || 0)), uPnlUsd: r2(upnl), pct: upnl == null || !invested ? null : r3(upnl / invested * 100),
+        inRange: Number.isFinite(v.lbPair?.activeId) ? v.lbPair.activeId >= d.lowerBinId && v.lbPair.activeId <= d.upperBinId : null };
     });
-    const sum = (k) => pos.some((p) => p[k] == null) ? null : r2(pos.reduce((a, p) => a + p[k], 0));
-    const lp = sum('valueUsd'), unc = sum('unclaimedFeesUsd'), solUsd = r2(bal.sol_usd);
-    const tokensUnpriced = (bal.tokens || []).filter((t) => t.symbol !== 'SOL' && t.usd == null).length;
-    const tokensUsd = r2((bal.tokens || []).filter((t) => t.symbol !== 'SOL' && num(t.usd) != null).reduce((a, t) => a + Number(t.usd), 0));
+    const sum = (k) => (pos.some((p) => p[k] == null) ? null : r2(pos.reduce((a, p) => a + p[k], 0)));
+    const lp = sum('valueUsd'), unc = sum('unclaimedFeesUsd'), solUsd = r2(solBal * solPx);
     const m2closed = Object.values(m2s).filter((x) => x.closed);
     return { label: 'Nilai wallet bersama', note: 'Seluruh wallet (posisi GMSOL + meridian2). BUKAN dasar PnL/perbandingan GMSOL; itu blok engine (Buku GMSOL).',
-      asOf: now, source: 'on-chain (RPC) via CLI baca meridian2', solPriceUsd: r2(bal.sol_price), freeSol: num(bal.sol) == null ? null : Number(Number(bal.sol).toFixed(4)), freeSolUsd: solUsd,
-      tokensUsd, tokensUnpriced, lpValueUsd: lp, unclaimedFeesUsd: unc, claimedFeesUsd: sum('claimedFeesUsd'), uPnlUsd: sum('uPnlUsd'),
-      totalAssetsUsd: solUsd == null || lp == null || unc == null ? null : r2(solUsd + (tokensUsd || 0) + lp + unc),
+      asOf: now, source: 'RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)', solPriceUsd: r2(solPx), freeSol: Number(solBal.toFixed(4)), freeSolUsd: solUsd,
+      lpValueUsd: lp, unclaimedFeesUsd: unc, claimedFeesUsd: sum('claimedFeesUsd'), uPnlUsd: sum('uPnlUsd'),
+      totalAssetsUsd: solUsd == null || lp == null || unc == null ? null : r2(solUsd + lp + unc),
       openCount: pos.length, positions: pos,
       closedCount: { meridian2Tracked: m2closed.length, gmsol: Array.isArray(engineState?.closes) ? engineState.closes.length : null },
-      winRatePct: null, pnlHistory: null, gaps: 'posisi non-DLMM (mis. DAMM v2) dan token tanpa harga tidak terbaca → tidak dihitung' };
+      winRatePct: null, pnlHistory: null, gaps: 'posisi DAMM v2 dan token SPL lain di wallet tidak dibaca → tidak dihitung' };
   } catch (e) { return { label: 'Nilai wallet bersama', asOf: now, totalAssetsUsd: null, positions: [], error: text(e.message, 80) }; }
 }
 const goLive = (j) => time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At) ?? time(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.created);
@@ -161,6 +178,6 @@ try {
     engine: { label: 'Buku GMSOL', note: 'Satu-satunya dasar PnL/perbandingan GMSOL (modal dikunci saat deploy r4.1).', capitalUsd: CAPITAL, equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
       realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd), totalFloorUsd: r2(j.brakes?.totalFloorUsd), dayFloorUsd: r2(j.brakes?.dayFloorUsd), maxOpen: num(j.sizing?.maxOpen), openCount: seats.length, closedCount: closes.length,
       winRatePct: closes.length ? r2(closes.filter((c) => c.netUsd > 0).length / closes.length * 100) : null },
-    walletShared: walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})) });
+    walletShared: await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})) });
   console.log(`[gmsol] ok ledger ${eq}`);
 } finally { release(); }
