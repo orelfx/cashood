@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5a67a27d-ea43-4890-8162-90692c26fe73",
-  "updatedAt": 1792699045125,
-  "generatedAt": "2026-10-23 02:57 WIB",
+  "generation": "f11db734-ece6-4eb2-b45d-c3ebbc5af242",
+  "updatedAt": 1792699345606,
+  "generatedAt": "2026-10-23 03:02 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 900,
+      "ageMinutes": 905,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -85,7 +85,7 @@
       "firstWallet": "smart #1994",
       "llmScore": 76,
       "peakPct": 75.57,
-      "ddPct": -90.04,
+      "ddPct": -90.11,
       "stale": true
     }
   ],
@@ -1415,12 +1415,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792699045125,
+    "heartbeatAt": 1792699345606,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792698824000,
+    "lastScanAt": 1792699307000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1447,7 +1447,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "445",
+        "v": "444",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1463,9 +1463,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792699045125,
+      "lastDecisionAt": 1792699345606,
       "lastAction": "keputusan",
-      "lastReason": "BOUNCER [degen]: Dilewati karena red flag: bundler pegang 31.3% supply."
+      "lastReason": "TRUMP [big]: Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
     }
   },
   "strategy": {
@@ -1701,6 +1701,33 @@
     },
     "decisions": [
       {
+        "at": 1792699173548,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
+      },
+      {
+        "at": 1792699129175,
+        "symbol": "CHROME",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 26% supply."
+      },
+      {
         "at": 1792698795370,
         "symbol": "BOUNCER",
         "action": "skip",
@@ -1741,23 +1768,6 @@
           }
         ],
         "reason": "Dilewati: explore: isolated virtual capital."
-      },
-      {
-        "at": 1792698564740,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.4% dari market cap."
       },
       {
         "at": 1792697691366,
@@ -2503,27 +2513,17 @@
           "smart": 1
         },
         "reason": "Dilewati: rugcheck_danger:Creator history of rugged tokens."
-      },
-      {
-        "at": 1792687765860,
-        "symbol": "MOGCHI",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 72.8% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 80,
+        "below_entry": 78,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 363,
+        "red_flag": 364,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2576,7 +2576,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792699344533,
+    "generatedAt": 1792699646728,
     "trades": {
       "count": 152,
       "wins": 63,
