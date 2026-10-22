@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 84.67,
-  "checkedAt": 1792663937540,
+  "checkedAt": 1792664251721,
   "status": "ok",
-  "asOf": 1792663928402,
+  "asOf": 1792664228212,
   "t0At": 1792657533144,
   "spec": "gmsol-live-v3.2 r4.1",
   "specStatus": "live_pinned",
@@ -36,35 +36,35 @@
   ],
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792663714333,
-    "solPools": 305,
-    "inactive1h": 121,
-    "checked": 184,
+    "scannedAt": 1792664044199,
+    "solPools": 317,
+    "inactive1h": 119,
+    "checked": 198,
     "passed": 0,
     "topReasons": [
       {
         "reason": "pool.fee_active_tvl_ratio",
-        "pools": 183
+        "pools": 198
       },
       {
         "reason": "pool.unique_traders",
-        "pools": 140
-      },
-      {
-        "reason": "pool.dlmm_params.bin_step",
-        "pools": 135
+        "pools": 154
       },
       {
         "reason": "pool.volume",
-        "pools": 135
+        "pools": 150
+      },
+      {
+        "reason": "pool.dlmm_params.bin_step",
+        "pools": 144
       },
       {
         "reason": "base.market_cap",
-        "pools": 116
+        "pools": 129
       },
       {
         "reason": "pool.tvl",
-        "pools": 83
+        "pools": 90
       }
     ],
     "closest": [
@@ -72,7 +72,7 @@
         "symbol": "PHP-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.2011 !>=2"
+          "pool.fee_active_tvl_ratio=0.1782 !>=2"
         ]
       },
       {
@@ -80,7 +80,7 @@
         "binStep": 8,
         "reasons": [
           "pool.dlmm_params.bin_step=8 !in[100,125,200,250]",
-          "pool.fee_active_tvl_ratio=1.2682 !>=2"
+          "pool.fee_active_tvl_ratio=1.0749 !>=2"
         ]
       },
       {
@@ -88,15 +88,15 @@
         "binStep": 20,
         "reasons": [
           "pool.dlmm_params.bin_step=20 !in[100,125,200,250]",
-          "pool.fee_active_tvl_ratio=1.0901 !>=2"
+          "pool.fee_active_tvl_ratio=1.0439 !>=2"
         ]
       },
       {
         "symbol": "PANGEA-SOL",
         "binStep": 100,
         "reasons": [
-          "derived.age_h=17.5698 !>=24",
-          "pool.fee_active_tvl_ratio=0.2064 !>=2"
+          "derived.age_h=17.6614 !>=24",
+          "pool.fee_active_tvl_ratio=0.1928 !>=2"
         ]
       },
       {
@@ -104,7 +104,7 @@
         "binStep": 50,
         "reasons": [
           "pool.dlmm_params.bin_step=50 !in[100,125,200,250]",
-          "pool.fee_active_tvl_ratio=0.2234 !>=2"
+          "pool.fee_active_tvl_ratio=0.2309 !>=2"
         ]
       }
     ]
@@ -112,7 +112,7 @@
   "equityStatus": "ok",
   "walletSolShared": {
     "sol": 1.2185,
-    "usd": 127.05,
+    "usd": 127.17,
     "label": "dipakai bersama Meridian2"
   },
   "sizing": {
@@ -242,6 +242,10 @@
     {
       "t": 1792663928402,
       "usd": 84.67
+    },
+    {
+      "t": 1792664228212,
+      "usd": 84.67
     }
   ],
   "engine": {
@@ -262,51 +266,9 @@
   },
   "walletShared": {
     "label": "Nilai wallet bersama",
-    "note": "Seluruh wallet (posisi GMSOL + meridian2). BUKAN dasar PnL/perbandingan GMSOL; itu blok engine (Buku GMSOL).",
-    "asOf": 1792663937540,
-    "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 104.41,
-    "freeSol": 1.2185,
-    "freeSolUsd": 127.22,
-    "lpValueUsd": 849.84,
-    "unclaimedFeesUsd": 0.87,
-    "claimedFeesUsd": 18.69,
-    "uPnlUsd": -11.6,
-    "uPnlExclFeesUsd": -31.16,
-    "definitions": {
-      "uPnlUsd": "valueUsd + unclaimedFeesUsd + claimedFeesUsd - investedUsd (fee ikut; konvensi utama yang diaudit)",
-      "uPnlExclFeesUsd": "valueUsd - investedUsd (tanpa fee; konvensi uPnL tracker)",
-      "investedUsd": "meridian2: initial_value_usd di state meridian2 saat deploy; gmsol: openSpentUsd mesin (USD keluar saat buka)",
-      "valueUsd": "jumlah token X+Y posisi on-chain x harga Jupiter sekarang",
-      "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
-      "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
-    },
-    "totalAssetsUsd": 977.93,
-    "openCount": 1,
-    "positions": [
-      {
-        "symbol": "PANGEA-SOL",
-        "protocol": "DLMM",
-        "owner": "meridian2",
-        "ageH": 9.02,
-        "investedUsd": 881,
-        "valueUsd": 849.84,
-        "unclaimedFeesUsd": 0.87,
-        "claimedFeesUsd": 18.69,
-        "feesUsd": 19.56,
-        "uPnlUsd": -11.6,
-        "pct": -1.316,
-        "uPnlExclFeesUsd": -31.16,
-        "pctExclFees": -3.537,
-        "inRange": true
-      }
-    ],
-    "closedCount": {
-      "meridian2Tracked": 0,
-      "gmsol": 0
-    },
-    "winRatePct": null,
-    "pnlHistory": null,
-    "gaps": "posisi DAMM v2 dan token SPL lain di wallet tidak dibaca → tidak dihitung. Fee klaim kini dari on-chain kedua sisi (dulu $4,66 = hanya 0,045 SOL sisi SOL di state meridian2); dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim."
+    "asOf": 1792664251721,
+    "totalAssetsUsd": null,
+    "positions": [],
+    "error": "harga SOL tidak terbaca"
   }
 }
