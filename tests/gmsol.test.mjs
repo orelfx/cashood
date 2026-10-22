@@ -8,6 +8,8 @@ import { spawnSync } from 'node:child_process';
 const ROOT = resolve(import.meta.dirname, '..');
 const NOW = Date.parse('2026-10-21T12:00:00Z');
 const src = (over = {}) => ({ fund: 'gmsol', mode: 'live', updatedAt: new Date(NOW - 60e3).toISOString(), t0At: new Date(NOW - 3600e3).toISOString(),
+  // r4.1: modal dikunci mesin saat deploy (tanpa ini sync menunggu).
+  capitalUsd: 1200, capitalUsdAtDeploy: { usd: 1200, lockedAt: new Date(NOW - 3600e3).toISOString(), solUsd: 100, freeSol: 12, reserveSol: 0 },
   equityLedgerUsd: 1195.5, walletSolShared: { sol: 8.7, label: 'dipakai bersama Meridian' }, sizing: { sizeUsd: 50, maxOpen: 5 }, brakes: { dailyPct: 25, totalFloorUsd: 600, halted: false }, openSeats: [{ symbol: 'ABC-SOL', basisUsd: 50 }], closeHistory: [{ symbol: 'XYZ-SOL', netUsd: 1 }], ...over });
 function run(source, { passed = false, now = NOW, engine = '/nonexistent-gmsol' } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'gmsol-')), data = join(dir, 'data'), file = join(dir, 'src.json');
@@ -24,7 +26,7 @@ test('gmsol v3: kinerja dari equityLedgerUsd, wallet hanya info bersama', () => 
   assert.ok(!JSON.stringify(d).includes('DRAFT')); assert.equal(d.walletSolShared.usd, 870);
   assert.equal(d.status, 'ok'); assert.equal(d.risk, 'high');
   assert.equal(d.equityUsd, 1195.5); assert.equal(d.pnlUsd, -4.5);
-  assert.equal(d.walletSolShared.label, 'dipakai bersama Meridian');
+  assert.equal(d.walletSolShared.label, 'dipakai bersama Meridian2');
   assert.equal(d.brakes.totalFloorUsd, 600); assert.equal(d.sizing.maxOpen, 5);
   assert.equal(d.openSeats.length, 1); assert.equal(d.closes.length, 1);
 });
@@ -49,7 +51,8 @@ test('gmsol: ringkasan screening dari scan terakhir, t0 dari state engine, tanpa
     { ts: last, pool_symbol: 'BBB-SOL', bs: 80, reasons: ['pool.tvl=10 !>=10000', `pool.fee_active_tvl_ratio=0.1 !>=2 ${addr}`] }];
   writeFileSync(join(eng, 'logs', 'screen-2026-10-22.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
   const d = run(src({ t0At: null }), { engine: eng }), sc = d.screening;
-  assert.equal(d.t0At, Date.parse('2026-10-22T03:34:29.332Z'));
+  // r4.1: mulai live = waktu modal dikunci mesin (sebelum t0At / state engine).
+  assert.equal(d.t0At, NOW - 3600e3);
   assert.equal(sc.scannedAt, Date.parse(last)); assert.equal(sc.solPools, 330); assert.equal(sc.checked, 2); assert.equal(sc.passed, 0);
   assert.deepEqual(sc.topReasons[0], { reason: 'pool.fee_active_tvl_ratio', pools: 2 });
   assert.equal(sc.closest[0].symbol, 'AAA-SOL'); assert.ok(!JSON.stringify(d).includes(addr)); assert.ok(!JSON.stringify(d).includes('OLD-SOL'));
