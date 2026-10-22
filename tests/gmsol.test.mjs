@@ -26,7 +26,7 @@ test('gmsol v3: kinerja dari equityLedgerUsd, wallet hanya info bersama', () => 
   assert.ok(!JSON.stringify(d).includes('DRAFT')); assert.equal(d.walletSolShared.usd, 870);
   assert.equal(d.status, 'ok'); assert.equal(d.risk, 'high');
   assert.equal(d.equityUsd, 1195.5); assert.equal(d.pnlUsd, -4.5);
-  assert.equal(d.walletSolShared.label, 'dipakai bersama Meridian2');
+  assert.equal(d.walletSolShared.label, 'saldo SOL bebas wallet GMSOL');
   assert.equal(d.brakes.totalFloorUsd, 600); assert.equal(d.sizing.maxOpen, 5);
   assert.equal(d.openSeats.length, 1); assert.equal(d.closes.length, 1);
 });
