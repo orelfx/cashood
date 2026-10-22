@@ -3866,68 +3866,191 @@ function gmsolChart(d) {
     ${[pts[0].t, last.t].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)} WIB</text>`).join('')}
   </svg></div>`;
 }
+/* ── GMSOL: susunan halaman sama dengan Meridian ───────────────────────────
+ * Ringkasan · Pembagian saham · Nilai wallet · Riwayat profit · Token di
+ * wallet · Posisi LP · Riwayat posisi ditutup · Puncak & titik terendah ·
+ * Mesin & rem · Biaya · Kejadian. Bagian yang datanya belum dikirim mesin
+ * menulis "menunggu data" (tidak ada angka karangan). Angka MESIN hanya tampil
+ * saat mesin jalan (data ≤ 15 menit); saldo wallet dibaca Cashood langsung dari
+ * blockchain dan tetap tampil. */
+const gsView = { hours: 0, profit: 'cal', calMonth: '', month: '', page: 0, last: null, chart: null };
 async function renderGmsol() {
   const d = await loadGmsol();
   if (state.view !== 'gmsol') return;
   const body = $('#gmsolBody');
-  if (!d || d.status !== 'ok') { setHTML(body, gmsolWait(gmsolStopped(d) ? 'Mesin berhenti' : 'Menunggu live', d?.asOf || null, d)); return; }
-  if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Mesin berhenti', d.asOf || null, d)); return; }
-  // Field kosong → "menunggu data", tidak pernah angka cadangan.
+  const engineOk = d?.status === 'ok' && d.asOf && Date.now() - d.asOf <= GMSOL_STALE_MS;
+  if (!d || (!engineOk && !gmsolWalletFresh(d))) { setHTML(body, gmsolWait(gmsolStopped(d) ? 'Mesin berhenti' : 'Menunggu live', d?.asOf || null, d)); return; }
+  gsView.last = d;
+  paintGmsol();
+}
+function gmsolNavSvg(d, flows) {
+  const cut = gsView.hours ? Date.now() - gsView.hours * 3600e3 : 0;
+  const fl = flows.map((f) => ({ at: f.t, usd: f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd) }));
+  const pts = (d.walletCurve || []).filter((p) => Number.isFinite(p.t) && Number.isFinite(p.usd) && p.t >= cut).sort((a, b) => a.t - b.t).map((p) => ({ t: p.t, v: p.usd + flowsAfter(fl, p.t), raw: p.usd }));
+  const small = narrow(), W = small ? 420 : 720, H = small ? 280 : 240, m = small ? { t: 18, r: 14, b: 30, l: 62 } : { t: 16, r: 54, b: 30, l: 64 };
+  if (pts.length < 2) return { W, H, svg: `<text x="${W / 2}" y="${H / 2}" text-anchor="middle" class="g-lbl">Grafik muncul setelah beberapa pembacaan wallet terkumpul di rentang ini.</text>`, hint: '' };
+  const vals = pts.map((p) => p.v); let lo = Math.min(...vals), hi = Math.max(...vals); const pad = Math.max((hi - lo) * 0.15, hi * 0.004, 0.5); lo -= pad; hi += pad;
+  const x = (t) => m.l + ((t - pts[0].t) / ((pts.at(-1).t - pts[0].t) || 1)) * (W - m.l - m.r), y = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * (H - m.t - m.b);
+  let grid = '';
+  for (let i = 0; i <= (small ? 2 : 3); i += 1) { const v = lo + ((hi - lo) / (small ? 2 : 3)) * i; grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" class="g-grid"/><text x="${m.l - 9}" y="${y(v) + 3.5}" text-anchor="end" class="g-lbl">${usdText(v, 0)}</text>`; }
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' '), last = pts.at(-1);
+  const up = last.v >= pts[0].v, stroke = up ? 'var(--green)' : 'var(--red)';
+  const shortSpan = last.t - pts[0].t < 36 * 3600e3;
+  const fmtT = (t) => { const z = new Date(t + 7 * 3600e3); return shortSpan ? z.toISOString().slice(11, 16) : `${z.getUTCDate()} ${M_SHORT[z.getUTCMonth()]}`; };
+  let ticks = ''; const xs = small ? 2 : 4;
+  for (let i = 0; i <= xs; i += 1) { const t = pts[0].t + ((last.t - pts[0].t) / xs) * i; ticks += `<text x="${x(t)}" y="${H - m.b + 18}" text-anchor="${i === 0 ? 'start' : i === xs ? 'end' : 'middle'}" class="g-lbl">${fmtT(t)}</text>`; }
+  const marks = fl.filter((f) => f.at > pts[0].t && f.at <= last.t).map((f) => `<line x1="${x(f.at).toFixed(1)}" x2="${x(f.at).toFixed(1)}" y1="${m.t}" y2="${H - m.b}" class="g-flow"/><text x="${(x(f.at) + 4).toFixed(1)}" y="${m.t + 10}" class="g-flow-lbl">${f.usd < 0 ? 'penarikan' : 'setoran'} ${signedCompact(f.usd)}</text>`).join('');
+  gsView.chart = { pts, x, y, W };
+  const svg = `<defs><linearGradient id="gsNavFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity=".22"/><stop offset="100%" stop-color="${up ? '#4ade80' : '#f87171'}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}<path d="${line} L${x(last.t).toFixed(1)},${y(lo)} L${x(pts[0].t).toFixed(1)},${y(lo)} Z" fill="url(#gsNavFill)"/><path d="${line}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linejoin="round"/>${marks}
+    <circle cx="${x(last.t)}" cy="${y(last.v)}" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2"/><text x="${x(last.t)}" y="${y(last.v) - 12}" text-anchor="end" class="g-cap">${usdText(last.v, 0)}</text>${ticks}
+    <line id="gsCross" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="#3a4552" stroke-width="1" style="display:none"/>
+    <circle id="gsDot" r="4.5" fill="${stroke}" stroke="var(--card)" stroke-width="2" style="display:none"/>
+    <rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" id="gsHit"/>`;
+  const delta = last.v - pts[0].v, pctMove = pts[0].v ? (delta / pts[0].v) * 100 : 0;
+  return { W, H, svg, hint: `${pts.length} titik · ${signed(delta)} (${pctMove >= 0 ? '+' : ''}${pct(pctMove)}) di rentang ini · termasuk naik-turun harga SOL` };
+}
+function wireGmsolNav() {
+  const c = gsView.chart, wrap = $('#gsWrap'), tip = $('#gsTip'), svg = $('#gsChart');
+  if (!c || !wrap || !svg?.querySelector('#gsHit')) return;
+  const hit = svg.querySelector('#gsHit'), cross = svg.querySelector('#gsCross'), dot = svg.querySelector('#gsDot');
+  hit.onpointermove = hit.onpointerdown = (ev) => {
+    const box = wrap.getBoundingClientRect(), ratio = c.W / (box.width || c.W), sx = (ev.clientX - box.left) * ratio;
+    let near = c.pts[0]; for (const p of c.pts) if (Math.abs(c.x(p.t) - sx) < Math.abs(c.x(near.t) - sx)) near = p;
+    cross.setAttribute('x1', c.x(near.t)); cross.setAttribute('x2', c.x(near.t)); cross.style.display = '';
+    dot.setAttribute('cx', c.x(near.t)); dot.setAttribute('cy', c.y(near.v)); dot.style.display = '';
+    setHTML(tip, `<div class="t-d">${esc(tglRingkas(near.t))} WIB</div><div class="t-v">${usd(near.v)}</div>${Math.abs(near.v - near.raw) >= 0.01 ? `<div class="t-n">nilai asli ${usd(near.raw)} · disesuaikan arus modal</div>` : '<div class="t-n">dibaca dari blockchain</div>'}`);
+    tip.hidden = false; tip.style.left = (c.x(near.t) / ratio) + 'px'; tip.style.top = ((c.y(near.v) - 10) / ratio) + 'px';
+  };
+  hit.onpointerleave = (ev) => { if (ev.pointerType === 'mouse') { tip.hidden = true; cross.style.display = 'none'; dot.style.display = 'none'; } };
+}
+function paintGmsol() {
+  const d = gsView.last, body = $('#gmsolBody');
+  if (!d || !body) return;
   const NA = '<span class="dim">menunggu data</span>';
-  const has = (v) => v !== null && v !== undefined && Number.isFinite(Number(v));
-  const $u = (v, dp = 2) => (has(v) ? usd(Number(v), dp) : NA);
+  const has = gmsolHas, $u = (v, dp = 2) => (has(v) ? usd(Number(v), dp) : NA);
   const tile = (k, v, n, c = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="n">${n}</div></div>`;
-  const e = d.engine || {}, b = d.brakes || {}, ws = d.walletShared || null;
-  const cap = e.capitalUsd ?? d.capitalUsd, eq = e.equityUsd ?? d.equityUsd, pnl = e.pnlUsd ?? d.pnlUsd, pnlPct = e.pnlPct ?? d.pnlPct;
-  const realized = e.realizedUsd ?? d.realizedUsd, unreal = e.unrealizedUsd ?? d.unrealizedUsd;
-  const maxOpen = e.maxOpen ?? d.sizing?.maxOpen, size = d.sizing?.sizeUsd;
-  // Seluruh wallet milik GMSOL (pemilik 2026-10-22): semua posisi dihitung GMSOL.
-  const all = gmsolPositions(d), closes = d.closes || [];
-  const openCount = e.openCount ?? all.length;
-  const none = !openCount && !closes.length;          // aturan Auditor: posisi 0 → tidak ada PnL
-  const mode = b.halted ? ['BERHENTI · rem total', 'sb-m-halt'] : b.dailyBlocked ? ['Rem harian aktif', 'sb-m-dry'] : all.length || openCount ? [`LIVE · ${all.length || openCount} posisi`, 'sb-m-live'] : ['LIVE · belum ada posisi', 'sb-m-live'];
-  const used = (from, to, now) => (has(from) && has(to) && has(now) && from > to ? Math.max(0, Math.min(1, (from - now) / (from - to))) : 0);
-  const dayFloor = e.dayFloorUsd ?? b.dayFloorUsd, totFloor = e.totalFloorUsd ?? b.totalFloorUsd;
-  const dayUsed = used(b.dayStartLedgerUsd, dayFloor, eq), totUsed = used(cap, totFloor, eq);
-  const bar = (f, hot) => `<div class="sb-meter" aria-hidden="true"><i style="width:${(f * 100).toFixed(0)}%" class="${hot || f >= 0.75 ? 'hot' : f >= 0.4 ? 'warm' : ''}"></i></div>`;
+  const engineOk = d.status === 'ok' && d.asOf && Date.now() - d.asOf <= GMSOL_STALE_MS;
+  const w = gmsolWalletFresh(d) ? (d.wallet || d.walletShared) : null;
+  const e = engineOk ? (d.engine || {}) : {}, b = engineOk ? (d.brakes || {}) : {};
+  const L = d.ledger || {}, flows = L.flows || [], owners = L.owners || [], costs = L.costs;
+  const closes = (engineOk ? d.closes : d.history?.closes) || d.closes || [];
+  const all = w && Array.isArray(w.positions) ? w.positions : gmsolPositions(d);
   const real = gmsolReal(d);
-  const posU = all.filter((p) => has(p.uPnlUsd)), uSum = posU.reduce((t, p) => t + Number(p.uPnlUsd), 0);
-  const feeSum = all.filter((p) => has(p.feesUsd)).reduce((t, p) => t + Number(p.feesUsd), 0);
-  const sc = d.screening;
-  setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}
-      <span class="sb-mode ${mode[1]}"><i></i>${mode[0]}</span></div>
-      ${b.halted ? '<p class="sb-halt" role="alert"><b>Rem total aktif:</b> buku GMSOL menyentuh batas total; semua posisi GMSOL ditutup dan mesin hanya jalan lagi atas izin Orel.</p>' : ''}
+  const dep = flows.filter((f) => f.type === 'deposit').reduce((t, f) => t + f.usd, 0), wd = flows.filter((f) => f.type === 'withdraw').reduce((t, f) => t + Math.abs(f.usd), 0);
+  const pnl = flows.length && real != null ? real + wd - dep : null;
+  const spec = d.spec || d.history?.spec, t0 = d.t0At || d.history?.t0At;
+  const mode = !engineOk ? (gmsolStopped(d) ? ['Mesin berhenti', 'sb-m-halt'] : ['Menunggu live', 'sb-m-wait']) : b.halted ? ['BERHENTI · rem total', 'sb-m-halt'] : b.dailyBlocked ? ['Rem harian aktif', 'sb-m-dry'] : all.length ? [`LIVE · ${all.length} posisi`, 'sb-m-live'] : ['LIVE · belum ada posisi', 'sb-m-live'];
+  const chart = gmsolNavSvg(d, flows);
+  // Riwayat profit per hari WIB dari close yang tercatat.
+  const dayMap = new Map();
+  for (const c of closes) { if (!c.closedAt || !has(c.netUsd)) continue; const k = new Date(c.closedAt + 7 * 3600e3).toISOString().slice(0, 10); const r = dayMap.get(k) || { date: k, usd: 0, closes: 0 }; r.usd += c.netUsd; r.closes += 1; dayMap.set(k, r); }
+  const days = [...dayMap.values()].sort((a, c) => a.date.localeCompare(c.date));
+  const wins = closes.filter((c) => c.netUsd > 0).length, losses = closes.filter((c) => c.netUsd < 0).length;
+  const locked = closes.reduce((t, c) => t + (has(c.netUsd) ? c.netUsd : 0), 0), basisC = closes.filter((c) => has(c.basisUsd));
+  const best = days.reduce((a, r) => (a == null || r.usd > a.usd ? r : a), null);
+  let cal = '<p class="dim">Belum ada posisi yang ditutup.</p>';
+  if (days.length && gsView.profit === 'chart') {
+    const Wc = 720, Hc = 200, m = { t: 14, r: 14, b: 28, l: 60 }, pw = Wc - m.l - m.r, ph = Hc - m.t - m.b, peak = Math.max(0.01, ...days.map((r) => Math.abs(r.usd)));
+    const lo = Math.min(0, ...days.map((r) => r.usd)) * 1.15, hi = Math.max(0, ...days.map((r) => r.usd)) * 1.15 || 1, yy = (v) => m.t + ((hi - v) / ((hi - lo) || 1)) * ph, bw = Math.min(46, (pw / days.length) * 0.7), xx = (i) => m.l + (pw / days.length) * (i + 0.5);
+    cal = `<div class="chart-wrap"><svg viewBox="0 0 ${Wc} ${Hc}" role="img" aria-label="Hasil close per hari"><line x1="${m.l}" x2="${Wc - m.r}" y1="${yy(0)}" y2="${yy(0)}" class="g-base"/>${days.map((r, i) => `<rect x="${(xx(i) - bw / 2).toFixed(1)}" y="${Math.min(yy(r.usd), yy(0)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1, Math.abs(yy(r.usd) - yy(0))).toFixed(1)}" rx="3" fill="${r.usd >= 0 ? '#4ade80' : '#f87171'}" opacity="${(0.45 + 0.55 * Math.abs(r.usd) / peak).toFixed(2)}"><title>${fmtDay(r.date)} · ${signedText(r.usd)} · ${r.closes} close</title></rect><text x="${xx(i)}" y="${Hc - m.b + 18}" text-anchor="middle" class="g-lbl">${fmtDay(r.date)}</text>`).join('')}</svg></div>`;
+  } else if (days.length) {
+    const months = [...new Set(days.map((r) => r.date.slice(0, 7)))].sort();
+    if (!gsView.calMonth || !months.includes(gsView.calMonth)) gsView.calMonth = months.at(-1);
+    const [yy, mm] = gsView.calMonth.split('-').map(Number), first = new Date(Date.UTC(yy, mm - 1, 1)), nDays = new Date(Date.UTC(yy, mm, 0)).getUTCDate(), peak = Math.max(0.01, ...days.map((r) => Math.abs(r.usd)));
+    let cells = '', tot = 0, n = 0;
+    for (let i = 0; i < first.getUTCDay(); i += 1) cells += '<div class="cell void"></div>';
+    for (let dd = 1; dd <= nDays; dd += 1) { const r = dayMap.get(`${gsView.calMonth}-${String(dd).padStart(2, '0')}`); if (!r) { cells += `<div class="cell void"><span class="d">${dd}</span></div>`; continue; } tot += r.usd; n += r.closes; const a = 0.12 + 0.42 * (Math.abs(r.usd) / peak), rgb = r.usd >= 0 ? '74,222,128' : '248,113,113'; cells += `<div class="cell" style="background:rgba(${rgb},${a.toFixed(3)});border-color:rgba(${rgb},.4)"><span class="d">${dd}</span><span class="a ${cls(r.usd)}">${narrow() ? signedCompact(r.usd) : signed(r.usd)}</span><span class="c">${r.closes} tutup</span></div>`; }
+    const idx = months.indexOf(gsView.calMonth);
+    cal = `<div class="cal-head"><button class="btn ghost" data-gscal="-1" aria-label="Bulan sebelumnya"${idx <= 0 ? ' disabled' : ''}>‹</button><strong>${M_SHORT[mm - 1]} ${yy}</strong><button class="btn ghost" data-gscal="1" aria-label="Bulan berikutnya"${idx >= months.length - 1 ? ' disabled' : ''}>›</button></div><div class="cal-dow">${D_SHORT.map((x) => `<span>${x}</span>`).join('')}</div><div class="cal-grid">${cells}</div><div class="cal-foot"><span>${n} posisi ditutup bulan ini</span><span>Total <b class="${cls(tot)}">${signed(tot)}</b></span></div>`;
+  }
+  // Riwayat close: bulan + halaman 20.
+  const mon = (t) => new Date(t + 7 * 3600e3).toISOString().slice(0, 7);
+  const months = [...new Set(closes.filter((c) => c.closedAt).map((c) => mon(c.closedAt)))].sort().reverse();
+  if (gsView.month && !months.includes(gsView.month)) gsView.month = '';
+  const scope = closes.filter((c) => !gsView.month || (c.closedAt && mon(c.closedAt) === gsView.month)), pages = Math.max(1, Math.ceil(scope.length / CLOSED_PER_PAGE));
+  gsView.page = Math.min(Math.max(0, gsView.page), pages - 1);
+  const label = (mo) => `${M_SHORT[Number(mo.slice(5)) - 1]} ${mo.slice(0, 4)}`;
+  const peakRows = closes.filter((c) => has(c.peakPct) || has(c.troughPct));
+  const posVal = all.reduce((t, p) => t + (has(p.valueUsd) ? Number(p.valueUsd) : 0), 0), posInv = all.reduce((t, p) => t + (has(p.investedUsd) ? Number(p.investedUsd) : 0), 0);
+  const posFee = all.reduce((t, p) => t + (has(p.feesUsd) ? Number(p.feesUsd) : 0), 0), posU = all.reduce((t, p) => t + (has(p.uPnlUsd) ? Number(p.uPnlUsd) : 0), 0), inR = all.filter((p) => p.inRange === true).length;
+  const sc = engineOk ? d.screening : null;
+  const used = (from, to, now) => (has(from) && has(to) && has(now) && from > to ? Math.max(0, Math.min(1, (from - now) / (from - to))) : 0);
+  const bar = (f, hot) => `<div class="sb-meter" aria-hidden="true"><i style="width:${(f * 100).toFixed(0)}%" class="${hot || f >= 0.75 ? 'hot' : f >= 0.4 ? 'warm' : ''}"></i></div>`;
+  const hm = /\w{3} (\w{3}) (\d+) ([\d:]+) (CEST|CET|UTC) (\d{4})/.exec(d.haltNote || '');
+  const haltAt = hm ? Date.parse(`${hm[1]} ${hm[2]} ${hm[5]} ${hm[3]} GMT${hm[4] === 'CEST' ? '+0200' : hm[4] === 'CET' ? '+0100' : '+0000'}`) : null;
+  const events = [...(!engineOk && d.asOf ? [[sbWib(d.asOf), 'Mesin berhenti mengirim data']] : []), ...(d.haltNote ? [[Number.isFinite(haltAt) ? sbWib(haltAt) : '—', 'Dihentikan manual untuk menutup posisi']] : []), ...flows.map((f) => [sbWib(f.t), `${f.type === 'deposit' ? 'Setoran' : 'Penarikan'} ${usd(Math.abs(f.usd))}${has(f.sol) ? ` (${fmtNum(f.sol, 4)} SOL)` : ''}${f.by ? ` · ${f.by}` : ''}`])];
+  setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${mode[1]}"><i></i>${esc(mode[0])}</span></div>
+      ${!engineOk ? `<p class="miss" role="status"><b>${esc(mode[0])}.</b> ${d.asOf ? `Data terakhir dari mesin ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}). ` : ''}Angka mesin (buku, rem, screening) disembunyikan sampai mesin jalan lagi; uang di wallet tetap dipantau langsung dari blockchain.</p>` : ''}
+      ${d.haltNote ? `<p class="hint">Catatan berhenti: ${esc(d.haltNote)}</p>` : ''}
+      ${b.halted ? '<p class="sb-halt" role="alert"><b>Rem total aktif:</b> semua posisi GMSOL ditutup; mesin jalan lagi hanya atas izin Orel.</p>' : ''}
       ${b.dailyBlocked ? `<p class="sb-halt" role="alert"><b>Rem harian aktif:</b> tidak ada posisi baru${b.dailyBlockedUntil ? ` sampai ${esc(sbWib(b.dailyBlockedUntil))}` : ' hari ini'}.</p>` : ''}
-      ${b.gateUnknownBlock ? '<p class="sb-halt" role="alert"><b>Ekuitas tidak pasti:</b> posisi baru ditahan sampai ekuitas terbaca lagi.</p>' : ''}
-      <p class="sb-strat">Tes eksekusi${has(size) ? ` ${usd(size, 0)}/posisi` : ''}; profit belum terbukti (backtest masih minus).</p>
-      <p class="hint">${d.spec ? `${esc(d.spec)} · ` : ''}live sejak ${d.t0At ? esc(sbWib(d.t0At)) : 'menunggu data'} · data mesin ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))})</p>
-    </section>
+      <p class="sb-strat">Tes eksekusi${has(d.sizing?.sizeUsd) ? ` ${usd(d.sizing.sizeUsd, 0)}/posisi` : ''}; profit belum terbukti (backtest masih minus).</p>
+      <p class="hint">${spec ? `${esc(spec)} · ` : ''}${t0 ? `live sejak ${esc(sbWib(t0))} · ` : ''}${w ? `wallet dibaca ${esc(ago(w.asOf))}` : ''}</p></section>
     <div class="stats sb-top">${[
-      tile('Aset nyata GMSOL', real == null ? NA : usd(real), ws ? `${has(ws.freeSol) ? `${fmtNum(ws.freeSol, 4)} SOL lepas` : ''}${has(ws.lpValueUsd) ? ` + LP ${usd(ws.lpValueUsd, 0)}` : ''}${has(ws.unclaimedFeesUsd) ? ` + fee ${usd(ws.unclaimedFeesUsd, 2)} belum diklaim` : ''} · seluruh isi wallet` : 'menunggu data'),
-      tile('Posisi berjalan', posU.length ? `<span class="${cls(uSum)}">${sbUsd(uSum)}</span>` : (all.length ? NA : '—'), all.length ? `${all.length} posisi LP · fee terkumpul ${usd(feeSum, 2)}` : 'belum ada posisi'),
-      tile('Buku mesin GMSOL', $u(eq), `modal ${$u(cap)} · ${none ? 'mesin belum membuka posisi, belum ada PnL' : `<span class="${cls(pnl ?? 0)}">${has(pnl) ? sbUsd(pnl) : 'menunggu data'}${has(pnlPct) ? ` (${sbPct(pnlPct)})` : ''}</span>`}`),
-      tile('Posisi mesin · error', `${openCount}/${has(maxOpen) ? maxOpen : '—'} · <span class="${d.execErrors ? 'neg' : ''}">${d.execErrors ?? '—'}</span>`, `${has(size) ? `${usd(size, 0)} per posisi` : 'ukuran menunggu data'}${has(d.sizing?.maxOpenCap) ? ` · batas atas ${d.sizing.maxOpenCap}` : ''} · ${closes.length} close`),
+      tile('Nilai sekarang', real == null ? NA : usd(real), w ? `${has(w.freeSol) ? `${fmtNum(w.freeSol, 4)} SOL lepas` : ''}${has(w.lpValueUsd) && Number(w.lpValueUsd) > 0 ? ` + ${usd(w.lpValueUsd, 0)} di LP` : ''} · seluruh wallet` : 'menunggu data'),
+      tile('Modal masuk', flows.length ? usd(dep) : NA, flows.length ? `${flows.filter((f) => f.type === 'deposit').length} setoran tercatat` : 'arus modal belum dikirim mesin'),
+      tile('Sudah ditarik', flows.length ? usd(wd) : NA, flows.length ? `${flows.filter((f) => f.type === 'withdraw').length} penarikan tercatat` : 'arus modal belum dikirim mesin'),
+      tile('Untung / rugi', pnl == null ? NA : signed(pnl), pnl == null ? 'butuh arus modal' : `${dep ? `${pnl >= 0 ? '+' : ''}${pct((pnl / dep) * 100)} dari modal` : ''} · nilai + ditarik − modal`, cls(pnl ?? 0)),
     ].join('')}</div>
-    <p class="hint gs-note"><b>Aset nyata GMSOL</b> = seluruh isi wallet GMSOL (SOL lepas + semua posisi LP + fee), dan angka inilah yang masuk Total aset beranda. <b>Buku mesin</b> hanya mencatat posisi yang dibuka mesin GMSOL v3.2 sejak modalnya dikunci${d.capitalLockedAt ? ` (${esc(sbWib(Date.parse(d.capitalLockedAt)))})` : ''}; dipakai untuk rem risiko dan kinerja mesin.</p>
-    <section class="card sb-guard"><div class="card-head"><h2>Rem risiko</h2><span class="hint">dikonfirmasi 2× berjarak 60 detik</span></div>
-      <div class="sb-grid gs-brakes">
-        <div class="sb-g${b.dailyBlocked ? ' gs-hot' : ''}"><div class="k">Rem harian${has(b.dailyPct) ? ` (−${b.dailyPct}%)` : ''}</div><div class="v ${cls(b.dayChangePct ?? 0)}">${has(b.dayChangePct) ? sbPct(b.dayChangePct) : NA}</div>${bar(dayUsed, b.dailyBlocked)}<div class="n">hari ini dari ${$u(b.dayStartLedgerUsd)} · batas ${$u(dayFloor)}${b.dailyBlocked ? ' · <b class="neg">AKTIF</b>' : ''}</div></div>
-        <div class="sb-g${b.halted ? ' gs-hot' : ''}"><div class="k">Rem total</div><div class="v">${has(eq) && has(totFloor) ? `${usd(eq - totFloor)} <small class="dim">di atas batas</small>` : NA}</div>${bar(totUsed, b.halted)}<div class="n">buku ${$u(eq)} · batas ${$u(totFloor)} · kena = semua posisi GMSOL ditutup, mesin berhenti${b.halted ? ' · <b class="neg">AKTIF</b>' : ''}</div></div>
-      </div></section>
-    <section class="card"><div class="card-head"><h2>Ekuitas buku</h2><span class="hint">sejak live · garis modal ${$u(cap)}, rem harian ${$u(dayFloor)}, rem total ${$u(totFloor)}</span></div>
-      ${none ? '<p class="hint">Mesin belum membuka posisi sejak modalnya dikunci, jadi buku mesin masih tepat di modal — garis datar ini data asli, bukan contoh.</p>' : ''}
-      ${gmsolChart(d)}</section>
-    <section class="card"><div class="card-head"><h2>Aset nyata dari waktu ke waktu</h2><span class="hint">pembacaan blockchain tiap 5 menit · bukan kinerja mesin</span></div>${gmsolWalletChart(d.walletCurve)}</section>
-    <section class="card"><div class="card-head"><h2>Posisi LP <span class="count">(${all.length})</span></h2><span class="hint">semua posisi di wallet GMSOL${has(ws?.uPnlUsd) ? ` · uPnL total ${sbUsd(ws.uPnlUsd)}` : ''}</span></div>${gmsolPosTable(all, ws)}</section>
-    <section class="card"><div class="card-head"><h2>Riwayat posisi ditutup <span class="count">(${closes.length})</span></h2></div>${gmsolClosesTable(closes)}</section>
-    ${sc ? `<section class="card"><div class="card-head"><h2>Screening pool</h2><span class="hint">${openCount ? 'pencarian pool baru' : 'kenapa mesin belum membuka posisi'} · scan terakhir ${sc.scannedAt ? `${esc(sbWib(sc.scannedAt))} (${esc(ago(sc.scannedAt))})` : 'menunggu data'}</span></div>
-      <div class="gs-funnel">${[['Pool SOL', sc.solPools], ['Tidak aktif 1 jam', sc.inactive1h], ['Dicek', sc.checked], ['Lolos', sc.passed]].map(([k, v], i) => `<div class="gs-step${i === 3 && has(v) ? (v ? ' ok' : ' zero') : ''}"><b>${has(v) ? v : '—'}</b><span>${k}</span></div>`).join('<i aria-hidden="true">›</i>')}</div>
-      ${(sc.topReasons || []).length ? `<h3 class="gs-h3">Alasan ditolak terbanyak</h3><div class="gs-reasons">${sc.topReasons.map((r) => { const g = gmsolReason(r.reason); const f = sc.checked ? r.pools / sc.checked : 0; return `<div class="gs-rrow"><span>${esc(g.label)}</span><div class="gs-rbar"><i style="width:${(f * 100).toFixed(0)}%"></i></div><b>${r.pools}</b></div>`; }).join('')}</div>` : ''}
-      ${(sc.closest || []).length ? `<h3 class="gs-h3">Paling dekat lolos</h3><div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Bin step</th><th>Kurang di</th></tr></thead><tbody>
-        ${sc.closest.map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol || '—')}</b></td><td class="num" data-k="Bin step">${c.binStep ?? '—'}</td><td data-k="Kurang di">${(c.reasons || []).map((r) => { const g = gmsolReason(r); return `<div><b>${esc(g.label)}</b> <span class="dim">${esc(g.text)}</span></div>`; }).join('')}</td></tr>`).join('')}</tbody></table></div>` : ''}
-    </section>` : ''}
-    ${gmsolEvents(d)}
+    <section class="card"><div class="card-head"><h2>Pembagian saham</h2><span class="hint">${owners.length ? `${owners.length} pemilik` : ''}</span></div>
+      ${owners.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pemilik</th><th class="num">Saham</th><th class="num">Setoran</th><th class="num">Ditarik</th><th class="num">Nilai sekarang</th><th class="num">Untung / rugi</th></tr></thead><tbody>
+        ${owners.map((o) => { const v = real != null && has(o.sharePct) ? real * o.sharePct / 100 : null; const pl = v != null && has(o.depositedUsd) ? v + (o.withdrawnUsd || 0) - o.depositedUsd : null; return `<tr><td class="mc-head"><b>${esc(o.name)}</b></td><td class="num" data-k="Saham">${has(o.sharePct) ? pct(o.sharePct, 2) : '—'}</td><td class="num" data-k="Setoran">${$u(o.depositedUsd)}</td><td class="num" data-k="Ditarik">${has(o.withdrawnUsd) ? usd(o.withdrawnUsd) : '—'}</td><td class="num" data-k="Nilai sekarang"><b>${v == null ? '—' : usd(v)}</b></td><td class="num ${cls(pl ?? 0)}" data-k="Untung / rugi">${pl == null ? '—' : signed(pl)}</td></tr>`; }).join('')}</tbody></table></div>`
+        : '<p class="dim">Menunggu data pemilik dari mesin (nama pemilik, persen saham, setoran, penarikan).</p>'}</section>
+    <section class="card"><div class="card-head"><div class="seg tabs2"><button class="on" tabindex="-1">Nilai wallet</button></div><span class="hint">${chart.hint}</span></div>
+      <div class="controls"><div class="seg" id="gsRange" role="group" aria-label="Rentang grafik">${[[24, '24 jam'], [168, '7 hari'], [0, 'semua']].map(([h, l]) => `<button data-h="${h}" class="${gsView.hours === h ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+      <div class="chart-wrap" id="gsWrap"><svg id="gsChart" viewBox="0 0 ${chart.W} ${chart.H}" role="img" aria-label="Nilai wallet GMSOL dari waktu ke waktu (WIB)">${chart.svg}</svg><div class="tip" id="gsTip" hidden></div></div>
+      <p class="hint">Dibaca langsung dari blockchain tiap 5 menit.${flows.length ? ' Titik sebelum setoran/penarikan digeser sebesar jumlahnya supaya modal masuk tidak terlihat sebagai untung.' : ''}</p></section>
+    <section class="card" id="gsProfit"><div class="card-head"><h2>Riwayat profit</h2><span class="hint">${days.length} hari ada transaksi · hasil posisi yang sudah ditutup</span></div>
+      <div class="stats">${[
+        tile('Profit terkunci', closes.length ? signed(locked) : '—', 'dari posisi yang sudah ditutup', cls(locked)),
+        tile('Win rate', wins + losses ? pct((wins / (wins + losses)) * 100, 1) : '—', `${wins} untung · ${losses} rugi`),
+        tile('Posisi ditutup', String(closes.length), `${all.length} masih jalan`),
+        tile('Rata-rata modal', basisC.length ? usd(basisC.reduce((t, c) => t + c.basisUsd, 0) / basisC.length) : '—', 'per posisi'),
+        best ? tile('Hari terbaik', signed(best.usd), fmtDay(best.date), cls(best.usd)) : tile('Hari terbaik', '—', 'belum ada data'),
+      ].join('')}</div>
+      <div class="controls"><div class="seg" id="gsProfitView" role="group" aria-label="Tampilan"><button data-v="chart" class="${gsView.profit === 'chart' ? 'on' : ''}">grafik</button><button data-v="cal" class="${gsView.profit !== 'chart' ? 'on' : ''}">kalender</button></div></div>${cal}</section>
+    <section class="card"><div class="card-head"><h2>Token di wallet</h2><span class="hint">dibaca dari blockchain</span></div>
+      ${w ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th class="num">Jumlah</th><th class="num">Harga</th><th class="num">Nilai</th></tr></thead><tbody>
+        <tr><td class="mc-head"><b>SOL</b></td><td class="num" data-k="Jumlah">${has(w.freeSol) ? fmtNum(w.freeSol, 4) : '—'}</td><td class="num" data-k="Harga">${has(w.solPriceUsd) ? usd(w.solPriceUsd) : '—'}</td><td class="num" data-k="Nilai"><b>${has(w.freeSolUsd) ? usd(w.freeSolUsd) : '—'}</b></td></tr>
+        ${(Array.isArray(w.tokens) ? w.tokens : []).map((t) => `<tr><td class="mc-head"><b>${esc(t.symbol || '—')}</b></td><td class="num" data-k="Jumlah">${has(t.amount) ? fmtNum(t.amount, 4) : '—'}</td><td class="num" data-k="Harga">${has(t.priceUsd) ? sbPx(t.priceUsd) : '—'}</td><td class="num" data-k="Nilai">${has(t.usd) ? usd(t.usd) : '<span class="dim">tanpa harga</span>'}</td></tr>`).join('')}
+        </tbody></table></div>${!Array.isArray(w.tokens) && has(w.tokensUnpriced) && w.tokensUnpriced ? `<p class="hint">${w.tokensUnpriced} token lain di wallet belum dirinci (menunggu data token dari mesin).</p>` : ''}` : `<p class="dim">${NA}</p>`}</section>
+    <section class="card"><div class="card-head"><h2>Posisi LP <span class="count">(${all.length})</span></h2><span class="hint">semua posisi di wallet GMSOL</span></div>
+      ${all.length ? `<div class="stats lp-sum n5">${[tile('Nilai posisi', usd(posVal), 'dari blockchain'), tile('Modal masuk', usd(posInv), 'ke posisi'), tile('Fee terkumpul', usd(posFee), 'diklaim + belum', 'pos'), tile('Untung / rugi', sbUsd(posU), 'termasuk fee', cls(posU)), tile('Di dalam range', `${inR}/${all.length}`, 'posisi')].join('')}</div>` : ''}
+      ${gmsolPosTable(all, w)}</section>
+    <section class="card" id="gsClosed"><div class="card-head"><h2>Riwayat posisi ditutup</h2><span class="hint">halaman ${gsView.page + 1} dari ${pages} · ${gsView.month ? label(gsView.month) : 'seluruh riwayat'}</span></div>
+      ${closes.length ? `<div class="controls closed-ctl"><label class="sel-wrap"><span>Periode</span><select id="gsMonth" aria-label="Pilih bulan"><option value="">Semua · ${closes.length} posisi</option>${months.map((mo) => `<option value="${mo}"${mo === gsView.month ? ' selected' : ''}>${label(mo)} · ${closes.filter((c) => c.closedAt && mon(c.closedAt) === mo).length} posisi</option>`).join('')}</select></label>
+        <span class="closed-sum"><b>${scope.length}</b> posisi · hasil <b class="${cls(scope.reduce((t, c) => t + (c.netUsd || 0), 0))}">${signed(scope.reduce((t, c) => t + (c.netUsd || 0), 0))}</b></span></div>` : ''}
+      ${gmsolClosesTable(scope.slice(gsView.page * CLOSED_PER_PAGE, (gsView.page + 1) * CLOSED_PER_PAGE))}
+      ${pages > 1 ? `<div class="pager" id="gsPager">${pagerHtml(gsView.page, pages)}</div>` : ''}</section>
+    <section class="card"><div class="card-head"><h2>Puncak &amp; titik terendah posisi</h2><span class="hint">persen tertinggi dan terendah selama posisi terbuka</span></div>
+      ${peakRows.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Puncak</th><th class="num">Terendah</th><th class="num">Hasil akhir</th><th class="num">Ditutup</th></tr></thead><tbody>${peakRows.slice(0, 30).map((c) => `<tr><td class="mc-head"><b>${esc(c.symbol || '—')}</b></td><td class="num pos" data-k="Puncak">${sbPct(c.peakPct)}</td><td class="num neg" data-k="Terendah">${sbPct(c.troughPct)}</td><td class="num ${cls(c.netPct ?? 0)}" data-k="Hasil akhir">${sbPct(c.netPct)}</td><td class="num dim" data-k="Ditutup">${c.closedAt ? esc(sbWib(c.closedAt)) : '—'}</td></tr>`).join('')}</tbody></table></div>` : `<p class="dim">${closes.length ? 'Menunggu data puncak/terendah dari mesin.' : 'Belum ada posisi yang ditutup.'}</p>`}</section>
+    <section class="card${engineOk ? ' sb-guard' : ' gs-off'}"><div class="card-head"><h2>Mesin GMSOL &amp; rem risiko</h2>${engineOk ? '<span class="hint">dikonfirmasi 2× berjarak 60 detik</span>' : '<span class="pill sb-sim">tidak aktif</span>'}</div>
+      ${engineOk ? `<div class="sb-grid gs-brakes">
+        <div class="sb-g${b.dailyBlocked ? ' gs-hot' : ''}"><div class="k">Rem harian${has(b.dailyPct) ? ` (−${b.dailyPct}%)` : ''}</div><div class="v ${cls(b.dayChangePct ?? 0)}">${has(b.dayChangePct) ? sbPct(b.dayChangePct) : NA}</div>${bar(used(b.dayStartLedgerUsd, e.dayFloorUsd ?? b.dayFloorUsd, e.equityUsd ?? d.equityUsd), b.dailyBlocked)}<div class="n">batas ${$u(e.dayFloorUsd ?? b.dayFloorUsd)}</div></div>
+        <div class="sb-g${b.halted ? ' gs-hot' : ''}"><div class="k">Rem total</div><div class="v">${has(e.equityUsd) && has(e.totalFloorUsd ?? b.totalFloorUsd) ? `${usd(e.equityUsd - (e.totalFloorUsd ?? b.totalFloorUsd))} <small class="dim">di atas batas</small>` : NA}</div>${bar(used(e.capitalUsd, e.totalFloorUsd ?? b.totalFloorUsd, e.equityUsd), b.halted)}<div class="n">buku mesin ${$u(e.equityUsd)} · modal ${$u(e.capitalUsd)}</div></div>
+      </div><p class="hint">Buku mesin = posisi yang dibuka mesin v3.2 sejak modalnya dikunci; dipakai untuk rem. Posisi mesin ${e.openCount ?? 0}/${e.maxOpen ?? d.sizing?.maxOpen ?? '—'} · error eksekusi ${d.execErrors ?? '—'}.</p>
+      ${sc ? `<h3 class="gs-h3">Screening pool · scan ${sc.scannedAt ? esc(ago(sc.scannedAt)) : '—'}</h3><div class="gs-funnel">${[['Pool SOL', sc.solPools], ['Tidak aktif 1 jam', sc.inactive1h], ['Dicek', sc.checked], ['Lolos', sc.passed]].map(([k, v], i) => `<div class="gs-step${i === 3 && has(v) ? (v ? ' ok' : ' zero') : ''}"><b>${has(v) ? v : '—'}</b><span>${k}</span></div>`).join('<i aria-hidden="true">›</i>')}</div>
+        ${(sc.topReasons || []).length ? `<div class="gs-reasons">${sc.topReasons.map((r) => { const g = gmsolReason(r.reason); const f = sc.checked ? r.pools / sc.checked : 0; return `<div class="gs-rrow"><span>${esc(g.label)}</span><div class="gs-rbar"><i style="width:${(f * 100).toFixed(0)}%"></i></div><b>${r.pools}</b></div>`; }).join('')}</div>` : ''}` : ''}`
+      : '<p class="dim">Mesin tidak berjalan: tidak membuka posisi baru, rem harian/total tidak aktif, dan screening pool berhenti. Bagian ini terisi lagi begitu mesin jalan.</p>'}</section>
+    <section class="card"><div class="card-head"><h2>Biaya bulanan</h2><span class="hint">biaya yang dibebankan ke GMSOL</span></div>
+      ${costs && ((costs.items || []).length || has(costs.gasUsd) || has(costs.swapFeesUsd)) ? `<div class="table-scroll"><table class="mcards sb-tbl"><tbody>
+        ${(costs.items || []).map((i) => `<tr><td class="mc-head">${esc(i.label)}</td><td class="num" data-k="Per bulan">${$u(i.usdPerMonth)}</td></tr>`).join('')}
+        ${has(costs.gasUsd) ? `<tr><td class="mc-head">Gas transaksi (total)</td><td class="num" data-k="Total">${usd(costs.gasUsd)}</td></tr>` : ''}${has(costs.swapFeesUsd) ? `<tr><td class="mc-head">Fee swap (total)</td><td class="num" data-k="Total">${usd(costs.swapFeesUsd)}</td></tr>` : ''}
+        </tbody></table></div>` : '<p class="dim">Menunggu data biaya dari mesin (gas, fee swap, biaya bulanan).</p>'}</section>
+    ${gmsolEvents(d, events)}
     <section class="card sb-disc"><p>${GMSOL_WARN}</p></section>`);
+  wireGmsolNav();
+  body.onclick = (ev) => {
+    const btn = ev.target.closest('button');
+    if (!btn || btn.disabled) return;
+    if (btn.closest('#gsRange')) { gsView.hours = Number(btn.getAttribute('data-h')) || 0; paintGmsol(); return; }
+    if (btn.closest('#gsProfitView')) { gsView.profit = btn.getAttribute('data-v'); paintGmsol(); return; }
+    if (btn.hasAttribute('data-gscal')) { const ms = days.map((r) => r.date.slice(0, 7)).filter((v, i, a) => a.indexOf(v) === i).sort(); const i = ms.indexOf(gsView.calMonth) + Number(btn.getAttribute('data-gscal')); if (ms[i]) { gsView.calMonth = ms[i]; paintGmsol(); } return; }
+    if (btn.closest('#gsPager')) { gsView.page = Number(btn.getAttribute('data-p')) || 0; paintGmsol(); $('#gsClosed')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+  };
+  const sel = $('#gsMonth');
+  if (sel) sel.onchange = (ev2) => { gsView.month = ev2.target.value; gsView.page = 0; paintGmsol(); };
 }
 
 /* ── SolBot: trading meme coin Solana dengan UANG ASLI (high risk) ──────────

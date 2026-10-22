@@ -78,9 +78,21 @@ function walletCurve(W) {
   return h.points.filter((_, i) => i % step === 0 || i === h.points.length - 1);
 }
 // Riwayat (fakta yang sudah terjadi, bukan angka live): posisi ditutup dan kejadian sebelum deploy.
+// Satu bentuk close untuk mode live dan mesin berhenti (field opsional → null).
+const closeRow = (c) => ({
+  symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80),
+  basisUsd: r2(c.basisUsd), feesUsd: r2(c.feesUsd), peakPct: r3(c.peakPct), troughPct: r3(c.troughPct), closeNote: text(c.closeNote, 200), entryNote: text(c.entryNote, 200),
+});
+// Data akuntansi untuk tampilan setara Meridian (diisi mesin di gmsol-live.json; kosong → halaman menulis "menunggu data").
+const ledgerFields = (j) => ({
+  flows: (Array.isArray(j.flows) ? j.flows : []).slice(0, 200).map((f) => ({ t: time(f.t ?? f.at), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null,
+    usd: r2(f.usd), sol: num(f.sol) == null ? null : Number(Number(f.sol).toFixed(4)), by: text(f.by, 30), note: text(f.note, 160) })).filter((f) => f.t && f.type && f.usd != null),
+  owners: (Array.isArray(j.owners) ? j.owners : []).slice(0, 20).map((o) => ({ name: text(o.name, 30), sharePct: r3(o.sharePct), depositedUsd: r2(o.depositedUsd), withdrawnUsd: r2(o.withdrawnUsd) })).filter((o) => o.name),
+  costs: j.costs && typeof j.costs === 'object' ? { gasUsd: r2(j.costs.gasUsd), swapFeesUsd: r2(j.costs.swapFeesUsd),
+    items: (Array.isArray(j.costs.items) ? j.costs.items : []).slice(0, 20).map((i) => ({ label: text(i.label, 60), usdPerMonth: r2(i.usdPerMonth) })).filter((i) => i.label) } : null,
+});
 const historyFields = (j) => ({
-  closes: (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map((c) => ({
-    symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) })),
+  closes: (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow),
   preDeployHistory: (Array.isArray(j.preDeployHistory) ? j.preDeployHistory : []).slice(0, 20).map((h) => ({ atWib: text(h.atWib, 40), type: text(h.type, 30), sol: num(h.sol), by: text(h.by, 30), note: text(h.note, 160) })),
   spec: text(j.spec, 40), t0At: time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At),
 });
@@ -199,7 +211,7 @@ try {
     const W = walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})));
     let halt = null; try { halt = text(readFileSync(resolve(ENGINE, 'state', 'HALTED'), 'utf8'), 120); } catch { /* tidak ada berkas HALTED */ }
     const extra = W && num(W.totalAssetsUsd) != null ? { wallet: W, walletShared: W, walletCurve: walletCurve(W) } : {};
-    out({ ...base, status: 'waiting', reason: 'Mesin berhenti, menunggu restart', asOf, haltNote: halt, ...(extra.wallet ? { history: historyFields(j) } : {}), ...extra });
+    out({ ...base, status: 'waiting', reason: 'Mesin berhenti, menunggu restart', asOf, haltNote: halt, ...(extra.wallet ? { history: historyFields(j), ledger: ledgerFields(j) } : {}), ...extra });
     console.log(`[gmsol] waiting: Mesin berhenti${extra.wallet ? ` · wallet ${W.totalAssetsUsd}` : ''}`); release(); process.exit(0);
   }
   if (eq == null) { out({ ...base, status: 'waiting', reason: 'ekuitas buku belum diketahui', asOf, ...v3Fields(j) }); console.log('[gmsol] waiting: ledger unknown'); release(); process.exit(0); }
@@ -213,8 +225,7 @@ try {
     return { symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), pnlUsd: r2(p.pnlUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null,
       valueUsd: m ? r2((Number(m.l.valueL) + Number(m.l.unclaimedL) + (num(m.s.rentL) || 0)) / 1e9 * px) : null,
       feesUsd: m ? r2(Number(m.l.unclaimedL) / 1e9 * px + (num(m.s.claimedUsd) || 0)) : null }; });
-  const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map((c) => ({
-    symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) }));
+  const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow);
   const WALLET = walletSane(await walletShared(readJSON(resolve(ENGINE, 'state', 'live.json'), {})));
   out({ ...base, status: 'ok', asOf, ...v3Fields(j),
     equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
@@ -223,6 +234,7 @@ try {
     engine: { label: 'Buku internal mesin r4.1', note: 'Buku internal mesin GMSOL r4.1 (modal dikunci saat deploy, dasar rem mesin). BUKAN angka utama; angka utama = wallet.totalAssetsUsd.', capitalUsd: CAPITAL, equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
       realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd), totalFloorUsd: r2(j.brakes?.totalFloorUsd), dayFloorUsd: r2(j.brakes?.dayFloorUsd), maxOpen: num(j.sizing?.maxOpen), openCount: seats.length, closedCount: closes.length,
       winRatePct: closes.length ? r2(closes.filter((c) => c.netUsd > 0).length / closes.length * 100) : null },
+    ledger: ledgerFields(j), history: historyFields(j),
     ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, walletCurve: walletCurve(w), headline: { label: 'Aset GMSOL', usd: w?.totalAssetsUsd ?? null, source: 'wallet.totalAssetsUsd', rule: 'saldo wallet sekarang = acuan utama (Orel, 22 Okt)', pnlNote: 'Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy.' } }; })() });
   console.log(`[gmsol] ok ledger ${eq}`);
 } finally { release(); }
