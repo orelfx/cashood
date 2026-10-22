@@ -20,7 +20,8 @@ function run(source, { passed = false, now = NOW } = {}) {
 }
 
 test('gmsol v3: kinerja dari equityLedgerUsd, wallet hanya info bersama', () => {
-  const d = run(src({ equityUsd: 900 }));
+  const d = run(src({ equityUsd: 900, specStatus: 'DRAFT', solPriceUsd: 100 }));
+  assert.ok(!JSON.stringify(d).includes('DRAFT')); assert.equal(d.walletSolShared.usd, 870);
   assert.equal(d.status, 'ok'); assert.equal(d.risk, 'high');
   assert.equal(d.equityUsd, 1195.5); assert.equal(d.pnlUsd, -4.5);
   assert.equal(d.walletSolShared.label, 'dipakai bersama Meridian');

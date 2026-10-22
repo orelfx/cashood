@@ -3703,6 +3703,8 @@ function showGmsol() {
 }
 const GMSOL_HEAD = `<div class="sb-hero-top"><div><div class="sb-title">GMSOL</div>
   <div class="sb-sub">Grok Meridian v3.2 · LP Meteora DLMM, Solana · uang asli · <span class="sb-risk">High risk</span> · modal buku $1.200</div></div>`;
+const gmsolFunds = (d) => { const w = d?.walletSolShared; if (!w || w.sol == null) return '';
+  return `<p class="miss" role="note"><b>Catatan dana:</b> buku $1.200 hanya modal acuan untuk menghitung kinerja dan rem. Dana nyata yang tersedia adalah saldo wallet <b>~${esc(String(w.sol))} SOL</b>${w.usd != null ? ` (≈ ${usd(w.usd)})` : ''}, dipakai bersama Meridian. Dengan saldo ini kapasitas hanya sekitar 1–2 posisi $50, bukan 5, sampai Orel menambah SOL atau memakai wallet terpisah.</p>`; };
 const GMSOL_WARN = '<b>Uang asli · uji eksekusi.</b> GMSOL v3.2 memasang likuiditas di pool Meteora DLMM dengan dana sungguhan: <b>$50 per posisi, maks. 5 posisi</b>. Rem otomatis (dihitung dari buku GMSOL, dikonfirmasi 2× berjarak 60 detik): <b>rem harian −25%</b> → tidak ada posisi baru selama 24 jam; <b>rem total $600</b> (−50% dari $1.200) → semua posisi GMSOL ditutup, mesin BERHENTI (HALTED), dan hanya bisa jalan lagi atas izin Orel. Ini <b>tes eksekusi — profitnya belum terbukti</b>. Arsip uji kertas Grok Meridian ada di <a href="#gm">Dry run</a> dan tidak digabung dengan angka ini.';
 function gmsolWait(msg, asOf) {
   return `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode sb-m-wait">${esc(msg)}</span></div>
@@ -3724,12 +3726,12 @@ async function renderGmsol() {
   if (!d.asOf || Date.now() - d.asOf > GMSOL_STALE_MS) { setHTML(body, gmsolWait('Data tertunda', d.asOf || null)); return; }
   const cl = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
   const seats = d.openSeats || [], closes = d.closes || [];
-  setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode">${d.brakes?.halted ? 'BERHENTI (rem total)' : d.brakes?.dailyBlocked ? 'Rem harian aktif' : 'LIVE · uji $50'}</span></div>
-    <div class="sb-kpis"><div><small>Ekuitas buku GMSOL</small><b>${usd(d.equityUsd)}</b></div>
+  setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode">${d.brakes?.halted ? 'BERHENTI (rem total)' : d.brakes?.dailyBlocked ? 'Rem harian aktif' : (seats.length ? 'Live' : 'Live, belum ada posisi')}</span></div>
+    <div class="sb-kpis"><div><small>Ekuitas buku GMSOL</small><b>${usd(d.equityUsd)}</b>${d.walletSolShared?.sol != null ? `<small>dana nyata ~${esc(String(d.walletSolShared.sol))} SOL, dipakai bersama Meridian</small>` : ''}</div>
     <div><small>Untung/rugi vs modal $1.200</small><b class="${cl(d.pnlUsd)}">${sbUsd(d.pnlUsd)} (${sbPct(d.pnlPct)})</b></div>
     <div><small>Posisi terbuka</small><b>${seats.length}${d.sizing?.maxOpen ? ' / ' + d.sizing.maxOpen : ''}</b></div></div>
     <p class="hint">Kinerja = buku GMSOL ($1.200 + PnL realisasi ${sbUsd(d.realizedUsd)} + belum realisasi ${sbUsd(d.unrealizedUsd)}), bukan saldo wallet. Rem: harian −${d.brakes?.dailyPct ?? 25}% · total ${usd(d.brakes?.totalFloorUsd ?? 600)} · ukuran ${usd(d.sizing?.sizeUsd ?? 50)}/posisi.${d.brakes?.dailyBlocked && d.brakes?.dailyBlockedUntil ? ` Posisi baru diblokir sampai ${esc(sbWib(d.brakes.dailyBlockedUntil))}.` : ''}</p>
-    ${d.walletSolShared ? `<p class="hint dim">Info: saldo wallet ${esc(String(d.walletSolShared.sol))} SOL — dipakai bersama Meridian, bukan kinerja GMSOL.</p>` : ''}
+    ${gmsolFunds(d)}
     <p class="hint">Diperbarui ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}).</p></section>
     <section class="card"><h3>Posisi terbuka</h3>${seats.length ? `<div class="tbl-wrap"><table><thead><tr><th>Koin</th><th class="num">Modal</th><th class="num">PnL</th><th class="num">%</th><th>Range</th></tr></thead><tbody>
       ${seats.map((p) => `<tr><td><b>${esc(p.symbol || '—')}</b></td><td class="num">${p.basisUsd == null ? '—' : usd(p.basisUsd)}</td><td class="num ${cl(p.pnlUsd ?? 0)}">${p.pnlUsd == null ? '—' : sbUsd(p.pnlUsd)}</td><td class="num ${cl(p.pnlPct ?? 0)}">${sbPct(p.pnlPct)}</td><td>${p.inRange == null ? '—' : p.inRange ? 'di dalam' : 'di luar'}</td></tr>`).join('')}</tbody></table></div>` : '<p class="dim">Belum ada posisi terbuka.</p>'}</section>
@@ -4907,7 +4909,7 @@ async function renderHome() {
   if (epoch !== homeEpoch || state.view !== 'home') return;
   const gmsolCard = () => {
     const f = state.gmsol, d = gsData && gsData.status === 'ok' && gsData.asOf && Date.now() - gsData.asOf <= GMSOL_STALE_MS ? gsData : null;
-    const status = !d ? 'Menunggu live' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
+    const status = !d ? 'Menunggu live' : !(d.openSeats || []).length && !d.brakes?.halted ? 'Live, belum ada posisi' : d.brakes?.halted ? 'berhenti (rem total)' : 'live';
     return `<a class="prod" href="#gmsol" style="--c:${f.accent}">
       <div class="prod-top">${iconTile('orbit', f.accent)}
         <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${esc(status)}</div></div></div>
@@ -4920,7 +4922,7 @@ async function renderHome() {
         <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || 'LP')}</span></div>
         <div><span class="k">Rem</span><span class="v txt">−25%/hari · $600 total</span></div>
       </div>
-      <p class="hint">${!d ? 'Menunggu live — ekuitas buku = modal $1.200, belum ada kinerja. ' : ''}Uji eksekusi $50/posisi (maks. 5); profit belum terbukti.</p>
+      <p class="hint">${!d ? 'Menunggu live — ekuitas buku = modal $1.200, belum ada kinerja. ' : ''}Uji eksekusi $50/posisi (maks. 5); profit belum terbukti.${d?.walletSolShared?.sol != null ? ` Buku $1.200 = modal acuan; dana nyata ~${esc(String(d.walletSolShared.sol))} SOL (dipakai bersama Meridian), cukup untuk sekitar 1–2 posisi.` : ''}</p>
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   const solbotCard = () => {
