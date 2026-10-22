@@ -74,7 +74,7 @@ const v3Fields = (j) => {
   const b = j.brakes || {};
   return {
     t0At: goLive(j), spec: text(j.spec, 40), execErrors: num(j.execErrors), screening: screening(), equityStatus: text(j.equityStatus, 80),
-    walletSolShared: num(j.walletSolShared?.sol) == null ? null : { sol: Number(Number(j.walletSolShared.sol).toFixed(4)), usd: num(j.solPriceUsd) == null ? null : r2(j.walletSolShared.sol * j.solPriceUsd), label: 'dipakai bersama Meridian' },
+    walletSolShared: num(j.walletSolShared?.sol) == null ? null : { sol: Number(Number(j.walletSolShared.sol).toFixed(4)), usd: num(j.solPriceUsd) == null ? null : r2(j.walletSolShared.sol * j.solPriceUsd), label: 'dipakai bersama Meridian2' },
     sizing: { sizeUsd: r2(j.sizing?.sizeUsd) ?? 50, maxOpen: num(j.sizing?.maxOpen) ?? 5 },
     brakes: { dailyPct: num(b.dailyPct) ?? 25, totalFloorUsd: r2(b.totalFloorUsd) ?? 600, dailyBlocked: b.dailyBlocked === true,
       dailyBlockedUntil: time(b.dailyBlockedUntil), dayChangePct: r3(b.dayChangePct), dayStartLedgerUsd: r2(b.dayStartLedgerUsd), dayFloorUsd: r2(b.dayFloorUsd), gateUnknownBlock: b.gateUnknownBlock === true, halted: b.halted === true },
