@@ -3776,7 +3776,8 @@ function gmsolClosesTable(closes) {
 // Kejadian penting (fakta yang sudah terjadi). Teks ditulis Cashood dari jenis
 // kejadiannya — catatan mentah mesin tidak dipakai (seluruh wallet milik GMSOL).
 function gmsolEvents(d, extra = []) {
-  const T = { withdrawal: (h) => `Penarikan ${gmsolHas(h.sol) ? fmtNum(h.sol, 4) + ' SOL' : ''}${h.by ? ` oleh ${h.by}` : ''}`, foreign_position: (h) => `Posisi LP ${gmsolHas(h.sol) ? fmtNum(h.sol, 2) + ' SOL ' : ''}dibuka di wallet di luar buku mesin` };
+  const T = { withdrawal: (h) => `Penarikan ${gmsolHas(h.sol) ? fmtNum(h.sol, 4) + ' SOL' : ''}${h.by ? ` oleh ${h.by}` : ''} · sebelum lock, riwayat saja`, foreign_position: (h) => `Posisi LP ${gmsolHas(h.sol) ? fmtNum(h.sol, 2) + ' SOL ' : ''}di wallet di luar buku mesin · riwayat`,
+    pre_deploy_close: () => 'Posisi lama (PANGEA) ditutup sebelum deploy · riwayat, bukan untung/rugi GMSOL', pre_deploy_swap: () => 'Sisa token lama di-swap ke SOL sebelum modal dikunci · riwayat, bukan untung/rugi GMSOL' };
   // "2026-10-22 00:03:28 WIB" → "22 Okt 00:03 WIB" (sama dengan format waktu lain di halaman).
   const wib = (v) => { const m = /(\d{4})-(\d{2})-(\d{2}) (~?)(\d{2}:\d{2})/.exec(String(v || '')); return m ? `${Number(m[3])} ${M_SHORT[Number(m[2]) - 1]} ${m[4]}${m[5]} WIB` : (v || '—'); };
   const rows = [...((d.history?.preDeployHistory || d.preDeployHistory || []).map((h) => [wib(h.atWib), (T[h.type] || ((x) => x.type || 'kejadian'))(h)])), ...extra];
@@ -3933,12 +3934,21 @@ function paintGmsol() {
   const engineOk = d.status === 'ok' && d.asOf && Date.now() - d.asOf <= GMSOL_STALE_MS;
   const w = gmsolWalletFresh(d) ? (d.wallet || d.walletShared) : null;
   const e = engineOk ? (d.engine || {}) : {}, b = engineOk ? (d.brakes || {}) : {};
-  const L = d.ledger || {}, flows = L.flows || [], owners = L.owners || [], costs = L.costs;
+  // Pemilik: dari mesin kalau ada, kalau tidak dari konfigurasi Cashood (funds.json, diisi Orel).
+  const L = d.ledger || {}, allFlows = L.flows || [], owners = (L.owners || []).length ? L.owners : (state.gmsol?.owners || []), costs = L.costs;
+  // Untung/rugi GMSOL dihitung SEJAK MODAL DIKUNCI (Auditor/Strategi r4.3.x): arus
+  // sebelum lock (mis. penarikan 2 SOL, penutupan PANGEA) hanya riwayat — modal
+  // lock sudah memotongnya, jadi tidak boleh dihitung lagi.
+  const lockAt = Date.parse(d.capitalLockedAt || '') || d.t0At || d.history?.t0At || null;
+  const flows = allFlows.filter((f) => lockAt && f.t >= lockAt), preFlows = allFlows.filter((f) => !lockAt || f.t < lockAt);
   const closes = (engineOk ? d.closes : d.history?.closes) || d.closes || [];
   const all = w && Array.isArray(w.positions) ? w.positions : gmsolPositions(d);
   const real = gmsolReal(d);
   const dep = flows.filter((f) => f.type === 'deposit').reduce((t, f) => t + f.usd, 0), wd = flows.filter((f) => f.type === 'withdraw').reduce((t, f) => t + Math.abs(f.usd), 0);
-  const pnl = flows.length && real != null ? real + wd - dep : null;
+  const cap = engineOk ? (e.capitalUsd ?? d.capitalUsd) : null;
+  // Aturan Auditor: posisi mesin masih 0 (belum pernah buka/tutup) → tidak ada PnL.
+  const noPos = engineOk && !(e.openCount || 0) && !(e.closedCount || 0) && !closes.length;
+  const pnl = engineOk && !noPos && has(e.pnlUsd) ? e.pnlUsd : null, pnlPct = engineOk && !noPos && has(e.pnlPct) ? e.pnlPct : null;
   const spec = d.spec || d.history?.spec, t0 = d.t0At || d.history?.t0At;
   const mode = !engineOk ? (gmsolStopped(d) ? ['Mesin berhenti', 'sb-m-halt'] : ['Menunggu live', 'sb-m-wait']) : b.halted ? ['BERHENTI · rem total', 'sb-m-halt'] : b.dailyBlocked ? ['Rem harian aktif', 'sb-m-dry'] : all.length ? [`LIVE · ${all.length} posisi`, 'sb-m-live'] : ['LIVE · belum ada posisi', 'sb-m-live'];
   const chart = gmsolNavSvg(d, flows);
@@ -3979,7 +3989,8 @@ function paintGmsol() {
   const bar = (f, hot) => `<div class="sb-meter" aria-hidden="true"><i style="width:${(f * 100).toFixed(0)}%" class="${hot || f >= 0.75 ? 'hot' : f >= 0.4 ? 'warm' : ''}"></i></div>`;
   const hm = /\w{3} (\w{3}) (\d+) ([\d:]+) (CEST|CET|UTC) (\d{4})/.exec(d.haltNote || '');
   const haltAt = hm ? Date.parse(`${hm[1]} ${hm[2]} ${hm[5]} ${hm[3]} GMT${hm[4] === 'CEST' ? '+0200' : hm[4] === 'CET' ? '+0100' : '+0000'}`) : null;
-  const events = [...(!engineOk && d.asOf ? [[sbWib(d.asOf), 'Mesin berhenti mengirim data']] : []), ...(d.haltNote ? [[Number.isFinite(haltAt) ? sbWib(haltAt) : '—', 'Dihentikan manual untuk menutup posisi']] : []), ...flows.map((f) => [sbWib(f.t), `${f.type === 'deposit' ? 'Setoran' : 'Penarikan'} ${usd(Math.abs(f.usd))}${has(f.sol) ? ` (${fmtNum(f.sol, 4)} SOL)` : ''}${f.by ? ` · ${f.by}` : ''}`])];
+  const events = [...(!engineOk && d.asOf ? [[sbWib(d.asOf), 'Mesin berhenti mengirim data']] : []), ...(d.haltNote ? [[Number.isFinite(haltAt) ? sbWib(haltAt) : '—', 'Dihentikan manual untuk menutup posisi']] : []), ...(lockAt ? [[sbWib(lockAt), `Modal dikunci${has(cap) ? ` ${usd(cap)}` : ''} — untung/rugi dihitung mulai di sini`]] : []),
+    ...allFlows.map((f) => [sbWib(f.t), `${f.type === 'deposit' ? 'Setoran' : 'Penarikan'} ${usd(Math.abs(f.usd))}${has(f.sol) ? ` (${fmtNum(f.sol, 4)} SOL)` : ''}${f.by ? ` · ${f.by}` : ''}${lockAt && f.t < lockAt ? ' · sebelum lock, riwayat saja' : ''}`])];
   setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${mode[1]}"><i></i>${esc(mode[0])}</span></div>
       ${!engineOk ? `<p class="miss" role="status"><b>${esc(mode[0])}.</b> ${d.asOf ? `Data terakhir dari mesin ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}). ` : ''}Angka mesin (buku, rem, screening) disembunyikan sampai mesin jalan lagi; uang di wallet tetap dipantau langsung dari blockchain.</p>` : ''}
       ${d.haltNote ? `<p class="hint">Catatan berhenti: ${esc(d.haltNote)}</p>` : ''}
@@ -3989,13 +4000,14 @@ function paintGmsol() {
       <p class="hint">${spec ? `${esc(spec)} · ` : ''}${t0 ? `live sejak ${esc(sbWib(t0))} · ` : ''}${w ? `wallet dibaca ${esc(ago(w.asOf))}` : ''}</p></section>
     <div class="stats sb-top">${[
       tile('Nilai sekarang', real == null ? NA : usd(real), w ? `${has(w.freeSol) ? `${fmtNum(w.freeSol, 4)} SOL lepas` : ''}${has(w.lpValueUsd) && Number(w.lpValueUsd) > 0 ? ` + ${usd(w.lpValueUsd, 0)} di LP` : ''} · seluruh wallet` : 'menunggu data'),
-      tile('Modal masuk', flows.length ? usd(dep) : NA, flows.length ? `${flows.filter((f) => f.type === 'deposit').length} setoran tercatat` : 'arus modal belum dikirim mesin'),
-      tile('Sudah ditarik', flows.length ? usd(wd) : NA, flows.length ? `${flows.filter((f) => f.type === 'withdraw').length} penarikan tercatat` : 'arus modal belum dikirim mesin'),
-      tile('Untung / rugi', pnl == null ? NA : signed(pnl), pnl == null ? 'butuh arus modal' : `${dep ? `${pnl >= 0 ? '+' : ''}${pct((pnl / dep) * 100)} dari modal` : ''} · nilai + ditarik − modal`, cls(pnl ?? 0)),
+      tile('Modal (dikunci)', has(cap) ? usd(cap) : NA, has(cap) ? `dikunci ${lockAt ? esc(sbWib(lockAt)) : '—'}${dep ? ` · + setoran ${usd(dep)}` : ''}${real != null && real - cap > 0.5 ? ` · ${usd(real - cap)} di luar modal (cadangan gas)` : ''}` : (engineOk ? 'menunggu lock modal' : 'tampil saat mesin jalan')),
+      tile('Sudah ditarik', engineOk ? usd(wd) : NA, engineOk ? (wd ? `${flows.filter((f) => f.type === 'withdraw').length} penarikan sejak modal dikunci` : 'belum ada penarikan sejak modal dikunci') : 'tampil saat mesin jalan'),
+      tile('Untung / rugi', noPos ? '<span class="dim">belum ada PnL</span>' : pnl == null ? NA : signed(pnl), noPos ? 'mesin belum membuka posisi sejak modal dikunci' : pnl == null ? 'dihitung sejak modal dikunci; tampil saat mesin jalan' : `${has(pnlPct) ? `${pnlPct >= 0 ? '+' : ''}${pct(pnlPct)} ` : ''}sejak modal dikunci · buku mesin − modal`, cls(pnl ?? 0)),
     ].join('')}</div>
     <section class="card"><div class="card-head"><h2>Pembagian saham</h2><span class="hint">${owners.length ? `${owners.length} pemilik` : ''}</span></div>
-      ${owners.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pemilik</th><th class="num">Saham</th><th class="num">Setoran</th><th class="num">Ditarik</th><th class="num">Nilai sekarang</th><th class="num">Untung / rugi</th></tr></thead><tbody>
-        ${owners.map((o) => { const v = real != null && has(o.sharePct) ? real * o.sharePct / 100 : null; const pl = v != null && has(o.depositedUsd) ? v + (o.withdrawnUsd || 0) - o.depositedUsd : null; return `<tr><td class="mc-head"><b>${esc(o.name)}</b></td><td class="num" data-k="Saham">${has(o.sharePct) ? pct(o.sharePct, 2) : '—'}</td><td class="num" data-k="Setoran">${$u(o.depositedUsd)}</td><td class="num" data-k="Ditarik">${has(o.withdrawnUsd) ? usd(o.withdrawnUsd) : '—'}</td><td class="num" data-k="Nilai sekarang"><b>${v == null ? '—' : usd(v)}</b></td><td class="num ${cls(pl ?? 0)}" data-k="Untung / rugi">${pl == null ? '—' : signed(pl)}</td></tr>`; }).join('')}</tbody></table></div>`
+      ${owners.length ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pemilik</th><th class="num">Saham</th><th class="num">Modal</th><th class="num">Ditarik</th><th class="num">Nilai sekarang</th><th class="num">Untung / rugi</th></tr></thead><tbody>
+        ${owners.map((o) => { const sh = has(o.sharePct) ? o.sharePct / 100 : null; const eq = engineOk ? (e.equityUsd ?? null) : null; const v = sh != null && has(eq) ? eq * sh : null; const m = sh != null && has(cap) ? (cap + dep) * sh : null; const pl = sh != null && has(pnl) ? pnl * sh : null; return `<tr><td class="mc-head"><b>${esc(o.name)}</b>${o.note ? `<div class="sub2">${esc(o.note)}</div>` : ''}</td><td class="num" data-k="Saham">${has(o.sharePct) ? pct(o.sharePct, 2) : '—'}</td><td class="num" data-k="Setoran">${m == null ? NA : usd(m)}</td><td class="num" data-k="Ditarik">${sh != null && engineOk ? usd(wd * sh) : '—'}</td><td class="num" data-k="Nilai sekarang"><b>${v == null ? NA : usd(v)}</b></td><td class="num ${cls(pl ?? 0)}" data-k="Untung / rugi">${pl == null ? '—' : signed(pl)}</td></tr>`; }).join('')}</tbody></table></div>
+        <p class="hint">Dihitung sejak modal dikunci: setoran = modal lock${dep ? ' + setoran sesudahnya' : ''}, nilai = buku mesin. Saldo di luar modal (cadangan gas) tidak dibagi.</p>`
         : '<p class="dim">Menunggu data pemilik dari mesin (nama pemilik, persen saham, setoran, penarikan).</p>'}</section>
     <section class="card"><div class="card-head"><div class="seg tabs2"><button class="on" tabindex="-1">Nilai wallet</button></div><span class="hint">${chart.hint}</span></div>
       <div class="controls"><div class="seg" id="gsRange" role="group" aria-label="Rentang grafik">${[[24, '24 jam'], [168, '7 hari'], [0, 'semua']].map(([h, l]) => `<button data-h="${h}" class="${gsView.hours === h ? 'on' : ''}">${l}</button>`).join('')}</div></div>
@@ -4013,8 +4025,8 @@ function paintGmsol() {
     <section class="card"><div class="card-head"><h2>Token di wallet</h2><span class="hint">dibaca dari blockchain</span></div>
       ${w ? `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Token</th><th class="num">Jumlah</th><th class="num">Harga</th><th class="num">Nilai</th></tr></thead><tbody>
         <tr><td class="mc-head"><b>SOL</b></td><td class="num" data-k="Jumlah">${has(w.freeSol) ? fmtNum(w.freeSol, 4) : '—'}</td><td class="num" data-k="Harga">${has(w.solPriceUsd) ? usd(w.solPriceUsd) : '—'}</td><td class="num" data-k="Nilai"><b>${has(w.freeSolUsd) ? usd(w.freeSolUsd) : '—'}</b></td></tr>
-        ${(Array.isArray(w.tokens) ? w.tokens : []).map((t) => `<tr><td class="mc-head"><b>${esc(t.symbol || '—')}</b></td><td class="num" data-k="Jumlah">${has(t.amount) ? fmtNum(t.amount, 4) : '—'}</td><td class="num" data-k="Harga">${has(t.priceUsd) ? sbPx(t.priceUsd) : '—'}</td><td class="num" data-k="Nilai">${has(t.usd) ? usd(t.usd) : '<span class="dim">tanpa harga</span>'}</td></tr>`).join('')}
-        </tbody></table></div>${!Array.isArray(w.tokens) && has(w.tokensUnpriced) && w.tokensUnpriced ? `<p class="hint">${w.tokensUnpriced} token lain di wallet belum dirinci (menunggu data token dari mesin).</p>` : ''}` : `<p class="dim">${NA}</p>`}</section>
+        ${(Array.isArray(w.tokens) ? w.tokens : []).map((t) => `<tr class="gs-foreign"><td class="mc-head"><b>${esc(t.symbol || t.id || '—')}</b>${t.symbol && t.id ? `<div class="sub2">${esc(t.id)}</div>` : ''}</td><td class="num" data-k="Jumlah">${has(t.amount) ? fmtNum(t.amount, 6) : '—'}</td><td class="num" data-k="Harga">${has(t.priceUsd) ? sbPx(t.priceUsd) : '<span class="dim">tanpa harga</span>'}</td><td class="num" data-k="Nilai">$0 <div class="sub2">${has(t.quotedUsd) && t.quotedUsd > 0 ? `kutipan ${usd(t.quotedUsd)} · info` : 'tidak dihitung'}</div></td></tr>`).join('')}
+        </tbody></table></div>${Array.isArray(w.tokens) && w.tokens.length ? `<p class="hint">${w.tokens.length} token selain SOL dihitung <b>$0</b> untuk nilai, untung/rugi, dan grafik GMSOL (aturan Auditor); kutipan harganya${has(w.tokensQuotedUsd) ? ` (total ${usd(w.tokensQuotedUsd)})` : ''} hanya info.${has(w.tokensUnpriced) && w.tokensUnpriced ? ` ${w.tokensUnpriced} token belum punya harga.` : ''}</p>` : has(w.tokensUnpriced) && w.tokensUnpriced ? `<p class="hint">${w.tokensUnpriced} token lain di wallet belum dirinci.</p>` : ''}` : `<p class="dim">${NA}</p>`}</section>
     <section class="card"><div class="card-head"><h2>Posisi LP <span class="count">(${all.length})</span></h2><span class="hint">semua posisi di wallet GMSOL</span></div>
       ${all.length ? `<div class="stats lp-sum n5">${[tile('Nilai posisi', usd(posVal), 'dari blockchain'), tile('Modal masuk', usd(posInv), 'ke posisi'), tile('Fee terkumpul', usd(posFee), 'diklaim + belum', 'pos'), tile('Untung / rugi', sbUsd(posU), 'termasuk fee', cls(posU)), tile('Di dalam range', `${inR}/${all.length}`, 'posisi')].join('')}</div>` : ''}
       ${gmsolPosTable(all, w)}</section>
