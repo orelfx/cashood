@@ -104,7 +104,7 @@ let EXCL_ITEMS = [];
 const GAPS = (j) => ['Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.',
   'Status dokumen spec mesin belum diterbitkan: menunggu perbaikan pemetaan status.',
   num(j?.costs?.gasUsd) != null ? 'costs.gasUsd hanya mencakup posisi yang sudah ditutup (gas posisi terbuka dan bacaan null tidak dihitung).' : null].filter(Boolean).join(' ');
-const withGaps = (W, j) => (W ? { ...W, gaps: GAPS(j), tokens: Array.isArray(W.tokens) ? mapExcluded(W.tokens, EXCL_ITEMS) : W.tokens } : W); // juga untuk pembacaan cache
+const withGaps = (W, j) => (W ? { ...W, label: 'Isi wallet, termasuk cadangan 0,3 SOL', note: 'Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.', gaps: GAPS(j), tokens: Array.isArray(W.tokens) ? mapExcluded(W.tokens, EXCL_ITEMS) : W.tokens } : W); // juga untuk pembacaan cache
 const historyFields = (j) => ({
   closes: (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow),
   preDeployHistory: preDeploy(j), excludedTokens: excluded(j),
@@ -200,7 +200,7 @@ async function walletShared(engineState) {
     const sum = (k) => (pos.some((p) => p[k] == null) ? null : r2(pos.reduce((a, p) => a + p[k], 0)));
     const lp = sum('valueUsd'), unc = sum('unclaimedFeesUsd'), solUsd = r2(solBal * solPx);
     const m2closed = Object.values(m2s).filter((x) => x.closed);
-    return { label: 'Aset GMSOL (wallet)', note: 'Seluruh isi wallet GMSOL: SOL bebas + posisi LP + fee belum diklaim. Angka utama (headline) GMSOL.',
+    return { label: 'Isi wallet, termasuk cadangan 0,3 SOL', note: 'Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.',
       asOf: now, source: 'RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)', solPriceUsd: r2(solPx), freeSol: Number(solBal.toFixed(4)), freeSolUsd: solUsd,
       tokens: tk.tokens, tokensUsd: tk.tokensUsd, tokensQuotedUsd: tk.tokensQuotedUsd ?? null, tokensUnpriced: tk.tokensUnpriced, tokensNote: 'semua token dihitung $0 untuk nilai/PnL/grafik; quotedUsd hanya info', tokensError: tk.tokensError,
       lpValueUsd: lp, unclaimedFeesUsd: unc, claimedFeesUsd: sum('claimedFeesUsd'), uPnlUsd: sum('uPnlUsd'), uPnlExclFeesUsd: sum('uPnlExclFeesUsd'),
@@ -209,7 +209,7 @@ async function walletShared(engineState) {
       openCount: pos.length, positions: pos,
       closedCount: { manualTracked: m2closed.length, engine: Array.isArray(engineState?.closes) ? engineState.closes.length : null },
       winRatePct: null, pnlHistory: null, gaps: 'Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.' };
-  } catch (e) { return { label: 'Aset GMSOL (wallet)', asOf: now, totalAssetsUsd: null, positions: [], error: text(e.message, 80) }; }
+  } catch (e) { return { label: 'Isi wallet, termasuk cadangan 0,3 SOL', asOf: now, totalAssetsUsd: null, positions: [], error: text(e.message, 80) }; }
 }
 const goLive = (j) => time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At) ?? time(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.created);
 const v3Fields = (j) => {
@@ -269,6 +269,6 @@ try {
       realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd), totalFloorUsd: r2(j.brakes?.totalFloorUsd), dayFloorUsd: r2(j.brakes?.dayFloorUsd), maxOpen: num(j.sizing?.maxOpen), openCount: seats.length, closedCount: closes.length,
       winRatePct: closes.length ? r2(closes.filter((c) => c.netUsd > 0).length / closes.length * 100) : null },
     ledger: ledgerFields(j), history: historyFields(j),
-    ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, walletCurve: walletCurve(w), headline: { label: 'Aset GMSOL', usd: w?.totalAssetsUsd ?? null, source: 'wallet.totalAssetsUsd', rule: 'saldo wallet sekarang = acuan utama (Orel, 22 Okt)', pnlNote: 'Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy.' } }; })() });
+    ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, walletCurve: walletCurve(w), headline: { label: 'Aset GMSOL', usd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100), capitalUsd: CAPITAL, source: 'engine.equityUsd', pnlNote: 'Headline = equity mesin; PnL = equity - modal kunci, hanya sejak lock. Isi wallet (wallet.totalAssetsUsd, termasuk cadangan 0,3 SOL) dan riwayat sebelum deploy hanya info, tidak masuk PnL.' } }; })() });
   console.log(`[gmsol] ok ledger ${eq}`);
 } finally { release(); }

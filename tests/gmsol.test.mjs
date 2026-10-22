@@ -27,6 +27,7 @@ test('gmsol v3: kinerja dari equityLedgerUsd, wallet hanya info bersama', () => 
   assert.ok(!JSON.stringify(d).includes('DRAFT')); assert.equal(d.walletSolShared, undefined);
   assert.equal(d.status, 'ok'); assert.equal(d.risk, 'high');
   assert.equal(d.equityUsd, 1195.5); assert.equal(d.pnlUsd, -4.5);
+  assert.equal(d.headline.usd, 1195.5); assert.equal(d.headline.pnlUsd, -4.5); assert.equal(d.headline.source, 'engine.equityUsd');
   assert.equal(d.preDeployHistory[0].resultUsd, -17.6); assert.equal(d.preDeployHistory[0].inPnl, false); assert.equal(d.preDeployHistory[0].note, null); assert.equal(d.pnlUsd, -4.5);
   assert.equal(d.excludedTokens.count, 1); assert.equal(d.excludedTokens.items[0].valueUsd, 0); assert.equal(d.excludedTokens.items[0].readUsd, undefined);
   assert.equal(d.brakes.totalFloorUsd, 600); assert.equal(d.sizing.maxOpen, 5);
