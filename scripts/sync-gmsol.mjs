@@ -181,6 +181,6 @@ try {
     engine: { label: 'Buku internal mesin r4.1', note: 'Buku internal mesin GMSOL r4.1 (modal dikunci saat deploy, dasar rem mesin). BUKAN angka utama; angka utama = wallet.totalAssetsUsd.', capitalUsd: CAPITAL, equityUsd: eq, pnlUsd: r2(eq - CAPITAL), pnlPct: r3((eq / CAPITAL - 1) * 100),
       realizedUsd: r2(j.realizedUsd), unrealizedUsd: r2(j.unrealizedUsd), totalFloorUsd: r2(j.brakes?.totalFloorUsd), dayFloorUsd: r2(j.brakes?.dayFloorUsd), maxOpen: num(j.sizing?.maxOpen), openCount: seats.length, closedCount: closes.length,
       winRatePct: closes.length ? r2(closes.filter((c) => c.netUsd > 0).length / closes.length * 100) : null },
-    ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, headline: { label: 'Aset GMSOL', usd: w?.totalAssetsUsd ?? null, source: 'wallet.totalAssetsUsd', rule: 'saldo wallet sekarang = acuan utama (Orel, 22 Okt)' } }; })() });
+    ...(() => { const w = WALLET; return { wallet: w, walletShared: w /* alias lama untuk app.js */, headline: { label: 'Aset GMSOL', usd: w?.totalAssetsUsd ?? null, source: 'wallet.totalAssetsUsd', rule: 'saldo wallet sekarang = acuan utama (Orel, 22 Okt)', pnlNote: 'Headline hanya nilai aset. PnL/drawdown/rem TIDAK dihitung dari angka ini vs modal; tetap dari blok engine sampai modal dikunci ulang saat r4.2 deploy.' } }; })() });
   console.log(`[gmsol] ok ledger ${eq}`);
 } finally { release(); }
