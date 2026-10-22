@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "39a9d1f8-384a-4ec0-ba96-3d6eaf910441",
-  "updatedAt": 1792644286368,
-  "generatedAt": "2026-10-22 11:44 WIB",
+  "generation": "613ed018-78fa-48a8-a4be-57cdf78365ca",
+  "updatedAt": 1792644589707,
+  "generatedAt": "2026-10-22 11:49 WIB",
   "usdIdr": null,
   "totalUsd": 907.2093651627605,
   "nativeSymbol": "SOL",
@@ -1346,12 +1346,12 @@
     "pnlUsd": -92.79063483723951,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792644286368,
+    "heartbeatAt": 1792644589707,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.13,
-    "lastScanAt": 1792644275000,
+    "lastScanAt": 1792644579000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1372,7 +1372,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "620",
+        "v": "621",
         "n": "24 jam · 2 diveto LLM"
       },
       {
@@ -1388,9 +1388,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792644286368,
+      "lastDecisionAt": 1792644589707,
       "lastAction": "keputusan",
-      "lastReason": "RETAIL [low]: Dilewati karena red flag: insider/entrapment pegang 24%."
+      "lastReason": "XMRVM [degen]: Dilewati karena red flag: bundler pegang 31% supply."
     }
   },
   "strategy": {
@@ -1421,7 +1421,7 @@
       ],
       [
         "Label wallet",
-        "smart 14692 · bot 6577 · blacklist 461 · lp 1 · fresh 1300 · kol 219 · dolphin 231 · whale 16"
+        "smart 14690 · bot 6580 · blacklist 461 · lp 1 · fresh 1299 · kol 219 · dolphin 231 · whale 16"
       ]
     ],
     "requirements": [
@@ -1477,21 +1477,21 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14692,
+          "total": 14690,
           "active": 453,
-          "passive": 14239
+          "passive": 14237
         },
         {
           "key": "bot",
-          "total": 6577,
+          "total": 6580,
           "active": 0,
-          "passive": 6577
+          "passive": 6580
         },
         {
           "key": "fresh",
-          "total": 1300,
+          "total": 1299,
           "active": 0,
-          "passive": 1300
+          "passive": 1299
         },
         {
           "key": "blacklist",
@@ -1625,6 +1625,27 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792644555526,
+        "symbol": "XMRVM",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1,
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 31% supply."
+      },
+      {
+        "at": 1792644457048,
+        "symbol": "4",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 10%."
+      },
       {
         "at": 1792644251340,
         "symbol": "RETAIL",
@@ -2374,51 +2395,6 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -66% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792632320872,
-        "symbol": "Wares",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 64,
-            "note": "bundler pegang 12.0%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 9.9%"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.6%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792632132142,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "dolphin": 2,
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 10,
-            "note": "10 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -12% di bawah harga beli wallet yang diikuti (batas −10%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2429,7 +2405,7 @@
         "wallet_left": 1,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 496,
+        "red_flag": 497,
         "round_trip_cost": 1,
         "basket_full": 0,
         "slippage": 0,
@@ -2479,7 +2455,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792644436350,
+    "generatedAt": 1792644747002,
     "trades": {
       "count": 152,
       "wins": 63,
