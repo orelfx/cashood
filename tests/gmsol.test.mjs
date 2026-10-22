@@ -94,3 +94,21 @@ test('gmsol wallet.tokens: nomor token = label excludedTokens mesin (satu sumber
   assert.ok(out.every((t) => t.usd === 0));
   assert.deepEqual(mapExcluded([], items), []);
 });
+
+test('gmsol r4.5: specDocStatus + tuningLabel di tingkat sistem, posisi terbuka apa adanya dari mesin, tanpa alamat', () => {
+  const addr = '7b6dX3nE25xrfNViEKZHL9wVJFcBxQYuWPpmzHUxx28H';
+  const d = run(src({ specDocStatus: 'audited_pass', tuningLabel: 'tuned_on_live_sample', tuningNote: 'catatan', tuningCashoodRequirement: 'wajib tampil',
+    openSeats: [{ symbol: 'PHP-SOL', lane: 'meme', openedAt: new Date(NOW - 600e3).toISOString(), basisUsd: 54.54, pnlUsd: -0.15, pnlPct: -0.269, peakPct: -0.0537, troughPct: -0.2948,
+      snaps: [[NOW - 300e3, -0.221], ['x', 1]], inRange: false, binStep: 100, bins: 70, shape: 'bid_ask', entryNote: 'lolos ' + addr, specRev: 'r4.4.1', sizeUsd: 50, rentSol: 0.0419 },
+      { symbol: 'B-SOL', basisUsd: 1 }] }));
+  assert.equal(d.specDocStatus, 'audited_pass'); assert.equal(d.tuningLabel, 'tuned_on_live_sample'); assert.equal(d.tuningNote, 'catatan');
+  const p = d.openSeats[0], q = d.openSeats[1];
+  assert.equal(p.symbol, 'PHP-SOL'); assert.equal(p.basisUsd, 54.54); assert.equal(p.pnlUsd, -0.15); assert.equal(p.inRange, false); assert.equal(p.bins, 70); assert.equal(p.shape, 'bid_ask');
+  assert.equal(p.peakPct, -0.054); assert.equal(p.troughPct, -0.295); assert.equal(p.snaps.length, 1);
+  // label tuning hanya di tingkat sistem; rev spec per posisi hanya bila mesin menulisnya
+  assert.equal(p.tuningLabel, undefined); assert.equal(p.specRev, 'r4.4.1'); assert.equal(p.sizeUsd, 50); assert.equal(p.rentSol, 0.0419);
+  assert.equal(q.specRev, null); assert.equal(q.sizeUsd, null); assert.equal(q.rentSol, null); assert.equal(q.status, null);
+  // SOL-denominated hanya diteruskan bila mesin menulisnya
+  assert.equal(d.equitySol, null); assert.equal(d.pnlSol, null);
+  assert.equal(d.headline.usd, d.equityUsd); assert.ok(!JSON.stringify(d).includes(addr));
+});

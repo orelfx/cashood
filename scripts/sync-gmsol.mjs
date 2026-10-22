@@ -102,7 +102,6 @@ const excluded = (j) => { const e = j.excludedTokens; if (!e || typeof e !== 'ob
   return { frozenAt: time(e.frozenAt), valueUsd: 0, count: items.length, note: text(e.note, 200), items }; };
 let EXCL_ITEMS = [];
 const GAPS = (j) => ['Token SPL di wallet dibaca, tapi dihitung $0 (kutipan harga hanya info, lihat tokens[].quotedUsd). Posisi DAMM v2 (NITA, terkunci permanen) tidak dihitung. Fee klaim dari on-chain kedua sisi, dinilai harga sekarang sehingga bisa beda dari tracker yang menilai saat klaim.',
-  'Status dokumen spec mesin belum diterbitkan: menunggu perbaikan pemetaan status.',
   num(j?.costs?.gasUsd) != null ? 'costs.gasUsd hanya mencakup posisi yang sudah ditutup (gas posisi terbuka dan bacaan null tidak dihitung).' : null].filter(Boolean).join(' ');
 const withGaps = (W, j) => (W ? { ...W, label: 'Isi wallet, termasuk cadangan 0,3 SOL', note: 'Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.', gaps: GAPS(j), tokens: Array.isArray(W.tokens) ? mapExcluded(W.tokens, EXCL_ITEMS) : W.tokens } : W); // juga untuk pembacaan cache
 const historyFields = (j) => ({
@@ -215,7 +214,7 @@ const goLive = (j) => time(j.capitalUsdAtDeploy?.lockedAt) ?? time(j.t0At) ?? ti
 const v3Fields = (j) => {
   const b = j.brakes || {};
   return {
-    t0At: goLive(j), spec: text(j.spec, 40), specStatus: /draft/i.test(String(j.specStatus || '')) ? null : text(j.specStatus, 30), // status draft tidak diterbitkan specHash: j.spec12 && typeof j.spec12 === 'object' ? Object.fromEntries(Object.entries(j.spec12).slice(0, 5).map(([k, v]) => [text(k, 40), text(v, 16)])) : null,
+    t0At: goLive(j), spec: text(j.spec, 40), specDocStatus: text(j.specDocStatus, 30), tuningLabel: text(j.tuningLabel, 40), tuningNote: text(j.tuningNote, 400), tuningCashoodRequirement: text(j.tuningCashoodRequirement, 200), equitySol: num(j.equitySol), pnlSol: num(j.pnlSol), specStatus: /draft/i.test(String(j.specStatus || '')) ? null : text(j.specStatus, 30), // status draft tidak diterbitkan specHash: j.spec12 && typeof j.spec12 === 'object' ? Object.fromEntries(Object.entries(j.spec12).slice(0, 5).map(([k, v]) => [text(k, 40), text(v, 16)])) : null,
     capitalUsd: CAPITAL, capitalUsdAtDeploy: num(j.capitalUsdAtDeploy?.usd) == null ? null : r2(j.capitalUsdAtDeploy.usd), capitalLockedAt: j.capitalUsdAtDeploy?.lockedAt && time(j.capitalUsdAtDeploy.lockedAt) ? new Date(time(j.capitalUsdAtDeploy.lockedAt)).toISOString() : null,
     capitalSolUsdAtLock: r2(j.capitalUsdAtDeploy?.solUsd), capitalFreeSolAtLock: num(j.capitalUsdAtDeploy?.freeSol), capitalReserveSol: num(j.capitalUsdAtDeploy?.reserveSol),
     flowsDeclaredNetUsd: r2(j.flowsDeclaredNetUsd),
@@ -257,6 +256,8 @@ try {
     return s && l && px != null && num(l.valueL) != null && num(l.unclaimedL) != null && now - (time(l.t) ?? 0) <= STALE_MS ? { s, l } : null; };
   const seats = (Array.isArray(j.openSeats) ? j.openSeats : []).slice(0, 10).map((p) => { const m = live(p);
     return { symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), pnlUsd: r2(p.pnlUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null,
+      lane: text(p.lane, 20), peakPct: r3(p.peakPct), troughPct: r3(p.troughPct), binStep: num(p.binStep), bins: num(p.bins), shape: text(p.shape, 20), entryNote: text(p.entryNote, 200), status: text(p.status ?? p.flag, 40), specRev: text(p.specRev ?? p.spec, 40), sizeUsd: r2(p.sizeUsd), rentSol: num(p.rentSol), rentUsd: r2(p.rentUsd), // hanya bila mesin memisahkannya // status hanya bila mesin menulisnya (mis. unexplained_open); tidak dikarang
+      snaps: (Array.isArray(p.snaps) ? p.snaps : []).slice(-60).filter((x) => Array.isArray(x) && num(x[0]) != null && num(x[1]) != null).map((x) => [Number(x[0]), r3(x[1])]),
       valueUsd: m ? r2((Number(m.l.valueL) + Number(m.l.unclaimedL) + (num(m.s.rentL) || 0)) / 1e9 * px) : null,
       feesUsd: m ? r2(Number(m.l.unclaimedL) / 1e9 * px + (num(m.s.claimedUsd) || 0)) : null }; });
   const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map(closeRow);
