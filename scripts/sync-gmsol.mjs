@@ -92,8 +92,16 @@ try {
   if (!asOf) wait('belum jalan — menunggu data live');
   if (now - asOf > STALE_MS) wait('Mesin berhenti, menunggu restart', asOf);
   if (eq == null) { out({ ...base, status: 'waiting', reason: 'ekuitas buku belum diketahui', asOf, ...v3Fields(j) }); console.log('[gmsol] waiting: ledger unknown'); release(); process.exit(0); }
-  const seats = (Array.isArray(j.openSeats) ? j.openSeats : []).slice(0, 10).map((p) => ({
-    symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), pnlUsd: r2(p.pnlUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null }));
+  // valueUsd/feesUsd per posisi: dari state mesin (HANYA DIBACA), pembacaan on-chain terakhir p.last.
+  // valueUsd = (likuiditas + fee belum diklaim + rent) x harga SOL; feesUsd = fee belum diklaim + fee sudah diklaim (USD saat klaim).
+  // Tidak ada pembacaan / basi (>15 menit) / harga tidak ada -> null (tidak dikarang).
+  const px = num(j.solPriceUsd), st = Object.values(readJSON(resolve(ENGINE, 'state', 'live.json'), {})?.positions || {});
+  const live = (p) => { const s = st.find((q) => time(q.openedAt) === time(p.openedAt) && text(q.name, 24) === text(p.symbol, 24)); const l = s?.last;
+    return s && l && px != null && num(l.valueL) != null && num(l.unclaimedL) != null && now - (time(l.t) ?? 0) <= STALE_MS ? { s, l } : null; };
+  const seats = (Array.isArray(j.openSeats) ? j.openSeats : []).slice(0, 10).map((p) => { const m = live(p);
+    return { symbol: text(p.symbol, 24), openedAt: time(p.openedAt), basisUsd: r2(p.basisUsd), pnlUsd: r2(p.pnlUsd), pnlPct: r3(p.pnlPct), inRange: typeof p.inRange === 'boolean' ? p.inRange : null,
+      valueUsd: m ? r2((Number(m.l.valueL) + Number(m.l.unclaimedL) + (num(m.s.rentL) || 0)) / 1e9 * px) : null,
+      feesUsd: m ? r2(Number(m.l.unclaimedL) / 1e9 * px + (num(m.s.claimedUsd) || 0)) : null }; });
   const closes = (Array.isArray(j.closeHistory) ? j.closeHistory : []).slice(0, 200).map((c) => ({
     symbol: text(c.symbol, 24), openedAt: time(c.openedAt), closedAt: time(c.closedAt), netUsd: r2(c.netUsd), netPct: r3(c.netPct), reason: text(c.reason, 80) }));
   out({ ...base, status: 'ok', asOf, ...v3Fields(j),
