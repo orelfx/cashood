@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792714935678,
+  "checkedAt": 1792715211611,
   "status": "ok",
-  "asOf": 1792714926364,
+  "asOf": 1792715195559,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.6.1",
   "specDocStatus": "audited_pass",
@@ -218,38 +218,52 @@
   },
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792714661158,
-    "solPools": 293,
-    "inactive1h": 134,
-    "checked": 159,
+    "scannedAt": 1792714988357,
+    "solPools": 301,
+    "inactive1h": 121,
+    "checked": 180,
     "passed": 0,
     "topReasons": [
       {
         "reason": "pool.fee_active_tvl_ratio",
-        "pools": 144
+        "pools": 164
       },
       {
         "reason": "pool.dlmm_params.bin_step",
-        "pools": 122
+        "pools": 134
       },
       {
         "reason": "pool.volume",
-        "pools": 110
+        "pools": 133
       },
       {
         "reason": "base.market_cap",
-        "pools": 103
+        "pools": 119
       },
       {
         "reason": "pool.unique_traders",
-        "pools": 95
+        "pools": 112
       },
       {
         "reason": "pool.tvl",
-        "pools": 70
+        "pools": 86
       }
     ],
     "closest": [
+      {
+        "symbol": "Kimchi-SOL",
+        "binStep": 50,
+        "reasons": [
+          "pool.dlmm_params.bin_step=50 !in[100,125,200,250]"
+        ]
+      },
+      {
+        "symbol": "McRib-SOL",
+        "binStep": 100,
+        "reasons": [
+          "derived.age_h=5.0057 !>=24"
+        ]
+      },
       {
         "symbol": "BTC-SOL",
         "binStep": 80,
@@ -259,30 +273,16 @@
       },
       {
         "symbol": "Kimchi-SOL",
-        "binStep": 50,
+        "binStep": 100,
         "reasons": [
-          "pool.dlmm_params.bin_step=50 !in[100,125,200,250]"
+          "pool.fee_active_tvl_ratio=0.3668 !>=0.4"
         ]
       },
       {
         "symbol": "Kimchi-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.3816 !>=0.4"
-        ]
-      },
-      {
-        "symbol": "Kimchi-SOL",
-        "binStep": 100,
-        "reasons": [
-          "pool.fee_active_tvl_ratio=0.3737 !>=0.4"
-        ]
-      },
-      {
-        "symbol": "BORDR-SOL",
-        "binStep": 100,
-        "reasons": [
-          "pool.fee_active_tvl_ratio=0.1691 !>=0.4"
+          "pool.fee_active_tvl_ratio=0.3657 !>=0.4"
         ]
       }
     ]
@@ -845,6 +845,10 @@
     },
     {
       "t": 1792714926364,
+      "usd": 961.83
+    },
+    {
+      "t": 1792715195559,
       "usd": 961.83
     }
   ],
