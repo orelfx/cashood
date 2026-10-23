@@ -1,15 +1,15 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "40642685-e71e-43d9-8dcb-8b094c6245a5",
-  "updatedAt": 1792723900629,
-  "generatedAt": "2026-10-23 09:51 WIB",
+  "generation": "863ad3a8-49aa-4056-82f2-12453f8c03b7",
+  "updatedAt": 1792724201733,
+  "generatedAt": "2026-10-23 09:56 WIB",
   "usdIdr": null,
-  "totalUsd": 899.8593470483738,
+  "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
-  "botWalletUsd": 899.8593470483738,
+  "botWalletUsd": 907.0593651627605,
   "walletUsd": 899.6247844152517,
-  "lpUsd": 0.23456263,
+  "lpUsd": 7.43458075,
   "treasuryUsd": 0,
   "holdings": [
     {
@@ -26,15 +26,14 @@
       "bookLabel": "low",
       "costUsd": 7.43458074750882,
       "investedUsd": 7.43458074750882,
-      "principalUsd": 0.23456263,
-      "valueUsd": 0.23456263,
+      "principalUsd": 7.43458075,
+      "valueUsd": 7.43458075,
       "feesUsd": 0,
       "collectedFeesUsd": 0,
-      "pnlUsd": -7.200018114386763,
-      "pnlPct": -96.84,
+      "pnlUsd": 0,
+      "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "priceUsd": 0.000015489500395759012,
-      "ageMinutes": 1314,
+      "ageMinutes": 1319,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -87,7 +86,7 @@
       "llmScore": 76,
       "peakPct": 75.57,
       "ddPct": -95.11,
-      "stale": false
+      "stale": true
     }
   ],
   "history": [
@@ -1410,18 +1409,18 @@
     "mode": "paper",
     "initialUsd": 1000,
     "cashUsd": 899.6247844152517,
-    "positionsUsd": 0.23456263,
+    "positionsUsd": 7.43458075,
     "realizedUsd": -92.94063484,
-    "unrealizedUsd": -7.20001811,
-    "pnlUsd": -100.14065295162618,
+    "unrealizedUsd": 0,
+    "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792723900629,
+    "heartbeatAt": 1792724201733,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
-    "drawdownPct": 10.85,
-    "lastScanAt": 1792723883000,
+    "drawdownPct": 10.14,
+    "lastScanAt": 1792724190000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1436,13 +1435,19 @@
       },
       {
         "k": "Belum terealisasi",
-        "v": "−$7.2000",
+        "v": "+$0.0000",
         "n": "dari posisi terbuka",
+        "tone": "pos"
+      },
+      {
+        "k": "Harga belum tersedia",
+        "v": "1",
+        "n": "posisi ditandai belum terverifikasi",
         "tone": "neg"
       },
       {
         "k": "Sinyal wallet",
-        "v": "391",
+        "v": "390",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1458,9 +1463,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792723900629,
+      "lastDecisionAt": 1792724201733,
       "lastAction": "keputusan",
-      "lastReason": "VIRTUAL [low]: Dilewati: solo_test: isolated virtual capital."
+      "lastReason": "SNOWMEI [degen]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1696,6 +1701,43 @@
     },
     "decisions": [
       {
+        "at": 1792724194973,
+        "symbol": "SNOWMEI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 4.36% supply di blok peluncuran"
+          },
+          {
+            "type": "bundler",
+            "count": 84,
+            "note": "bundler pegang 20.6%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 1.0%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792723989474,
+        "symbol": "RETARDIO",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "dolphin": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 43%."
+      },
+      {
         "at": 1792723608283,
         "symbol": "VIRTUAL",
         "action": "skip",
@@ -1753,16 +1795,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 27% supply."
-      },
-      {
-        "at": 1792723380932,
-        "symbol": "RETARDIO",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 43%."
       },
       {
         "at": 1792723274242,
@@ -2482,23 +2514,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: bundler pegang 26% supply."
-      },
-      {
-        "at": 1792712074348,
-        "symbol": "ANDURIL",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
       }
     ],
     "reasonStats": {
@@ -2509,7 +2524,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 337,
+        "red_flag": 336,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2555,12 +2570,14 @@
     }
   },
   "quality": {
-    "complete": true,
-    "reasons": []
+    "complete": false,
+    "reasons": [
+      "1 posisi tanpa harga masuk/mark; nilainya dari catatan paper"
+    ]
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792723951378,
+    "generatedAt": 1792724240628,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2601,25 +2618,25 @@
     "equity": {
       "days": 17,
       "spanDays": 17.1,
-      "returnPct": -9.07,
+      "returnPct": -8.34,
       "maxDrawdownPct": 9.07,
-      "maxDrawdownAt": 1792723900629,
+      "maxDrawdownAt": 1792723597492,
       "maxDrawdownUsd": 89.77,
       "maxDrawdownPeakUsd": 989.63,
       "maxDrawdownTroughUsd": 899.86,
-      "currentDrawdownPct": 9.07,
-      "currentDrawdownUsd": 89.77,
+      "currentDrawdownPct": 8.34,
+      "currentDrawdownUsd": 82.57,
       "positiveDaysPct": 41.18,
       "bestDayPct": 1.18,
       "worstDayPct": -3.87,
-      "sharpe": -8.44,
-      "sortino": -8.27,
+      "sharpe": -7.69,
+      "sortino": -7.66,
       "calmar": null,
       "since": 1791244607698
     },
-    "profitUsd": -100.14,
-    "profitPct": -10.01,
-    "recoveryFactor": -1.12,
+    "profitUsd": -92.94,
+    "profitPct": -9.29,
+    "recoveryFactor": -1.04,
     "score": {
       "axes": {
         "winRate": 42,
