@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4b4963fe-e364-4263-9a7d-95aa838f89a3",
-  "updatedAt": 1792742314134,
-  "generatedAt": "2026-10-23 14:58 WIB",
+  "generation": "c007a5a9-89f8-4b9b-8e4c-558cfb29cc3f",
+  "updatedAt": 1792742616303,
+  "generatedAt": "2026-10-23 15:03 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 1621,
+      "ageMinutes": 1626,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1415,12 +1415,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792742314134,
+    "heartbeatAt": 1792742616303,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792742296000,
+    "lastScanAt": 1792742598000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1463,9 +1463,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792742314134,
+      "lastDecisionAt": 1792742616303,
       "lastAction": "keputusan",
-      "lastReason": "NULL [degen]: Dilewati karena red flag: bundler pegang 36.77% supply."
+      "lastReason": "WHEEL [degen]: Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1496,7 +1496,7 @@
       ],
       [
         "Label wallet",
-        "smart 14532 · bot 6771 · blacklist 476 · lp 1 · fresh 1309 · kol 225 · dolphin 197 · whale 15 · unknown 1"
+        "smart 14529 · bot 6774 · blacklist 476 · lp 1 · fresh 1309 · kol 225 · dolphin 197 · whale 15 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1552,15 +1552,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14532,
+          "total": 14529,
           "active": 501,
-          "passive": 14031
+          "passive": 14028
         },
         {
           "key": "bot",
-          "total": 6771,
+          "total": 6774,
           "active": 0,
-          "passive": 6771
+          "passive": 6774
         },
         {
           "key": "fresh",
@@ -1706,6 +1706,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792742510572,
+        "symbol": "WHEEL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792740876573,
         "symbol": "NULL",
@@ -2351,35 +2361,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 15%."
-      },
-      {
-        "at": 1792716224363,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma 2.9% dari market cap."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 51,
+        "below_entry": 52,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 290,
+        "red_flag": 289,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2432,7 +2424,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792742539286,
+    "generatedAt": 1792742824013,
     "trades": {
       "count": 152,
       "wins": 63,
