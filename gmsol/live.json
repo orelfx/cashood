@@ -4,17 +4,17 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792745545288,
+  "checkedAt": 1792745849846,
   "status": "ok",
-  "asOf": 1792745531497,
+  "asOf": 1792745832845,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.7.9",
   "specDocStatus": "audited_pass",
   "tuningLabel": "tuned_on_live_sample",
   "tuningNote": "Ambang diturunkan dari snapshot pasar 22 Okt malam (r4.4.1: 0 dari 311 pool lolos) dan pool yang dipilih Meridian. Ini PENGECUALIAN atas aturan anti-retune, disetujui Master berdasarkan kebebasan desain dari Orel. Bukan hasil kalibrasi/OOS; edge belum terbukti.",
   "tuningCashoodRequirement": "label tuned_on_live_sample WAJIB ditampilkan di Cashood (tab GMSOL) untuk semua posisi di bawah r4.5",
-  "equitySol": 9.212839,
-  "pnlSol": 0.000162,
+  "equitySol": 9.211306,
+  "pnlSol": -0.001371,
   "specStatus": "live_pinned",
   "capitalUsdAtDeploy": 961.86,
   "capitalLockedAt": "2026-10-22T13:56:11.712Z",
@@ -218,35 +218,35 @@
   },
   "execErrors": 0,
   "screening": {
-    "scannedAt": 1792745489185,
+    "scannedAt": 1792745807521,
     "solPools": 555,
-    "inactive1h": 11,
-    "checked": 544,
+    "inactive1h": 23,
+    "checked": 532,
     "passed": 0,
     "topReasons": [
       {
         "reason": "pool.volume",
-        "pools": 465
+        "pools": 450
       },
       {
         "reason": "pool.fee_active_tvl_ratio",
-        "pools": 437
+        "pools": 424
       },
       {
         "reason": "pool.unique_traders",
-        "pools": 393
+        "pools": 388
       },
       {
         "reason": "pool.tvl",
-        "pools": 359
+        "pools": 350
       },
       {
         "reason": "base.organic_score",
-        "pools": 327
+        "pools": 319
       },
       {
         "reason": "base.market_cap",
-        "pools": 191
+        "pools": 189
       }
     ],
     "closest": [
@@ -254,7 +254,14 @@
         "symbol": "McRib-SOL",
         "binStep": 100,
         "reasons": [
-          "derived.age_h=13.4504 !>=24"
+          "derived.age_h=13.5413 !>=24"
+        ]
+      },
+      {
+        "symbol": "McRib-SOL",
+        "binStep": 125,
+        "reasons": [
+          "derived.age_h=13.5413 !>=24"
         ]
       },
       {
@@ -268,21 +275,14 @@
         "symbol": "BLACKTOBER-SOL",
         "binStep": 100,
         "reasons": [
-          "pool.volume=1726.4295 !>=3000"
+          "pool.volume=1713.0736 !>=3000"
         ]
       },
       {
         "symbol": "pill-SOL",
         "binStep": 200,
         "reasons": [
-          "pool.fee_active_tvl_ratio=0.0511 !>=0.1"
-        ]
-      },
-      {
-        "symbol": "LUKE-SOL",
-        "binStep": 100,
-        "reasons": [
-          "pool.fee_active_tvl_ratio=0.0932 !>=0.1"
+          "pool.fee_active_tvl_ratio=0.0442 !>=0.1"
         ]
       }
     ]
@@ -298,18 +298,47 @@
     "totalFloorUsd": 480.93,
     "dailyBlocked": false,
     "dailyBlockedUntil": null,
-    "dayChangePct": -0.002,
+    "dayChangePct": -0.052,
     "dayStartLedgerUsd": null,
     "dayFloorUsd": 721.39,
     "gateUnknownBlock": false,
     "halted": false
   },
-  "equityUsd": 961.83,
-  "pnlUsd": -0.03,
-  "pnlPct": -0.003,
+  "equityUsd": 961.35,
+  "pnlUsd": -0.51,
+  "pnlPct": -0.053,
   "realizedUsd": -0.02,
-  "unrealizedUsd": 0,
-  "openSeats": [],
+  "unrealizedUsd": -0.48,
+  "openSeats": [
+    {
+      "symbol": "ヤギ-SOL",
+      "openedAt": 1792745779699,
+      "basisUsd": 293.09,
+      "pnlUsd": -0.48,
+      "pnlPct": -0.055,
+      "inRange": true,
+      "lane": "meme",
+      "peakPct": -0.055,
+      "troughPct": -0.055,
+      "binStep": 100,
+      "bins": 70,
+      "shape": "bid_ask",
+      "entryNote": "ヤギ-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y.",
+      "status": null,
+      "specRev": "r4.7.4",
+      "sizeUsd": 288.55,
+      "rentSol": 0.0419,
+      "rentUsd": null,
+      "snaps": [
+        [
+          1792745827585,
+          -0.055
+        ]
+      ],
+      "valueUsd": 292.61,
+      "feesUsd": 0
+    }
+  ],
   "closes": [
     {
       "symbol": "PHP-SOL",
@@ -1254,6 +1283,10 @@
     {
       "t": 1792745531497,
       "usd": 961.83
+    },
+    {
+      "t": 1792745832845,
+      "usd": 961.35
     }
   ],
   "engine": {
@@ -1261,15 +1294,15 @@
     "note": "Buku mesin GMSOL: modal dikunci saat deploy; PnL = equity - modal kunci, hanya sejak lock. Riwayat sebelum deploy tidak masuk PnL.",
     "capitalLockedAt": "2026-10-22T13:56:11.712Z",
     "capitalUsd": 961.86,
-    "equityUsd": 961.83,
-    "pnlUsd": -0.03,
-    "pnlPct": -0.003,
+    "equityUsd": 961.35,
+    "pnlUsd": -0.51,
+    "pnlPct": -0.053,
     "realizedUsd": -0.02,
-    "unrealizedUsd": 0,
+    "unrealizedUsd": -0.48,
     "totalFloorUsd": 480.93,
     "dayFloorUsd": 721.39,
     "maxOpen": 8,
-    "openCount": 0,
+    "openCount": 1,
     "closedCount": 1,
     "winRatePct": 0
   },
@@ -3228,9 +3261,9 @@
   ],
   "headline": {
     "label": "Aset GMSOL",
-    "usd": 961.83,
-    "pnlUsd": -0.03,
-    "pnlPct": -0.003,
+    "usd": 961.35,
+    "pnlUsd": -0.51,
+    "pnlPct": -0.053,
     "capitalUsd": 961.86,
     "source": "engine.equityUsd",
     "pnlNote": "Headline = equity mesin; PnL = equity - modal kunci, hanya sejak lock. Isi wallet (wallet.totalAssetsUsd, termasuk cadangan 0,3 SOL) dan riwayat sebelum deploy hanya info, tidak masuk PnL."
