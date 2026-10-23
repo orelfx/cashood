@@ -1,9 +1,9 @@
 {
   "fund": "dgsol",
   "schemaVersion": 2,
-  "generation": "8b4213ea-9ddf-4b7d-b3b9-9188fdb1aa3a",
-  "updatedAt": 1792726334000,
-  "generatedAt": "2026-10-23 10:32 WIB",
+  "generation": "dbd46d78-6c55-4713-be6d-2e6b1ee4043d",
+  "updatedAt": 1792726639000,
+  "generatedAt": "2026-10-23 10:37 WIB",
   "usdIdr": null,
   "totalUsd": 451.9699,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": -2.66,
       "entryPriceUsd": 0.00007214589045089647,
       "priceUsd": 0.00007023,
-      "ageMinutes": 3493,
+      "ageMinutes": 3498,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -60,7 +60,7 @@
       "pnlPct": -9.27,
       "entryPriceUsd": 0.0008045667502271757,
       "priceUsd": 0.00073,
-      "ageMinutes": 3277,
+      "ageMinutes": 3282,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -86,7 +86,7 @@
       "pnlPct": -18.46,
       "entryPriceUsd": 0.0030854907305539144,
       "priceUsd": 0.002516,
-      "ageMinutes": 785,
+      "ageMinutes": 790,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -112,7 +112,7 @@
       "pnlPct": 0.84,
       "entryPriceUsd": 0.0004214777574114343,
       "priceUsd": 0.000425,
-      "ageMinutes": 95,
+      "ageMinutes": 100,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -138,7 +138,7 @@
       "pnlPct": 7.08,
       "entryPriceUsd": 0.000339291590782522,
       "priceUsd": 0.0003633,
-      "ageMinutes": 94,
+      "ageMinutes": 99,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -548,7 +548,7 @@
     "pnlUsd": -548.0301,
     "paused": false,
     "startedAt": 1791029940000,
-    "heartbeatAt": 1792726334000,
+    "heartbeatAt": 1792726639000,
     "status": "running",
     "healthy": true,
     "peakUsd": 1806.3426,
@@ -619,7 +619,7 @@
       ],
       [
         "keputusan copydesk",
-        "55 copy · 1112 skip sejak 17 Okt 16:02 WIB"
+        "55 copy · 1119 skip sejak 17 Okt 16:02 WIB"
       ],
       [
         "ditolak judge",
@@ -627,7 +627,7 @@
       ],
       [
         "diblok cek aman",
-        "131 · terakhir XMR 23/10 10:14 WIB: mint authority open; danger: Mint Authority still enabled; risk score 71"
+        "133 · terakhir Pepper 23/10 10:33 WIB: RugCheck report not available"
       ],
       [
         "leader aktif",
@@ -635,7 +635,7 @@
       ],
       [
         "sinyal masuk",
-        "1162 · 799 dari leader, 363 dari radar"
+        "1169 · 806 dari leader, 363 dari radar"
       ]
     ],
     "requirements": [
@@ -653,6 +653,55 @@
   "copyTrade": {
     "wallets": null,
     "decisions": [
+      {
+        "at": 1792726387000,
+        "symbol": "GATO",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: pump.fun coin mcap $3,255,941 outside $10k-$1M"
+      },
+      {
+        "at": 1792726385000,
+        "symbol": "TOKENL",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: liquidity not reported (bonding curve?) - exits can't be modeled"
+      },
+      {
+        "at": 1792726385000,
+        "symbol": "Pepper",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "safety: RugCheck report not available"
+      },
+      {
+        "at": 1792726351000,
+        "symbol": "tanpa simbol",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
+      },
+      {
+        "at": 1792726351000,
+        "symbol": "NIO",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "safety: danger: Creator history of rugged tokens"
+      },
+      {
+        "at": 1792726348000,
+        "symbol": "tanpa simbol",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
+      },
+      {
+        "at": 1792726347000,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "Leader S",
+        "reason": "fact cut: pump.fun coin mcap $11,640,085 outside $10k-$1M"
+      },
       {
         "at": 1792725734000,
         "symbol": "POOT",
@@ -953,62 +1002,13 @@
         "action": "skip",
         "basket": "radar",
         "reason": "fact cut: liquidity not reported (bonding curve?) - exits can't be modeled"
-      },
-      {
-        "at": 1792718168000,
-        "symbol": "tanpa simbol",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "stale alert"
-      },
-      {
-        "at": 1792718168000,
-        "symbol": "Pepper",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "safety: check_sol timeout >120s (fail closed)"
-      },
-      {
-        "at": 1792718045000,
-        "symbol": "Kim",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "safety: top10 non-pool 34.5% > 30%"
-      },
-      {
-        "at": 1792718043000,
-        "symbol": "tanpa simbol",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "already holding"
-      },
-      {
-        "at": 1792718043000,
-        "symbol": "OPEQ",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "safety: check_sol timeout >120s (fail closed)"
-      },
-      {
-        "at": 1792717920000,
-        "symbol": "MEOWOS",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "safety: top10 non-pool 36.0% > 30%"
-      },
-      {
-        "at": 1792717916000,
-        "symbol": "DRMR",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "safety: check_sol timeout >120s (fail closed)"
       }
     ],
     "reasonStats": {
       "skip": {
-        "cek aman gagal": 78,
-        "fact cut": 229,
         "beli leader terlalu kecil": 2,
+        "fact cut": 230,
+        "cek aman gagal": 79,
         "jeda 24 jam": 12,
         "sudah pegang": 6,
         "skor judge rendah": 1,
@@ -1022,7 +1022,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792726631976,
+    "generatedAt": 1792726940117,
     "trades": {
       "count": 84,
       "wins": 34,
