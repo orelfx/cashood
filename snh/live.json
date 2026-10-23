@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "eb413110-2fb8-4958-b5f2-eaf7db1234f1",
-  "updatedAt": 1792782482790,
-  "generatedAt": "2026-10-24 02:08 WIB",
+  "generation": "1f8d5f10-8d19-44b2-9b77-88879661fc2b",
+  "updatedAt": 1792782783382,
+  "generatedAt": "2026-10-24 02:13 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 2290,
+      "ageMinutes": 2295,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1414,12 +1414,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792782482790,
+    "heartbeatAt": 1792782783382,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792782463000,
+    "lastScanAt": 1792782769000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1446,13 +1446,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "343",
+        "v": "344",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23551",
-        "n": "548 aktif"
+        "n": "549 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1462,9 +1462,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792782482790,
+      "lastDecisionAt": 1792782783382,
       "lastAction": "keputusan",
-      "lastReason": "PEERLOCK [degen]: Dilewati: unpriced_exposure."
+      "lastReason": "BTC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 69%."
     }
   },
   "strategy": {
@@ -1483,7 +1483,7 @@
       ],
       [
         "Wallet dipantau",
-        "23551 · 548 aktif"
+        "23551 · 549 aktif"
       ],
       [
         "Cadangan kas",
@@ -1495,7 +1495,7 @@
       ],
       [
         "Label wallet",
-        "smart 14454 · bot 6868 · blacklist 482 · lp 1 · fresh 1322 · kol 224 · dolphin 184 · whale 16"
+        "smart 14455 · bot 6868 · blacklist 482 · lp 1 · fresh 1322 · kol 224 · dolphin 183 · whale 16"
       ]
     ],
     "requirements": [
@@ -1544,15 +1544,15 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23551,
-      "active": 548,
-      "passive": 23003,
+      "active": 549,
+      "passive": 23002,
       "trusted": 0,
       "promising": 20,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14454,
-          "active": 516,
+          "total": 14455,
+          "active": 517,
           "passive": 13938
         },
         {
@@ -1581,9 +1581,9 @@
         },
         {
           "key": "dolphin",
-          "total": 184,
+          "total": 183,
           "active": 19,
-          "passive": 165
+          "passive": 164
         },
         {
           "key": "whale",
@@ -1700,6 +1700,48 @@
     },
     "decisions": [
       {
+        "at": 1792782556596,
+        "symbol": "BTC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 69%."
+      },
+      {
+        "at": 1792782546309,
+        "symbol": "VIRTUAL",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 4.9%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 1.3%"
+          },
+          {
+            "type": "fresh",
+            "count": 170,
+            "note": "5.9% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 1.3%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
         "at": 1792782174485,
         "symbol": "PEERLOCK",
         "action": "skip",
@@ -1740,16 +1782,6 @@
           }
         ],
         "reason": "Dilewati: unpriced_exposure."
-      },
-      {
-        "at": 1792781953918,
-        "symbol": "BTC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 69%."
       },
       {
         "at": 1792781474193,
@@ -2476,16 +2508,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792775412206,
-        "symbol": "REMARKET",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 39% supply."
       }
     ],
     "reasonStats": {
@@ -2496,7 +2518,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 297,
+        "red_flag": 298,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2549,7 +2571,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792782736193,
+    "generatedAt": 1792783042471,
     "trades": {
       "count": 152,
       "wins": 63,
