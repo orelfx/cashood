@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792774329535,
+  "checkedAt": 1792774637469,
   "status": "ok",
-  "asOf": 1792774304167,
+  "asOf": 1792774486780,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.7.12",
   "specDocStatus": "pending_audit",
@@ -298,79 +298,23 @@
     "totalFloorUsd": 480.93,
     "dailyBlocked": false,
     "dailyBlockedUntil": null,
-    "dayChangePct": -0.101,
+    "dayChangePct": -0.183,
     "dayStartLedgerUsd": null,
     "dayFloorUsd": 725.01,
     "gateUnknownBlock": false,
     "halted": false
   },
-  "equityUsd": 965.7,
-  "pnlUsd": 3.84,
-  "pnlPct": 0.399,
-  "realizedUsd": 2.53,
-  "unrealizedUsd": 1.31,
+  "equityUsd": 965.43,
+  "pnlUsd": 3.57,
+  "pnlPct": 0.371,
+  "realizedUsd": 3.05,
+  "unrealizedUsd": 0.52,
   "openSeats": [
-    {
-      "symbol": "CATE-SOL",
-      "openedAt": 1792771623861,
-      "basisUsd": 104.39,
-      "pnlUsd": 0.1,
-      "pnlPct": 0.001,
-      "inRange": true,
-      "lane": "meme",
-      "peakPct": 0.003,
-      "troughPct": -0.001,
-      "binStep": 20,
-      "bins": 70,
-      "shape": "bid_ask",
-      "entryNote": "CATE-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y.",
-      "status": null,
-      "specRev": "r4.7.12",
-      "sizeUsd": 100,
-      "rentSol": 0.0419,
-      "rentUsd": null,
-      "snaps": [
-        [
-          1792771735402,
-          -0.001
-        ],
-        [
-          1792772039484,
-          -0.001
-        ],
-        [
-          1792772361513,
-          0
-        ],
-        [
-          1792772701242,
-          0.001
-        ],
-        [
-          1792773012050,
-          0.002
-        ],
-        [
-          1792773360663,
-          0.003
-        ],
-        [
-          1792773706230,
-          0.003
-        ],
-        [
-          1792774025619,
-          0.002
-        ]
-      ],
-      "valueUsd": 104.48,
-      "feesUsd": 0.01
-    },
     {
       "symbol": "LUKE-SOL",
       "openedAt": 1792772852290,
       "basisUsd": 293.08,
-      "pnlUsd": 1.21,
+      "pnlUsd": 0.74,
       "pnlPct": -0.04,
       "inRange": true,
       "lane": "meme",
@@ -401,41 +345,45 @@
         [
           1792774025620,
           -0.04
+        ],
+        [
+          1792774329213,
+          -0.04
         ]
       ],
-      "valueUsd": 294.29,
+      "valueUsd": 293.6,
       "feesUsd": 0.05
+    }
+  ],
+  "closes": [
+    {
+      "symbol": "CATE-SOL",
+      "openedAt": 1792771623861,
+      "closedAt": 1792774472777,
+      "netUsd": 0.36,
+      "netPct": 0.342,
+      "reason": "fee_pace 0.006%/30m < 0.05%",
+      "basisUsd": 104.39,
+      "feesUsd": null,
+      "peakPct": 0.004,
+      "troughPct": -0.001,
+      "closeNote": "Laju fee terlalu rendah.",
+      "entryNote": "CATE-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y."
     },
     {
       "symbol": "McRib-SOL",
       "openedAt": 1792773840348,
+      "closedAt": 1792774434733,
+      "netUsd": 0.16,
+      "netPct": 0.149,
+      "reason": "emergency m5 -14.67% s/b 8/1",
       "basisUsd": 104.39,
-      "pnlUsd": 0.01,
-      "pnlPct": 0.011,
-      "inRange": true,
-      "lane": "meme",
+      "feesUsd": 0.04,
       "peakPct": 0.011,
       "troughPct": -0.005,
-      "binStep": 125,
-      "bins": 56,
-      "shape": "bid_ask",
-      "entryNote": "McRib-SOL: lolos filter v3.2 + anti-scam G1-G10, 56 bin bid_ask (-50%), SOL sebagai token Y.",
-      "status": null,
-      "specRev": "r4.7.12",
-      "sizeUsd": 100,
-      "rentSol": 0.0419,
-      "rentUsd": null,
-      "snaps": [
-        [
-          1792774025621,
-          -0.004
-        ]
-      ],
-      "valueUsd": 104.4,
-      "feesUsd": 0.04
-    }
-  ],
-  "closes": [
+      "closeNote": "Exit darurat: harga turun -12% dalam 5 menit dengan tekanan jual tinggi.",
+      "entryNote": "McRib-SOL: lolos filter v3.2 + anti-scam G1-G10, 56 bin bid_ask (-50%), SOL sebagai token Y."
+    },
     {
       "symbol": "KLED-SOL",
       "openedAt": 1792770692675,
@@ -2105,6 +2053,10 @@
     {
       "t": 1792774304167,
       "usd": 965.7
+    },
+    {
+      "t": 1792774486780,
+      "usd": 965.43
     }
   ],
   "engine": {
@@ -2112,17 +2064,17 @@
     "note": "Buku mesin GMSOL: modal dikunci saat deploy; PnL = equity - modal kunci, hanya sejak lock. Riwayat sebelum deploy tidak masuk PnL.",
     "capitalLockedAt": "2026-10-22T13:56:11.712Z",
     "capitalUsd": 961.86,
-    "equityUsd": 965.7,
-    "pnlUsd": 3.84,
-    "pnlPct": 0.399,
-    "realizedUsd": 2.53,
-    "unrealizedUsd": 1.31,
+    "equityUsd": 965.43,
+    "pnlUsd": 3.57,
+    "pnlPct": 0.371,
+    "realizedUsd": 3.05,
+    "unrealizedUsd": 0.52,
     "totalFloorUsd": 480.93,
     "dayFloorUsd": 725.01,
     "maxOpen": 8,
-    "openCount": 3,
-    "closedCount": 26,
-    "winRatePct": 53.85
+    "openCount": 1,
+    "closedCount": 28,
+    "winRatePct": 57.14
   },
   "ledger": {
     "flows": [],
@@ -2135,6 +2087,34 @@
   },
   "history": {
     "closes": [
+      {
+        "symbol": "CATE-SOL",
+        "openedAt": 1792771623861,
+        "closedAt": 1792774472777,
+        "netUsd": 0.36,
+        "netPct": 0.342,
+        "reason": "fee_pace 0.006%/30m < 0.05%",
+        "basisUsd": 104.39,
+        "feesUsd": null,
+        "peakPct": 0.004,
+        "troughPct": -0.001,
+        "closeNote": "Laju fee terlalu rendah.",
+        "entryNote": "CATE-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y."
+      },
+      {
+        "symbol": "McRib-SOL",
+        "openedAt": 1792773840348,
+        "closedAt": 1792774434733,
+        "netUsd": 0.16,
+        "netPct": 0.149,
+        "reason": "emergency m5 -14.67% s/b 8/1",
+        "basisUsd": 104.39,
+        "feesUsd": 0.04,
+        "peakPct": 0.011,
+        "troughPct": -0.005,
+        "closeNote": "Exit darurat: harga turun -12% dalam 5 menit dengan tekanan jual tinggi.",
+        "entryNote": "McRib-SOL: lolos filter v3.2 + anti-scam G1-G10, 56 bin bid_ask (-50%), SOL sebagai token Y."
+      },
       {
         "symbol": "KLED-SOL",
         "openedAt": 1792770692675,
@@ -2700,19 +2680,19 @@
   "wallet": {
     "label": "Isi wallet, termasuk cadangan 0,3 SOL",
     "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
-    "asOf": 1792774329535,
+    "asOf": 1792774637469,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 104.63,
-    "freeSol": 4.5215,
-    "freeSolUsd": 473.09,
+    "solPriceUsd": 104.53,
+    "freeSol": 5.5184,
+    "freeSolUsd": 576.86,
     "tokens": [
       {
         "id": null,
         "symbol": "GUST",
         "amount": 72137.264881,
-        "priceUsd": 0.000106344,
+        "priceUsd": 0.0000784862,
         "usd": 0,
-        "quotedUsd": 7.67,
+        "quotedUsd": 5.66,
         "countedUsd": 0,
         "inExcluded": false
       },
@@ -2720,9 +2700,9 @@
         "id": null,
         "symbol": "PHP",
         "amount": 10668.371015,
-        "priceUsd": 0.000342309,
+        "priceUsd": 0.000330557,
         "usd": 0,
-        "quotedUsd": 3.65,
+        "quotedUsd": 3.53,
         "countedUsd": 0,
         "inExcluded": false
       },
@@ -2730,9 +2710,9 @@
         "id": null,
         "symbol": "ヤギ",
         "amount": 1130.869667,
-        "priceUsd": 0.000855183,
+        "priceUsd": 0.000969471,
         "usd": 0,
-        "quotedUsd": 0.97,
+        "quotedUsd": 1.1,
         "countedUsd": 0,
         "inExcluded": false
       },
@@ -2740,7 +2720,7 @@
         "id": null,
         "symbol": "Pepper",
         "amount": 233.527354,
-        "priceUsd": 0.000422161,
+        "priceUsd": 0.000430202,
         "usd": 0,
         "quotedUsd": 0.1,
         "countedUsd": 0,
@@ -2750,7 +2730,7 @@
         "id": "token#14",
         "symbol": "MET",
         "amount": 0.000635,
-        "priceUsd": 0.333823,
+        "priceUsd": 0.333265,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -2760,7 +2740,7 @@
         "id": "token#2",
         "symbol": "GTA6",
         "amount": 0.051100149,
-        "priceUsd": 0.00332683,
+        "priceUsd": 0.00329674,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -2810,7 +2790,7 @@
         "id": "token#7",
         "symbol": "Jimothy",
         "amount": 0.000001,
-        "priceUsd": 0.00235486,
+        "priceUsd": 0.00237654,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -2908,15 +2888,15 @@
       }
     ],
     "tokensUsd": 0,
-    "tokensQuotedUsd": 12.39,
+    "tokensQuotedUsd": 10.39,
     "tokensUnpriced": 5,
     "tokensNote": "semua token dihitung $0 untuk nilai/PnL/grafik; quotedUsd hanya info",
     "tokensError": null,
-    "lpValueUsd": 489.44,
-    "unclaimedFeesUsd": 0.1,
+    "lpValueUsd": 389.35,
+    "unclaimedFeesUsd": 0.05,
     "claimedFeesUsd": 0,
-    "uPnlUsd": -12.32,
-    "uPnlExclFeesUsd": -12.42,
+    "uPnlUsd": -8.22,
+    "uPnlExclFeesUsd": -8.27,
     "definitions": {
       "uPnlUsd": "valueUsd + unclaimedFeesUsd + claimedFeesUsd - investedUsd (fee ikut; konvensi utama yang diaudit)",
       "uPnlExclFeesUsd": "valueUsd - investedUsd (tanpa fee; konvensi uPnL tracker)",
@@ -2925,64 +2905,47 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 962.63,
-    "openCount": 3,
+    "totalAssetsUsd": 966.26,
+    "openCount": 2,
     "positions": [
       {
         "symbol": "McRib-SOL",
         "protocol": "DLMM",
         "owner": "gmsol",
         "openedBy": "engine",
-        "ageH": 0.14,
-        "investedUsd": 104.39,
-        "valueUsd": 99.88,
-        "unclaimedFeesUsd": 0.04,
+        "ageH": 0.03,
+        "investedUsd": 104.54,
+        "valueUsd": 100.05,
+        "unclaimedFeesUsd": 0,
         "claimedFeesUsd": 0,
-        "feesUsd": 0.04,
-        "uPnlUsd": -4.47,
-        "pct": -4.281,
-        "uPnlExclFeesUsd": -4.51,
-        "pctExclFees": -4.321,
-        "inRange": true
+        "feesUsd": 0,
+        "uPnlUsd": -4.49,
+        "pct": -4.292,
+        "uPnlExclFeesUsd": -4.49,
+        "pctExclFees": -4.292,
+        "inRange": false
       },
       {
         "symbol": "LUKE-SOL",
         "protocol": "DLMM",
         "owner": "gmsol",
         "openedBy": "engine",
-        "ageH": 0.41,
+        "ageH": 0.5,
         "investedUsd": 293.08,
-        "valueUsd": 289.57,
+        "valueUsd": 289.3,
         "unclaimedFeesUsd": 0.05,
         "claimedFeesUsd": 0,
         "feesUsd": 0.05,
-        "uPnlUsd": -3.46,
-        "pct": -1.182,
-        "uPnlExclFeesUsd": -3.51,
-        "pctExclFees": -1.198,
-        "inRange": true
-      },
-      {
-        "symbol": "CATE-SOL",
-        "protocol": "DLMM",
-        "owner": "gmsol",
-        "openedBy": "engine",
-        "ageH": 0.75,
-        "investedUsd": 104.39,
-        "valueUsd": 99.99,
-        "unclaimedFeesUsd": 0.01,
-        "claimedFeesUsd": 0,
-        "feesUsd": 0.01,
-        "uPnlUsd": -4.39,
-        "pct": -4.209,
-        "uPnlExclFeesUsd": -4.4,
-        "pctExclFees": -4.218,
+        "uPnlUsd": -3.73,
+        "pct": -1.273,
+        "uPnlExclFeesUsd": -3.78,
+        "pctExclFees": -1.29,
         "inRange": true
       }
     ],
     "closedCount": {
       "manualTracked": 0,
-      "engine": 26
+      "engine": 28
     },
     "winRatePct": null,
     "pnlHistory": null,
@@ -2991,19 +2954,19 @@
   "walletShared": {
     "label": "Isi wallet, termasuk cadangan 0,3 SOL",
     "note": "Seluruh isi wallet GMSOL: SOL bebas (termasuk cadangan 0,3 SOL) + posisi LP + fee belum diklaim. BUKAN headline; headline = equity mesin sejak lock.",
-    "asOf": 1792774329535,
+    "asOf": 1792774637469,
     "source": "RPC publik + SDK DLMM + harga Jupiter publik (tanpa key)",
-    "solPriceUsd": 104.63,
-    "freeSol": 4.5215,
-    "freeSolUsd": 473.09,
+    "solPriceUsd": 104.53,
+    "freeSol": 5.5184,
+    "freeSolUsd": 576.86,
     "tokens": [
       {
         "id": null,
         "symbol": "GUST",
         "amount": 72137.264881,
-        "priceUsd": 0.000106344,
+        "priceUsd": 0.0000784862,
         "usd": 0,
-        "quotedUsd": 7.67,
+        "quotedUsd": 5.66,
         "countedUsd": 0,
         "inExcluded": false
       },
@@ -3011,9 +2974,9 @@
         "id": null,
         "symbol": "PHP",
         "amount": 10668.371015,
-        "priceUsd": 0.000342309,
+        "priceUsd": 0.000330557,
         "usd": 0,
-        "quotedUsd": 3.65,
+        "quotedUsd": 3.53,
         "countedUsd": 0,
         "inExcluded": false
       },
@@ -3021,9 +2984,9 @@
         "id": null,
         "symbol": "ヤギ",
         "amount": 1130.869667,
-        "priceUsd": 0.000855183,
+        "priceUsd": 0.000969471,
         "usd": 0,
-        "quotedUsd": 0.97,
+        "quotedUsd": 1.1,
         "countedUsd": 0,
         "inExcluded": false
       },
@@ -3031,7 +2994,7 @@
         "id": null,
         "symbol": "Pepper",
         "amount": 233.527354,
-        "priceUsd": 0.000422161,
+        "priceUsd": 0.000430202,
         "usd": 0,
         "quotedUsd": 0.1,
         "countedUsd": 0,
@@ -3041,7 +3004,7 @@
         "id": "token#14",
         "symbol": "MET",
         "amount": 0.000635,
-        "priceUsd": 0.333823,
+        "priceUsd": 0.333265,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -3051,7 +3014,7 @@
         "id": "token#2",
         "symbol": "GTA6",
         "amount": 0.051100149,
-        "priceUsd": 0.00332683,
+        "priceUsd": 0.00329674,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -3101,7 +3064,7 @@
         "id": "token#7",
         "symbol": "Jimothy",
         "amount": 0.000001,
-        "priceUsd": 0.00235486,
+        "priceUsd": 0.00237654,
         "usd": 0,
         "quotedUsd": 0,
         "countedUsd": 0,
@@ -3199,15 +3162,15 @@
       }
     ],
     "tokensUsd": 0,
-    "tokensQuotedUsd": 12.39,
+    "tokensQuotedUsd": 10.39,
     "tokensUnpriced": 5,
     "tokensNote": "semua token dihitung $0 untuk nilai/PnL/grafik; quotedUsd hanya info",
     "tokensError": null,
-    "lpValueUsd": 489.44,
-    "unclaimedFeesUsd": 0.1,
+    "lpValueUsd": 389.35,
+    "unclaimedFeesUsd": 0.05,
     "claimedFeesUsd": 0,
-    "uPnlUsd": -12.32,
-    "uPnlExclFeesUsd": -12.42,
+    "uPnlUsd": -8.22,
+    "uPnlExclFeesUsd": -8.27,
     "definitions": {
       "uPnlUsd": "valueUsd + unclaimedFeesUsd + claimedFeesUsd - investedUsd (fee ikut; konvensi utama yang diaudit)",
       "uPnlExclFeesUsd": "valueUsd - investedUsd (tanpa fee; konvensi uPnL tracker)",
@@ -3216,64 +3179,47 @@
       "unclaimedFeesUsd": "fee X+Y belum diklaim on-chain x harga sekarang",
       "claimedFeesUsd": "totalClaimedFeeX/YAmount on-chain (kedua sisi) x harga SEKARANG, bukan harga saat klaim"
     },
-    "totalAssetsUsd": 962.63,
-    "openCount": 3,
+    "totalAssetsUsd": 966.26,
+    "openCount": 2,
     "positions": [
       {
         "symbol": "McRib-SOL",
         "protocol": "DLMM",
         "owner": "gmsol",
         "openedBy": "engine",
-        "ageH": 0.14,
-        "investedUsd": 104.39,
-        "valueUsd": 99.88,
-        "unclaimedFeesUsd": 0.04,
+        "ageH": 0.03,
+        "investedUsd": 104.54,
+        "valueUsd": 100.05,
+        "unclaimedFeesUsd": 0,
         "claimedFeesUsd": 0,
-        "feesUsd": 0.04,
-        "uPnlUsd": -4.47,
-        "pct": -4.281,
-        "uPnlExclFeesUsd": -4.51,
-        "pctExclFees": -4.321,
-        "inRange": true
+        "feesUsd": 0,
+        "uPnlUsd": -4.49,
+        "pct": -4.292,
+        "uPnlExclFeesUsd": -4.49,
+        "pctExclFees": -4.292,
+        "inRange": false
       },
       {
         "symbol": "LUKE-SOL",
         "protocol": "DLMM",
         "owner": "gmsol",
         "openedBy": "engine",
-        "ageH": 0.41,
+        "ageH": 0.5,
         "investedUsd": 293.08,
-        "valueUsd": 289.57,
+        "valueUsd": 289.3,
         "unclaimedFeesUsd": 0.05,
         "claimedFeesUsd": 0,
         "feesUsd": 0.05,
-        "uPnlUsd": -3.46,
-        "pct": -1.182,
-        "uPnlExclFeesUsd": -3.51,
-        "pctExclFees": -1.198,
-        "inRange": true
-      },
-      {
-        "symbol": "CATE-SOL",
-        "protocol": "DLMM",
-        "owner": "gmsol",
-        "openedBy": "engine",
-        "ageH": 0.75,
-        "investedUsd": 104.39,
-        "valueUsd": 99.99,
-        "unclaimedFeesUsd": 0.01,
-        "claimedFeesUsd": 0,
-        "feesUsd": 0.01,
-        "uPnlUsd": -4.39,
-        "pct": -4.209,
-        "uPnlExclFeesUsd": -4.4,
-        "pctExclFees": -4.218,
+        "uPnlUsd": -3.73,
+        "pct": -1.273,
+        "uPnlExclFeesUsd": -3.78,
+        "pctExclFees": -1.29,
         "inRange": true
       }
     ],
     "closedCount": {
       "manualTracked": 0,
-      "engine": 26
+      "engine": 28
     },
     "winRatePct": null,
     "pnlHistory": null,
@@ -4974,13 +4920,18 @@
       "t": 1792774329535,
       "usd": 962.63,
       "sol": 4.5215
+    },
+    {
+      "t": 1792774637469,
+      "usd": 966.26,
+      "sol": 5.5184
     }
   ],
   "headline": {
     "label": "Aset GMSOL",
-    "usd": 965.7,
-    "pnlUsd": 3.84,
-    "pnlPct": 0.399,
+    "usd": 965.43,
+    "pnlUsd": 3.57,
+    "pnlPct": 0.371,
     "capitalUsd": 961.86,
     "source": "engine.equityUsd",
     "pnlNote": "Headline = equity mesin; PnL = equity - modal kunci, hanya sejak lock. Isi wallet (wallet.totalAssetsUsd, termasuk cadangan 0,3 SOL) dan riwayat sebelum deploy hanya info, tidak masuk PnL."
