@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "64c728cf-c03f-4de6-9ac9-4bc5664f375a",
-  "updatedAt": 1792765866340,
-  "generatedAt": "2026-10-23 21:31 WIB",
+  "generation": "b77f0887-d1d3-49bf-ad25-b3af4942fffd",
+  "updatedAt": 1792766170346,
+  "generatedAt": "2026-10-23 21:36 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 2013,
+      "ageMinutes": 2018,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1414,12 +1414,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792765866340,
+    "heartbeatAt": 1792766170346,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792765846000,
+    "lastScanAt": 1792766148000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1446,7 +1446,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "347",
+        "v": "348",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1462,9 +1462,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792765866340,
+      "lastDecisionAt": 1792766170346,
       "lastAction": "keputusan",
-      "lastReason": "GUST [low]: Dilewati: harga sudah -29% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "GUST [low]: Dilewati: explore: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1705,6 +1705,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792765987223,
+        "symbol": "GUST",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 10.4%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "10.7% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
       {
         "at": 1792765370628,
         "symbol": "GUST",
@@ -2419,16 +2446,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -29% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792742510572,
-        "symbol": "WHEEL",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -26% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2439,7 +2456,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 293,
+        "red_flag": 294,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2492,7 +2509,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792765941074,
+    "generatedAt": 1792766242156,
     "trades": {
       "count": 152,
       "wins": 63,
