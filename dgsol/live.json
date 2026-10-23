@@ -1,9 +1,9 @@
 {
   "fund": "dgsol",
   "schemaVersion": 2,
-  "generation": "54535a69-a2d2-4ff0-b957-73fbb7fd70ac",
-  "updatedAt": 1792739661000,
-  "generatedAt": "2026-10-23 14:14 WIB",
+  "generation": "69962513-23c2-44bf-a234-9247f36010b6",
+  "updatedAt": 1792740041000,
+  "generatedAt": "2026-10-23 14:20 WIB",
   "usdIdr": null,
   "totalUsd": 451.9699,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": -2.66,
       "entryPriceUsd": 0.00007214589045089647,
       "priceUsd": 0.00007023,
-      "ageMinutes": 3715,
+      "ageMinutes": 3721,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -60,7 +60,7 @@
       "pnlPct": -9.27,
       "entryPriceUsd": 0.0008045667502271757,
       "priceUsd": 0.00073,
-      "ageMinutes": 3499,
+      "ageMinutes": 3505,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -86,7 +86,7 @@
       "pnlPct": -18.46,
       "entryPriceUsd": 0.0030854907305539144,
       "priceUsd": 0.002516,
-      "ageMinutes": 1007,
+      "ageMinutes": 1013,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -112,7 +112,7 @@
       "pnlPct": 0.84,
       "entryPriceUsd": 0.0004214777574114343,
       "priceUsd": 0.000425,
-      "ageMinutes": 317,
+      "ageMinutes": 324,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -138,7 +138,7 @@
       "pnlPct": 7.08,
       "entryPriceUsd": 0.000339291590782522,
       "priceUsd": 0.0003633,
-      "ageMinutes": 316,
+      "ageMinutes": 322,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -548,7 +548,7 @@
     "pnlUsd": -548.0301,
     "paused": false,
     "startedAt": 1791029940000,
-    "heartbeatAt": 1792739661000,
+    "heartbeatAt": 1792740041000,
     "status": "running",
     "healthy": true,
     "peakUsd": 1806.3426,
@@ -619,7 +619,7 @@
       ],
       [
         "keputusan copydesk",
-        "55 copy · 1168 skip sejak 17 Okt 16:02 WIB"
+        "55 copy · 1171 skip sejak 17 Okt 16:02 WIB"
       ],
       [
         "ditolak judge",
@@ -627,7 +627,7 @@
       ],
       [
         "diblok cek aman",
-        "145 · terakhir TTWO 23/10 13:42 WIB: mint authority open; freeze authority open; danger: Mint Authority still"
+        "146 · terakhir SHIP 23/10 14:20 WIB: check_sol: top10 non-pool 40.2% > 30%; check_sol: bundle 101.5% supply d"
       ],
       [
         "leader aktif",
@@ -635,7 +635,7 @@
       ],
       [
         "sinyal masuk",
-        "1218 · 844 dari leader, 374 dari radar"
+        "1221 · 847 dari leader, 374 dari radar"
       ]
     ],
     "requirements": [
@@ -653,6 +653,27 @@
   "copyTrade": {
     "wallets": null,
     "decisions": [
+      {
+        "at": 1792740027000,
+        "symbol": "HAMR",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: liquidity not reported (bonding curve?) - exits can't be modeled"
+      },
+      {
+        "at": 1792740026000,
+        "symbol": "tanpa simbol",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
+      },
+      {
+        "at": 1792740026000,
+        "symbol": "SHIP",
+        "action": "skip",
+        "basket": "Leader O",
+        "reason": "safety: check_sol: top10 non-pool 40.2% > 30%; check_sol: bundle 101.5% supply dibeli satu blok (slot 452731913)"
+      },
       {
         "at": 1792739345000,
         "symbol": "Rork",
@@ -981,33 +1002,12 @@
         "action": "skip",
         "basket": "Leader O",
         "reason": "already holding"
-      },
-      {
-        "at": 1792727558000,
-        "symbol": "tanpa simbol",
-        "action": "skip",
-        "basket": "Leader O",
-        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
-      },
-      {
-        "at": 1792726711000,
-        "symbol": "protect",
-        "action": "skip",
-        "basket": "radar",
-        "reason": "fact cut: liquidity not reported (bonding curve?) - exits can't be modeled"
-      },
-      {
-        "at": 1792726387000,
-        "symbol": "GATO",
-        "action": "skip",
-        "basket": "Leader O",
-        "reason": "fact cut: pump.fun coin mcap $3,255,941 outside $10k-$1M"
       }
     ],
     "reasonStats": {
       "skip": {
-        "cek aman gagal": 85,
-        "fact cut": 220,
+        "cek aman gagal": 86,
+        "fact cut": 222,
         "jeda 24 jam": 11,
         "sudah pegang": 7,
         "beli leader terlalu kecil": 1,
@@ -1022,7 +1022,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792739848192,
+    "generatedAt": 1792740136513,
     "trades": {
       "count": 84,
       "wins": 34,
