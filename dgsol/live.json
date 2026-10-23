@@ -1,9 +1,9 @@
 {
   "fund": "dgsol",
   "schemaVersion": 2,
-  "generation": "c2a8d201-6f53-4fd9-9689-892a61d9bb9d",
-  "updatedAt": 1792730107000,
-  "generatedAt": "2026-10-23 11:35 WIB",
+  "generation": "52080aa6-2d08-4d6c-8701-e4b41744da75",
+  "updatedAt": 1792730743000,
+  "generatedAt": "2026-10-23 11:45 WIB",
   "usdIdr": null,
   "totalUsd": 451.9699,
   "nativeSymbol": "SOL",
@@ -34,7 +34,7 @@
       "pnlPct": -2.66,
       "entryPriceUsd": 0.00007214589045089647,
       "priceUsd": 0.00007023,
-      "ageMinutes": 3556,
+      "ageMinutes": 3566,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -60,7 +60,7 @@
       "pnlPct": -9.27,
       "entryPriceUsd": 0.0008045667502271757,
       "priceUsd": 0.00073,
-      "ageMinutes": 3340,
+      "ageMinutes": 3350,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -86,7 +86,7 @@
       "pnlPct": -18.46,
       "entryPriceUsd": 0.0030854907305539144,
       "priceUsd": 0.002516,
-      "ageMinutes": 848,
+      "ageMinutes": 858,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -112,7 +112,7 @@
       "pnlPct": 0.84,
       "entryPriceUsd": 0.0004214777574114343,
       "priceUsd": 0.000425,
-      "ageMinutes": 158,
+      "ageMinutes": 169,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -138,7 +138,7 @@
       "pnlPct": 7.08,
       "entryPriceUsd": 0.000339291590782522,
       "priceUsd": 0.0003633,
-      "ageMinutes": 157,
+      "ageMinutes": 167,
       "stopPct": 30,
       "targetPct": 30,
       "maxHoldHours": 168,
@@ -548,7 +548,7 @@
     "pnlUsd": -548.0301,
     "paused": false,
     "startedAt": 1791029940000,
-    "heartbeatAt": 1792730107000,
+    "heartbeatAt": 1792730743000,
     "status": "running",
     "healthy": true,
     "peakUsd": 1806.3426,
@@ -619,7 +619,7 @@
       ],
       [
         "keputusan copydesk",
-        "55 copy · 1129 skip sejak 17 Okt 16:02 WIB"
+        "55 copy · 1131 skip sejak 17 Okt 16:02 WIB"
       ],
       [
         "ditolak judge",
@@ -627,7 +627,7 @@
       ],
       [
         "diblok cek aman",
-        "137 · terakhir USDF 23/10 11:34 WIB: top10 non-pool 42.6% > 30%"
+        "138 · terakhir SUPERCORE 23/10 11:41 WIB: top10 non-pool 30.9% > 30%"
       ],
       [
         "leader aktif",
@@ -635,7 +635,7 @@
       ],
       [
         "sinyal masuk",
-        "1179 · 815 dari leader, 364 dari radar"
+        "1181 · 816 dari leader, 365 dari radar"
       ]
     ],
     "requirements": [
@@ -653,6 +653,20 @@
   "copyTrade": {
     "wallets": null,
     "decisions": [
+      {
+        "at": 1792730671000,
+        "symbol": "FLOOD",
+        "action": "skip",
+        "basket": "radar",
+        "reason": "fact cut: pool age 0.2h < 0.25h"
+      },
+      {
+        "at": 1792730491000,
+        "symbol": "SUPERCORE",
+        "action": "skip",
+        "basket": "Leader S",
+        "reason": "safety: top10 non-pool 30.9% > 30%"
+      },
       {
         "at": 1792730097000,
         "symbol": "OVER",
@@ -988,26 +1002,12 @@
         "action": "skip",
         "basket": "Leader S",
         "reason": "safety: check_sol timeout >120s (fail closed)"
-      },
-      {
-        "at": 1792719347000,
-        "symbol": "Fartcoin",
-        "action": "skip",
-        "basket": "Leader S",
-        "reason": "safety: copy: Copycat token"
-      },
-      {
-        "at": 1792719344000,
-        "symbol": "tanpa simbol",
-        "action": "skip",
-        "basket": "Leader Q",
-        "reason": "fact cut: no SOL/USDC/WSOL pair on DexScreener (1 other pairs)"
       }
     ],
     "reasonStats": {
       "skip": {
         "fact cut": 224,
-        "cek aman gagal": 82,
+        "cek aman gagal": 83,
         "jeda 24 jam": 12,
         "sudah pegang": 7,
         "beli leader terlalu kecil": 1,
@@ -1022,7 +1022,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792730234511,
+    "generatedAt": 1792730835243,
     "trades": {
       "count": 84,
       "wins": 34,
