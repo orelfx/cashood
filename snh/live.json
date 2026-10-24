@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c5f36fa6-3d4e-4dcb-a8e6-49a983ba2ad5",
-  "updatedAt": 1792825833417,
-  "generatedAt": "2026-10-24 14:10 WIB",
+  "generation": "b26609e0-7546-41ea-824c-d4edbd0d6110",
+  "updatedAt": 1792826135913,
+  "generatedAt": "2026-10-24 14:15 WIB",
   "usdIdr": null,
   "totalUsd": 899.8126173140648,
   "nativeSymbol": "SOL",
@@ -1370,12 +1370,12 @@
     "pnlUsd": -100.18738268593518,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792825833417,
+    "heartbeatAt": 1792826135913,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.86,
-    "lastScanAt": 1792825811000,
+    "lastScanAt": 1792826112000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1396,7 +1396,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "317",
+        "v": "318",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1412,9 +1412,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792825833417,
+      "lastDecisionAt": 1792826135913,
       "lastAction": "keputusan",
-      "lastReason": "anondog [low]: Dilewati karena red flag: bundler pegang 77.57% supply."
+      "lastReason": "PAWN [degen]: Dilewati: solo_test: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1649,6 +1649,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792826039975,
+        "symbol": "PAWN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 7.18% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 3.61%"
+          },
+          {
+            "type": "bundler",
+            "count": 162,
+            "note": "bundler pegang 47.0%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 3.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 10,
+            "note": "sniper awal masih pegang 19.7%"
+          },
+          {
+            "type": "fresh",
+            "count": 102,
+            "note": "11.0% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1792824260834,
         "symbol": "anondog",
@@ -2551,16 +2598,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792798317231,
-        "symbol": "TRX",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $3557."
       }
     ],
     "reasonStats": {
@@ -2571,7 +2608,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 279,
+        "red_flag": 280,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2622,7 +2659,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792825914576,
+    "generatedAt": 1792826213011,
     "trades": {
       "count": 153,
       "wins": 63,
