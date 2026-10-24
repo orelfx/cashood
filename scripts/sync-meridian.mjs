@@ -95,7 +95,16 @@ if (unpricedTokens.length) {
     return res.json();
   };
   const mints = unpricedTokens.map((t) => t.mint).filter(Boolean);
-  const jup = await tanya(`https://lite-api.jup.ag/price/v3?ids=${mints.join(',')}`);
+  const jup = await tanya(`https://lite-api.jup.ag/price/v3?ids=${mints.join(',')}`)
+    .catch(async (e) => { if (!/HTTP 429/.test(e.message)) throw e; await new Promise((r) => setTimeout(r, 5000)); return tanya(`https://lite-api.jup.ag/price/v3?ids=${mints.join(',')}`); });
+  // Cache hasil quote jual per mint: 2026-10-24 sekitar 30% siklus gagal karena
+  // 8 koin sisa di-quote ulang tiap 5 menit dan kena batas 429. Token tanpa
+  // rute dicek ulang tiap 6 jam; quote berhasil dipakai ulang 30 menit, dan
+  // kalau API sedang 429, quote terakhir (maks 6 jam, saldo sama) jadi cadangan.
+  const quoteCacheFile = resolve(OUT_DIR, 'token-quotes.local.json');
+  const quoteCache = readJSON(quoteCacheFile, {}) || {};
+  const QUOTE_FRESH_MS = 30 * 60 * 1000, QUOTE_MAX_MS = 6 * 60 * 60 * 1000;
+  let quoteFail = null;
   for (const t of unpricedTokens) {
     const hargaJup = Number(jup?.[t.mint]?.usdPrice);
     let harga = Number.isFinite(hargaJup) && hargaJup > 0 ? hargaJup : null;
@@ -109,7 +118,13 @@ if (unpricedTokens.length) {
     if (harga == null) {
       const dec = Number.isInteger(Number(t.decimals)) ? Number(t.decimals) : null;
       const units = dec == null ? null : BigInt(Math.floor(Core.number(t.balance, 'Saldo token', 0) * 10 ** Math.min(dec, 12))) * 10n ** BigInt(Math.max(0, dec - 12));
-      if (units && units > 0n) {
+      const cached = quoteCache[t.mint];
+      const cacheAge = cached && cached.units === String(units) ? Date.now() - Number(cached.at) : Infinity;
+      if (units && units > 0n && cacheAge < QUOTE_FRESH_MS && cached.outLamports > 0) {
+        t.usd = Number((cached.outLamports / 1e9 * solPrice).toFixed(2)); t.priceSource = 'jupiter-quote'; continue;
+      }
+      if (units && units > 0n && cacheAge < QUOTE_MAX_MS && cached.unsellable) unsellable = true;
+      else if (units && units > 0n) {
         // API quote membatasi permintaan beruntun: jeda antar token, sekali coba ulang kalau 429.
         const quoteUrl = `https://lite-api.jup.ag/swap/v1/quote?inputMint=${t.mint}&outputMint=${wrappedSolMint}&amount=${units}&slippageBps=5000`;
         let res;
@@ -119,9 +134,16 @@ if (unpricedTokens.length) {
           if (res.status !== 429) break;
         }
         const q = await res.json().catch(() => null);
-        if (Number(q?.outAmount) > 0) { t.usd = Number((Number(q.outAmount) / 1e9 * solPrice).toFixed(2)); t.priceSource = 'jupiter-quote'; continue; }
-        if (q?.errorCode === 'NO_ROUTES_FOUND' || q?.errorCode === 'COULD_NOT_FIND_ANY_ROUTE' || q?.errorCode === 'TOKEN_NOT_TRADABLE') unsellable = true;
-        else throw new Error(`quote jual token tidak terbaca (HTTP ${res.status})`);
+        if (Number(q?.outAmount) > 0) {
+          quoteCache[t.mint] = { at: Date.now(), units: String(units), outLamports: Number(q.outAmount) };
+          t.usd = Number((Number(q.outAmount) / 1e9 * solPrice).toFixed(2)); t.priceSource = 'jupiter-quote'; continue;
+        }
+        if (q?.errorCode === 'NO_ROUTES_FOUND' || q?.errorCode === 'COULD_NOT_FIND_ANY_ROUTE' || q?.errorCode === 'TOKEN_NOT_TRADABLE') {
+          unsellable = true;
+          quoteCache[t.mint] = { at: Date.now(), units: String(units), unsellable: true };
+        } else if (cacheAge < QUOTE_MAX_MS && cached.outLamports > 0) {
+          t.usd = Number((cached.outLamports / 1e9 * solPrice).toFixed(2)); t.priceSource = 'jupiter-quote-cache'; continue;
+        } else { quoteFail = `quote jual token tidak terbaca (HTTP ${res.status})`; continue; }
       }
     }
     if (harga != null) {
@@ -134,6 +156,9 @@ if (unpricedTokens.length) {
       deadTokens.push({ mint: String(t.mint).slice(0, 8), amount: Number(t.balance) });
     }
   }
+  try { atomicJSON(quoteCacheFile, quoteCache); } catch (e) { console.warn(`[meridian] cache quote tidak tersimpan: ${e.message}`); }
+  // Token lain tetap di-quote dulu supaya cache terisi; snapshot tetap ditolak.
+  if (quoteFail) throw new Error(quoteFail);
   if (deadTokens.length) console.warn(`[meridian] ${deadTokens.length} token tanpa pasar dinilai $0 (bukan kurang harga — tidak ada pair sama sekali)`);
 }
 for (const t of extraTokens) if (t.balance>0) Core.number(t.usd, 'Nilai token', 0);

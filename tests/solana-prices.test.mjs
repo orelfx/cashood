@@ -35,3 +35,13 @@ test('a DexScreener pair that is barely traded is not a price (fake liquidity)',
   assert.equal(result.prices.troll, undefined);
   assert.deepEqual(result.noMarket, ['troll']);
 });
+test('a rate-limited price source (429) is retried before giving up', async () => {
+  let calls = 0;
+  const result = await solanaPrices(['SOL'], { retryDelayMs: 1, fetchImpl: async () => {
+    calls += 1;
+    return calls < 3 ? { ok: false, status: 429 } : response({ SOL: { usdPrice: 190 } });
+  } });
+  assert.equal(calls, 3);
+  assert.equal(result.prices.SOL.usdPrice, 190);
+  await assert.rejects(solanaPrices(['SOL'], { retryDelayMs: 1, fetchImpl: async () => ({ ok: false, status: 429 }) }), /HTTP 429/);
+});

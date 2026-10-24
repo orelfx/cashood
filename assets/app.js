@@ -3751,6 +3751,18 @@ function gmsolWalletChart(curve) {
     ${[pts[0].t, last.t].map((t, i) => `<text x="${x(t).toFixed(1)}" y="${H - 6}" text-anchor="${i ? 'end' : 'start'}" class="g-lbl">${tick(t)} WIB</text>`).join('')}
   </svg></div>`;
 }
+// Catatan `gaps` dari mesin ditulis untuk sesama mesin (nama field, "null").
+// Yang tampil hanya kalimat biasa; kurung/kalimat berisi istilah kode dibuang.
+const GMSOL_CODEISH = /\w\[\]|\b[a-z]+[A-Z]\w*|\bnull\b|\b[a-zA-Z_]\w*\.[a-zA-Z_]\w*/;
+function gmsolPlainNote(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/\s*\([^)]*\)/g, (m) => (GMSOL_CODEISH.test(m) ? '' : m))
+    .split(/(?<=\.)\s+/)
+    .filter((x) => x.trim() && !GMSOL_CODEISH.test(x))
+    .join(' ')
+    .replace(/\.\s*$/, '');
+}
 function gmsolPosTable(all, ws) {
   if (!all.length) return '<p class="dim">Tidak ada posisi LP di wallet saat ini.</p>';
   return `<div class="table-scroll"><table class="mcards sb-tbl"><thead><tr><th>Pool</th><th class="num">Umur</th><th class="num">Modal</th><th class="num">Nilai</th><th class="num">Fee</th><th class="num">uPnL</th><th>Range</th></tr></thead><tbody>
@@ -3761,7 +3773,7 @@ function gmsolPosTable(all, ws) {
       <td class="num pos" data-k="Fee">${gmsolHas(p.feesUsd) ? usd(p.feesUsd) : '—'}${gmsolHas(p.unclaimedFeesUsd) ? `<div class="sub2">${usd(p.unclaimedFeesUsd)} belum diklaim</div>` : ''}</td>
       <td class="num ${cls(p.uPnlUsd ?? 0)}" data-k="uPnL">${gmsolHas(p.uPnlUsd) ? sbUsd(p.uPnlUsd) : '—'}${gmsolHas(p.pct) ? `<div class="sub2">${sbPct(p.pct)}</div>` : ''}</td>
       <td data-k="Range">${p.inRange == null ? '—' : `<span class="pill ${p.inRange ? 'in' : 'out2'}">${p.inRange ? 'di dalam' : 'di luar'}</span>`}</td></tr>`).join('')}</tbody></table></div>
-    ${ws?.gaps ? `<p class="hint">Catatan data: ${esc(ws.gaps)}${gmsolHas(ws.tokensUnpriced) && ws.tokensUnpriced ? ` (${ws.tokensUnpriced} token tanpa harga)` : ''}.</p>` : ''}`;
+    ${gmsolPlainNote(ws?.gaps) ? `<p class="hint">Catatan data: ${esc(gmsolPlainNote(ws.gaps))}${gmsolHas(ws.tokensUnpriced) && ws.tokensUnpriced ? ` (${ws.tokensUnpriced} token tanpa harga)` : ''}.</p>` : ''}`;
 }
 function gmsolClosesTable(closes) {
   if (!closes.length) return '<p class="dim">Belum ada posisi yang ditutup mesin.</p>';

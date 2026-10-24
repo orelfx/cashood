@@ -1,8 +1,14 @@
 // Resolve every requested asset. An unavailable price is not a zero balance.
-export async function solanaPrices(mints, { fetchImpl = globalThis.fetch } = {}) {
+export async function solanaPrices(mints, { fetchImpl = globalThis.fetch, retryDelayMs = 4000 } = {}) {
   const ids = [...new Set(mints)], prices = {}, noMarket = [];
+  // Batas permintaan (429) bersifat sementara: coba ulang dua kali sebelum menyerah.
   const read = async url => {
-    const r = await fetchImpl(url, { signal: AbortSignal.timeout(15000) });
+    let r;
+    for (let i = 0; i < 3; i += 1) {
+      if (i) await new Promise(ok => setTimeout(ok, retryDelayMs * i));
+      r = await fetchImpl(url, { signal: AbortSignal.timeout(15000) });
+      if (r.status !== 429) break;
+    }
     if (!r.ok) throw new Error(`Sumber harga tidak tersedia (HTTP ${r.status})`);
     return r.json();
   };
