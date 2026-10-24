@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "4b9e0584-302a-4866-a4a9-25b24c94472a",
-  "updatedAt": 1792872611483,
-  "generatedAt": "2026-10-25 03:10 WIB",
+  "generation": "31ddf512-6ef0-47de-9d64-23707b6ea1a9",
+  "updatedAt": 1792872915446,
+  "generatedAt": "2026-10-25 03:15 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 268,
+      "ageMinutes": 273,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792872611483,
+    "heartbeatAt": 1792872915446,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792872580000,
+    "lastScanAt": 1792872895000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "336",
+        "v": "339",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792872611483,
+      "lastDecisionAt": 1792872915446,
       "lastAction": "keputusan",
-      "lastReason": "MON [mid]: Dilewati karena red flag: mint authority belum dilepas."
+      "lastReason": "ZEC [big]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1712,6 +1712,44 @@
     },
     "decisions": [
       {
+        "at": 1792872895894,
+        "symbol": "ZEC",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792872759885,
+        "symbol": "ETH",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
+      },
+      {
+        "at": 1792872711429,
+        "symbol": "MET",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
+      },
+      {
         "at": 1792872458238,
         "symbol": "MON",
         "action": "skip",
@@ -1749,16 +1787,6 @@
         "reason": "Dilewati: harga sudah -97% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
-        "at": 1792872148852,
-        "symbol": "ETH",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
-      },
-      {
         "at": 1792872109312,
         "symbol": "CATTLEAXE",
         "action": "skip",
@@ -1779,16 +1807,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792872101881,
-        "symbol": "MET",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
       },
       {
         "at": 1792871789256,
@@ -2347,16 +2365,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 18%."
-      },
-      {
-        "at": 1792863999533,
-        "symbol": "GWA",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: unsupported_extension."
       }
     ],
     "reasonStats": {
@@ -2367,7 +2375,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 308,
+        "red_flag": 311,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2420,7 +2428,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792872710004,
+    "generatedAt": 1792873019313,
     "trades": {
       "count": 154,
       "wins": 63,
