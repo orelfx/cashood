@@ -4,9 +4,9 @@
   "realMoney": true,
   "risk": "high",
   "capitalUsd": 961.86,
-  "checkedAt": 1792878713724,
+  "checkedAt": 1792879012746,
   "status": "ok",
-  "asOf": 1792878651141,
+  "asOf": 1792878977439,
   "t0At": 1792677371712,
   "spec": "gmsol-live-v3.2 r4.7.12",
   "specDocStatus": "pending_audit",
@@ -298,28 +298,28 @@
     "totalFloorUsd": 480.93,
     "dailyBlocked": false,
     "dailyBlockedUntil": null,
-    "dayChangePct": -3.544,
+    "dayChangePct": -5.154,
     "dayStartLedgerUsd": null,
     "dayFloorUsd": 746.17,
     "gateUnknownBlock": false,
     "halted": false
   },
-  "equityUsd": 959.63,
-  "pnlUsd": -2.23,
-  "pnlPct": -0.232,
-  "realizedUsd": -2.09,
-  "unrealizedUsd": -0.13,
+  "equityUsd": 925.86,
+  "pnlUsd": -36,
+  "pnlPct": -3.743,
+  "realizedUsd": -33.8,
+  "unrealizedUsd": -2.19,
   "openSeats": [
     {
       "symbol": "BLACKTOBER-SOL",
       "openedAt": 1792874846436,
       "basisUsd": 292.95,
-      "pnlUsd": -0.79,
-      "pnlPct": 0.008,
+      "pnlUsd": -0.82,
+      "pnlPct": -0.086,
       "inRange": true,
       "lane": "meme",
       "peakPct": 0.026,
-      "troughPct": -0.055,
+      "troughPct": -0.086,
       "binStep": 100,
       "bins": 70,
       "shape": "bid_ask",
@@ -377,73 +377,25 @@
         [
           1792878565060,
           0.008
+        ],
+        [
+          1792878881096,
+          0.009
         ]
       ],
-      "valueUsd": 292.16,
-      "feesUsd": 0.5
-    },
-    {
-      "symbol": "Hercules-SOL",
-      "openedAt": 1792876426449,
-      "basisUsd": 104.24,
-      "pnlUsd": 1.27,
-      "pnlPct": 1.223,
-      "inRange": true,
-      "lane": "meme",
-      "peakPct": 1.223,
-      "troughPct": 0.031,
-      "binStep": 100,
-      "bins": 70,
-      "shape": "bid_ask",
-      "entryNote": "Hercules-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y.",
-      "status": null,
-      "specRev": "r4.7.12",
-      "sizeUsd": 100,
-      "rentSol": 0.0419,
-      "rentUsd": null,
-      "snaps": [
-        [
-          1792876560435,
-          0.031
-        ],
-        [
-          1792876879579,
-          0.2
-        ],
-        [
-          1792877306026,
-          0.223
-        ],
-        [
-          1792877624765,
-          0.316
-        ],
-        [
-          1792877925725,
-          0.394
-        ],
-        [
-          1792878252708,
-          0.519
-        ],
-        [
-          1792878565060,
-          0.826
-        ]
-      ],
-      "valueUsd": 104.29,
-      "feesUsd": 1.85
+      "valueUsd": 292.29,
+      "feesUsd": 0.82
     },
     {
       "symbol": "ヤギ-SOL",
       "openedAt": 1792877108940,
       "basisUsd": 292.94,
-      "pnlUsd": -0.61,
-      "pnlPct": -0.169,
+      "pnlUsd": -0.76,
+      "pnlPct": -0.306,
       "inRange": true,
       "lane": "meme",
       "peakPct": -0.042,
-      "troughPct": -0.169,
+      "troughPct": -0.306,
       "binStep": 100,
       "bins": 70,
       "shape": "bid_ask",
@@ -473,13 +425,31 @@
         [
           1792878565061,
           -0.047
+        ],
+        [
+          1792878881095,
+          -0.306
         ]
       ],
-      "valueUsd": 292.34,
-      "feesUsd": 0.57
+      "valueUsd": 291.57,
+      "feesUsd": 1.15
     }
   ],
   "closes": [
+    {
+      "symbol": "Hercules-SOL",
+      "openedAt": 1792876426449,
+      "closedAt": 1792878953508,
+      "netUsd": -31.71,
+      "netPct": null,
+      "reason": "stop_loss value -14.04% <= -12%",
+      "basisUsd": 104.24,
+      "feesUsd": 5.96,
+      "peakPct": 1.223,
+      "troughPct": -14.043,
+      "closeNote": "Stop loss --12% PnL SOL posisi tersentuh (r4.7.1).",
+      "entryNote": "Hercules-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y."
+    },
     {
       "symbol": "CATE-SOL",
       "openedAt": 1792877208001,
@@ -3819,6 +3789,10 @@
     {
       "t": 1792878651141,
       "usd": 959.63
+    },
+    {
+      "t": 1792878977439,
+      "usd": 925.86
     }
   ],
   "engine": {
@@ -3826,29 +3800,43 @@
     "note": "Buku mesin GMSOL: modal dikunci saat deploy; PnL = equity - modal kunci, hanya sejak lock. Riwayat sebelum deploy tidak masuk PnL.",
     "capitalLockedAt": "2026-10-22T13:56:11.712Z",
     "capitalUsd": 961.86,
-    "equityUsd": 959.63,
-    "pnlUsd": -2.23,
-    "pnlPct": -0.232,
-    "realizedUsd": -2.09,
-    "unrealizedUsd": -0.13,
+    "equityUsd": 925.86,
+    "pnlUsd": -36,
+    "pnlPct": -3.743,
+    "realizedUsd": -33.8,
+    "unrealizedUsd": -2.19,
     "totalFloorUsd": 480.93,
     "dayFloorUsd": 746.17,
     "maxOpen": 8,
-    "openCount": 3,
-    "closedCount": 143,
-    "winRatePct": 48.95
+    "openCount": 2,
+    "closedCount": 144,
+    "winRatePct": 48.61
   },
   "ledger": {
     "flows": [],
     "owners": [],
     "costs": {
-      "gasUsd": 0.35,
+      "gasUsd": 0.36,
       "swapFeesUsd": null,
       "items": []
     }
   },
   "history": {
     "closes": [
+      {
+        "symbol": "Hercules-SOL",
+        "openedAt": 1792876426449,
+        "closedAt": 1792878953508,
+        "netUsd": -31.71,
+        "netPct": null,
+        "reason": "stop_loss value -14.04% <= -12%",
+        "basisUsd": 104.24,
+        "feesUsd": 5.96,
+        "peakPct": 1.223,
+        "troughPct": -14.043,
+        "closeNote": "Stop loss --12% PnL SOL posisi tersentuh (r4.7.1).",
+        "entryNote": "Hercules-SOL: lolos filter v3.2 + anti-scam G1-G10, 70 bin bid_ask (-50%), SOL sebagai token Y."
+      },
       {
         "symbol": "CATE-SOL",
         "openedAt": 1792877208001,
@@ -8219,9 +8207,9 @@
   ],
   "headline": {
     "label": "Aset GMSOL",
-    "usd": 959.63,
-    "pnlUsd": -2.23,
-    "pnlPct": -0.232,
+    "usd": 925.86,
+    "pnlUsd": -36,
+    "pnlPct": -3.743,
     "capitalUsd": 961.86,
     "source": "engine.equityUsd",
     "pnlNote": "Headline = equity mesin; PnL = equity - modal kunci, hanya sejak lock. Isi wallet (wallet.totalAssetsUsd, termasuk cadangan 0,3 SOL) dan riwayat sebelum deploy hanya info, tidak masuk PnL."
