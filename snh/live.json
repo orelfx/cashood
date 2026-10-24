@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1eb05b61-cc63-4d71-bf7e-5744e9a84be5",
-  "updatedAt": 1792867157486,
-  "generatedAt": "2026-10-25 01:39 WIB",
+  "generation": "2f506761-e230-4cc1-8a1b-cda30af81c2d",
+  "updatedAt": 1792867459174,
+  "generatedAt": "2026-10-25 01:44 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 177,
+      "ageMinutes": 182,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792867157486,
+    "heartbeatAt": 1792867459174,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792867143000,
+    "lastScanAt": 1792867432000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "320",
+        "v": "321",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792867157486,
+      "lastDecisionAt": 1792867459174,
       "lastAction": "keputusan",
-      "lastReason": "MET [big]: Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
+      "lastReason": "FLIP [degen]: Dilewati: solo_test: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14268 · bot 6987 · blacklist 489 · lp 1 · fresh 1381 · kol 225 · dolphin 193 · whale 16"
+        "smart 14265 · bot 6990 · blacklist 489 · lp 1 · fresh 1381 · kol 225 · dolphin 193 · whale 16"
       ]
     ],
     "requirements": [
@@ -1563,15 +1563,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14268,
+          "total": 14265,
           "active": 503,
-          "passive": 13765
+          "passive": 13762
         },
         {
           "key": "bot",
-          "total": 6987,
+          "total": 6990,
           "active": 0,
-          "passive": 6987
+          "passive": 6990
         },
         {
           "key": "fresh",
@@ -1712,7 +1712,29 @@
     },
     "decisions": [
       {
-        "at": 1792866630236,
+        "at": 1792867334428,
+        "symbol": "FLIP",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 2.27% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 3.46%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
+      {
+        "at": 1792867237678,
         "symbol": "MET",
         "action": "skip",
         "basket": "big",
@@ -2299,16 +2321,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 34%."
-      },
-      {
-        "at": 1792861216362,
-        "symbol": "Peekhole",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
       }
     ],
     "reasonStats": {
@@ -2319,11 +2331,11 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 290,
+        "red_flag": 292,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
-        "no_price": 1,
+        "no_price": 0,
         "max_open": 0,
         "day_loss": 0,
         "paused": 0,
@@ -2372,7 +2384,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792867312156,
+    "generatedAt": 1792867611656,
     "trades": {
       "count": 154,
       "wins": 63,
