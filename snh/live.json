@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "33c93fa1-639b-465d-aa5e-58661c203549",
-  "updatedAt": 1792861135339,
-  "generatedAt": "2026-10-24 23:58 WIB",
+  "generation": "54e631e3-a17b-46b5-9c61-eef62d8d8cc7",
+  "updatedAt": 1792861435346,
+  "generatedAt": "2026-10-25 00:03 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 76,
+      "ageMinutes": 81,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -65,7 +65,7 @@
       "firstWallet": "smart #1488",
       "llmScore": 67,
       "peakPct": 24.8,
-      "ddPct": -26.7,
+      "ddPct": -27.84,
       "stale": true
     }
   ],
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792861135339,
+    "heartbeatAt": 1792861435346,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792861095000,
+    "lastScanAt": 1792861433000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "309",
+        "v": "318",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792861135339,
+      "lastDecisionAt": 1792861435346,
       "lastAction": "keputusan",
-      "lastReason": "CORTEX [degen]: Dilewati karena red flag: bundler pegang 28.64% supply."
+      "lastReason": "GTAV [degen]: Dilewati karena red flag: 55% holder wallet baru (sybil)."
     }
   },
   "strategy": {
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14303 · bot 6954 · blacklist 489 · lp 1 · fresh 1378 · kol 225 · dolphin 194 · whale 16"
+        "smart 14301 · bot 6956 · blacklist 489 · lp 1 · fresh 1378 · kol 225 · dolphin 194 · whale 16"
       ]
     ],
     "requirements": [
@@ -1563,15 +1563,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14303,
+          "total": 14301,
           "active": 484,
-          "passive": 13819
+          "passive": 13817
         },
         {
           "key": "bot",
-          "total": 6954,
+          "total": 6956,
           "active": 0,
-          "passive": 6954
+          "passive": 6956
         },
         {
           "key": "fresh",
@@ -1711,6 +1711,123 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792861365126,
+        "symbol": "GTAV",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 55% holder wallet baru (sybil)."
+      },
+      {
+        "at": 1792861359404,
+        "symbol": "HOTBOT",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 29%."
+      },
+      {
+        "at": 1792861349649,
+        "symbol": "PARK",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 13x."
+      },
+      {
+        "at": 1792861339891,
+        "symbol": "PINKBOW",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev masih pegang 20%."
+      },
+      {
+        "at": 1792861303347,
+        "symbol": "WAGMI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 25% supply."
+      },
+      {
+        "at": 1792861293682,
+        "symbol": "PRIVACY",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 51,
+            "note": "bundler pegang 2.4%"
+          },
+          {
+            "type": "sniper",
+            "count": 32,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 185,
+            "note": "24.9% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792861276500,
+        "symbol": "SPCXx",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792861262659,
+        "symbol": "Kimchi",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 79%."
+      },
+      {
+        "at": 1792861226193,
+        "symbol": "KILROY",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 34%."
+      },
+      {
+        "at": 1792861216362,
+        "symbol": "Peekhole",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
+      },
       {
         "at": 1792860172229,
         "symbol": "CORTEX",
@@ -2386,212 +2503,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 75.89% supply."
-      },
-      {
-        "at": 1792837889531,
-        "symbol": "morpheooor",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 79.12% supply."
-      },
-      {
-        "at": 1792836974633,
-        "symbol": "ELIZABETH",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 21%."
-      },
-      {
-        "at": 1792836677163,
-        "symbol": "DOOMPEPE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 75.88% supply."
-      },
-      {
-        "at": 1792835954877,
-        "symbol": "GORD",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 73.7% supply."
-      },
-      {
-        "at": 1792834664604,
-        "symbol": "Pumptache",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 74.94% supply."
-      },
-      {
-        "at": 1792833353516,
-        "symbol": "Catpital",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 79.12% supply."
-      },
-      {
-        "at": 1792832958571,
-        "symbol": "Musktache",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 65.17% supply."
-      },
-      {
-        "at": 1792832834021,
-        "symbol": "SWAMIS",
-        "action": "exit",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 23.89% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 97,
-            "note": "bundler pegang 20.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.7%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 9.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 111,
-            "note": "6.6% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Keluar (follow exit): 1 dari 2 wallet yang diikuti sudah menjual setelah 3 menit, jadi posisi ikut ditutup. Hasil -32,9%."
-      },
-      {
-        "at": 1792832639507,
-        "symbol": "SWAMIS",
-        "action": "enter",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 23.89% supply di blok peluncuran"
-          },
-          {
-            "type": "bundler",
-            "count": 97,
-            "note": "bundler pegang 20.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.7%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 9.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 111,
-            "note": "6.6% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Masuk: konsensus wallet terpenuhi dan semua cek lolos."
-      },
-      {
-        "at": 1792831920495,
-        "symbol": "SPCX",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 2,
-            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 27,
+        "below_entry": 26,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 275,
+        "red_flag": 285,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2644,7 +2566,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792861313526,
+    "generatedAt": 1792861627224,
     "trades": {
       "count": 154,
       "wins": 63,
@@ -2683,7 +2605,7 @@
       "lastAt": 1792832834021
     },
     "equity": {
-      "days": 18,
+      "days": 19,
       "spanDays": 18.7,
       "returnPct": -9.3,
       "maxDrawdownPct": 9.46,
@@ -2693,11 +2615,11 @@
       "maxDrawdownTroughUsd": 896.01,
       "currentDrawdownPct": 9.3,
       "currentDrawdownUsd": 92.04,
-      "positiveDaysPct": 44.44,
+      "positiveDaysPct": 42.11,
       "bestDayPct": 1.04,
       "worstDayPct": -3.87,
-      "sharpe": -8.4,
-      "sortino": -8.18,
+      "sharpe": -8.14,
+      "sortino": -7.97,
       "calmar": null,
       "since": 1791244607698
     },
@@ -2710,9 +2632,9 @@
         "profitFactor": 0,
         "risk": 76.35,
         "recovery": 0,
-        "consistency": 44.44
+        "consistency": 42.11
       },
-      "overall": 32.45,
+      "overall": 31.98,
       "complete": true
     }
   }
