@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "42f667f6-c6a2-4c9b-be34-728b867b2f1a",
-  "updatedAt": 1792859624692,
-  "generatedAt": "2026-10-24 23:33 WIB",
+  "generation": "340ff786-79ec-467d-a580-4240b5c787ef",
+  "updatedAt": 1792859926021,
+  "generatedAt": "2026-10-24 23:38 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 51,
+      "ageMinutes": 56,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792859624692,
+    "heartbeatAt": 1792859926021,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792859567000,
+    "lastScanAt": 1792859856000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "307",
+        "v": "308",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792859624692,
+      "lastDecisionAt": 1792859926021,
       "lastAction": "keputusan",
-      "lastReason": "DEADRICH [degen]: Dilewati karena red flag: bundler pegang 70.33% supply."
+      "lastReason": "bye [degen]: Dilewati karena red flag: bundler pegang 27% supply."
     }
   },
   "strategy": {
@@ -1711,6 +1711,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792859818202,
+        "symbol": "bye",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 27% supply."
+      },
       {
         "at": 1792857443687,
         "symbol": "DEADRICH",
@@ -2564,53 +2581,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1792826039975,
-        "symbol": "PAWN",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 7.18% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 3.61%"
-          },
-          {
-            "type": "bundler",
-            "count": 162,
-            "note": "bundler pegang 47.0%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 3.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 10,
-            "note": "sniper awal masih pegang 19.7%"
-          },
-          {
-            "type": "fresh",
-            "count": 102,
-            "note": "11.0% holder wallet baru"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2621,7 +2591,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 273,
+        "red_flag": 274,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2674,7 +2644,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792859812359,
+    "generatedAt": 1792860114642,
     "trades": {
       "count": 154,
       "wins": 63,
