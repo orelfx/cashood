@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c1f6e1ca-9252-4398-8189-3bb445f5872f",
-  "updatedAt": 1792872008182,
-  "generatedAt": "2026-10-25 03:00 WIB",
+  "generation": "4e04bdfe-b2a1-49e1-97a0-5a314a7e6459",
+  "updatedAt": 1792872309447,
+  "generatedAt": "2026-10-25 03:05 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 258,
+      "ageMinutes": 263,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792872008182,
+    "heartbeatAt": 1792872309447,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792871960000,
+    "lastScanAt": 1792872279000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "331",
+        "v": "334",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792872008182,
+      "lastDecisionAt": 1792872309447,
       "lastAction": "keputusan",
-      "lastReason": "TAMARA [degen]: Dilewati karena red flag: holder baru 19."
+      "lastReason": "ETH [low]: Dilewati karena red flag: 10 holder terbesar pegang 76%."
     }
   },
   "strategy": {
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14254 · bot 7005 · blacklist 489 · lp 1 · fresh 1377 · kol 226 · dolphin 193 · whale 16"
+        "smart 14255 · bot 7004 · blacklist 489 · lp 1 · fresh 1377 · kol 226 · dolphin 193 · whale 16"
       ]
     ],
     "requirements": [
@@ -1563,15 +1563,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14254,
+          "total": 14255,
           "active": 504,
-          "passive": 13750
+          "passive": 13751
         },
         {
           "key": "bot",
-          "total": 7005,
+          "total": 7004,
           "active": 0,
-          "passive": 7005
+          "passive": 7004
         },
         {
           "key": "fresh",
@@ -1712,6 +1712,48 @@
     },
     "decisions": [
       {
+        "at": 1792872148852,
+        "symbol": "ETH",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
+      },
+      {
+        "at": 1792872109312,
+        "symbol": "CATTLEAXE",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "rat",
+            "count": 67,
+            "note": "insider/entrapment pegang 10.2%"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 12x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1792872101881,
+        "symbol": "MET",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
+      },
+      {
         "at": 1792871789256,
         "symbol": "TAMARA",
         "action": "skip",
@@ -1732,16 +1774,6 @@
         "reason": "Dilewati: harga sudah -95% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       },
       {
-        "at": 1792871535206,
-        "symbol": "ETH",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 76%."
-      },
-      {
         "at": 1792871519443,
         "symbol": "Emilio",
         "action": "skip",
@@ -1750,16 +1782,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 36% supply."
-      },
-      {
-        "at": 1792871497485,
-        "symbol": "MET",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
       },
       {
         "at": 1792871379856,
@@ -2328,16 +2350,6 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: bundler pegang 79.26% supply."
-      },
-      {
-        "at": 1792863689848,
-        "symbol": "HeeHaw",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 39%."
       }
     ],
     "reasonStats": {
@@ -2348,7 +2360,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 303,
+        "red_flag": 306,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2401,7 +2413,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792872117412,
+    "generatedAt": 1792872418495,
     "trades": {
       "count": 154,
       "wins": 63,
