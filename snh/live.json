@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "e8cfc5d8-dfe7-47b5-93f2-0b649eb0b9f5",
-  "updatedAt": 1792846334947,
-  "generatedAt": "2026-10-24 19:52 WIB",
+  "generation": "4ca27739-b072-470a-8d63-536313ad9644",
+  "updatedAt": 1792846636573,
+  "generatedAt": "2026-10-24 19:57 WIB",
   "usdIdr": null,
   "totalUsd": 897.744577880411,
   "nativeSymbol": "SOL",
@@ -1377,12 +1377,12 @@
     "pnlUsd": -102.25542211958896,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792846334947,
+    "heartbeatAt": 1792846636573,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.06,
-    "lastScanAt": 1792846327000,
+    "lastScanAt": 1792846621000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1409,7 +1409,7 @@
       {
         "k": "Wallet dipantau",
         "v": "23556",
-        "n": "532 aktif"
+        "n": "533 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1419,9 +1419,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792846334947,
+      "lastDecisionAt": 1792846636573,
       "lastAction": "keputusan",
-      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.9% dari market cap."
+      "lastReason": "DJT [mid]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1440,7 +1440,7 @@
       ],
       [
         "Wallet dipantau",
-        "23556 · 532 aktif"
+        "23556 · 533 aktif"
       ],
       [
         "Cadangan kas",
@@ -1452,7 +1452,7 @@
       ],
       [
         "Label wallet",
-        "smart 14351 · bot 6939 · blacklist 488 · lp 1 · fresh 1360 · kol 225 · dolphin 175 · whale 17"
+        "smart 14353 · bot 6937 · blacklist 488 · lp 1 · fresh 1360 · kol 225 · dolphin 175 · whale 17"
       ]
     ],
     "requirements": [
@@ -1501,22 +1501,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23556,
-      "active": 532,
-      "passive": 23024,
+      "active": 533,
+      "passive": 23023,
       "trusted": 0,
       "promising": 15,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14351,
-          "active": 503,
-          "passive": 13848
+          "total": 14353,
+          "active": 504,
+          "passive": 13849
         },
         {
           "key": "bot",
-          "total": 6939,
+          "total": 6937,
           "active": 0,
-          "passive": 6939
+          "passive": 6937
         },
         {
           "key": "fresh",
@@ -1656,6 +1656,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792846589777,
+        "symbol": "DJT",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792846584438,
+        "symbol": "Dacity",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 27%."
+      },
       {
         "at": 1792846241935,
         "symbol": "CARDS",
@@ -1810,7 +1830,7 @@
         "action": "skip",
         "basket": "degen",
         "wallets": {
-          "bot": 1
+          "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 75.89% supply."
       },
@@ -2500,16 +2520,6 @@
         "reason": "Dilewati: explore: zone/cooldown/budget."
       },
       {
-        "at": 1792809255494,
-        "symbol": "Dacity",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 4
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 27%."
-      },
-      {
         "at": 1792809025408,
         "symbol": "ANSEM",
         "action": "skip",
@@ -2612,63 +2622,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792807734518,
-        "symbol": "STOCK",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": null,
-            "note": "bundler membeli 10.31% supply di blok peluncuran"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev sudah menjual"
-          },
-          {
-            "type": "bundler",
-            "count": 296,
-            "note": "bundler pegang 60.3%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 6.3%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 19.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 116,
-            "note": "8.5% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
@@ -2730,7 +2683,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792846615989,
+    "generatedAt": 1792846919308,
     "trades": {
       "count": 154,
       "wins": 63,
