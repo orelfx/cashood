@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b8a7b45e-d642-47fe-96a7-9fb70c5cab9e",
-  "updatedAt": 1792799735800,
-  "generatedAt": "2026-10-24 06:55 WIB",
+  "generation": "f4f3a6dc-608f-4810-b6c3-9de5e4c1a113",
+  "updatedAt": 1792800044599,
+  "generatedAt": "2026-10-24 07:00 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 2578,
+      "ageMinutes": 2583,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1414,12 +1414,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792799735800,
+    "heartbeatAt": 1792800044599,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792799716000,
+    "lastScanAt": 1792799958000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1462,9 +1462,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792799735800,
+      "lastDecisionAt": 1792800044599,
       "lastAction": "keputusan",
-      "lastReason": "BTC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 68%."
+      "lastReason": "ANSEM [big]: Dilewati karena red flag: 10 holder terbesar pegang 65%."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Label wallet",
-        "smart 14428 · bot 6893 · blacklist 483 · lp 1 · fresh 1320 · kol 225 · dolphin 185 · whale 17"
+        "smart 14426 · bot 6895 · blacklist 483 · lp 1 · fresh 1320 · kol 225 · dolphin 185 · whale 17"
       ]
     ],
     "requirements": [
@@ -1551,15 +1551,15 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14428,
+          "total": 14426,
           "active": 519,
-          "passive": 13909
+          "passive": 13907
         },
         {
           "key": "bot",
-          "total": 6893,
+          "total": 6895,
           "active": 0,
-          "passive": 6893
+          "passive": 6895
         },
         {
           "key": "fresh",
@@ -1700,7 +1700,17 @@
     },
     "decisions": [
       {
-        "at": 1792799225546,
+        "at": 1792799948084,
+        "symbol": "ANSEM",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      },
+      {
+        "at": 1792799831540,
         "symbol": "BTC",
         "action": "skip",
         "basket": "mid",
@@ -2284,7 +2294,8 @@
         "action": "skip",
         "basket": "low",
         "wallets": {
-          "smart": 3
+          "smart": 2,
+          "bot": 1
         },
         "flags": [
           {
@@ -2503,38 +2514,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1792782546309,
-        "symbol": "VIRTUAL",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 4.9%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 1.3%"
-          },
-          {
-            "type": "fresh",
-            "count": 170,
-            "note": "5.9% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 1.3%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
@@ -2598,7 +2577,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792799844099,
+    "generatedAt": 1792800166151,
     "trades": {
       "count": 152,
       "wins": 63,
