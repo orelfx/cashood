@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "738eae57-2181-4537-ae6f-f1abc242a155",
-  "updatedAt": 1792852974331,
-  "generatedAt": "2026-10-24 21:42 WIB",
+  "generation": "d1aceea8-9714-4437-a690-831d71611133",
+  "updatedAt": 1792853278625,
+  "generatedAt": "2026-10-24 21:47 WIB",
   "usdIdr": null,
   "totalUsd": 897.744577880411,
   "nativeSymbol": "SOL",
@@ -1377,12 +1377,12 @@
     "pnlUsd": -102.25542211958896,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792852974331,
+    "heartbeatAt": 1792853278625,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.06,
-    "lastScanAt": 1792852945000,
+    "lastScanAt": 1792853248000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1403,7 +1403,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "304",
+        "v": "306",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1419,9 +1419,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792852974331,
+      "lastDecisionAt": 1792853278625,
       "lastAction": "keputusan",
-      "lastReason": "DESSA [degen]: Dilewati: harga jatuh lebih dari 20% di bawah harga beli wallet; itu dump, bukan pullback."
+      "lastReason": "TTWO [mid]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1656,6 +1656,70 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792853181717,
+        "symbol": "TTWO",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792853037513,
+        "symbol": "VELK",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 16.28% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 9.6%"
+          },
+          {
+            "type": "sniper",
+            "count": 8,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 859,
+            "note": "7.3% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 10x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1792852922529,
         "symbol": "DESSA",
@@ -2505,33 +2569,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 32%."
-      },
-      {
-        "at": 1792820521729,
-        "symbol": "ZEC",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1792820363332,
-        "symbol": "Moustache",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 18%."
       }
     ],
     "reasonStats": {
@@ -2542,7 +2579,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 266,
+        "red_flag": 268,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2593,7 +2630,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792853230299,
+    "generatedAt": 1792853518632,
     "trades": {
       "count": 154,
       "wins": 63,
