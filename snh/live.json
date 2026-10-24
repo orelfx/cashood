@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "049f8ac2-a338-40fa-a35d-44a25bd7ac2c",
-  "updatedAt": 1792881074694,
-  "generatedAt": "2026-10-25 05:31 WIB",
+  "generation": "0c054970-8a89-46bd-9747-af86fdcf57c7",
+  "updatedAt": 1792881377169,
+  "generatedAt": "2026-10-25 05:36 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 409,
+      "ageMinutes": 414,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792881074694,
+    "heartbeatAt": 1792881377169,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792881049000,
+    "lastScanAt": 1792881351000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "349",
+        "v": "353",
         "n": "24 jam · 2 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792881074694,
+      "lastDecisionAt": 1792881377169,
       "lastAction": "keputusan",
-      "lastReason": "COIL [low]: Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "ヤギ [low]: Dilewati karena red flag: insider/entrapment pegang 24%."
     }
   },
   "strategy": {
@@ -1712,6 +1712,46 @@
     },
     "decisions": [
       {
+        "at": 1792881356700,
+        "symbol": "ヤギ",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 4
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 24%."
+      },
+      {
+        "at": 1792881231267,
+        "symbol": "kimchifomo",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 6
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 78.96% supply."
+      },
+      {
+        "at": 1792881198879,
+        "symbol": "MET",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
+      },
+      {
+        "at": 1792881155591,
+        "symbol": "RETARDIO",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "dolphin": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 43%."
+      },
+      {
         "at": 1792880854921,
         "symbol": "COIL",
         "action": "skip",
@@ -1730,26 +1770,6 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792880592895,
-        "symbol": "MET",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 1.3% dari market cap."
-      },
-      {
-        "at": 1792880546257,
-        "symbol": "RETARDIO",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "dolphin": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 43%."
       },
       {
         "at": 1792880534384,
@@ -2514,33 +2534,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 16%."
-      },
-      {
-        "at": 1792870006385,
-        "symbol": "CyberAxe",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 17%."
-      },
-      {
-        "at": 1792869604076,
-        "symbol": "Hercules",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 4x."
       }
     ],
     "reasonStats": {
@@ -2551,7 +2544,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 313,
+        "red_flag": 317,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2604,7 +2597,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792881110058,
+    "generatedAt": 1792881413797,
     "trades": {
       "count": 154,
       "wins": 63,
