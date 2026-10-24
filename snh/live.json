@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "fa353244-e693-4baa-aa1a-7a486d8b926d",
-  "updatedAt": 1792803972311,
-  "generatedAt": "2026-10-24 08:06 WIB",
+  "generation": "6f976840-d138-4a36-880a-b8004743dcc4",
+  "updatedAt": 1792804273115,
+  "generatedAt": "2026-10-24 08:11 WIB",
   "usdIdr": null,
   "totalUsd": 907.0593651627605,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.0002923837125811098,
-      "ageMinutes": 2648,
+      "ageMinutes": 2653,
       "stopPct": 32,
       "targetPct": 20,
       "maxHoldHours": 24,
@@ -1414,12 +1414,12 @@
     "pnlUsd": -92.94063483723949,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792803972311,
+    "heartbeatAt": 1792804273115,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 10.14,
-    "lastScanAt": 1792803893000,
+    "lastScanAt": 1792804167000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1446,13 +1446,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "316",
+        "v": "319",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23553",
-        "n": "546 aktif"
+        "n": "547 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1462,9 +1462,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792803972311,
+      "lastDecisionAt": 1792804273115,
       "lastAction": "keputusan",
-      "lastReason": "XTV [low]: Dilewati karena red flag: insider/entrapment pegang 19%."
+      "lastReason": "ANSEM [big]: Dilewati karena red flag: 10 holder terbesar pegang 65%."
     }
   },
   "strategy": {
@@ -1483,7 +1483,7 @@
       ],
       [
         "Wallet dipantau",
-        "23553 · 546 aktif"
+        "23553 · 547 aktif"
       ],
       [
         "Cadangan kas",
@@ -1495,7 +1495,7 @@
       ],
       [
         "Label wallet",
-        "smart 14422 · bot 6900 · blacklist 484 · lp 1 · fresh 1320 · kol 225 · dolphin 184 · whale 17"
+        "smart 14425 · bot 6897 · blacklist 484 · lp 1 · fresh 1320 · kol 225 · dolphin 184 · whale 17"
       ]
     ],
     "requirements": [
@@ -1544,22 +1544,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23553,
-      "active": 546,
-      "passive": 23007,
+      "active": 547,
+      "passive": 23006,
       "trusted": 0,
       "promising": 17,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14422,
-          "active": 515,
-          "passive": 13907
+          "total": 14425,
+          "active": 516,
+          "passive": 13909
         },
         {
           "key": "bot",
-          "total": 6900,
+          "total": 6897,
           "active": 0,
-          "passive": 6900
+          "passive": 6897
         },
         {
           "key": "fresh",
@@ -1700,6 +1700,43 @@
     },
     "decisions": [
       {
+        "at": 1792804183957,
+        "symbol": "ANSEM",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      },
+      {
+        "at": 1792804156045,
+        "symbol": "MEME",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 53% supply."
+      },
+      {
+        "at": 1792804115120,
+        "symbol": "BITCHES",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -57% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
         "at": 1792803837168,
         "symbol": "XTV",
         "action": "skip",
@@ -1708,16 +1745,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 19%."
-      },
-      {
-        "at": 1792803577848,
-        "symbol": "ANSEM",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
       },
       {
         "at": 1792803508704,
@@ -2483,54 +2510,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 54.1% supply."
-      },
-      {
-        "at": 1792786624721,
-        "symbol": "BASE",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 50,
-            "note": "bundler pegang 4.7%"
-          },
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 3.5%"
-          },
-          {
-            "type": "sniper",
-            "count": 4,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792786617246,
-        "symbol": "Rico",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 11%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 36,
+        "below_entry": 37,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 278,
+        "red_flag": 280,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2583,7 +2573,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792804038034,
+    "generatedAt": 1792804348731,
     "trades": {
       "count": 152,
       "wins": 63,
@@ -2623,7 +2613,7 @@
     },
     "equity": {
       "days": 18,
-      "spanDays": 18,
+      "spanDays": 18.1,
       "returnPct": -8.34,
       "maxDrawdownPct": 9.08,
       "maxDrawdownAt": 1792760727295,
