@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b044fd15-b69e-43e9-82a1-02432c45ffc6",
-  "updatedAt": 1792964491571,
-  "generatedAt": "2026-10-26 04:41 WIB",
+  "generation": "f948c1dd-a117-46e4-9c06-264a11f0a8b3",
+  "updatedAt": 1792964794031,
+  "generatedAt": "2026-10-26 04:46 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1799,
+      "ageMinutes": 1804,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792964491571,
+    "heartbeatAt": 1792964794031,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792964392000,
+    "lastScanAt": 1792964764000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1464,7 +1464,7 @@
       {
         "k": "Wallet dipantau",
         "v": "23585",
-        "n": "573 aktif"
+        "n": "572 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792964491571,
+      "lastDecisionAt": 1792964794031,
       "lastAction": "keputusan",
-      "lastReason": "ANSEM [big]: Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      "lastReason": "AUC [degen]: Dilewati: solo_test: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23585 · 573 aktif"
+        "23585 · 572 aktif"
       ],
       [
         "Cadangan kas",
@@ -1556,16 +1556,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23585,
-      "active": 573,
-      "passive": 23012,
+      "active": 572,
+      "passive": 23013,
       "trusted": 0,
       "promising": 12,
       "byLabel": [
         {
           "key": "smart",
           "total": 14175,
-          "active": 539,
-          "passive": 13636
+          "active": 538,
+          "passive": 13637
         },
         {
           "key": "bot",
@@ -1717,6 +1717,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792964598011,
+        "symbol": "AUC",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 171,
+            "note": "bundler pegang 13.9%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 0.2%"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 16x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
+      {
+        "at": 1792964570315,
+        "symbol": "NICKI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 40% supply."
+      },
       {
         "at": 1792964317865,
         "symbol": "ANSEM",
@@ -2381,33 +2423,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $773."
-      },
-      {
-        "at": 1792956029663,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 4,
-            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma $22241."
-      },
-      {
-        "at": 1792956022922,
-        "symbol": "Brünnhilde",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: holder baru 22."
       }
     ],
     "reasonStats": {
@@ -2471,7 +2486,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792964509756,
+    "generatedAt": 1792964806913,
     "trades": {
       "count": 154,
       "wins": 63,
