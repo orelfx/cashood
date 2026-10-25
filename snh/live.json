@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "676a0a5a-e231-4897-a6b4-995d3b7973b7",
-  "updatedAt": 1792888036327,
-  "generatedAt": "2026-10-25 07:27 WIB",
+  "generation": "bddffbcc-c6c8-45af-9f84-a674878570f9",
+  "updatedAt": 1792888339602,
+  "generatedAt": "2026-10-25 07:32 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 525,
+      "ageMinutes": 530,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792888036327,
+    "heartbeatAt": 1792888339602,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792887988000,
+    "lastScanAt": 1792888304000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "362",
+        "v": "363",
         "n": "24 jam · 3 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792888036327,
+      "lastDecisionAt": 1792888339602,
       "lastAction": "keputusan",
-      "lastReason": "RETARDIO [mid]: Dilewati karena red flag: 10 holder terbesar pegang 43%."
+      "lastReason": "GIN-CHAN [degen]: Dilewati: harga sudah -41% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1712,6 +1712,33 @@
     },
     "decisions": [
       {
+        "at": 1792888293513,
+        "symbol": "GIN-CHAN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1
+        },
+        "reason": "Dilewati: harga sudah -41% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792888287239,
+        "symbol": "BOYCOTT",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 4
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: unsupported_extension."
+      },
+      {
         "at": 1792887848640,
         "symbol": "RETARDIO",
         "action": "skip",
@@ -1870,23 +1897,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma $10113."
-      },
-      {
-        "at": 1792885641879,
-        "symbol": "BOYCOTT",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: unsupported_extension."
       },
       {
         "at": 1792885433376,
@@ -2418,44 +2428,12 @@
           }
         ],
         "reason": "Diveto LLM: The two strongest wallets show near-identical trade metrics, suggesting one operator, while the third is a losing high-churn trader. Tidak dimasuki."
-      },
-      {
-        "at": 1792874618065,
-        "symbol": "GLITCH",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "rat",
-            "count": 1,
-            "note": "insider/entrapment pegang 10.6%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 2.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 717,
-            "note": "7.5% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 2.0%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 37,
+        "below_entry": 38,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
@@ -2513,7 +2491,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792888311356,
+    "generatedAt": 1792888622395,
     "trades": {
       "count": 154,
       "wins": 63,
