@@ -3,8 +3,8 @@
   "status": "ok",
   "paperOnly": true,
   "phase": "scored",
-  "updatedAt": 1792908105182,
-  "checkedAt": 1792908115367,
+  "updatedAt": 1792908402196,
+  "checkedAt": 1792908418124,
   "startCapitalUsd": 1000,
   "startedAt": 1792574691746,
   "engineStartedAt": 1792574691746,
@@ -35,34 +35,31 @@
     "pctSinceStart": -3.95,
     "netFlowsUsd": 0,
     "maxDrawdownPct": -6.91,
-    "closes": 11,
-    "winRatePct": 45.5,
-    "avgWinUsd": 1.72,
+    "closes": 12,
+    "winRatePct": 50,
+    "avgWinUsd": 1.47,
     "avgLossUsd": -0.22,
     "feesUsd": 10.15,
     "costsUsd": 1.4,
-    "openSeats": [
+    "openSeats": [],
+    "last10Closes": [
       {
         "symbol": "BTC-SOL",
         "book": "CH-v1-RG",
-        "binStep": 80,
-        "bins": 88,
-        "shape": "spot",
         "openedAt": 1792904088649,
-        "basisUsd": 192.07,
-        "basisSol": 1.888,
-        "pnlPct": 0.1,
-        "inRange": false,
-        "valueUsd": 192.27,
+        "closedAt": 1792908196638,
+        "netUsd": 0.19,
+        "netSol": 0.0019,
+        "netPct": 0.1,
         "feesUsd": 0.2,
-        "pnlUsd": 0.2,
-        "pnlSol": 0.0019,
-        "peakPct": 0.11,
-        "troughPct": 0,
-        "entryNote": "BTC-SOL dipilih: fee/TVL 24j 7.59% (min 5.0%), fee/TVL aktif 1.450, slippage pulang-pergi 2.13% ≤ batas 2.45% pada 100% ukuran rencana (1.888 SOL), rezim R1 spot 88 bin."
-      }
-    ],
-    "last10Closes": [
+        "reason": "oor_above 60m",
+        "basisUsd": null,
+        "peakPct": null,
+        "troughPct": null,
+        "closeNote": null,
+        "shape": null,
+        "binStep": null
+      },
       {
         "symbol": "BTC-SOL",
         "book": "CH-v1-RG",
@@ -215,26 +212,26 @@
         "closeNote": null,
         "shape": null,
         "binStep": null
-      },
-      {
-        "symbol": "Macca-SOL",
-        "book": "CH-v1-RG",
-        "openedAt": 1792682961272,
-        "closedAt": 1792684687300,
-        "netUsd": 0,
-        "netSol": 0,
-        "netPct": 0.01,
-        "feesUsd": 0.44,
-        "reason": "dump_guard -18.0%/5m",
-        "basisUsd": null,
-        "peakPct": null,
-        "troughPct": null,
-        "closeNote": null,
-        "shape": null,
-        "binStep": null
       }
     ],
     "closeHistory": [
+      {
+        "symbol": "BTC-SOL",
+        "book": "CH-v1-RG",
+        "openedAt": 1792904088649,
+        "closedAt": 1792908196638,
+        "netUsd": 0.19,
+        "netSol": 0.0019,
+        "netPct": 0.1,
+        "feesUsd": 0.2,
+        "reason": "oor_above 60m",
+        "basisUsd": 193.6,
+        "peakPct": 0.11,
+        "troughPct": 0,
+        "closeNote": "BTC-SOL ditutup, harga di atas rentang selama 60 menit (batas 60 menit).",
+        "shape": "spot",
+        "binStep": 80
+      },
       {
         "symbol": "BTC-SOL",
         "book": "CH-v1-RG",
@@ -447,25 +444,25 @@
       },
       {
         "date": "2026-10-25",
-        "usd": 4.39,
-        "closes": 4,
-        "wins": 2,
+        "usd": 4.58,
+        "closes": 5,
+        "wins": 3,
         "losses": 2
       }
     ],
     "holdings": [
       {
         "symbol": "SOL",
-        "amount": 7.499659,
-        "usd": 762.97
+        "amount": 9.441683,
+        "usd": 960.54
       }
     ],
-    "cashUsd": 762.97,
-    "lpUsd": 197.57,
-    "realizedUsd": 7.26,
-    "unrealizedUsd": 0.2,
+    "cashUsd": 960.54,
+    "lpUsd": 0,
+    "realizedUsd": 7.46,
+    "unrealizedUsd": 0,
     "pctSinceStartSol": 0.77,
-    "deployedPctNow": 20,
+    "deployedPctNow": 0,
     "maxPositionsNow": 6,
     "ddBasis": "harian",
     "cashoodNetFlowsUsd": 0,
@@ -486,15 +483,15 @@
   ],
   "live": {
     "status": "ok",
-    "equityUsd": 5890.57,
-    "pctSinceStart": -20.08,
-    "rawPctSinceStart": -20.08,
+    "equityUsd": 5879.41,
+    "pctSinceStart": -20.23,
+    "rawPctSinceStart": -20.23,
     "netFlowsUsd": 0,
     "maxDrawdownPct": -22.16,
     "startNavUsd": 7370.42,
     "startNavAt": 1792572978345,
-    "asOf": 1792908060496,
+    "asOf": 1792908360407,
     "source": "cashood meridian",
-    "note": "Dihitung Cashood dari data dana Meridian, bukan dari mesin Grok: Modified Dietz harian dirangkai (USD) sejak T0. NAV di T0 $7370.42, sekarang $5890.57; arus dana bersih sejak T0 $0.00; tanpa koreksi arus dana -20.08%. Perhatian: modal kertas berbeda -86.43% dari NAV Meridian di T0."
+    "note": "Dihitung Cashood dari data dana Meridian, bukan dari mesin Grok: Modified Dietz harian dirangkai (USD) sejak T0. NAV di T0 $7370.42, sekarang $5879.41; arus dana bersih sejak T0 $0.00; tanpa koreksi arus dana -20.23%. Perhatian: modal kertas berbeda -86.43% dari NAV Meridian di T0."
   }
 }
