@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "566e6df4-f7c0-4b82-bcaa-ca9cc9799c59",
-  "updatedAt": 1792966006171,
-  "generatedAt": "2026-10-26 05:06 WIB",
+  "generation": "124ac55b-0022-4861-9c60-b0deb4008018",
+  "updatedAt": 1792966311124,
+  "generatedAt": "2026-10-26 05:11 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1824,
+      "ageMinutes": 1829,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792966006171,
+    "heartbeatAt": 1792966311124,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792965983000,
+    "lastScanAt": 1792966303000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "401",
+        "v": "404",
         "n": "24 jam · 2 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792966006171,
+      "lastDecisionAt": 1792966311124,
       "lastAction": "keputusan",
-      "lastReason": "ANSEM [big]: Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
     }
   },
   "strategy": {
@@ -1718,7 +1718,27 @@
     },
     "decisions": [
       {
-        "at": 1792965532190,
+        "at": 1792966185797,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      },
+      {
+        "at": 1792966177483,
+        "symbol": "BREAK",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 43%."
+      },
+      {
+        "at": 1792966140201,
         "symbol": "ANSEM",
         "action": "skip",
         "basket": "big",
@@ -1728,7 +1748,7 @@
         "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
       },
       {
-        "at": 1792965438864,
+        "at": 1792966046037,
         "symbol": "TRUMP",
         "action": "skip",
         "basket": "big",
@@ -2408,44 +2428,17 @@
           }
         ],
         "reason": "Dilewati: harga sudah -19% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792956413921,
-        "symbol": "ETH",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792956285527,
-        "symbol": "PCAT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 55,
-            "note": "bundler pegang 10.6%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 55,
+        "below_entry": 54,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 342,
+        "red_flag": 346,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2498,7 +2491,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792966307606,
+    "generatedAt": 1792966607177,
     "trades": {
       "count": 154,
       "wins": 63,
