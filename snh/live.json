@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "f27f25d7-5690-4734-bb09-0fcc59eef7de",
-  "updatedAt": 1792951134425,
-  "generatedAt": "2026-10-26 00:58 WIB",
+  "generation": "a15e8191-99b0-426f-891a-06c7951d6b18",
+  "updatedAt": 1792951438120,
+  "generatedAt": "2026-10-26 01:03 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1576,
+      "ageMinutes": 1581,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792951134425,
+    "heartbeatAt": 1792951438120,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792951126000,
+    "lastScanAt": 1792951417000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "327",
+        "v": "325",
         "n": "24 jam · 4 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792951134425,
+      "lastDecisionAt": 1792951438120,
       "lastAction": "keputusan",
-      "lastReason": "BTC [mid]: Dilewati: harga sudah -16% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "XRPL [degen]: Dilewati karena red flag: holder baru 15."
     }
   },
   "strategy": {
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14199 · bot 7030 · blacklist 502 · lp 1 · fresh 1403 · kol 230 · dolphin 202 · whale 16 · unknown 1"
+        "smart 14197 · bot 7030 · blacklist 502 · lp 1 · fresh 1405 · kol 230 · dolphin 202 · whale 16 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1563,9 +1563,9 @@
       "byLabel": [
         {
           "key": "smart",
-          "total": 14199,
+          "total": 14197,
           "active": 535,
-          "passive": 13664
+          "passive": 13662
         },
         {
           "key": "bot",
@@ -1575,9 +1575,9 @@
         },
         {
           "key": "fresh",
-          "total": 1403,
+          "total": 1405,
           "active": 0,
-          "passive": 1403
+          "passive": 1405
         },
         {
           "key": "blacklist",
@@ -1717,6 +1717,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792951298050,
+        "symbol": "XRPL",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: holder baru 15."
+      },
+      {
+        "at": 1792951167240,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 5,
+            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $21217."
+      },
       {
         "at": 1792950998461,
         "symbol": "BTC",
@@ -2320,40 +2347,6 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792937056884,
-        "symbol": "GMEx",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1792937047558,
-        "symbol": "GME",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 16%."
       }
     ],
     "reasonStats": {
@@ -2364,7 +2357,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 277,
+        "red_flag": 275,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2417,7 +2410,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792951311196,
+    "generatedAt": 1792951617793,
     "trades": {
       "count": 154,
       "wins": 63,
