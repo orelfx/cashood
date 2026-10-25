@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "ded7351d-f214-4bae-a7e9-831bc37c4ff7",
-  "updatedAt": 1792960223662,
-  "generatedAt": "2026-10-26 03:30 WIB",
+  "generation": "9863874d-cf44-4430-a389-1c60d1dcb06c",
+  "updatedAt": 1792960526199,
+  "generatedAt": "2026-10-26 03:35 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1728,
+      "ageMinutes": 1733,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792960223662,
+    "heartbeatAt": 1792960526199,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792960029000,
+    "lastScanAt": 1792960474000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,8 +1458,8 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "391",
-        "n": "24 jam · 4 diveto LLM"
+        "v": "389",
+        "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792960223662,
+      "lastDecisionAt": 1792960526199,
       "lastAction": "keputusan",
-      "lastReason": "ANSEM [big]: Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $21450."
     }
   },
   "strategy": {
@@ -1717,6 +1717,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792960284159,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $21450."
+      },
       {
         "at": 1792960065681,
         "symbol": "ANSEM",
@@ -2361,38 +2378,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $1042."
-      },
-      {
-        "at": 1792954822250,
-        "symbol": "MINEHUB",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "kol": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 173,
-            "note": "bundler pegang 24.1%"
-          },
-          {
-            "type": "rat",
-            "count": 2,
-            "note": "insider/entrapment pegang 2.3%"
-          },
-          {
-            "type": "sniper",
-            "count": 9,
-            "note": "sniper awal masih pegang 4.0%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 9x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
@@ -2403,7 +2388,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 328,
+        "red_flag": 327,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2421,7 +2406,7 @@
         "jumlah": 0
       },
       "veto": {
-        "llm": 4
+        "llm": 3
       },
       "test": {
         "solo": 0,
@@ -2456,7 +2441,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792960313955,
+    "generatedAt": 1792960607323,
     "trades": {
       "count": 154,
       "wins": 63,
