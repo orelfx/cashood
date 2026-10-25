@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "abc47825-0ad2-439f-9259-f01ebd2ca31e",
-  "updatedAt": 1792956274369,
-  "generatedAt": "2026-10-26 02:24 WIB",
+  "generation": "51cd6321-129f-4f5c-8b9b-92d6e9560713",
+  "updatedAt": 1792956577464,
+  "generatedAt": "2026-10-26 02:29 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1662,
+      "ageMinutes": 1667,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792956274369,
+    "heartbeatAt": 1792956577464,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792956167000,
+    "lastScanAt": 1792956564000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "378",
+        "v": "379",
         "n": "24 jam · 4 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23584",
-        "n": "576 aktif"
+        "n": "574 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792956274369,
+      "lastDecisionAt": 1792956577464,
       "lastAction": "keputusan",
-      "lastReason": "TEST [degen]: Dilewati karena red flag: holder baru 13."
+      "lastReason": "BTC [mid]: Dilewati: harga sudah -19% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23584 · 576 aktif"
+        "23584 · 574 aktif"
       ],
       [
         "Cadangan kas",
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14176 · bot 7033 · blacklist 503 · lp 1 · fresh 1422 · kol 230 · dolphin 203 · whale 15 · unknown 1"
+        "smart 14175 · bot 7034 · blacklist 503 · lp 1 · fresh 1422 · kol 230 · dolphin 203 · whale 15 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1556,22 +1556,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23584,
-      "active": 576,
-      "passive": 23008,
+      "active": 574,
+      "passive": 23010,
       "trusted": 0,
       "promising": 12,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14176,
-          "active": 543,
-          "passive": 13633
+          "total": 14175,
+          "active": 541,
+          "passive": 13634
         },
         {
           "key": "bot",
-          "total": 7033,
+          "total": 7034,
           "active": 0,
-          "passive": 7033
+          "passive": 7034
         },
         {
           "key": "fresh",
@@ -1718,6 +1718,71 @@
     },
     "decisions": [
       {
+        "at": 1792956448318,
+        "symbol": "BTC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 3,
+          "dolphin": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -19% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792956418639,
+        "symbol": "ANSEM",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      },
+      {
+        "at": 1792956413921,
+        "symbol": "ETH",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1792956349798,
+        "symbol": "TRUMP",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.5% dari market cap."
+      },
+      {
+        "at": 1792956285527,
+        "symbol": "PCAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 55,
+            "note": "bundler pegang 10.6%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
         "at": 1792956158127,
         "symbol": "TEST",
         "action": "skip",
@@ -1775,44 +1840,6 @@
         "reason": "Dilewati karena red flag: likuiditas cuma $1081."
       },
       {
-        "at": 1792955841229,
-        "symbol": "BTC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 3,
-          "dolphin": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -19% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792955810241,
-        "symbol": "ANSEM",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
-      },
-      {
-        "at": 1792955802150,
-        "symbol": "ETH",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -22% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
         "at": 1792955784438,
         "symbol": "NEAR",
         "action": "skip",
@@ -1821,16 +1848,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $1088."
-      },
-      {
-        "at": 1792955747684,
-        "symbol": "TRUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.5% dari market cap."
       },
       {
         "at": 1792955576527,
@@ -2421,22 +2438,12 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -76% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792952494182,
-        "symbol": "GOIF",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -83% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 52,
+        "below_entry": 53,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2494,7 +2501,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792956409338,
+    "generatedAt": 1792956707559,
     "trades": {
       "count": 154,
       "wins": 63,
@@ -2536,11 +2543,11 @@
       "days": 20,
       "spanDays": 19.8,
       "returnPct": -9.3,
-      "maxDrawdownPct": 9.55,
-      "maxDrawdownAt": 1792869572130,
-      "maxDrawdownUsd": 94.52,
+      "maxDrawdownPct": 9.3,
+      "maxDrawdownAt": 1792857508564,
+      "maxDrawdownUsd": 92.04,
       "maxDrawdownPeakUsd": 989.63,
-      "maxDrawdownTroughUsd": 895.11,
+      "maxDrawdownTroughUsd": 897.59,
       "currentDrawdownPct": 9.3,
       "currentDrawdownUsd": 92.04,
       "positiveDaysPct": 35,
@@ -2553,16 +2560,16 @@
     },
     "profitUsd": -102.41,
     "profitPct": -10.24,
-    "recoveryFactor": -1.08,
+    "recoveryFactor": -1.11,
     "score": {
       "axes": {
         "winRate": 41.45,
         "profitFactor": 0,
-        "risk": 76.13,
+        "risk": 76.75,
         "recovery": 0,
         "consistency": 35
       },
-      "overall": 30.51,
+      "overall": 30.64,
       "complete": true
     }
   }
