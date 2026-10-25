@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "57003d83-a9d8-462f-b9e3-e1fc3dab4cd1",
-  "updatedAt": 1792900730176,
-  "generatedAt": "2026-10-25 10:58 WIB",
+  "generation": "ca2e9284-1ae7-44c1-b498-d02749278656",
+  "updatedAt": 1792901033378,
+  "generatedAt": "2026-10-25 11:03 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 736,
+      "ageMinutes": 741,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792900730176,
+    "heartbeatAt": 1792901033378,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792900715000,
+    "lastScanAt": 1792901017000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "361",
+        "v": "363",
         "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23568",
-        "n": "541 aktif"
+        "n": "540 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792900730176,
+      "lastDecisionAt": 1792901033378,
       "lastAction": "keputusan",
-      "lastReason": "Marvin [low]: Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "WingSlop [degen]: Dilewati: unpriced_exposure."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23568 · 541 aktif"
+        "23568 · 540 aktif"
       ],
       [
         "Cadangan kas",
@@ -1556,16 +1556,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23568,
-      "active": 541,
-      "passive": 23027,
+      "active": 540,
+      "passive": 23028,
       "trusted": 0,
       "promising": 14,
       "byLabel": [
         {
           "key": "smart",
           "total": 14244,
-          "active": 513,
-          "passive": 13731
+          "active": 512,
+          "passive": 13732
         },
         {
           "key": "bot",
@@ -1712,6 +1712,65 @@
     },
     "decisions": [
       {
+        "at": 1792901018236,
+        "symbol": "WingSlop",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "dolphin": 1,
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 323,
+            "note": "bundler pegang 16.7%"
+          },
+          {
+            "type": "rat",
+            "count": 6,
+            "note": "insider/entrapment pegang 8.2%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 0.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 466,
+            "note": "8.9% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 16x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: unpriced_exposure."
+      },
+      {
+        "at": 1792900931683,
+        "symbol": "BTC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 3,
+          "kol": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 68%."
+      },
+      {
         "at": 1792900528049,
         "symbol": "Marvin",
         "action": "skip",
@@ -1727,17 +1786,6 @@
           }
         ],
         "reason": "Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792900320990,
-        "symbol": "BTC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 4,
-          "kol": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 68%."
       },
       {
         "at": 1792899920729,
@@ -2503,16 +2551,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792886916636,
-        "symbol": "GLITCH",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 6
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 78.96% supply."
       }
     ],
     "reasonStats": {
@@ -2523,7 +2561,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 315,
+        "red_flag": 316,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2532,7 +2570,7 @@
         "day_loss": 0,
         "paused": 0,
         "reserve": 0,
-        "unpriced_exposure": 1
+        "unpriced_exposure": 2
       },
       "wait": {
         "jumlah": 1
@@ -2576,7 +2614,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792900913161,
+    "generatedAt": 1792901209125,
     "trades": {
       "count": 154,
       "wins": 63,
