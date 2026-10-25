@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "73ada81e-cdea-4e24-9332-e376c1d5bcf3",
-  "updatedAt": 1792889547239,
-  "generatedAt": "2026-10-25 07:52 WIB",
+  "generation": "acd0240a-9e71-4def-9b5a-4ec290fd023f",
+  "updatedAt": 1792889847307,
+  "generatedAt": "2026-10-25 07:57 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 550,
+      "ageMinutes": 555,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792889547239,
+    "heartbeatAt": 1792889847307,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792889539000,
+    "lastScanAt": 1792889835000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "367",
+        "v": "368",
         "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
-        "v": "23566",
-        "n": "540 aktif"
+        "v": "23568",
+        "n": "541 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792889547239,
+      "lastDecisionAt": 1792889847307,
       "lastAction": "keputusan",
-      "lastReason": "ULTRON [degen]: Dilewati: rugcheck_danger:Creator history of rugged tokens."
+      "lastReason": "ORE [big]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23566 · 540 aktif"
+        "23568 · 541 aktif"
       ],
       [
         "Cadangan kas",
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14243 · bot 7016 · blacklist 495 · lp 1 · fresh 1377 · kol 227 · dolphin 191 · whale 16"
+        "smart 14244 · bot 7018 · blacklist 495 · lp 1 · fresh 1375 · kol 228 · dolphin 191 · whale 16"
       ]
     ],
     "requirements": [
@@ -1555,29 +1555,29 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 23566,
-      "active": 540,
-      "passive": 23026,
+      "tracked": 23568,
+      "active": 541,
+      "passive": 23027,
       "trusted": 0,
       "promising": 15,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14243,
-          "active": 511,
+          "total": 14244,
+          "active": 512,
           "passive": 13732
         },
         {
           "key": "bot",
-          "total": 7016,
+          "total": 7018,
           "active": 0,
-          "passive": 7016
+          "passive": 7018
         },
         {
           "key": "fresh",
-          "total": 1377,
+          "total": 1375,
           "active": 0,
-          "passive": 1377
+          "passive": 1375
         },
         {
           "key": "blacklist",
@@ -1587,9 +1587,9 @@
         },
         {
           "key": "kol",
-          "total": 227,
+          "total": 228,
           "active": 9,
-          "passive": 218
+          "passive": 219
         },
         {
           "key": "dolphin",
@@ -1712,17 +1712,27 @@
     },
     "decisions": [
       {
-        "at": 1792889399188,
-        "symbol": "ULTRON",
+        "at": 1792889696976,
+        "symbol": "ORE",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1792889682070,
+        "symbol": "pOREsch",
         "action": "skip",
         "basket": "degen",
         "wallets": {
           "smart": 1
         },
-        "reason": "Dilewati: rugcheck_danger:Creator history of rugged tokens."
+        "reason": "Dilewati: unsupported_extension."
       },
       {
-        "at": 1792889066999,
+        "at": 1792889677295,
         "symbol": "RETARDIO",
         "action": "skip",
         "basket": "mid",
@@ -1737,6 +1747,16 @@
           }
         ],
         "reason": "Dilewati karena red flag: 10 holder terbesar pegang 43%."
+      },
+      {
+        "at": 1792889399188,
+        "symbol": "ULTRON",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: rugcheck_danger:Creator history of rugged tokens."
       },
       {
         "at": 1792889056794,
@@ -2330,53 +2350,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 50% supply."
-      },
-      {
-        "at": 1792878436113,
-        "symbol": "COIL",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 349,
-            "note": "bundler pegang 7.3%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 14.9%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "11.9% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 8x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792877873754,
-        "symbol": "Chog",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 29% supply."
       }
     ],
     "reasonStats": {
@@ -2387,7 +2360,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 319,
+        "red_flag": 320,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2440,7 +2413,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792889825868,
+    "generatedAt": 1792890117801,
     "trades": {
       "count": 154,
       "wins": 63,
