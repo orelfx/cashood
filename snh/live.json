@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "b06f8840-9306-487f-9c6c-e7078cca46ff",
-  "updatedAt": 1792962682107,
-  "generatedAt": "2026-10-26 04:11 WIB",
+  "generation": "f87982c3-6f6d-4038-9fcc-53688bb3762c",
+  "updatedAt": 1792962983411,
+  "generatedAt": "2026-10-26 04:16 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1769,
+      "ageMinutes": 1774,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792962682107,
+    "heartbeatAt": 1792962983411,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792962582000,
+    "lastScanAt": 1792962821000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "396",
+        "v": "397",
         "n": "24 jam · 2 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792962682107,
+      "lastDecisionAt": 1792962983411,
       "lastAction": "keputusan",
-      "lastReason": "ANSEM [big]: Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      "lastReason": "Bezzy [degen]: Dilewati karena red flag: bundler pegang 41% supply."
     }
   },
   "strategy": {
@@ -1717,6 +1717,65 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792962725313,
+        "symbol": "Bezzy",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 41% supply."
+      },
+      {
+        "at": 1792962720921,
+        "symbol": "PRESIDENT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 33% supply."
+      },
+      {
+        "at": 1792962708527,
+        "symbol": "Bezzy",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 372,
+            "note": "bundler pegang 11.9%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.8%"
+          },
+          {
+            "type": "sniper",
+            "count": 3,
+            "note": "sniper awal masih pegang 19.5%"
+          },
+          {
+            "type": "fresh",
+            "count": 291,
+            "note": "9.5% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
       {
         "at": 1792962497205,
         "symbol": "ANSEM",
@@ -2310,54 +2369,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: holder baru 11."
-      },
-      {
-        "at": 1792955527561,
-        "symbol": "HOTBOT",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 29%."
-      },
-      {
-        "at": 1792955521082,
-        "symbol": "WSB",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 53%."
-      },
-      {
-        "at": 1792955513856,
-        "symbol": "GME",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 27%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 58,
+        "below_entry": 57,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 335,
+        "red_flag": 337,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2410,7 +2432,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792962708338,
+    "generatedAt": 1792963007103,
     "trades": {
       "count": 154,
       "wins": 63,
