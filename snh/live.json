@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "6f23b47f-548d-4cda-aab6-5a7a86607f7b",
-  "updatedAt": 1792902243820,
-  "generatedAt": "2026-10-25 11:24 WIB",
+  "generation": "e4acc764-ba03-4979-8231-90c4d1d15972",
+  "updatedAt": 1792902546480,
+  "generatedAt": "2026-10-25 11:29 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 761,
+      "ageMinutes": 766,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792902243820,
+    "heartbeatAt": 1792902546480,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792902216000,
+    "lastScanAt": 1792902529000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "363",
+        "v": "364",
         "n": "24 jam · 3 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792902243820,
+      "lastDecisionAt": 1792902546480,
       "lastAction": "keputusan",
-      "lastReason": "BTC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 68%."
+      "lastReason": "Marvin [low]: Dilewati: harga sudah -71% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1711,6 +1711,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792902358516,
+        "symbol": "Marvin",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 4,
+            "note": "4 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -71% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1792902143400,
         "symbol": "BTC",
@@ -2533,22 +2550,12 @@
           "kol": 1
         },
         "reason": "Dilewati: harga sudah -29% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792887674223,
-        "symbol": "Kona",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: holder baru 21."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 40,
+        "below_entry": 41,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 1,
@@ -2606,7 +2613,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792902409651,
+    "generatedAt": 1792902709303,
     "trades": {
       "count": 154,
       "wins": 63,
