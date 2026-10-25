@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "45dc4cc2-ca30-4d90-b9a4-c460c204141a",
-  "updatedAt": 1792966611155,
-  "generatedAt": "2026-10-26 05:16 WIB",
+  "generation": "c8832dce-26b4-46a5-8a28-0eb9f97cd19f",
+  "updatedAt": 1792966915522,
+  "generatedAt": "2026-10-26 05:21 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1834,
+      "ageMinutes": 1839,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792966611155,
+    "heartbeatAt": 1792966915522,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792966590000,
+    "lastScanAt": 1792966881000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "401",
+        "v": "403",
         "n": "24 jam · 2 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23585",
-        "n": "572 aktif"
+        "n": "573 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792966611155,
+      "lastDecisionAt": 1792966915522,
       "lastAction": "keputusan",
-      "lastReason": "DJT [mid]: Dilewati karena red flag: mint authority belum dilepas."
+      "lastReason": "CARDS [big]: Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23585 · 572 aktif"
+        "23585 · 573 aktif"
       ],
       [
         "Cadangan kas",
@@ -1556,16 +1556,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23585,
-      "active": 572,
-      "passive": 23013,
+      "active": 573,
+      "passive": 23012,
       "trusted": 0,
       "promising": 12,
       "byLabel": [
         {
           "key": "smart",
           "total": 14176,
-          "active": 538,
-          "passive": 13638
+          "active": 539,
+          "passive": 13637
         },
         {
           "key": "bot",
@@ -1718,6 +1718,53 @@
     },
     "decisions": [
       {
+        "at": 1792966788610,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      },
+      {
+        "at": 1792966745674,
+        "symbol": "ANSEM",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
+      },
+      {
+        "at": 1792966733051,
+        "symbol": "ASSCOIN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 272,
+            "note": "bundler pegang 17.1%"
+          },
+          {
+            "type": "rat",
+            "count": 7,
+            "note": "insider/entrapment pegang 3.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 427,
+            "note": "11.5% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: unpriced_exposure."
+      },
+      {
         "at": 1792966609004,
         "symbol": "DJT",
         "action": "skip",
@@ -1755,16 +1802,6 @@
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
       },
       {
-        "at": 1792966185797,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
-      },
-      {
         "at": 1792966177483,
         "symbol": "BREAK",
         "action": "skip",
@@ -1773,16 +1810,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 43%."
-      },
-      {
-        "at": 1792966140201,
-        "symbol": "ANSEM",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 65%."
       },
       {
         "at": 1792966046037,
@@ -2420,34 +2447,17 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $2177."
-      },
-      {
-        "at": 1792956633735,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma $22216."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 54,
+        "below_entry": 53,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 343,
+        "red_flag": 345,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2456,7 +2466,7 @@
         "day_loss": 0,
         "paused": 0,
         "reserve": 0,
-        "unpriced_exposure": 2
+        "unpriced_exposure": 3
       },
       "wait": {
         "jumlah": 0
@@ -2500,7 +2510,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792966920000,
+    "generatedAt": 1792967213078,
     "trades": {
       "count": 154,
       "wins": 63,
