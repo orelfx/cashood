@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "cfe6c847-ccfa-4322-922e-7373c63a708e",
-  "updatedAt": 1792926101154,
-  "generatedAt": "2026-10-25 18:01 WIB",
+  "generation": "fb731dfe-6413-41d5-a640-5a6bcaa6f5a8",
+  "updatedAt": 1792926401153,
+  "generatedAt": "2026-10-25 18:06 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1159,
+      "ageMinutes": 1164,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792926101154,
+    "heartbeatAt": 1792926401153,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792926091000,
+    "lastScanAt": 1792926392000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "336",
+        "v": "337",
         "n": "24 jam · 3 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23574",
-        "n": "560 aktif"
+        "n": "564 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792926101154,
+      "lastDecisionAt": 1792926401153,
       "lastAction": "keputusan",
-      "lastReason": "SPCX [degen]: Dilewati: harga sudah -97% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "STD [degen]: Dilewati karena red flag: holder baru 13."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23574 · 560 aktif"
+        "23574 · 564 aktif"
       ],
       [
         "Cadangan kas",
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14220 · bot 7019 · blacklist 499 · lp 1 · fresh 1392 · kol 229 · dolphin 197 · whale 16 · unknown 1"
+        "smart 14218 · bot 7018 · blacklist 499 · lp 1 · fresh 1393 · kol 229 · dolphin 199 · whale 16 · unknown 1"
       ]
     ],
     "requirements": [
@@ -1556,28 +1556,28 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23574,
-      "active": 560,
-      "passive": 23014,
+      "active": 564,
+      "passive": 23010,
       "trusted": 0,
       "promising": 13,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14220,
-          "active": 530,
-          "passive": 13690
+          "total": 14218,
+          "active": 533,
+          "passive": 13685
         },
         {
           "key": "bot",
-          "total": 7019,
+          "total": 7018,
           "active": 0,
-          "passive": 7019
+          "passive": 7018
         },
         {
           "key": "fresh",
-          "total": 1392,
+          "total": 1393,
           "active": 0,
-          "passive": 1392
+          "passive": 1393
         },
         {
           "key": "blacklist",
@@ -1588,14 +1588,14 @@
         {
           "key": "kol",
           "total": 229,
-          "active": 8,
-          "passive": 221
+          "active": 9,
+          "passive": 220
         },
         {
           "key": "dolphin",
-          "total": 197,
+          "total": 199,
           "active": 22,
-          "passive": 175
+          "passive": 177
         },
         {
           "key": "whale",
@@ -1717,6 +1717,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792926157204,
+        "symbol": "STD",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: holder baru 13."
+      },
       {
         "at": 1792924744515,
         "symbol": "SPCX",
@@ -2539,16 +2556,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: likuiditas cuma $3803."
-      },
-      {
-        "at": 1792891339846,
-        "symbol": "MEME",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 54.42% supply."
       }
     ],
     "reasonStats": {
@@ -2559,7 +2566,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 286,
+        "red_flag": 287,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2612,7 +2619,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792926119192,
+    "generatedAt": 1792926413335,
     "trades": {
       "count": 154,
       "wins": 63,
