@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "cd0e188f-7234-4954-a417-a7c40de49667",
-  "updatedAt": 1792896504108,
-  "generatedAt": "2026-10-25 09:48 WIB",
+  "generation": "a427092e-5ddc-40ff-90c3-40241c3ff342",
+  "updatedAt": 1792896808128,
+  "generatedAt": "2026-10-25 09:53 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 666,
+      "ageMinutes": 671,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792896504108,
+    "heartbeatAt": 1792896808128,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792896467000,
+    "lastScanAt": 1792896790000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "353",
+        "v": "355",
         "n": "24 jam · 3 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792896504108,
+      "lastDecisionAt": 1792896808128,
       "lastAction": "keputusan",
-      "lastReason": "BTC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 68%."
+      "lastReason": "BTC [mid]: Dilewati karena red flag: 10 holder terbesar pegang 67%."
     }
   },
   "strategy": {
@@ -1711,6 +1711,68 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1792896693852,
+        "symbol": "BTC",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: 10 holder terbesar pegang 67%."
+      },
+      {
+        "at": 1792896669727,
+        "symbol": "Marvin",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 3
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 3.6% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev sudah menjual"
+          },
+          {
+            "type": "bundler",
+            "count": 692,
+            "note": "bundler pegang 23.6%"
+          },
+          {
+            "type": "rat",
+            "count": 11,
+            "note": "insider/entrapment pegang 12.1%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 1.6%"
+          },
+          {
+            "type": "fresh",
+            "count": 1000,
+            "note": "12.8% holder wallet baru"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 28x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: explore: zone/cooldown/budget."
+      },
       {
         "at": 1792896092071,
         "symbol": "BTC",
@@ -2470,43 +2532,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792883933253,
-        "symbol": "XBT",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 739,
-            "note": "bundler pegang 2.9%"
-          },
-          {
-            "type": "rat",
-            "count": 3,
-            "note": "insider/entrapment pegang 7.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 2,
-            "note": "sniper awal masih pegang 0.0%"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1792883370785,
-        "symbol": "ofish",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati: harga sudah -96% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2517,7 +2542,7 @@
         "wallet_left": 0,
         "breakdown": 1,
         "liq_drop": 0,
-        "red_flag": 309,
+        "red_flag": 311,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2570,7 +2595,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792896715162,
+    "generatedAt": 1792897009029,
     "trades": {
       "count": 154,
       "wins": 63,
