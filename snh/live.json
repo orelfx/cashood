@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "20f03e6f-e9bf-4eae-8df8-9707a350735e",
-  "updatedAt": 1792970859880,
-  "generatedAt": "2026-10-26 06:27 WIB",
+  "generation": "d48eabf2-6956-4db4-aa83-2f29816f3752",
+  "updatedAt": 1792971160065,
+  "generatedAt": "2026-10-26 06:32 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 1905,
+      "ageMinutes": 1910,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1792970859880,
+    "heartbeatAt": 1792971160065,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1792970735000,
+    "lastScanAt": 1792971088000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "392",
+        "v": "397",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1792970859880,
+      "lastDecisionAt": 1792971160065,
       "lastAction": "keputusan",
-      "lastReason": "kimchi [low]: Dilewati karena red flag: 10 holder terbesar pegang 64%."
+      "lastReason": "MEMECOIN [degen]: Dilewati karena red flag: dev sudah menjual di bonding curve."
     }
   },
   "strategy": {
@@ -1718,6 +1718,70 @@
     },
     "decisions": [
       {
+        "at": 1792971070650,
+        "symbol": "MEMECOIN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
+      },
+      {
+        "at": 1792971043700,
+        "symbol": "sassy",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 41% supply."
+      },
+      {
+        "at": 1792971037701,
+        "symbol": "CARDS",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
+      },
+      {
+        "at": 1792970998320,
+        "symbol": "HUSS",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: bundler pegang 49% supply."
+      },
+      {
+        "at": 1792970991090,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 6,
+            "note": "6 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $21331."
+      },
+      {
         "at": 1792970625210,
         "symbol": "kimchi",
         "action": "skip",
@@ -1726,16 +1790,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: 10 holder terbesar pegang 64%."
-      },
-      {
-        "at": 1792970433889,
-        "symbol": "CARDS",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma 0.8% dari market cap."
       },
       {
         "at": 1792970391147,
@@ -2451,61 +2505,6 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -29% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792958479989,
-        "symbol": "ONECOIN",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1792958469989,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 3,
-            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma $21926."
-      },
-      {
-        "at": 1792958268609,
-        "symbol": "BTC",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 3,
-          "dolphin": 1
-        },
-        "reason": "Dilewati: harga sudah -25% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792958264796,
-        "symbol": "sizeinu",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 12%."
       }
     ],
     "reasonStats": {
@@ -2516,7 +2515,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 345,
+        "red_flag": 350,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2569,7 +2568,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1792971111005,
+    "generatedAt": 1792971407212,
     "trades": {
       "count": 154,
       "wins": 63,
