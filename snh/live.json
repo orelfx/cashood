@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "57073275-ae6b-489c-8577-9d46b7255666",
-  "updatedAt": 1793025618885,
-  "generatedAt": "2026-10-26 21:40 WIB",
+  "generation": "6e9b017e-1a65-46c3-b4c5-38141aec97b6",
+  "updatedAt": 1793025919864,
+  "generatedAt": "2026-10-26 21:45 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 2818,
+      "ageMinutes": 2823,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793025618885,
+    "heartbeatAt": 1793025919864,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793025589000,
+    "lastScanAt": 1793025887000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "510",
+        "v": "511",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793025618885,
+      "lastDecisionAt": 1793025919864,
       "lastAction": "keputusan",
-      "lastReason": "BOYCOTT [degen]: Dilewati: solo_test: zone/cooldown/budget."
+      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $22178."
     }
   },
   "strategy": {
@@ -1717,6 +1717,41 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793025777263,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $22178."
+      },
+      {
+        "at": 1793025733032,
+        "symbol": "SCS",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 5
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793025426610,
         "symbol": "BOYCOTT",
@@ -2550,39 +2585,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: bundler pegang 79.26% supply."
-      },
-      {
-        "at": 1793010972018,
-        "symbol": "ILY",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: bundler pegang 29.15% supply."
-      },
-      {
-        "at": 1793010968404,
-        "symbol": "FREAK",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "reason": "Dilewati: harga sudah -75% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 65,
+        "below_entry": 66,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2640,7 +2648,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793025709536,
+    "generatedAt": 1793026002265,
     "trades": {
       "count": 154,
       "wins": 63,
