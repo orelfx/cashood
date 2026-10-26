@@ -27,8 +27,8 @@ function source(over = {}) {
     ...over,
   };
 }
-function run(src, now = NOW) {
-  const dir = mkdtempSync(join(tmpdir(), 'solbot-')), file = join(dir, 'src.json');
+function run(src, now = NOW, dir = mkdtempSync(join(tmpdir(), 'solbot-'))) {
+  const file = join(dir, 'src.json');
   if (src !== undefined) writeFileSync(file, typeof src === 'string' ? src : JSON.stringify(src));
   const r = spawnSync(process.execPath, [join(ROOT, 'scripts', 'sync-solbot.mjs')], {
     env: { ...process.env, CASHOOD_DATA_DIR: join(dir, 'data'), SOLBOT_SRC: file, SOLBOT_NOW: String(now) }, encoding: 'utf8',
@@ -48,8 +48,15 @@ test('solbot: skema lain atau JSON rusak → waiting', () => {
   assert.equal(run('{rusak').status, 'waiting');
 });
 
-test('solbot: as_of lebih dari 15 menit → stale tanpa angka lama', () => {
+test('solbot: as_of lebih dari 15 menit → stale, angka terakhir tetap ada', () => {
   const d = run(source({ as_of: iso(16) }));
+  assert.equal(d.status, 'stale');
+  assert.equal(d.reason, 'Data tertunda');
+  assert.ok(d.equityUsd != null && Array.isArray(d.positions));
+});
+
+test('solbot: as_of lebih dari 7 hari → stale tanpa angka', () => {
+  const d = run(source({ as_of: iso(7 * 24 * 60 + 1) }));
   assert.equal(d.status, 'stale');
   for (const k of ['equityUsd', 'positions', 'closedTrades', 'guards', 'equityCurve']) assert.equal(d[k], undefined, k);
 });
@@ -122,4 +129,14 @@ test('solbot: sleeve (degen/low) ikut terbit di posisi dan trade tertutup', () =
   const d = run(src);
   assert.equal(d.positions[0].sleeve, 'degen');
   assert.equal(d.closedTrades.find((c) => c.symbol === 'AAA').sleeve, 'low');
+});
+
+test('solbot: kiriman rusak sesudah data sah → angka terakhir dipertahankan (stale)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'solbot-'));
+  const ok = run(source(), NOW, dir);
+  assert.equal(ok.status, 'ok');
+  const d = run('{rusak', NOW + 60e3, dir);
+  assert.equal(d.status, 'stale');
+  assert.equal(d.equityUsd, ok.equityUsd);
+  assert.equal(d.asOf, ok.asOf);
 });

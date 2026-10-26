@@ -45,7 +45,18 @@ function publish(snapshot) {
   if (/[1-9A-HJ-NP-Za-km-z]{32,}/.test(raw)) throw new Error('string mirip alamat/signature lolos ke data SolBot; dibatalkan');
   atomicJSON(resolve(DIR, 'live.json'), snapshot);
 }
+// Kiriman bot tertunda/rusak: angka terakhir yang sah tetap diterbitkan
+// (status 'stale' + asOf lama), supaya SolBot tidak hilang dari halaman dan
+// Total aset. 2026-10-26: kiriman Grok putus 39 jam dan SolBot lenyap dari beranda.
+const KEEP_MS = 7 * 24 * 3600e3;
 function waiting(status, reason, extra = {}) {
+  let prev = null;
+  try { prev = JSON.parse(readFileSync(resolve(DIR, 'live.json'), 'utf8')); } catch { /* belum ada */ }
+  if (prev && ['ok', 'stale'].includes(prev.status) && prev.equityUsd != null && prev.asOf && now - prev.asOf <= KEEP_MS) {
+    publish({ ...prev, status: 'stale', reason: 'Data tertunda', checkedAt: now });
+    console.log(`[solbot] stale: ${reason}; angka terakhir dipertahankan`);
+    release(); process.exit(0);
+  }
   publish({ fund: 'solbot', status, reason, checkedAt: now, ...extra });
   console.log(`[solbot] ${status}: ${reason}`);
   release(); process.exit(0);
@@ -61,7 +72,9 @@ const asOf = time(src.as_of);
 if (!asOf) waiting('waiting', 'Data belum lengkap (as_of kosong)');
 const mode = MODES.includes(String(src.mode).toUpperCase()) ? String(src.mode).toUpperCase() : null;
 // Umur dinilai dari as_of milik bot, bukan dari waktu berkas ditarik.
-if (now - asOf > STALE_MS) waiting('stale', 'Data tertunda', { asOf, mode });
+// Lewat 15 menit tetap diolah, tapi ditandai 'stale'; lewat 7 hari tanpa angka.
+const late = now - asOf > STALE_MS;
+if (now - asOf > KEEP_MS) waiting('stale', 'Data tertunda', { asOf, mode });
 
 // Kategori market cap dari bot: degen < $200 rb, low $200 rb – $30 jt.
 const sleeve = (v) => { const t = String(v ?? '').toLowerCase().trim(); return ['degen', 'low'].includes(t) ? t : text(v, 16); };
@@ -109,7 +122,7 @@ const day = curve.length ? curve.filter((p) => p.t <= asOf - 20 * 3600e3).at(-1)
 const flows24 = flows.filter((f) => day && f.t > day.t).reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0);
 
 const snapshot = {
-  fund: 'solbot', status: 'ok', schema: SCHEMA, realMoney: true,
+  fund: 'solbot', status: late ? 'stale' : 'ok', ...(late ? { reason: 'Data tertunda' } : {}), schema: SCHEMA, realMoney: true,
   mode, haltReason: text(src.halt_reason, 200),
   asOf, startedAt: time(src.started_at), checkedAt: now,
   startCapitalUsd: startUsd, startCapitalSol: r4(src.start_capital_sol), solPriceUsd: r2(src.sol_price_usd),

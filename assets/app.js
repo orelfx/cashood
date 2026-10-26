@@ -3125,14 +3125,15 @@ async function loadFundBrief(id) {
 
 /* SolBot (uang asli) ikut total aset sebagai satu "dana" ringkas: nilai =
  * ekuitas, modal = modal awal + setoran − penarikan, deret = kurva ekuitas.
- * Data kosong atau lebih dari 15 menit → tidak dijumlahkan dan total ditandai
- * sebagian, supaya angka lama tidak ikut seolah live. Terpisah dari paper. */
+ * Kiriman bot telat (>15 menit) → angka terakhir tetap dijumlahkan, ditandai
+ * "data terakhir"; baru hilang kalau lebih dari 7 hari. Terpisah dari paper. */
 async function solbotBrief() {
   if (!state.solbot) return null;
   const d = await loadSolbot().catch(() => null);
-  if (!d || d.status !== 'ok' || !d.asOf || Date.now() - d.asOf > SOLBOT_STALE_MS || !(d.equityUsd >= 0)) return null;
+  if (!solbotUsable(d) || !(d.equityUsd >= 0)) return null;
   const f = state.solbot;
   return {
+    late: solbotLate(d),
     id: 'solbot', label: f.label, chain: f.chain || 'Solana', accent: f.accent, totalUsd: d.equityUsd,
     depositedUsd: Number(d.basisUsd ?? d.startCapitalUsd) || 0, pnlUsd: d.changeUsd ?? null, updatedAt: d.asOf, risk: f.risk, paper: false,
     flows: (d.flows || []).map((x) => ({ at: x.t, usd: x.type === 'withdraw' ? -Math.abs(x.usd) : Math.abs(x.usd) })),
@@ -4084,6 +4085,10 @@ function paintGmsol() {
  * dari 15 menit → "tertunda" tanpa angka, supaya angka lama tidak tampil
  * seolah live. */
 const SOLBOT_STALE_MS = 15 * 60e3;
+const SOLBOT_KEEP_MS = 7 * 24 * 3600e3;
+// Angka SolBot boleh tampil kalau ada; telat >15 menit = angka terakhir, ditandai.
+const solbotUsable = (d) => !!d && ['ok', 'stale'].includes(d.status) && !!d.asOf && d.equityUsd != null && Date.now() - d.asOf <= SOLBOT_KEEP_MS;
+const solbotLate = (d) => !d?.asOf || d.status !== 'ok' || Date.now() - d.asOf > SOLBOT_STALE_MS;
 const solbotView = { month: '', page: 0, hours: 24, profit: 'cal', calMonth: '', last: null, chart: null };
 let solbotEpoch = 0, solbotTimer = null;
 function showSolbot() {
@@ -4249,7 +4254,7 @@ async function renderSolbot() {
   if (epoch !== solbotEpoch || state.view !== 'solbot') return;
   const body = $('#solbotBody');
   if (!d || d.status === 'waiting') { setHTML(body, solbotWait('Data belum masuk / tertunda', null)); return; }
-  if (d.status !== 'ok' || !d.asOf || Date.now() - d.asOf > SOLBOT_STALE_MS) { setHTML(body, solbotWait('Data belum masuk / tertunda', d.asOf || null)); return; }
+  if (!solbotUsable(d)) { setHTML(body, solbotWait('Data belum masuk / tertunda', d.asOf || null)); return; }
   solbotView.last = d;
   paintSolbot(d);
 }
@@ -4271,7 +4276,8 @@ function paintSolbot(d) {
   const nClosed = d.totals?.trades ?? (d.closedTrades || []).length;
   const chart = solbotChartSvg(d);
   const flowsTxt = (d.flows || []).map((f) => ` + ${f.type === 'withdraw' ? 'tarik' : 'setor'} ${usd(Math.abs(f.usd))}`).join('');
-  setHTML(body, `<section class="card sb-hero">
+  const lateNote = solbotLate(d) ? `<p class="miss" role="status"><b>Kiriman data bot tertunda.</b> Angka di bawah adalah data terakhir dari bot: ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}). Halaman kembali live otomatis begitu data baru masuk.</p>` : '';
+  setHTML(body, `${lateNote}<section class="card sb-hero">
       ${SOLBOT_HEAD}<span class="sb-mode ${modeCls}"><i></i>${modeTxt}</span></div>
       ${d.mode === 'HALTED' || d.haltReason ? `<p class="sb-halt" role="alert"><b>Bot dihentikan${d.mode === 'HALTED' ? '' : ' (catatan)'}:</b> ${esc(d.haltReason || 'alasan tidak dilaporkan')}</p>` : ''}
       ${d.mode === 'DRY_RUN' ? '<p class="hint">Mode <b>DRY RUN</b>: bot berjalan tanpa mengirim order sungguhan; trade yang terjadi di mode ini ditandai "simulasi".</p>' : ''}
@@ -5143,11 +5149,11 @@ async function renderHome() {
   const box = g.box;
 
   // ── total aset + alokasi ──
-  const parts = [...g.briefs.map((b) => ({ id: b.id, name: b.label, color: b.accent, usd: b.totalUsd })),
+  const parts = [...g.briefs.map((b) => ({ id: b.id, name: b.label, color: b.accent, usd: b.totalUsd, late: b.late ? b.updatedAt : null })),
     ...(box ? [{ id: 'safebox', name: state.safebox.label, color: state.safebox.accent, usd: g.simpanan }] : [])]
     .filter((p) => p.usd > 0).sort((a, b) => b.usd - a.usd);
   const pnlPct = g.setoran ? (g.untung / g.setoran) * 100 : 0;
-  const tua = Math.min(...g.briefs.filter((b) => !b.frozen).map((b) => b.updatedAt || Date.now()), box?.updatedAt || Date.now());
+  const tua = Math.min(...g.briefs.filter((b) => !b.frozen && !b.late).map((b) => b.updatedAt || Date.now()), box?.updatedAt || Date.now());
   setHTML($('#homeAum'), `
     <div class="aum-k"><span class="live-dot"></span>Total aset dikelola${g.missing.length ? ' <span class="dim">(sebagian)</span>' : ''}</div>
     <div class="aum-v">${usd(g.total, 0)}</div>
@@ -5159,7 +5165,7 @@ async function renderHome() {
     <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
     <ul class="alloc-legend">${parts.map((p) => `<li>
       <span class="chip" style="background:${p.color}"></span>
-      <span class="leg-l"><span class="nm">${esc(p.name)}</span><span class="leg-w">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'} dari total</span></span>
+      <span class="leg-l"><span class="nm">${esc(p.name)}</span><span class="leg-w">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'} dari total${p.late ? ` · data terakhir ${esc(sbWib(p.late))}` : ''}</span></span>
       <span class="leg-r"><span class="v">${usd(p.usd, 0)}</span><span class="leg-chg" data-leg="${esc(p.id)}"></span></span></li>`).join('')}</ul>
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
 
@@ -5265,7 +5271,7 @@ async function renderHome() {
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   const solbotCard = () => {
-    const f = state.solbot, d = sbData && sbData.status === 'ok' && sbData.asOf && Date.now() - sbData.asOf <= SOLBOT_STALE_MS ? sbData : null;
+    const f = state.solbot, d = solbotUsable(sbData) ? sbData : null, late = d && solbotLate(d);
     const MODE = { LIVE: 'live', DRY_RUN: 'dry run', HALTED: 'dihentikan' };
     const s1 = (v) => (v == null ? '—' : `${v >= 0 ? '+' : ''}${pct(v, 1)}`);
     const t = d?.totals || {}, real = d?.closedStats?.real || {};
@@ -5283,7 +5289,7 @@ async function renderHome() {
         <div><span class="k">Jenis</span><span class="v txt">${esc(f.type || '—')}</span></div>
         <div><span class="k">Pengaman</span><span class="v txt">stop −30% · halt −15%/hari</span></div>
       </div>
-      ${d ? '' : '<p class="hint">Data belum masuk / tertunda — angka muncul begitu bot mengirim data.</p>'}
+      ${!d ? '<p class="hint">Data belum masuk / tertunda — angka muncul begitu bot mengirim data.</p>' : late ? `<p class="hint">Kiriman bot tertunda — angka di atas data terakhir ${esc(sbWib(d.asOf))}.</p>` : ''}
       <span class="prod-go">Buka ${esc(f.label)} <b>→</b></span></a>`;
   };
   setHTML($('#homeProducts'), '<div class="risk-wrap">' + RISK.map((r) => {
