@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "cba83bc8-5057-4460-a764-11b02e8bcd2f",
-  "updatedAt": 1793047442414,
-  "generatedAt": "2026-10-27 03:44 WIB",
+  "generation": "a149ddb9-6eb3-48f4-a84e-a2dfebebe4d6",
+  "updatedAt": 1793047748776,
+  "generatedAt": "2026-10-27 03:49 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 3181,
+      "ageMinutes": 3187,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793047442414,
+    "heartbeatAt": 1793047748776,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793047331000,
+    "lastScanAt": 1793047647000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "432",
+        "v": "431",
         "n": "24 jam · 1 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23622",
-        "n": "569 aktif"
+        "n": "567 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793047442414,
+      "lastDecisionAt": 1793047748776,
       "lastAction": "keputusan",
-      "lastReason": "DEXPAD [degen]: Dilewati karena red flag: bundler pegang 30.46% supply."
+      "lastReason": "REM [low]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23622 · 569 aktif"
+        "23622 · 567 aktif"
       ],
       [
         "Cadangan kas",
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14107 · bot 7098 · blacklist 508 · lp 1 · fresh 1429 · kol 241 · dolphin 221 · whale 15 · unknown 2"
+        "smart 14106 · bot 7099 · blacklist 508 · lp 1 · fresh 1429 · kol 241 · dolphin 221 · whale 15 · unknown 2"
       ]
     ],
     "requirements": [
@@ -1556,22 +1556,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23622,
-      "active": 569,
-      "passive": 23053,
+      "active": 567,
+      "passive": 23055,
       "trusted": 0,
       "promising": 9,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14107,
-          "active": 536,
-          "passive": 13571
+          "total": 14106,
+          "active": 534,
+          "passive": 13572
         },
         {
           "key": "bot",
-          "total": 7098,
+          "total": 7099,
           "active": 0,
-          "passive": 7098
+          "passive": 7099
         },
         {
           "key": "fresh",
@@ -1718,6 +1718,53 @@
     },
     "decisions": [
       {
+        "at": 1793047634690,
+        "symbol": "REM",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 300,
+            "note": "bundler pegang 1.2%"
+          },
+          {
+            "type": "rat",
+            "count": 1,
+            "note": "insider/entrapment pegang 5.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 5,
+            "note": "sniper awal masih pegang 1.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 694,
+            "note": "20.8% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 1.0%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1793047617937,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 3
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $19712."
+      },
+      {
         "at": 1793047112878,
         "symbol": "DEXPAD",
         "action": "skip",
@@ -1778,16 +1825,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: isolated virtual capital."
-      },
-      {
-        "at": 1793047010546,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "reason": "Dilewati karena red flag: likuiditas cuma $19712."
       },
       {
         "at": 1793045793133,
@@ -2547,16 +2584,6 @@
           }
         ],
         "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1793035537298,
-        "symbol": "UTI",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 68% supply."
       }
     ],
     "reasonStats": {
@@ -2567,7 +2594,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 367,
+        "red_flag": 366,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2620,7 +2647,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793047601453,
+    "generatedAt": 1793047909476,
     "trades": {
       "count": 154,
       "wins": 63,
