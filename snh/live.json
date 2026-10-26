@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "c5c104b1-878b-4994-b2f3-970833f5d2aa",
-  "updatedAt": 1793049561205,
-  "generatedAt": "2026-10-27 04:19 WIB",
+  "generation": "0e09e90a-b732-407c-8eae-6e5dfb37e998",
+  "updatedAt": 1793049862008,
+  "generatedAt": "2026-10-27 04:24 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 3217,
+      "ageMinutes": 3222,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793049561205,
+    "heartbeatAt": 1793049862008,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793049472000,
+    "lastScanAt": 1793049749000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "442",
+        "v": "443",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793049561205,
+      "lastDecisionAt": 1793049862008,
       "lastAction": "keputusan",
-      "lastReason": "Kimchi [mid]: Dilewati karena red flag: likuiditas cuma 3.6% dari market cap."
+      "lastReason": "[degen]: Dilewati karena red flag: bundler pegang 53% supply."
     }
   },
   "strategy": {
@@ -1717,6 +1717,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793049578709,
+        "symbol": null,
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: bundler pegang 53% supply."
+      },
       {
         "at": 1793049471910,
         "symbol": "Kimchi",
@@ -2575,24 +2592,6 @@
           }
         ],
         "reason": "Dilewati karena red flag: likuiditas cuma $20054."
-      },
-      {
-        "at": 1793039687595,
-        "symbol": "PUMP",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "kol": 1,
-          "smart": 5
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 18,
-            "note": "18 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: unsupported_extension."
       }
     ],
     "reasonStats": {
@@ -2603,7 +2602,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 375,
+        "red_flag": 376,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2656,7 +2655,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793049721200,
+    "generatedAt": 1793050007764,
     "trades": {
       "count": 154,
       "wins": 63,
