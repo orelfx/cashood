@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "8966f447-899c-4772-a0da-6748d4a425f8",
-  "updatedAt": 1793006875437,
-  "generatedAt": "2026-10-26 16:27 WIB",
+  "generation": "5d5f0516-b42d-4fdd-ad16-a5c229d15c21",
+  "updatedAt": 1793007179192,
+  "generatedAt": "2026-10-26 16:32 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 2505,
+      "ageMinutes": 2510,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793006875437,
+    "heartbeatAt": 1793007179192,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793006856000,
+    "lastScanAt": 1793007159000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "458",
+        "v": "459",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793006875437,
+      "lastDecisionAt": 1793007179192,
       "lastAction": "keputusan",
-      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $22011."
+      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $22312."
     }
   },
   "strategy": {
@@ -1697,7 +1697,7 @@
           "trusted": false
         },
         {
-          "alias": "smart #17724",
+          "alias": "smart #18071",
           "label": "smart",
           "score": 100,
           "copied": 0,
@@ -1706,7 +1706,7 @@
           "trusted": false
         },
         {
-          "alias": "smart #18071",
+          "alias": "smart #18307",
           "label": "smart",
           "score": 100,
           "copied": 0,
@@ -1717,6 +1717,33 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793007000852,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 5
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $22312."
+      },
+      {
+        "at": 1793006977981,
+        "symbol": "TIT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 12
+        },
+        "reason": "Dilewati: harga sudah -51% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793006395668,
         "symbol": "STONK",
@@ -2465,66 +2492,12 @@
           }
         ],
         "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1792981430202,
-        "symbol": "Kimchi",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 13.3%"
-          },
-          {
-            "type": "rat",
-            "count": 9,
-            "note": "insider/entrapment pegang 7.8%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 0.0%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "15.8% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
-      },
-      {
-        "at": 1792980992694,
-        "symbol": "Hacchan",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 5x."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 56,
+        "below_entry": 57,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2582,7 +2555,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793007110408,
+    "generatedAt": 1793007404023,
     "trades": {
       "count": 154,
       "wins": 63,
