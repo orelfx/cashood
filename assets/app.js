@@ -5435,7 +5435,7 @@ async function renderPemegang() {
   const tile = (k, v, n) => `<div class="hs"><div class="hs-v">${v}</div><div class="hs-k">${k}</div><div class="hs-n">${n}</div></div>`;
   setHTML($('#pemegangBody'), `
     <div class="home-stats">${[
-      tile('Pemegang', String(list.length), 'di seluruh produk'),
+      tile('Pemegang', String(list.filter((p) => p.rows.some((r) => !r.exited)).length), `di seluruh produk${list.some((p) => p.rows.every((r) => r.exited)) ? ` · ${list.filter((p) => p.rows.every((r) => r.exited)).length} sudah keluar` : ''}`),
       tile('Nilai dipegang', usd(total, 0), 'dana + Safe Box'),
       tile('Modal masuk', usd(list.reduce((s, p) => s + p.modal, 0), 0), 'total setoran'),
       tile('Produk', String(g.briefs.length + (g.box ? 1 : 0)), 'tanpa dana uji coba'),
