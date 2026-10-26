@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7960292a-65e8-4b5f-99ef-233a8fd11043",
-  "updatedAt": 1793005374548,
-  "generatedAt": "2026-10-26 16:02 WIB",
+  "generation": "7fd1dbba-0771-46ef-a7f3-9d59181d9e38",
+  "updatedAt": 1793005675250,
+  "generatedAt": "2026-10-26 16:07 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 2480,
+      "ageMinutes": 2485,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793005374548,
+    "heartbeatAt": 1793005675250,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793005362000,
+    "lastScanAt": 1793005652000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "455",
+        "v": "456",
         "n": "24 jam · 1 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23603",
-        "n": "578 aktif"
+        "n": "575 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793005374548,
+      "lastDecisionAt": 1793005675250,
       "lastAction": "keputusan",
-      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $22526."
+      "lastReason": "STM [low]: Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23603 · 578 aktif"
+        "23603 · 575 aktif"
       ],
       [
         "Cadangan kas",
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14135 · bot 7064 · blacklist 507 · lp 1 · fresh 1421 · kol 234 · dolphin 224 · whale 15 · unknown 2"
+        "smart 14136 · bot 7063 · blacklist 507 · lp 1 · fresh 1421 · kol 234 · dolphin 224 · whale 15 · unknown 2"
       ]
     ],
     "requirements": [
@@ -1556,22 +1556,22 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23603,
-      "active": 578,
-      "passive": 23025,
+      "active": 575,
+      "passive": 23028,
       "trusted": 0,
       "promising": 12,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14135,
-          "active": 542,
-          "passive": 13593
+          "total": 14136,
+          "active": 540,
+          "passive": 13596
         },
         {
           "key": "bot",
-          "total": 7064,
+          "total": 7063,
           "active": 0,
-          "passive": 7064
+          "passive": 7063
         },
         {
           "key": "fresh",
@@ -1588,8 +1588,8 @@
         {
           "key": "kol",
           "total": 234,
-          "active": 10,
-          "passive": 224
+          "active": 9,
+          "passive": 225
         },
         {
           "key": "dolphin",
@@ -1717,6 +1717,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793005527910,
+        "symbol": "STM",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -50% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793005187636,
         "symbol": "STONK",
@@ -2495,29 +2505,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 34%."
-      },
-      {
-        "at": 1792980380669,
-        "symbol": "Hacchan",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati: harga sudah -27% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 54,
+        "below_entry": 55,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2575,7 +2568,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793005608624,
+    "generatedAt": 1793005908312,
     "trades": {
       "count": 154,
       "wins": 63,
