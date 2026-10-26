@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "08629016-4b4a-4e1e-a185-6e0c9de309b9",
-  "updatedAt": 1793040475775,
-  "generatedAt": "2026-10-27 01:47 WIB",
+  "generation": "4839a26e-4f48-445c-b122-b514c07b1c46",
+  "updatedAt": 1793040777315,
+  "generatedAt": "2026-10-27 01:52 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 3065,
+      "ageMinutes": 3070,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793040475775,
+    "heartbeatAt": 1793040777315,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793040458000,
+    "lastScanAt": 1793040666000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1463,7 +1463,7 @@
       },
       {
         "k": "Wallet dipantau",
-        "v": "23618",
+        "v": "23619",
         "n": "567 aktif"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793040475775,
+      "lastDecisionAt": 1793040777315,
       "lastAction": "keputusan",
-      "lastReason": "Grokbot [degen]: Dilewati: harga sudah -54% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "SOJO [low]: Dilewati: solo_test: isolated virtual capital."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23618 · 567 aktif"
+        "23619 · 567 aktif"
       ],
       [
         "Cadangan kas",
@@ -1507,7 +1507,7 @@
       ],
       [
         "Label wallet",
-        "smart 14104 · bot 7097 · blacklist 508 · lp 1 · fresh 1430 · kol 238 · dolphin 223 · whale 15 · unknown 2"
+        "smart 14105 · bot 7097 · blacklist 508 · lp 1 · fresh 1430 · kol 238 · dolphin 223 · whale 15 · unknown 2"
       ]
     ],
     "requirements": [
@@ -1555,17 +1555,17 @@
   },
   "copyTrade": {
     "wallets": {
-      "tracked": 23618,
+      "tracked": 23619,
       "active": 567,
-      "passive": 23051,
+      "passive": 23052,
       "trusted": 0,
       "promising": 9,
       "byLabel": [
         {
           "key": "smart",
-          "total": 14104,
+          "total": 14105,
           "active": 534,
-          "passive": 13570
+          "passive": 13571
         },
         {
           "key": "bot",
@@ -1717,6 +1717,58 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793040609650,
+        "symbol": "SOJO",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 540,
+            "note": "bundler pegang 38.3%"
+          },
+          {
+            "type": "rat",
+            "count": 6,
+            "note": "insider/entrapment pegang 6.3%"
+          },
+          {
+            "type": "sniper",
+            "count": null,
+            "note": "sniper awal masih pegang 9.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 377,
+            "note": "14.0% holder wallet baru"
+          },
+          {
+            "type": "dev",
+            "count": 2,
+            "note": "akun Twitter dev pernah ganti nama 2x"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 16x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
+      {
+        "at": 1793040604979,
+        "symbol": "Sojo",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -31% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793040426804,
         "symbol": "Grokbot",
@@ -2457,44 +2509,17 @@
           "smart": 2
         },
         "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1793034266180,
-        "symbol": "AudaCity",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: akun Twitter dev sudah ganti nama 8x."
-      },
-      {
-        "at": 1793034254794,
-        "symbol": "MoonCoin",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -62% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 73,
+        "below_entry": 74,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 411,
+        "red_flag": 410,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2547,7 +2572,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793040709277,
+    "generatedAt": 1793041009744,
     "trades": {
       "count": 154,
       "wins": 63,
