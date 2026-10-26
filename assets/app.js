@@ -3116,6 +3116,11 @@ async function loadFundBrief(id) {
         .map((o) => ({ id: o.id, name: o.name, color: o.color, share: (o.units / ledger.totalUnits) * 100, value: o.units * unit,
           deposited: o.deposited, withdrawn: o.withdrawn - (dividendByOwner(cfg)[o.id]?.gross || 0) + (dividendByOwner(cfg)[o.id]?.net || 0) }))
         .sort((a, b) => b.share - a.share),
+      // Halaman Data investor juga memuat yang sudah keluar penuh (unit ±0):
+      // modal dan penarikannya tetap bagian dari hasil orang itu.
+      holders: ledger.owners.filter((o) => o.units > 0 || o.deposited > 0)
+        .map((o) => ({ id: o.id, name: o.name, color: o.color, share: (o.units / ledger.totalUnits) * 100, value: o.units * unit,
+          deposited: o.deposited, withdrawn: o.withdrawn - (dividendByOwner(cfg)[o.id]?.gross || 0) + (dividendByOwner(cfg)[o.id]?.net || 0) })),
     };
   })();
   portoCache.set(id, { job, at: Date.now() });
@@ -3179,7 +3184,11 @@ async function gmsolBrief() {
     // Bukan dana investor dan tanpa modal nyata yang tercatat: tidak menambah "modal masuk" dan tidak dihitung untung/rugi.
     depositedUsd: 0, pnlUsd: null, updatedAt: engineOk ? d.asOf : (d.wallet || d.walletShared).asOf, risk: f.risk, paper: false,
     flows: [], series: [{ t: engineOk ? d.asOf : (d.wallet || d.walletShared).asOf, usd: real }],
-    owners: [], openCount: (d.openSeats || []).length, closedCount: (d.closes || []).length, winRate: null, gmsol: d,
+    // Pemilik dari konfigurasi Cashood (funds.json gmsol.owners, dikonfirmasi Orel). Modal nyata belum
+    // tercatat, jadi baris pemegangnya tidak dihitung untung/rugi.
+    owners: (f.owners || []).filter((o) => Number(o.sharePct) > 0).map((o) => ({ id: String(o.name).toLowerCase().replace(/[^a-z0-9]/g, ''), name: o.name, color: null,
+      share: Number(o.sharePct), value: real * Number(o.sharePct) / 100, deposited: null, withdrawn: 0 })),
+    openCount: (d.openSeats || []).length, closedCount: (d.closes || []).length, winRate: null, gmsol: d,
   };
 }
 
@@ -3251,7 +3260,7 @@ async function renderPortofolio() {
         <span class="porto-val">${usd(b.totalUsd)}<span class="n ${cls(b.pnlUsd)}">${signed(b.pnlUsd)}</span></span>
       </div>
       <div class="table-scroll"><table class="porto-tbl"><tbody>
-        ${b.id === 'solbot' || b.id === 'gmsol' ? `<tr><td colspan="3" class="dim">Uang asli · ekuitas bot, bukan saham investor · <a href="#${b.id}">buka ${esc(b.label)}</a></td></tr>` : ''}${b.owners.map((o) => `<tr>
+        ${b.id === 'solbot' || b.id === 'gmsol' ? `<tr><td colspan="3" class="dim">Uang asli · ${b.id === 'gmsol' ? 'seluruh isi wallet GMSOL' : 'ekuitas bot, bukan saham investor'} · <a href="#${b.id}">buka ${esc(b.label)}</a></td></tr>` : ''}${b.owners.map((o) => `<tr>
           <td><span class="who"><span class="chip" style="background:${o.color || '#4ade80'}"></span>${esc(o.name)}</span></td>
           <td class="num">${pct(o.share)}</td>
           <td class="num">${usd(o.value)}</td></tr>`).join('')}
@@ -5406,12 +5415,16 @@ async function renderPemegang() {
   const people = new Map();
   const add = (id, name, color, row) => {
     const key = id || name;
-    const p = people.get(key) || { name, color, rows: [], value: 0, modal: 0, out: 0 };
-    p.rows.push(row); p.value += row.value; p.modal += row.modal; p.out += row.out;
+    const p = people.get(key) || { name, color, rows: [], value: 0, modal: 0, out: 0, noModal: [] };
+    p.color ||= color;
+    p.rows.push(row); p.value += row.value;
+    // Tanpa modal tercatat: nilainya tidak boleh terbaca sebagai untung.
+    if (row.modal == null) p.noModal.push(row.fund); else { p.modal += row.modal; p.out += row.out; }
     people.set(key, p);
   };
   for (const b of g.briefs) {
-    for (const o of b.owners) add(o.id, o.name, o.color, { fund: b.label, accent: b.accent, share: o.share, value: o.value, modal: Number(o.deposited) || 0, out: Number(o.withdrawn) || 0 });
+    for (const o of b.holders || b.owners) add(o.id, o.name, o.color, { fund: b.label, accent: b.accent, share: o.share, value: o.value,
+      modal: o.deposited == null ? null : Number(o.deposited) || 0, out: Number(o.withdrawn) || 0, exited: o.value < 0.5 && o.share < 0.01 });
   }
   for (const o of g.box?.owners || []) {
     add(o.id, o.name, null, { fund: state.safebox?.label || 'Safe Box', accent: state.safebox?.accent || '#2dd4bf', share: Number(o.sharePct) || 0,
@@ -5428,16 +5441,17 @@ async function renderPemegang() {
       tile('Produk', String(g.briefs.length + (g.box ? 1 : 0)), 'tanpa dana uji coba'),
     ].join('')}</div>
     <div class="inv-grid">${list.map((p) => {
-      const pnl = p.value + p.out - p.modal;
+      const pnl = p.value - p.rows.filter((r) => r.modal == null).reduce((t, r) => t + r.value, 0) + p.out - p.modal;
+      const active = p.rows.filter((r) => !r.exited);
       return `<article class="inv">
         <div class="inv-head"><span class="inv-av" style="--c:${p.color || '#94a3b8'}">${esc(p.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '?')}</span>
-          <div class="inv-id"><div class="prod-name">${esc(p.name)}</div><div class="prod-sub">${p.rows.length} produk · ${total ? pct((p.value / total) * 100, 1) : '—'} dari seluruh aset</div></div>
+          <div class="inv-id"><div class="prod-name">${esc(p.name)}</div><div class="prod-sub">${active.length ? `${active.length} produk · ${total ? pct((p.value / total) * 100, 1) : '—'} dari seluruh aset` : 'sudah keluar dari semua produk'}</div></div>
           <div class="inv-tot"><b>${usd(p.value, 0)}</b><span class="${cls(pnl)}">${signed(pnl)}</span></div></div>
         <div class="inv-rows">${p.rows.sort((a, b) => b.value - a.value).map((r) => `<div class="inv-row">
           <span class="who"><span class="chip" style="background:${r.accent}"></span>${esc(r.fund)}</span>
           <span class="inv-share"><i style="width:${Math.min(100, r.share)}%;background:${r.accent}"></i></span>
-          <span class="num">${pct(r.share, 1)}</span><span class="num"><b>${usd(r.value, 0)}</b></span></div>`).join('')}</div>
-        <div class="inv-foot">modal ${usd(p.modal, 0)}${p.out > 0 ? ` · sudah ditarik ${usd(p.out, 0)}` : ''}</div></article>`;
+          ${r.exited ? '<span class="num dim">keluar</span><span class="num dim">—</span>' : `<span class="num">${pct(r.share, 1)}</span><span class="num"><b>${usd(r.value, 0)}</b></span>`}</div>`).join('')}</div>
+        <div class="inv-foot">modal ${usd(p.modal, 0)}${p.out > 0 ? ` · sudah ditarik ${usd(p.out, 0)}` : ''}${p.noModal.length ? ` · ${esc(p.noModal.join(', '))}: modal belum tercatat, tidak dihitung untung/rugi` : ''}</div></article>`;
     }).join('')}</div>`);
 }
 
