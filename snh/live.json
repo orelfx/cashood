@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "64054377-e606-45d0-a03d-5008674cb5a0",
-  "updatedAt": 1793028643878,
-  "generatedAt": "2026-10-26 22:30 WIB",
+  "generation": "8563901b-a4dd-4b94-9258-6d9782420448",
+  "updatedAt": 1793028944213,
+  "generatedAt": "2026-10-26 22:35 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 2868,
+      "ageMinutes": 2873,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793028643878,
+    "heartbeatAt": 1793028944213,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793028597000,
+    "lastScanAt": 1793028815000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "525",
+        "v": "526",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793028643878,
+      "lastDecisionAt": 1793028944213,
       "lastAction": "keputusan",
-      "lastReason": "LAUNCH [mid]: Dilewati karena red flag: insider/entrapment pegang 18%."
+      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $21395."
     }
   },
   "strategy": {
@@ -1717,6 +1717,24 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793028809632,
+        "symbol": "STONK",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 2,
+          "kol": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 3,
+            "note": "3 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: likuiditas cuma $21395."
+      },
       {
         "at": 1793028600256,
         "symbol": "LAUNCH",
@@ -2580,53 +2598,6 @@
           }
         ],
         "reason": "Diveto LLM: Only one wallet is profitable, two are currently negative, and the strongest wallet's two prior copies both lost. Tidak dimasuki."
-      },
-      {
-        "at": 1793014841512,
-        "symbol": "불개미",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "fresh": 2
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 54,
-            "note": "bundler pegang 22.8%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 0.1%"
-          },
-          {
-            "type": "sniper",
-            "count": 26,
-            "note": "sniper awal masih pegang 14.1%"
-          },
-          {
-            "type": "fresh",
-            "count": 51,
-            "note": "17.3% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "dev",
-            "count": null,
-            "note": "dev masih pegang 1.7%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 9x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: unpriced_exposure."
       }
     ],
     "reasonStats": {
@@ -2637,7 +2608,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 451,
+        "red_flag": 452,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2690,7 +2661,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793028716077,
+    "generatedAt": 1793029011568,
     "trades": {
       "count": 154,
       "wins": 63,
@@ -2730,7 +2701,7 @@
     },
     "equity": {
       "days": 20,
-      "spanDays": 20.6,
+      "spanDays": 20.7,
       "returnPct": -9.3,
       "maxDrawdownPct": 9.3,
       "maxDrawdownAt": 1792857508564,
