@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7a3a3380-b4b1-41b8-b281-fd39b17173c1",
-  "updatedAt": 1793079563964,
-  "generatedAt": "2026-10-27 12:39 WIB",
+  "generation": "9c8cce15-5768-4254-9cc5-442cd8ab5949",
+  "updatedAt": 1793079871948,
+  "generatedAt": "2026-10-27 12:44 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 3717,
+      "ageMinutes": 3722,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793079563964,
+    "heartbeatAt": 1793079871948,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793079507000,
+    "lastScanAt": 1793079843000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "368",
+        "v": "370",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793079563964,
+      "lastDecisionAt": 1793079871948,
       "lastAction": "keputusan",
-      "lastReason": "? [degen]: Dilewati karena red flag: bundler pegang 34% supply."
+      "lastReason": "CapyHub [degen]: Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1717,6 +1717,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793079846566,
+        "symbol": "CapyHub",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1793079592029,
+        "symbol": "MIYA",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 2
+        },
+        "reason": "Dilewati: harga sudah -23% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793079455190,
         "symbol": "?",
@@ -2575,39 +2595,12 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: dev sudah menjual di bonding curve."
-      },
-      {
-        "at": 1793060347216,
-        "symbol": "STONK",
-        "action": "skip",
-        "basket": "big",
-        "wallets": {
-          "smart": 3
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: likuiditas cuma $18709."
-      },
-      {
-        "at": 1793060084485,
-        "symbol": "stock",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -47% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 62,
+        "below_entry": 64,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2665,7 +2658,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793079711460,
+    "generatedAt": 1793080010753,
     "trades": {
       "count": 154,
       "wins": 63,
