@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7046a727-8ec8-4e16-a836-438907a05a81",
-  "updatedAt": 1793059293685,
-  "generatedAt": "2026-10-27 07:01 WIB",
+  "generation": "499d4fb0-6d72-4396-ba5e-4a8bc166c3be",
+  "updatedAt": 1793059594019,
+  "generatedAt": "2026-10-27 07:06 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 3379,
+      "ageMinutes": 3384,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793059293685,
+    "heartbeatAt": 1793059594019,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793059184000,
+    "lastScanAt": 1793059487000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,7 +1458,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "418",
+        "v": "417",
         "n": "24 jam · 1 diveto LLM"
       },
       {
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793059293685,
+      "lastDecisionAt": 1793059594019,
       "lastAction": "keputusan",
-      "lastReason": "STONK [big]: Dilewati karena red flag: likuiditas cuma $18374."
+      "lastReason": "stock [degen]: Dilewati: harga sudah -47% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1717,6 +1717,16 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793059476850,
+        "symbol": "stock",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -47% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793059130193,
         "symbol": "STONK",
@@ -2508,49 +2518,17 @@
           "dolphin": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 29%."
-      },
-      {
-        "at": 1793048187221,
-        "symbol": "glorp",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 62,
-            "note": "bundler pegang 22.0%"
-          },
-          {
-            "type": "rat",
-            "count": 5,
-            "note": "insider/entrapment pegang 0.3%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 9.5%"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 67,
+        "below_entry": 68,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 346,
+        "red_flag": 344,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2603,7 +2581,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793059313510,
+    "generatedAt": 1793059607999,
     "trades": {
       "count": 154,
       "wins": 63,
