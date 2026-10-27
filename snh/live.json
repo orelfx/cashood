@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "1c7a82c2-89c4-447e-80a3-82b36f523787",
-  "updatedAt": 1793099221630,
-  "generatedAt": "2026-10-27 18:07 WIB",
+  "generation": "d5f5d11e-6a01-4f9d-8dc8-36fc71ef486e",
+  "updatedAt": 1793099523964,
+  "generatedAt": "2026-10-27 18:12 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 4044,
+      "ageMinutes": 4049,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793099221630,
+    "heartbeatAt": 1793099523964,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793099212000,
+    "lastScanAt": 1793099501000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1464,7 +1464,7 @@
       {
         "k": "Wallet dipantau",
         "v": "23631",
-        "n": "561 aktif"
+        "n": "560 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793099221630,
+      "lastDecisionAt": 1793099523964,
       "lastAction": "keputusan",
-      "lastReason": "DRMR [low]: Dilewati karena red flag: insider/entrapment pegang 32%."
+      "lastReason": "SPAD [degen]: Dilewati: solo_test: zone/cooldown/budget."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23631 · 561 aktif"
+        "23631 · 560 aktif"
       ],
       [
         "Cadangan kas",
@@ -1556,16 +1556,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23631,
-      "active": 561,
-      "passive": 23070,
+      "active": 560,
+      "passive": 23071,
       "trusted": 0,
       "promising": 7,
       "byLabel": [
         {
           "key": "smart",
           "total": 14052,
-          "active": 537,
-          "passive": 13515
+          "active": 536,
+          "passive": 13516
         },
         {
           "key": "bot",
@@ -1717,6 +1717,38 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793099372188,
+        "symbol": "SPAD",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": null,
+            "note": "bundler membeli 7.35% supply di blok peluncuran"
+          },
+          {
+            "type": "dev",
+            "count": null,
+            "note": "dev masih pegang 1.39%"
+          },
+          {
+            "type": "bundler",
+            "count": 52,
+            "note": "bundler pegang 17.8%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.0%"
+          }
+        ],
+        "reason": "Dilewati: solo_test: zone/cooldown/budget."
+      },
       {
         "at": 1793099148157,
         "symbol": "DRMR",
@@ -2596,43 +2628,6 @@
           "smart": 1
         },
         "reason": "Dilewati: unsupported_extension."
-      },
-      {
-        "at": 1793063400203,
-        "symbol": "PEAK",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 1,
-            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 76,
-            "note": "bundler pegang 21.9%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 2.6%"
-          },
-          {
-            "type": "fresh",
-            "count": 183,
-            "note": "15.3% holder wallet baru"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 7x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: isolated virtual capital."
       }
     ],
     "reasonStats": {
@@ -2696,7 +2691,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793099506729,
+    "generatedAt": 1793099803202,
     "trades": {
       "count": 154,
       "wins": 63,
