@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "5daaa0b3-1f14-4c19-bb87-c8f7312d0342",
-  "updatedAt": 1793077756169,
-  "generatedAt": "2026-10-27 12:09 WIB",
+  "generation": "aede8a25-7b93-48df-90a7-830bfc97e9b6",
+  "updatedAt": 1793078057001,
+  "generatedAt": "2026-10-27 12:14 WIB",
   "usdIdr": null,
   "totalUsd": 897.594577880411,
   "nativeSymbol": "SOL",
@@ -33,7 +33,7 @@
       "pnlUsd": 0,
       "pnlPct": 0,
       "entryPriceUsd": 0.000006033425030026115,
-      "ageMinutes": 3687,
+      "ageMinutes": 3692,
       "stopPct": 35,
       "targetPct": 20,
       "maxHoldHours": 4,
@@ -1426,12 +1426,12 @@
     "pnlUsd": -102.40542211958905,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1793077756169,
+    "heartbeatAt": 1793078057001,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 11.08,
-    "lastScanAt": 1793077721000,
+    "lastScanAt": 1793077963000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1458,13 +1458,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "360",
+        "v": "361",
         "n": "24 jam · 1 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "23629",
-        "n": "555 aktif"
+        "n": "556 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1474,9 +1474,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1793077756169,
+      "lastDecisionAt": 1793078057001,
       "lastAction": "keputusan",
-      "lastReason": "SPX [big]: Dilewati karena red flag: mint authority belum dilepas."
+      "lastReason": "CAT [degen]: Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1495,7 +1495,7 @@
       ],
       [
         "Wallet dipantau",
-        "23629 · 555 aktif"
+        "23629 · 556 aktif"
       ],
       [
         "Cadangan kas",
@@ -1556,16 +1556,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 23629,
-      "active": 555,
-      "passive": 23074,
+      "active": 556,
+      "passive": 23073,
       "trusted": 0,
       "promising": 10,
       "byLabel": [
         {
           "key": "smart",
           "total": 14089,
-          "active": 528,
-          "passive": 13561
+          "active": 529,
+          "passive": 13560
         },
         {
           "key": "bot",
@@ -1717,6 +1717,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1793077842307,
+        "symbol": "CAT",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -52% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1793077677019,
         "symbol": "SPX",
@@ -2576,54 +2593,12 @@
           "smart": 2
         },
         "reason": "Dilewati karena red flag: dev masih pegang 17.88%."
-      },
-      {
-        "at": 1793057960695,
-        "symbol": "Nothing",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "flags": [
-          {
-            "type": "bundler",
-            "count": 839,
-            "note": "bundler pegang 12.2%"
-          },
-          {
-            "type": "rat",
-            "count": null,
-            "note": "insider/entrapment pegang 12.2%"
-          },
-          {
-            "type": "sniper",
-            "count": 1,
-            "note": "sniper awal masih pegang 5.2%"
-          },
-          {
-            "type": "fresh",
-            "count": 1000,
-            "note": "13.8% holder wallet baru"
-          },
-          {
-            "type": "dev",
-            "count": 2,
-            "note": "akun Twitter dev pernah ganti nama 2x"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 25x likuiditas"
-          }
-        ],
-        "reason": "Dilewati: solo_test: zone/cooldown/budget."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 57,
+        "below_entry": 58,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2681,7 +2656,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1793077914739,
+    "generatedAt": 1793078208539,
     "trades": {
       "count": 154,
       "wins": 63,
