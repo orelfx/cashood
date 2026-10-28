@@ -18,6 +18,7 @@ import { readFileSync, existsSync, readdirSync, openSync, readSync, fstatSync, c
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { atomicJSON, assertPublic, lock, readJSON } from './lib/io.mjs';
+import { solanaRpcList } from './lib/rpc-env.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'gmsol');
@@ -63,7 +64,16 @@ function walletSane(W) {
   const lastF = resolve(DIR, 'wallet-last.local.json');
   const prev = readJSON(resolve(DIR, 'wallet-nav.local.json'), { points: [] }).points.at(-1)?.usd;
   let ok = W && num(W.totalAssetsUsd) != null ? W : null;
-  if (ok && prev > 20 && Number(ok.totalAssetsUsd) <= prev * 0.1) { console.warn(`[gmsol] pembacaan wallet ${ok.totalAssetsUsd} vs sebelumnya ${prev}: dianggap gagal baca`); ok = null; }
+  // Bacaan anjlok sekali = gagal baca; dua bacaan berturut-turut yang saling cocok
+  // (±10%) = saldo memang turun (2026-10-28: saldo GMSOL dipindah ke SolBot dan
+  // penjaga ini menahan angka lama, sehingga uang yang sama terhitung dua kali).
+  const lowF = resolve(DIR, 'wallet-low.local.json');
+  if (ok && prev > 20 && Number(ok.totalAssetsUsd) <= prev * 0.1) {
+    const low = readJSON(lowF, null), v = Number(ok.totalAssetsUsd);
+    const same = low && now - low.at <= 2 * STALE_MS && Math.abs(v - low.usd) <= Math.max(1, low.usd * 0.1);
+    if (same) console.warn(`[gmsol] wallet turun ke ${v} (dari ${prev}) dan terkonfirmasi dua bacaan: diterima`);
+    else { atomicJSON(lowF, { at: now, usd: v }); console.warn(`[gmsol] pembacaan wallet ${v} vs sebelumnya ${prev}: dianggap gagal baca, menunggu konfirmasi`); ok = null; }
+  }
   if (ok) { atomicJSON(lastF, ok); return ok; }
   const last = readJSON(lastF, null);
   return last && now - (time(last.asOf) ?? 0) <= STALE_MS ? last : null;
@@ -136,13 +146,18 @@ let CAP_LOCK = null;
 // Saldo + posisi dibaca lewat RPC publik + SDK DLMM (node_modules mesin, hanya di-require), harga via Jupiter publik.
 // Pubkey, pool, mint, tx, URL RPC tidak pernah terbit.
 const M2 = process.env.MERIDIAN2_HOME || '/root/meridian2/main/meridian2';
-const PUBLIC_RPC = 'https://api.mainnet-beta.solana.com';
 const WSOL = 'So11111111111111111111111111111111111111112';
+// RPC utama situs lalu cadangan (lib/rpc-env.mjs): RPC publik saja sering gagal/429.
 async function walletShared(engineState) {
+  let w = null;
+  for (const url of solanaRpcList()) { w = await walletSharedVia(engineState, url); if (num(w?.totalAssetsUsd) != null) return w; }
+  return w;
+}
+async function walletSharedVia(engineState, RPC_URL) {
   try {
     const req = createRequire(resolve(ENGINE, 'package.json'));
     const { Connection, PublicKey } = req('@solana/web3.js'); const dm = req('@meteora-ag/dlmm'); const DLMM = dm.DLMM || dm.default || dm;
-    const c = new Connection(PUBLIC_RPC, 'confirmed');
+    const c = new Connection(RPC_URL, 'confirmed');
     const m2s = readJSON(resolve(M2, 'state.json'), {})?.positions || {};
     const cacheF = resolve(DIR, 'owner.local.json'); let owner = readJSON(cacheF, {})?.owner || null;
     if (!owner) {
