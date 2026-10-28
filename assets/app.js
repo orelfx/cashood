@@ -2749,8 +2749,10 @@ function renderSafebox() {
     // Laju harian mengikuti kinerja bot (Cashood Index), dikurung 0 sampai
     // batas harian. Tabel di bawah memakai rata-rata yang sudah terjadi dan
     // batas atasnya — laju satu hari saja bisa 0 dan tidak mewakili.
-    const maxDay = Number(rate.maxMonthlyPct ?? 3) / 30 / 100;   // laju yang tepat menghabiskan jatah bulanan
-    const avgDay = Number(rate.avgMonthlyPct ?? 0) / 30 / 100;
+    // Mode tetap (aturan pemilik 2026-10-28): bersih fixedMin–fixedMax% per bulan dari pengelola.
+    const fixed = rate.mode === 'fixed', fLo = Number(rate.fixedMinMonthlyPct ?? 1), fHi = Number(rate.fixedMaxMonthlyPct ?? 3);
+    const maxDay = (fixed ? fHi : Number(rate.maxMonthlyPct ?? 3)) / 30 / 100;   // laju yang tepat menghabiskan jatah bulanan
+    const avgDay = (fixed ? fLo : Number(rate.avgMonthlyPct ?? 0)) / 30 / 100;
 
     // Satu kolom saja. Bunga di sini TIDAK diputar lagi: yang menghasilkan
     // tetap pokoknya, dan bunga yang sudah masuk berhenti di tempatnya. Kolom
@@ -2792,16 +2794,19 @@ function renderSafebox() {
             <div class="n">${(d.days || []).length || 1} hari tercatat · menumpuk tiap hari</div></div>`}
           <div class="stat"><div class="k">Laju hari ini</div>
             <div class="v">${rate.dailyPct == null ? '—' : pct(rate.dailyPct, 2)} <span class="dim" style="font-size:.6em">/hari</span></div>
-            <div class="n">jatah minggu ini ${pct(rate.weekUsedPct ?? 0, 2)} / ${pct(rate.weekQuotaPct ?? 0.75, 2)} · bulan ini ${pct(rate.monthUsedPct ?? 0, 2)} / ${pctRate(rate.maxMonthlyPct ?? 3)}${
-              Number(rate.reserveUsd) > 0 ? ` · cadangan ${usd(rate.reserveUsd, 2)}` : ''}</div></div>
+            <div class="n">${fixed ? `bulan ini sudah ${pct(rate.monthUsedPct ?? 0, 2)} · sebulan bersih ${pctRate(fLo)}–${pctRate(fHi)}` : `jatah minggu ini ${pct(rate.weekUsedPct ?? 0, 2)} / ${pct(rate.weekQuotaPct ?? 0.75, 2)} · bulan ini ${pct(rate.monthUsedPct ?? 0, 2)} / ${pctRate(rate.maxMonthlyPct ?? 3)}${
+              Number(rate.reserveUsd) > 0 ? ` · cadangan ${usd(rate.reserveUsd, 2)}` : ''}`}</div></div>
         </div>
-        <p class="hint" style="margin-top:14px">Bunganya <strong>minimal ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan</strong>, dibayar tiap hari
+        ${fixed ? `<p class="hint" style="margin-top:14px">Imbal hasil Safe Box <strong>ditetapkan pengelola: bersih ${pctRate(fLo)}–${pctRate(fHi)} dari pokok per bulan</strong>,
+          masuk ke saldo <strong>setiap hari</strong>. Jumlah hariannya bervariasi; totalnya sebulan tetap di antara ${pctRate(fLo)} dan ${pctRate(fHi)}.
+          Tidak bergantung pada kinerja bot (berlaku sejak ${fmtDay(rate.fixedFrom || rate.since)}).
+          Angka hari ini dikunci tengah malam WIB. Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran.</p>` : `<p class="hint" style="margin-top:14px">Bunganya <strong>minimal ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan</strong>, dibayar tiap hari
           walau bot sedang rugi. Saat bot untung, bunga naik <strong>mengikuti kinerja bot Cashood</strong>: rata-rata kenaikan
           <a href="#index">Cashood Index</a> selama ${rate.windowDays ?? 7} hari terakhir. Jatahnya <strong>${pct(rate.weekQuotaPct ?? 0.75, 2)} per minggu</strong>: minggu yang bagus berhenti di jatah itu dan
           kelebihannya disimpan sebagai cadangan; minggu yang rugi diisi sebagian dari cadangan itu. Sebulan
           <strong>paling banyak ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)}</strong> dari pokok — itu batas atas, bukan janji.
           Angka hari ini masih bisa berubah sampai tengah malam WIB, lalu dikunci.
-          Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran atau jaminan hasil investasi.</p>
+          Riwayat ini adalah pencatatan hak bunga, bukan bukti pembayaran atau jaminan hasil investasi.</p>`}
       </section>
 
       ${(d.owners || []).length ? `<section class="card">
@@ -2857,11 +2862,18 @@ function renderSafebox() {
           <h2>Apa itu Safe Box</h2>
           <span class="hint">cara kerjanya, apa adanya</span>
         </div>
-        <p class="lead">Safe Box bekerja seperti deposito: pokoknya disimpan pengelola, dan bunganya mengikuti kinerja
+        <p class="lead">${fixed ? `Safe Box bekerja seperti deposito: pokoknya disimpan pengelola, dan imbal hasilnya <strong>ditetapkan pengelola,
+          bersih ${pctRate(fLo)} sampai ${pctRate(fHi)} per bulan</strong>, masuk ke saldo tiap hari dan <strong>ditarik ke pemilik tiap tanggal 1</strong>.` : `Safe Box bekerja seperti deposito: pokoknya disimpan pengelola, dan bunganya mengikuti kinerja
           bot-bot Cashood — <strong>${pctRate(rate.minMonthlyPct ?? 0.5)} sampai ${rate.maxMonthlyPct == null ? '—' : pctRate(rate.maxMonthlyPct)} per bulan</strong>,
-          dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>. Pokoknya tetap di dalam dan terus bekerja.</p>
+          dihitung harian dan <strong>ditarik ke pemilik tiap tanggal 1</strong>.`} Pokoknya tetap di dalam dan terus bekerja.</p>
         <div class="two">
-          <div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
+          ${fixed ? `<div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
+            <li>Tiap bulan kalender, Safe Box mendapat imbal hasil <strong>bersih ${pctRate(fLo)}–${pctRate(fHi)} dari pokok</strong>, ditanggung pengelola.</li>
+            <li>Imbal hasil itu dibagi ke setiap hari dan <strong>masuk ke saldo tiap hari</strong>; jumlah per harinya tidak sama.</li>
+            <li>Tidak mengikuti naik-turun bot: bulan yang buruk untuk bot tetap mendapat ${pctRate(fLo)}–${pctRate(fHi)}.</li>
+            <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
+            <li><strong>Bunga tidak diputar ulang.</strong> Yang bekerja tetap uang pokok; bunga menumpuk di sampingnya.</li>
+          </ul></div>` : `<div><h3 class="sub-h">Bagaimana bunganya ditentukan</h3><ul class="plain">
             <li>Tiap hari dilihat Cashood Index — gabungan kinerja bot-bot Cashood yang memakai uang asli.</li>
             <li><strong>Lantai: ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan</strong> (±${pct((rate.minMonthlyPct ?? 0.5) / 30, 4)} per hari), ditanggung pengelola — dibayar walau seminggu bot rugi.</li>
             <li>Kalau bot untung, bunga hari itu = rata-rata kenaikan index ${rate.windowDays ?? 7} hari terakhir, kalau itu lebih besar dari lantai.</li>
@@ -2873,11 +2885,11 @@ function renderSafebox() {
             <li>Bunga yang sudah dicatat pada satu hari tidak pernah ditarik kembali.</li>
             <li><strong>Bunga tidak diputar ulang.</strong> Yang bekerja tetap uang pokok; bunga menumpuk di sampingnya
                 dan tidak ikut menghasilkan bunga baru.</li>
-          </ul></div>
+          </ul></div>`}
           <div><h3 class="sub-h">Yang dijamin dan yang tidak</h3><ul class="plain">
             <li><strong>Pokok simpanan dijamin tidak hilang.</strong> Tidak ada margin call, tidak ada likuidasi yang bisa
                 menghapus dana di dalam Safe Box.</li>
-            <li><strong>Anti rugi, bunga minimal ${pctRate(rate.minMonthlyPct ?? 0.5)} per bulan.</strong> Bulan yang buruk tetap mendapat bunga lantai;
+            <li><strong>Anti rugi, bunga minimal ${pctRate(fixed ? fLo : rate.minMonthlyPct ?? 0.5)} per bulan.</strong> Bulan yang buruk tetap mendapat bunga ${fixed ? 'minimal itu' : 'lantai'};
                 yang tidak terjadi adalah saldonya berkurang.</li>
             <li>Ke instrumen mana dana ini ditempatkan bersifat rahasia dan menjadi kewenangan pengelola.</li>
             <li>Bunga dan saldo di halaman ini dihitung ulang setiap hari dari catatan yang sama; tidak ada angka
@@ -2902,11 +2914,11 @@ function renderSafebox() {
           </div>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Jangka</th><th class="num">Bunga · laju rata-rata</th><th class="num">Bunga · maksimal</th><th class="num">Pokok + bunga maks</th></tr></thead>
+          <thead><tr><th>Jangka</th><th class="num">${fixed ? `Bunga · minimal ${pctRate(fLo)}/bln` : 'Bunga · laju rata-rata'}</th><th class="num">${fixed ? `Bunga · maksimal ${pctRate(fHi)}/bln` : 'Bunga · maksimal'}</th><th class="num">Pokok + bunga maks</th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
-        <p class="hint disclaimer">Tabel ini mengalikan laju rata-rata sejauh ini dan batas ${pctRate(rate.maxMonthlyPct ?? 3)} per bulan
-          ke depan — bukan ramalan. Bunga nyatanya mengikuti kinerja bot tiap hari. <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
+        <p class="hint disclaimer">${fixed ? `Tabel ini mengalikan imbal hasil ${pctRate(fLo)} dan ${pctRate(fHi)} per bulan ke depan.` : `Tabel ini mengalikan laju rata-rata sejauh ini dan batas ${pctRate(rate.maxMonthlyPct ?? 3)} per bulan
+          ke depan — bukan ramalan. Bunga nyatanya mengikuti kinerja bot tiap hari.`} <strong>Bunganya tidak diputar lagi:</strong> yang menghasilkan
           tetap uang pokok, dan bunga yang sudah masuk berhenti di tempatnya — pokok ${usd(modal, 0)} yang sudah
           berbunga ${usd(100, 0)} tetap bekerja dengan ${usd(modal, 0)}, bukan ${usd(modal + 100, 0)}.</p>
       </section>`);
@@ -3278,7 +3290,7 @@ async function renderPortofolio() {
       <div class="table-scroll"><table class="porto-tbl"><tbody>
         ${(box.owners || []).map(o => `<tr><td>${esc(o.name)}</td><td class="num">${pct(o.sharePct)}</td><td class="num">${usd(o.balanceUsd)}</td></tr>`).join('')}
       </tbody></table></div>
-      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · laju ${box.measure?.dailyPct == null ? '—' : pct(box.measure.dailyPct, 2)}/hari (maks ${pct(box.measure?.maxMonthlyPct ?? 3, 0)}/bulan).</p>
+      <p class="dim" style="margin:6px 0 0">Bunga hari ini ${usd(box.interestTodayUsd ?? 0, 2)} · laju ${box.measure?.dailyPct == null ? '—' : pct(box.measure.dailyPct, 2)}/hari (${box.measure?.mode === 'fixed' ? `bersih ${pct(box.measure.fixedMinMonthlyPct ?? 1, 0)}–${pct(box.measure.fixedMaxMonthlyPct ?? 3, 0)}/bulan` : `maks ${pct(box.measure?.maxMonthlyPct ?? 3, 0)}/bulan`}).</p>
     </div>` : ''));
 }
 
@@ -4981,7 +4993,14 @@ async function renderGrowth(g, paper = []) {
       const at = latest ? null : (valueAt(series[i], t) || (series[i]?.length && t < series[i][0].t ? series[i][0] : null));
       return { id: b.id, name: b.label, color: b.accent, known: latest || Boolean(at), usd: latest ? b.totalUsd : (at ? at.usd + flowsAfter(b.flows, at.t) : 0) };   // arus kas sesudah titik itu diamati
     });
-    if (box && t >= boxStart) parts.push({ id: 'safebox', fixed: true, name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: Number(box.balanceUsd) || 0 });
+    // Safe Box: nilai di titik t = saldo sekarang − bunga harian yang masuk sesudah t
+    // (bunga dikreditkan per hari WIB). Penarikan/pokok = arus kas, jadi tidak digeser.
+    // Dulu dianggap datar, sehingga bunga hariannya tidak pernah terlihat di beranda.
+    if (box && t >= boxStart) {
+      const day = new Date(t + 7 * 3600e3).toISOString().slice(0, 10);
+      const later = latest || !Array.isArray(box.days) ? 0 : box.days.filter((d) => d.date > day).reduce((s, d) => s + (Number(d.usd) || 0), 0);
+      parts.push({ id: 'safebox', fixed: !latest && !Array.isArray(box.days), name: state.safebox?.label || 'Safe Box', color: state.safebox?.accent || '#2dd4bf', usd: (Number(box.balanceUsd) || 0) - later });
+    }
     return parts;
   };
   // The same endpoints drive the 24-hour cards and the 24-hour chart.
@@ -5226,7 +5245,7 @@ async function renderHome() {
     const today = box && box.principalUsd ? ((Number(box.interestTodayUsd) || 0) / box.principalUsd) * 100 : null;
     return `<a class="prod" href="#safebox" style="--c:${sb.accent || '#2dd4bf'}">
       <div class="prod-top">${iconTile('vault', sb.accent || '#2dd4bf')}
-        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · bunga 0,5–3%/bulan, naik ikut kinerja bot</div></div>
+        <div class="prod-id"><div class="prod-name">${esc(sb.label || 'Safe Box')}</div><div class="prod-sub">simpanan · ${box?.measure?.mode === 'fixed' ? `bunga ${String(box.measure.fixedMinMonthlyPct ?? 1).replace('.', ',')}–${String(box.measure.fixedMaxMonthlyPct ?? 3).replace('.', ',')}%/bulan, masuk tiap hari` : 'bunga 0,5–3%/bulan, naik ikut kinerja bot'}</div></div>
         ${today == null ? '' : `<span class="chg up">▲ ${pct(today, 3)}<small>hari ini</small></span>`}</div>
       <p class="prod-desc">${esc(sb.blurb || '')}</p>
       <div class="prod-nums">

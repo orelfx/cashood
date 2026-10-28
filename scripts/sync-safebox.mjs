@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import Core from '../assets/core.js';
 import { atomicJSON, readJSON, lock, downsample, generation, assertPublic } from './lib/io.mjs';
 import { sourceProblems, heldSnapshot } from './lib/source-quality.mjs';
-import { accrue, weekOf } from './lib/accrual.mjs';
+import { accrue, weekOf, isFixedDay } from './lib/accrual.mjs';
 import { parseTransfers } from './lib/treasury.mjs';
 const DIR=resolve(process.env.CASHOOD_DATA_DIR || resolve(dirname(fileURLToPath(import.meta.url)),'..','data'),'safebox');
 const release=lock(resolve(DIR,'sync.lock.local'));
@@ -40,6 +40,10 @@ const stateFile=resolve(DIR,'accrual-v3.local.json');
 const payoutFile=resolve(DIR,'payouts.jsonl');
 const payouts=existsSync(payoutFile)?parseTransfers(readFileSync(payoutFile,'utf8')):[];
 let state;
+// Mode tetap (rate.fixedFrom): bunga tidak bergantung pada Index, jadi masalah
+// sumber Index tidak boleh menahan akrual.
+const fixedNow=isFixedDay(cfg,Core.day(now));
+if (fixedNow) problems.length=0;
 if (!problems.length) {
  try { state=accrue(cfg,readJSON(stateFile),{at:now,points,requireQuality:true},payouts); }
  catch (error) { if (error.code!=='INDEX_QUALITY') throw error; problems.push({id:'index',reason:error.message}); }
@@ -62,7 +66,7 @@ const interest=Core.money(rows.reduce((t,o)=>t+o.interestUsd,0));
 const dailyPct=today?today.ratePct:0, maxM=Number(cfg.rate?.maxMonthlyPct??3);
 const done=state.days.filter(d=>d.date>=Core.day(state.from));
 const avgDaily=done.length?done.reduce((t,d)=>t+d.ratePct,0)/done.length:dailyPct;
-const snapshot={schemaVersion:2,generation:generation(),updatedAt:index.updatedAt,checkedAt:now,sourceGeneration:index.generation,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
+const snapshot={schemaVersion:2,generation:generation(),updatedAt:fixedNow?now:index.updatedAt,checkedAt:now,sourceGeneration:index?.generation??null,generatedAt:new Date(now+Core.WIB).toISOString().slice(0,16)+' WIB',
  principalUsd:principal,interestUsd:interest,paidUsd:Core.money(Object.values(state.balances).reduce((t,b)=>t+(Number(b.paid)||0),0)),   // termasuk pemilik yang sudah keluar
  lastPayout:(()=>{const p=payouts.filter(x=>x.type==='interest');if(!p.length)return null;const at=Math.max(...p.map(x=>Date.parse(x.at)));const same=p.filter(x=>Date.parse(x.at)===at);return {at,period:same[0].period||null,usd:Core.money(same.reduce((t,x)=>t+Number(x.usd),0))};})(),
  interestTodayUsd:Core.money(today?.usd||0),valueUsd:Core.money(principal+interest),balanceUsd:Core.money(principal+interest),owners:rows,
@@ -77,7 +81,9 @@ const snapshot={schemaVersion:2,generation:generation(),updatedAt:index.updatedA
   fromReserveTodayUsd:Core.money(Object.values(today?.fromReserve||{}).reduce((t,v)=>t+v,0)),
   avgMonthlyPct:Number((avgDaily*30).toFixed(3)),apyPct:Number((avgDaily*365).toFixed(3)),perDayUsd:today?.usd||0,
   minMonthlyPct:Number(cfg.rate?.minMonthlyPct??0),maxMonthlyPct:maxM,spanDays:done.length,
-  basis:'minimal '+String(cfg.rate?.minMonthlyPct??0).replace('.',',')+'% per bulan; di atasnya rata-rata kenaikan Cashood Index '+(cfg.rate?.windowDays??7)+' hari terakhir; jatah per minggu, kelebihan disimpan untuk minggu rugi; paling banyak '+String(maxM).replace('.',',')+'% per bulan',since:Core.day(state.from)},
+  basis:'minimal '+String(cfg.rate?.minMonthlyPct??0).replace('.',',')+'% per bulan; di atasnya rata-rata kenaikan Cashood Index '+(cfg.rate?.windowDays??7)+' hari terakhir; jatah per minggu, kelebihan disimpan untuk minggu rugi; paling banyak '+String(maxM).replace('.',',')+'% per bulan',since:Core.day(state.from),
+  ...(fixedNow?{mode:'fixed',fixedFrom:cfg.rate.fixedFrom,fixedMinMonthlyPct:Number(cfg.rate.fixedMinMonthlyPct??1),fixedMaxMonthlyPct:Number(cfg.rate.fixedMaxMonthlyPct??3),
+   basis:'imbal hasil ditetapkan pengelola: bersih '+String(cfg.rate.fixedMinMonthlyPct??1).replace('.',',')+'–'+String(cfg.rate.fixedMaxMonthlyPct??3).replace('.',',')+'% per bulan, masuk ke saldo tiap hari dengan jumlah harian bervariasi',since:cfg.rate.fixedFrom}:{})},
  };
 assertPublic(snapshot);
 const navFile=resolve(DIR,'nav.json'),old=readJSON(navFile,{points:[]});

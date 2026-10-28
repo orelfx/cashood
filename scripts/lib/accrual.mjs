@@ -53,6 +53,26 @@ export function windowRate(points,closeAt,{windowDays,minDaily,maxDaily}){
  const move=end.usd/start.usd-1;
  return {rate:Math.min(maxDaily,Math.max(minDaily,move/span)),move,spanDays:span,missing:false};
 }
+/*
+ * Mode tetap (aturan pemilik 2026-10-28): mulai rate.fixedFrom, bunga TIDAK lagi
+ * mengikuti index. Tiap bulan kalender mendapat imbal hasil bersih antara
+ * fixedMinMonthlyPct dan fixedMaxMonthlyPct dari pokok (bawaan 1–3%), besarnya
+ * diundi per bulan, lalu dibagi ke tiap hari dengan bobot acak (0,4–1,6) supaya
+ * jumlah harian bervariasi. Undian deterministik (hash tanggal), jadi hari yang
+ * sedang berjalan tidak berubah tiap siklus. Bulan pertama: bunga yang sudah
+ * tercatat sebelum fixedFrom ikut dihitung, sisanya dibagi ke hari-hari tetap.
+ */
+const unit=(key)=>{let h=2166136261;for(const c of key){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}h^=h>>>13;h=Math.imul(h,1274126177);h^=h>>>16;return (h>>>0)/4294967296;};
+export const fixedMonthPct=(cfg,month)=>{const lo=Number(cfg.rate?.fixedMinMonthlyPct??1),hi=Number(cfg.rate?.fixedMaxMonthlyPct??3);return Number((lo+(hi-lo)*unit('safebox-bulan|'+month)).toFixed(4));};
+const dayWeight=(date)=>0.4+1.2*unit('safebox-hari|'+date);
+const monthDays=(month)=>{const [y,m]=month.split('-').map(Number);const n=new Date(Date.UTC(y,m,0)).getUTCDate();return Array.from({length:n},(_,i)=>`${month}-${String(i+1).padStart(2,'0')}`);};
+export const isFixedDay=(cfg,date)=>Boolean(cfg.rate?.fixedFrom)&&date>=cfg.rate.fixedFrom;
+/** Bunga hari `date` untuk pokok P dalam mode tetap; `before` = bunga bulan itu yang tercatat sebelum mode tetap. */
+export function fixedDayAmount(cfg,date,P,before=0){
+ const month=date.slice(0,7),days=monthDays(month).filter(d=>isFixedDay(cfg,d));
+ const left=Math.max(0,P*fixedMonthPct(cfg,month)/100-before),W=days.reduce((t,d)=>t+dayWeight(d),0);
+ return W>0?left*dayWeight(date)/W:0;
+}
 export function accrue(cfg,previous,observation,payouts=[]){
  const now=Core.number(observation.at,'Waktu pengamatan',1);
  const points=(observation.points||[]).filter(p=>Number.isFinite(p.t)&&p.usd>0).sort((a,b)=>a.t-b.t);
@@ -73,7 +93,8 @@ export function accrue(cfg,previous,observation,payouts=[]){
  for(let start=Math.max(lastFrozen,state.from);start<=now;start+=DAY){
   const end=start+DAY,closeAt=Math.min(end-1,now),done=end<=now;
   let qualityHeld=false;
-  if(observation.requireQuality){
+  const fixed=isFixedDay(cfg,Core.day(start));
+  if(observation.requireQuality&&!fixed){
    const from=closeAt-limits.windowDays*DAY;
    let first=null,last=null;
    for(const p of points){if(p.t>closeAt)break;last=p;if(p.t<=from||!first)first=p;}
@@ -87,7 +108,7 @@ export function accrue(cfg,previous,observation,payouts=[]){
    // Safe Box beku berhari-hari setelah riwayat Index dibangun ulang.
    if(!valid(first)||!valid(last)||closeAt-last.t>tolerance||last.t-first.t<DAY)qualityHeld=true;
   }
-  const r=qualityHeld?{rate:0,move:null,spanDays:0,missing:true}:windowRate(points,closeAt,limits);
+  const r=fixed?{rate:0,move:null,spanDays:0,missing:false}:qualityHeld?{rate:0,move:null,spanDays:0,missing:true}:windowRate(points,closeAt,limits);
   const active=ownersAt(cfg,closeAt);
   const date=Core.day(start),month=date.slice(0,7),week=weekOf(date);
   const entry={date,ratePct:Number((Math.max(r.rate,floorDaily)*100).toFixed(4)),botRatePct:Number((r.rate*100).toFixed(4)),floorPct:Number((floorDaily*100).toFixed(4)),windowMovePct:r.missing?null:Number((r.move*100).toFixed(4)),windowDays:Number(r.spanDays.toFixed(2)),usd:0,owners:{},estimated:r.missing,...(qualityHeld?{botRateHeld:true}:{})};
@@ -96,6 +117,14 @@ export function accrue(cfg,previous,observation,payouts=[]){
    const P=o.principalUsd,sum=(keep)=>state.days.filter(d=>keep(d.date)).reduce((t,d)=>t+(d.owners?.[o.id]||0),0);
    // Sisa jatah minggu ini dan bulan ini, dari yang sudah dicatat.
    const room=Math.max(0,Math.min(P*weekQ-sum((d)=>weekOf(d)===week),P*maxM/100-sum((d)=>d.startsWith(month))));
+   if(fixed){
+    // Mode tetap: tanpa jatah mingguan/cadangan; bulan itu pas di angka undiannya.
+    const before=state.days.filter(d=>d.date.startsWith(month)&&!isFixedDay(cfg,d.date)).reduce((t,d)=>t+(d.owners?.[o.id]||0),0);
+    const amount=Number(fixedDayAmount(cfg,date,P,before).toFixed(4));
+    entry.owners[o.id]=amount;entry.usd=Number((entry.usd+amount).toFixed(4));
+    if(done)b.accrued=Number((b.accrued+amount).toFixed(4));
+    continue;
+   }
    const raw=P*r.rate,floor=P*floorDaily,reserve=Number(b.reserve)||0;
    // Bunga = hasil bot atau lantai minimum, mana yang lebih besar, dalam jatah.
    let amount=Math.min(room,Math.max(raw,floor)),fromReserve=0;
@@ -112,6 +141,7 @@ export function accrue(cfg,previous,observation,payouts=[]){
     b.reserve=Number(Math.min(P*reserveMax,reserve-fromReserve+excess).toFixed(4));
    }
   }
+  if(fixed){const P=active.reduce((t,o)=>t+o.principalUsd,0);Object.assign(entry,{ratePct:P?Number((entry.usd/P*100).toFixed(4)):0,botRatePct:null,floorPct:null,windowMovePct:null,windowDays:0,fixed:true,monthTargetPct:fixedMonthPct(cfg,month)});}
   if(done)state.days.push(entry);else today=entry;
  }
  for(const p of payouts){
