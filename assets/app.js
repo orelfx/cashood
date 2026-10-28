@@ -3143,7 +3143,10 @@ async function solbotBrief() {
     depositedUsd: Number(d.basisUsd ?? d.startCapitalUsd) || 0, pnlUsd: d.changeUsd ?? null, updatedAt: d.asOf, risk: f.risk, paper: false,
     flows: (d.flows || []).map((x) => ({ at: x.t, usd: x.type === 'withdraw' ? -Math.abs(x.usd) : Math.abs(x.usd) })),
     series: (d.equityCurve || []).map((p) => ({ t: p.t, usd: p.usd })),
-    owners: [], openCount: (d.positions || []).length, closedCount: d.totals?.trades ?? d.closedStats?.all?.count ?? 0,
+    // Pemilik dari konfigurasi Cashood (funds.json solbot.owners). Modal = modal bersih bot.
+    owners: (f.owners || []).filter((o) => Number(o.sharePct) > 0).map((o) => ({ id: String(o.name).toLowerCase().replace(/[^a-z0-9]/g, ''), name: o.name, color: null,
+      share: Number(o.sharePct), value: d.equityUsd * Number(o.sharePct) / 100, deposited: d.basisUsd != null ? d.basisUsd * Number(o.sharePct) / 100 : null, withdrawn: 0 })),
+    openCount: (d.positions || []).length, closedCount: d.totals?.trades ?? d.closedStats?.all?.count ?? 0,
     winRate: d.totals?.winRatePct ?? d.closedStats?.real?.winRatePct ?? null, solbot: d,
   };
 }
@@ -4013,7 +4016,8 @@ function paintGmsol() {
   const haltAt = hm ? Date.parse(`${hm[1]} ${hm[2]} ${hm[5]} ${hm[3]} GMT${hm[4] === 'CEST' ? '+0200' : hm[4] === 'CET' ? '+0100' : '+0000'}`) : null;
   const events = [...(!engineOk && d.asOf ? [[sbWib(d.asOf), 'Mesin berhenti mengirim data']] : []), ...(d.haltNote ? [[Number.isFinite(haltAt) ? sbWib(haltAt) : '—', 'Dihentikan manual untuk menutup posisi']] : []), ...(lockAt ? [[sbWib(lockAt), `Modal dikunci${has(cap) ? ` ${usd(cap)}` : ''} — untung/rugi dihitung mulai di sini`]] : []),
     ...allFlows.map((f) => [sbWib(f.t), `${f.type === 'deposit' ? 'Setoran' : 'Penarikan'} ${usd(Math.abs(f.usd))}${has(f.sol) ? ` (${fmtNum(f.sol, 4)} SOL)` : ''}${f.by ? ` · ${f.by}` : ''}${lockAt && f.t < lockAt ? ' · sebelum lock, riwayat saja' : ''}`])];
-  setHTML(body, `<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${mode[1]}"><i></i>${esc(mode[0])}</span></div>
+  const stopNote = state.gmsol?.stopped ? `<p class="miss" role="status"><b>GMSOL dihentikan.</b> ${esc(state.gmsol.stopped.note || '')} Saldo yang masih terbaca di wallet tetap ikut Total aset sampai seluruhnya pindah; sesudah pindah, nilainya terhitung di SolBot.</p>` : '';
+  setHTML(body, `${stopNote}<section class="card sb-hero">${GMSOL_HEAD}<span class="sb-mode ${mode[1]}"><i></i>${esc(mode[0])}</span></div>
       ${!engineOk ? `<p class="miss" role="status"><b>${esc(mode[0])}.</b> ${d.asOf ? `Data terakhir dari mesin ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}). ` : ''}Angka mesin (buku, rem, screening) disembunyikan sampai mesin jalan lagi; uang di wallet tetap dipantau langsung dari blockchain.</p>` : ''}
       ${d.haltNote ? `<p class="hint">Catatan berhenti: ${esc(d.haltNote)}</p>` : ''}
       ${b.halted ? '<p class="sb-halt" role="alert"><b>Rem total aktif:</b> semua posisi GMSOL ditutup; mesin jalan lagi hanya atas izin Orel.</p>' : ''}
@@ -5263,11 +5267,11 @@ async function renderHome() {
     const f = state.gmsol, d = gsData && gsData.status === 'ok' && gsData.asOf && Date.now() - gsData.asOf <= GMSOL_STALE_MS ? gsData : null;
     const stopped = !d && gmsolStopped(gsData);
     const seats = d?.openSeats || [], real = d ? gmsolReal(d) : gmsolWalletFresh(gsData) ? gmsolReal(gsData) : null;
-    const status = !d ? (stopped ? 'mesin berhenti' : 'menunggu live') : d.brakes?.halted ? 'berhenti (rem total)' : d.brakes?.dailyBlocked ? 'rem harian aktif' : seats.length ? 'live' : 'live, belum ada posisi';
+    const status = f.stopped ? 'dihentikan' : !d ? (stopped ? 'mesin berhenti' : 'menunggu live') : d.brakes?.halted ? 'berhenti (rem total)' : d.brakes?.dailyBlocked ? 'rem harian aktif' : seats.length ? 'live' : 'live, belum ada posisi';
     return `<a class="prod" href="#gmsol" style="--c:${f.accent}">
       <div class="prod-top">${iconTile('orbit', f.accent)}
         <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${esc(status)}</div></div></div>
-      <p class="prod-desc">${esc(f.blurb || '')}</p>
+      <p class="prod-desc">${esc(f.stopped?.note || f.blurb || '')}</p>
       <div class="prod-nums">
         <div><span class="k">Aset nyata</span><span class="v">${real == null ? '—' : usd(real, 0)}</span></div>
         <div><span class="k">Buku GMSOL</span><span class="v ${cls(d?.pnlUsd ?? 0)}">${d?.pnlUsd == null || (!seats.length && !(d.closes || []).length) ? '<span class="dim">belum ada PnL</span>' : `${signed(d.pnlUsd)}<small>${d.pnlPct >= 0 ? '+' : ''}${pct(d.pnlPct, 1)}${d.capitalUsd != null ? ` vs ${usd(d.capitalUsd, 0)}` : ''}</small>`}</span></div>

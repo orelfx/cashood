@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import Core from '../assets/core.js';
 import { atomicJSON, lock } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
-import { cashoodEnv } from './lib/rpc-env.mjs';
+import { cashoodEnv, solanaRpc } from './lib/rpc-env.mjs';
 import { solanaPrices } from './lib/solana-prices.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -33,7 +33,6 @@ const release = lock(resolve(DIR, 'sync.lock.local'));
 const cfg = JSON.parse(readFileSync(resolve(DIR, 'config.json'), 'utf8'));
 // Alamatnya dibaca dari berkas lokal, bukan dari config yang ikut terbit.
 const WALLET = String(JSON.parse(readFileSync(resolve(DIR, 'wallet.local.json'), 'utf8')).address);
-const RPC = cashoodEnv('CASHOOD_SOLANA_RPC') || 'https://api.mainnet-beta.solana.com';
 
 // Kunci LP Agent: milik situs kalau ada, kalau tidak yang sama dengan No Risk
 // No Ferari (dari .env bot Robinhood).
@@ -51,13 +50,8 @@ const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
 const r2 = (n) => Number(num(n).toFixed(2));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function rpc(method, params) {
-  const res = await fetch(RPC, { method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: AbortSignal.timeout(20000) });
-  const j = await res.json();
-  if (j.error) throw new Error(`${method}: ${j.error.message}`);
-  return j.result;
-}
+// RPC utama situs, lalu cadangan (lib/rpc-env.mjs) kalau utama gagal/dijeda.
+const rpc = (method, params) => solanaRpc(method, params);
 
 async function lpAgent(path, extra = {}) {
   const url = new URL('https://api.lpagent.io/open-api/v1/' + path);

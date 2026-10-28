@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 import Core from '../assets/core.js';
 import { lock } from './lib/io.mjs';
 import { saveSnapshot } from './lib/snapshot.mjs';
-import { cashoodEnv } from './lib/rpc-env.mjs';
+import { solanaRpc } from './lib/rpc-env.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DIR = resolve(process.env.CASHOOD_DATA_DIR || resolve(HERE, '..', 'data'), 'staking');
@@ -30,18 +30,14 @@ const OUT = resolve(DIR, 'live.json');
 const release = lock(resolve(DIR, 'sync.lock.local'));
 const cfg = JSON.parse(readFileSync(resolve(DIR, 'config.json'), 'utf8'));
 const local = JSON.parse(readFileSync(resolve(DIR, 'wallet.local.json'), 'utf8'));
-const RPC = cashoodEnv('CASHOOD_SOLANA_RPC') || 'https://api.mainnet-beta.solana.com';
 const MET = 'METvsvVRapdj9cFLzq4Tr43xK4tAjQfwX76z3n6mWQL';
 const WIB = 7 * 3600e3;
 const r2 = (n) => Number((Number(n) || 0).toFixed(2));
 
+// Tiap putaran mencoba RPC utama lalu cadangan (lib/rpc-env.mjs); dua putaran.
 async function rpc(method, params) {
-  for (let i = 0; i < 4; i += 1) {
-    try {
-      const res = await fetch(RPC, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: AbortSignal.timeout(20000) });
-      const j = await res.json();
-      if (j.result !== undefined) return j.result;
-    } catch { /* coba lagi */ }
+  for (let i = 0; i < 2; i += 1) {
+    try { return await solanaRpc(method, params); } catch { /* coba lagi */ }
     await new Promise((r) => setTimeout(r, 1500));
   }
   throw new Error(`RPC ${method} gagal`);

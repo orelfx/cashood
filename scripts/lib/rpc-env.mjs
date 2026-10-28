@@ -32,11 +32,36 @@ export function useCashoodRobinhoodRpc() {
   return true;
 }
 
+// Urutan RPC Solana: utama situs, cadangan situs (opsional), lalu dua RPC
+// publik. 2026-10-28: RPC utama dijeda penyedia (tagihan) beberapa jam dan
+// Meridian/Staking/Robsol berhenti diperbarui; cadangan mencegah itu terulang.
+export const PUBLIC_SOLANA_RPCS = ['https://solana-rpc.publicnode.com', 'https://api.mainnet-beta.solana.com'];
+export function solanaRpcList() {
+  return [...new Set([pick('CASHOOD_SOLANA_RPC'), pick('CASHOOD_SOLANA_RPC_BACKUP'), ...PUBLIC_SOLANA_RPCS].filter(Boolean))];
+}
+
+// Panggil RPC Solana dengan cadangan: endpoint berikutnya dicoba kalau HTTP
+// gagal, jawaban bukan JSON, atau RPC mengembalikan error (jeda, 429, kunci).
+export async function solanaRpc(method, params, { urls = solanaRpcList(), fetchImpl = globalThis.fetch, timeoutMs = 20000 } = {}) {
+  let last = null;
+  for (const url of urls) {
+    try {
+      const res = await fetchImpl(url, { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }), signal: AbortSignal.timeout(timeoutMs) });
+      const j = await res.json();
+      if (j && j.result !== undefined) return j.result;
+      last = new Error(`${method}: ${j?.error?.message || `HTTP ${res.status}`}`);
+    } catch (e) { last = new Error(`${method}: ${e.message}`); }
+  }
+  throw last || new Error(`RPC ${method} gagal`);
+}
+
 // Solana: Meridian. Dipakai sebagai env proses CLI bot yang dijalankan exporter.
 export function cashoodSolanaEnv(base = process.env) {
   const url = pick('CASHOOD_SOLANA_RPC');
   if (!url) return base;
-  return { ...base, RPC_URL: url, RPC_URL_BACKUP: '', OPPORTUNITY_RPC_URL: '', RPC_EXTRA_URLS: '', RPC_WS_URL: '', RPC_WS_URL_BACKUP: '',
+  const backup = solanaRpcList().filter((u) => u !== url);
+  return { ...base, RPC_URL: url, RPC_URL_BACKUP: backup[0] || '', OPPORTUNITY_RPC_URL: '', RPC_EXTRA_URLS: '', RPC_WS_URL: '', RPC_WS_URL_BACKUP: '',
     // Saldo dompet: tanpa kunci Helius bot membaca saldo lewat RPC di atas
     // (getBalance + daftar token) dan harga Jupiter/DexScreener.
     HELIUS_API_KEY: '' };
