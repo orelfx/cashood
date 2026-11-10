@@ -2623,6 +2623,8 @@ function parseHash() {
   if (parts[0] === 'grr') return { grr: true, tab: 'portfolio' };
   if (parts[0] === 'gm') return { gm: true, tab: 'portfolio' };
   if (parts[0] === 'solbot') return { solbot: true, tab: 'portfolio' };
+  if (parts[0] === 'elysium') return {elysium:true,tab:'portfolio'};
+  if (parts[0] === 'riskelysium') return {riskelysium:true,tab:'portfolio'};
   if (parts[0] === 'gmsol') return { gmsol: true, tab: 'portfolio' };
   if (parts[0] === 'update') return { update: true, tab: 'portfolio' };
   if (parts[0] === 'analisa') {
@@ -2657,7 +2659,7 @@ function navItems(key) {
     .map((f) => ({ attr: `data-fund="${esc(f.id)}"`, name: f.label, sub: f.chain, accent: f.accent, on: state.view === 'fund' && f.id === state.fund }));
   if (state.safebox && (state.safebox.risk || 'low') === key) items.push({ attr: 'data-view="safebox"', name: state.safebox.label, sub: state.safebox.subtitle, accent: state.safebox.accent, on: state.view === 'safebox' });
   if (state.index && (state.index.risk || 'low') === key) items.push({ attr: 'data-view="index"', name: state.index.label, sub: state.index.subtitle, accent: state.index.accent, on: state.view === 'index' });
-  for (const k of ['solbot', 'gmsol', 'grr', 'gm']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, badge: state[k].badge, on: state.view === k });
+  for (const k of ['solbot', 'gmsol', 'grr', 'gm', 'elysium', 'riskelysium']) if (state[k] && (state[k].risk || 'paper') === key) items.push({ attr: `data-view="${k}"`, name: state[k].label, sub: state[k].subtitle, accent: state[k].accent, badge: state[k].badge, on: state.view === k });
   return items;
 }
 function renderFundBar() {
@@ -3216,11 +3218,12 @@ async function portoTotals() {
   const sb = await sbJob, gs = await gsJob;
   if (state.solbot) { ids.push('solbot'); loaded.push(sb); }
   if (state.gmsol) { ids.push('gmsol'); loaded.push(gs); }
+  for(const id of ['elysium','riskelysium']) if(state[id]) { ids.push(id); loaded.push(await elysiumBrief(id)); }
   const briefs = loaded.filter(Boolean);
   const box = await boxJob;
   const dana = briefs.reduce((s, b) => s + b.totalUsd, 0);
   const simpanan = Number(box?.balanceUsd) || 0;
-  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + (Number(box?.principalUsd) || 0);
+  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) - matchedInternalCapital(briefs) + (Number(box?.principalUsd) || 0);
   const untung = briefs.reduce((s, b) => s + (b.pnlUsd || 0), 0) + (Number(box?.interestUsd) || 0) + (Number(box?.paidUsd) || 0);
   const orang = new Set([...briefs.flatMap((b) => b.owners.map((o) => o.name)), ...(box?.owners || []).map((o) => o.name)]).size;
   return { ids, briefs, missing: ids.filter((id, i) => !loaded[i]), box, dana, simpanan, total: dana + simpanan, setoran, untung, orang };
@@ -3237,6 +3240,7 @@ async function renderPortofolio() {
   const loaded = await Promise.all(ids.map(id => loadFundBrief(id).catch(() => null)));
   if (state.solbot) { ids.push('solbot'); loaded.push(await sbJob); }
   if (state.gmsol) { ids.push('gmsol'); loaded.push(await gsJob); }
+  for(const id of ['elysium','riskelysium']) if(state[id]) { ids.push(id); loaded.push(await elysiumBrief(id)); }
   const missing = ids.filter((id, i) => !loaded[i]);
   const briefs = loaded.filter(Boolean);
   const box = await boxJob;
@@ -3250,7 +3254,7 @@ async function renderPortofolio() {
   const pokokBox = Number(box?.principalUsd) || 0;
   // Bunga yang sudah ditarik tetap hasil Safe Box, meski saldonya kembali ke pokok.
   const bungaBox = (Number(box?.interestUsd) || 0) + (Number(box?.paidUsd) || 0);
-  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) + pokokBox;
+  const setoran = briefs.reduce((s, b) => s + b.depositedUsd, 0) - matchedInternalCapital(briefs) + pokokBox;
   const untung = briefs.reduce((s, b) => s + b.pnlUsd, 0) + bungaBox;
   const orang = new Set(briefs.flatMap((b) => b.owners.map((o) => o.name))).size;
 
@@ -3565,7 +3569,7 @@ const RISK = [
 ];
 
 function leaveHome() {
-  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm', '#tab-gmsol', '#tab-solbot']) if ($(id)) $(id).hidden = true;
+  for (const id of ['#tab-home', '#tab-kinerja', '#tab-pemegang', '#tab-index', '#tab-grr', '#tab-gm', '#tab-gmsol', '#tab-solbot', '#tab-elysium', '#tab-riskelysium']) if ($(id)) $(id).hidden = true;
   if ($('#strip')) $('#strip').hidden = false;
   if (document.body.classList.contains('at-home')) {
     document.body.classList.remove('at-home');
@@ -3576,7 +3580,7 @@ function leaveHome() {
   }
 }
 
-const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm', 'gmsol', 'solbot'];
+const GLOBAL_TABS = ['portfolio', 'investor', 'analys', 'bot', 'tentang', 'analisa', 'safebox', 'update', 'home', 'kinerja', 'pemegang', 'index', 'grr', 'gm', 'gmsol', 'solbot', 'elysium', 'riskelysium'];
 function showGlobal(view, title) {
   state.view = view;
   banner('');
@@ -5328,8 +5332,9 @@ async function renderHome() {
     // Low risk: Safe Box & Index (kartu khusus) ditambah dana biasa berisiko rendah (Staking).
     const items = r.key === 'low' ? [...(state.safebox ? [safeCard()] : []), ...(state.index && idx ? [indexCard()] : []), ...state.funds.filter((f) => f.risk === 'low').map(card)]
       : [...state.funds.filter((f) => f.risk === r.key).map(card), ...(state.solbot && (state.solbot.risk || 'high') === r.key ? [solbotCard()] : []), ...(state.gmsol && (state.gmsol.risk || 'high') === r.key ? [gmsolCard()] : [])];
+    for(const id of ['elysium','riskelysium']) if(state[id]?.risk===r.key)items.push(`<a class="prod" href="#${id}" style="--c:${state[id].accent}"><h3>${esc(state[id].label)}</h3><p>${id==='elysium'?'Cabang Reborn Rich · Elysium · dry run':'Cabang No Risk No Ferari · Elysium'}</p><p class="hint">Saldo per jaringan terpisah. ${id==='elysium'?'Modal nyata Orel $100; hasil simulasi tidak termasuk aset nyata.':'Lihat saldo token dan posisi LP yang terverifikasi.'}</p><span class="prod-go">Buka ${esc(state[id].label)} →</span></a>`);
     if (!items.length) return '';
-    return `<div class="risk-group" style="--rc:${r.color}">
+    return `<div class="risk-group style="--rc:${r.color}">
       <div class="rg-head"><span class="rg-badge">${r.title}</span><span class="rg-note">${r.note}</span></div>
       <div class="prod-grid">${items.join('')}</div></div>`;
   }).join('') + '</div>');
@@ -5453,6 +5458,7 @@ async function renderPemegang() {
     add(o.id, o.name, null, { fund: state.safebox?.label || 'Safe Box', accent: state.safebox?.accent || '#2dd4bf', share: Number(o.sharePct) || 0,
       value: Number(o.balanceUsd) || 0, modal: Number(o.principalUsd) || 0, out: Number(o.paidUsd) || 0 });
   }
+  for(const b of g.briefs){if(!matchedInternalCapital(g.briefs,b))continue;const p=people.get(b.internalTransfer.owner);if(p){p.modal-=b.internalTransfer.usd;p.out-=b.internalTransfer.usd;}}
   const list = [...people.values()].sort((a, b) => b.value - a.value);
   const total = list.reduce((s, p) => s + p.value, 0);
   const tile = (k, v, n) => `<div class="hs"><div class="hs-v">${v}</div><div class="hs-k">${k}</div><div class="hs-n">${n}</div></div>`;
@@ -5481,6 +5487,7 @@ async function renderPemegang() {
 /* ── boot ────────────────────────────────────────────────────────────── */
 
 function renderAll() {
+  renderFamilyChains();
   const rows = ownerValues(state.ledger, state.nav.totalUsd);
   applyFundKind();
   hideEmptyCards(state.nav);
@@ -5542,6 +5549,7 @@ function renderVisible() {
   else if (state.view === 'pemegang') renderPemegang().catch(() => {});
   else if (state.view === 'index') renderIndex().catch(() => {});
   else if (state.view === 'solbot') renderSolbot().catch(() => {});
+  else if (['elysium','riskelysium'].includes(state.view)) renderElysium(state.view).catch(() => {});
   else if (state.view === 'gmsol') renderGmsol().catch(() => {});
   else if (state.view === 'safebox') renderSafebox();
   else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
@@ -5560,6 +5568,7 @@ async function init() {
     state.gm = list.gm || null;
     state.solbot = list.solbot || null;
     state.gmsol = list.gmsol || null;
+    state.elysium = list.elysium || null; state.riskelysium = list.riskelysium || null;
     if (!state.funds.length) throw new Error('daftar dana kosong');
     await loadFundConfig(parseHash().fund || list.active || state.funds[0].id);
   } catch (err) {
@@ -5580,6 +5589,8 @@ async function init() {
     if (view === 'grr') { showGrr(); return; }
     if (view === 'gm') { showGm(); return; }
     if (view === 'solbot') { showSolbot(); return; }
+    if (view === 'elysium') { showElysium('elysium'); return; }
+    if (view === 'riskelysium') { showElysium('riskelysium'); return; }
     if (view === 'gmsol') { showGmsol(); return; }
     if (view === 'analisa') { showAnalisa(); return; }
     if (view === 'safebox') { showSafebox(); return; }
@@ -5671,7 +5682,8 @@ async function init() {
     else if (state.view === 'pemegang') renderPemegang().catch(() => {});
     else if (state.view === 'index') renderIndex().catch(() => {});
     else if (state.view === 'solbot') renderSolbot().catch(() => {});
-    else if (state.view === 'gmsol') renderGmsol().catch(() => {});
+    else if (['elysium','riskelysium'].includes(state.view)) renderElysium(state.view).catch(() => {});
+  else if (state.view === 'gmsol') renderGmsol().catch(() => {});
     else if (state.view === 'analisa') { renderPortofolio().catch(() => {}); }
     else if (state.view === 'safebox') renderSafebox();
     else if (state.view === 'update') renderUpdates();
@@ -5693,6 +5705,8 @@ async function init() {
     if (route.grr) { showGrr(); return; }
     if (route.gm) { showGm(); return; }
     if (route.solbot) { showSolbot(); return; }
+    if (route.elysium) { showElysium('elysium'); return; }
+    if (route.riskelysium) { showElysium('riskelysium'); return; }
     if (route.gmsol) { showGmsol(); return; }
     if (route.update) { showUpdate(); return; }
     if (route.analisa) { showAnalisa(route.fund); return; }
@@ -5764,3 +5778,52 @@ async function init() {
 globalThis.cashood = { state, buildLedger, ownerValues, load, renderProfitProbe: renderProfit };
 
 if (typeof document !== 'undefined') init();
+
+
+const elysiumCache = new Map();
+async function loadElysium(id) {
+ const cached=elysiumCache.get(id);if(cached&&Date.now()-cached.at<60000)return cached.data;
+ for(const url of [(rawDataBase(id)||RAW_BASE+id+'/')+'live.json','data/'+id+'/live.json']){
+  try{const d=await getJSON(url);if(d?.fund===id){elysiumCache.set(id,{at:Date.now(),data:d});return d;}}catch{}
+ }
+ return null;
+}
+function custodyValue(d){const c=d?.custody;return c?.quality?.complete===true&&Number.isFinite(c.totalUsd)&&Date.now()-c.updatedAt<=15*60000?usd(c.totalUsd):'Belum terverifikasi';}
+function renderFamilyChains(){
+ const box=$('#familyChains');if(!box)return;
+ const id=state.fund==='reborn'?'elysium':state.fund==='ferari'?'riskelysium':null;
+ box.hidden=!id;if(!id)return;
+ const family=state.fund;
+ setHTML(box,`<section class="card"><div class="card-head"><h2>Saldo per jaringan</h2><a href="#${id}">${esc(state[id]?.label||'Elysium')} →</a></div><p>Robinhood: <b>${usd(state.nav?.totalUsd)}</b> · Elysium: <span data-elysium-balance>memuat…</span></p><p class="hint">Pencatatan tiap jaringan terpisah. Hasil simulasi tidak menambah saldo nyata.</p></section>`);
+ loadElysium(id).then(d=>{if(state.fund===family&&box.querySelector('[data-elysium-balance]'))box.querySelector('[data-elysium-balance]').textContent=custodyValue(d);});
+}
+function showElysium(id){showGlobal(id,(state[id]?.label||'Elysium')+' — Cashood');renderElysium(id).catch(()=>{if(state.view===id)setHTML($('#'+id+'Body'),'<p class="miss">Data Elysium belum tersedia.</p>');});}
+async function renderElysium(id){
+ const d=await loadElysium(id);if(state.view!==id)return;
+ const meta=state[id], parent=meta?.family||'reborn';
+ const sim=d?.simulation, paper=sim?.quality?.complete&&Date.now()-sim.updatedAt<=15*60000?sim.paper:null;
+ setHTML($('#'+id+'Body'),`<section class="card"><div class="card-head"><h2>${esc(meta?.label||'Elysium')}</h2><a href="#${parent}/portfolio">${parent==='reborn'?'Reborn Rich':'No Risk No Ferari'} · Robinhood →</a></div>
+ <p>${id==='elysium'?'Mesin masih dry run. Pendanaan nyata milik Orel terpisah dari buku simulasi.':'Cabang Elysium dari No Risk No Ferari. Saldo Robinhood dan Elysium dihitung terpisah.'}</p>
+ <div class="stats"><div class="stat"><div class="k">Saldo nyata · Elysium</div><div class="v">${custodyValue(d)}</div></div>
+ <div class="stat"><div class="k">Pendanaan Orel yang dicatat</div><div class="v">${d?.funding?.declaredUsd!=null?usd(d.funding.declaredUsd):'Menunggu rekonsiliasi'}</div><div class="n">Modal masuk, bukan nilai pasar saat ini.</div></div></div>
+ ${d?.custody?.quality?.complete?'': '<p class="miss">Pembacaan saldo token dan LP belum lengkap. Nilai tidak dianggap nol.</p>'}</section>
+ ${id==='elysium'?`<section class="card"><h2>Simulasi · tidak masuk total aset nyata</h2>${paper?`<p>Modal virtual ${usd(paper.capitalUsd)} · ekuitas simulasi ${usd(paper.equityUsd)}</p><p>Untung/rugi simulasi ${usd(paper.netPnlUsd)} · ${paper.openPositions} posisi terbuka</p><p class="hint">${paper.feeEstimated?'Fee simulasi masih estimasi.':''} Diperbarui ${ago(sim.updatedAt)}.</p>`:'<p class="miss">Data simulasi belum tersedia atau sudah kedaluwarsa.</p>'}</section>`:''}`);
+}
+
+async function elysiumBrief(id){
+ const d=await loadElysium(id),c=d?.custody,meta=state[id];
+ if(!meta||c?.quality?.complete!==true||!Number.isFinite(c.totalUsd)||Date.now()-c.updatedAt>15*60000)return null;
+ const capital=d.funding?.declaredUsd??null;
+ const owner={id:'orel',name:'Orel',color:'#4ade80',share:100,value:c.totalUsd,deposited:capital,withdrawn:0};
+ return {id,label:meta.label,chain:'Elysium',accent:meta.accent,totalUsd:c.totalUsd,depositedUsd:capital??0,pnlUsd:capital==null?null:c.totalUsd-capital,updatedAt:c.updatedAt,risk:meta.risk,paper:false,
+  internalTransfer:id==='elysium'&&capital!=null?{owner:'orel',sourceFund:'reborn',sourceEvent:'reborn-orel-transfer-elysium-100-20261110',usd:capital}:null,
+  flows:capital!=null&&d.funding.at?[{at:d.funding.at,usd:capital}]:[],series:d.curve||[],owners:[owner],holders:[owner],openCount:0,closedCount:0,winRate:null,history:[],basisIncomplete:capital==null};
+}
+
+function matchedInternalCapital(briefs,only=null){
+ return (only?[only]:briefs).reduce((total,b)=>{const t=b.internalTransfer;if(!t)return total;
+  const source=briefs.find(x=>x.id===t.sourceFund);
+  const event=source?.cfg?.events?.find(e=>e.id===t.sourceEvent&&e.owner===t.owner&&e.type==='withdraw'&&e.usd===t.usd);
+  return total+(event?t.usd:0);
+ },0);
+}

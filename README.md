@@ -236,3 +236,31 @@ lengkap beserta timestamp aslinya; jangan sekadar menambahkan `complete:true` at
 menghapus state akrual. Pemulihan snapshot saat ini saja tidak menyelesaikan celah
 riwayat. Pengujian exporter menggunakan direktori sementara dan tidak memperbaiki
 atau menulis ulang riwayat produksi.
+
+## Elysium: cabang jaringan dan pemisahan simulasi
+
+`elysium` berada di kelompok Reborn Rich (medium risk), sedangkan `riskelysium`
+berada di kelompok No Risk No Ferari (high risk). Kedua cabang memiliki pembacaan
+saldo sendiri pada chain 99901. Alamat hanya berada di `wallet.local.json` yang
+tidak dipublikasikan. Nilai Robinhood tidak ditambah langsung ke NAV cabang Elysium.
+
+`read-elysium-custody.mjs` memakai RPC read-only, memeriksa chain, kesegaran blok,
+harga HYPE, penerimaan ERC20/ERC721/ERC1155/ERC6909, dan jumlah NFT posisi Uniswap
+v4. Pembaca awal memverifikasi wallet yang hanya berisi HYPE. Jika ditemukan
+penerimaan aset lain atau posisi, valuasi total ditahan sampai tersedia adapter
+aset/LP yang sesuai; aset yang belum dinilai tidak dianggap nol. Kegagalan RPC
+atau harga tidak memperbarui hasil observasi terakhir. Hasil lebih dari 15 menit
+tidak masuk total aset dan ditandai sebagai data belum lengkap.
+
+`sync-elysium.mjs` memisahkan `custody` (nilai nyata) dari `simulation` (mesin paper
+lokal). Modal virtual dan PnL simulasi tidak masuk total aset, modal investor,
+atau Index. Hanya saldo nyata lengkap yang masuk ringkasan aset dan kepemilikan
+Orel. Modal RISK Elysium yang belum direkonsiliasi tetap tidak diketahui; saldonya
+tidak dianggap sebagai laba. Transfer $100 Orel dari Reborn ke Elysium memiliki
+referensi event sumber; modal global menghilangkan transfer internal yang cocok,
+sementara masing-masing buku jaringan tetap mencatat arus dananya.
+
+Transaksi Meridian 10 November 2026 tercatat 20 SOL keluar dan 14,984 SOL masuk,
+hanya mengubah unit Orel. Valuasi USD menggunakan harga dan NAV snapshot terakhir
+sebelum transaksi, dengan waktu referensi dicantumkan pada event. Bukti transaksi
+serta salinan konfigurasi sebelum perubahan disimpan privat di server audit.

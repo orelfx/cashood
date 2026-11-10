@@ -65,3 +65,13 @@ try{
 }catch(err){console.error(`[stage] gmsol: ${err.message}`);failed=true;}
 // Valid other funds may still publish, but the operator gets a nonzero status.
 if(failed)process.exitCode=2;
+
+// Elysium custody and simulation have different schemas and must not be merged.
+for(const fund of ['elysium','riskelysium']){
+ try{
+  const live=readJSON(resolve(ROOT,'data',fund,'live.json'));
+  if(!live)throw Error('Snapshot Elysium belum ada');
+  if(live.fund!==fund||live.schemaVersion!==2)throw Error('Identitas snapshot Elysium salah');
+  assertPublic(live);atomicJSON(resolve(destination,fund,'live.json'),live);
+ }catch(err){console.error(`[stage] ${fund}: ${err.message}`);process.exitCode=2;}
+}

@@ -133,8 +133,8 @@ console.log('PASS complete forecast render');
  assert.equal(await ev('document.documentElement.scrollWidth===innerWidth'),true);
  if(process.env.CASHOOD_SCREENSHOT_DIR){fs.mkdirSync(process.env.CASHOOD_SCREENSHOT_DIR,{recursive:true});const shot=await cmd('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.CASHOOD_SCREENSHOT_DIR,'growth-mobile.png'),Buffer.from(shot.data,'base64'));}
  console.log('PASS touch chart comparison stays within the mobile viewport');
- await ev(`homeView.referenceAt=null;homeView.selectedAt=null;const missing=structuredClone(__growthFixture);missing[0].parts[0].known=false;drawGrowth(document.querySelector('#hgChart'),missing,false)`);
- assert.match(await ev('document.querySelector("#hgCompareTotal").textContent'),/data pembanding belum lengkap/i);
+ const missingComparison=await ev(`homeView.referenceAt=null;homeView.selectedAt=null;const missing=structuredClone(__growthFixture);missing[0].parts[0].known=false;drawGrowth(document.querySelector('#hgChart'),missing,false);document.querySelector("#hgCompareTotal").textContent`);
+ assert.match(missingComparison,/data pembanding belum lengkap/i);
  console.log('PASS missing history cannot appear as a total gain');
  await cmd('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
  await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
@@ -364,6 +364,21 @@ console.log('PASS complete forecast render');
  await ev(`(async()=>{const old=loadIndex;loadIndex=async()=>({fund:'index',quality:{complete:false,calculationDeferred:true},dataNotice:'Index ditunda: sumber tidak lengkap'});showGlobal('index','Index');await renderIndex();loadIndex=old;})()`);
  assert.match(await ev('document.querySelector("#indexBody").textContent'),/Index ditunda: sumber tidak lengkap/);
  console.log('PASS deferred Index and Safe Box display warnings without fabricating initial balances');
+ const elysiumCheck=await ev(`(async()=>{
+   const at=Date.now();
+   for(const id of ['elysium','riskelysium'])elysiumCache.set(id,{at,data:{fund:id,custody:{updatedAt:at,totalUsd:id==='elysium'?100:200,quality:{complete:true}},funding:{owner:'orel',declaredUsd:id==='elysium'?100:null,at},curve:[{t:at,usd:id==='elysium'?100:200}],simulation:{updatedAt:at,quality:{complete:true},paper:{capitalUsd:1000,equityUsd:1500,netPnlUsd:500,openPositions:0,feeEstimated:true}}}});
+   const g=await portoTotals();return {capitalNeutral:Math.abs(g.setoran-(g.briefs.reduce((n,b)=>n+b.depositedUsd,0)+(g.box?.principalUsd||0)-100))<.001,extra:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).reduce((n,b)=>n+b.totalUsd,0),owner:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).every(b=>b.owners.length===1&&b.owners[0].id==='orel'),medium:navItems('medium').some(x=>x.name==='Elysium LP'),high:navItems('high').some(x=>x.name==='RISK Elysium')};
+ })()`);
+ assert.deepEqual(elysiumCheck,{capitalNeutral:true,extra:300,owner:true,medium:true,high:true});
+ for(const id of ['elysium','riskelysium']){
+   await ev(`location.hash='#${id}'`);await new Promise(r=>setTimeout(r,200));
+   assert.equal(await ev('state.view'),id);
+   assert.equal(await ev(`document.querySelector('#tab-${id}').hidden`),false);
+ }
+ await ev(`location.hash='#reborn/portfolio'`);await new Promise(r=>setTimeout(r,300));
+ assert.equal(await ev(`document.querySelector('#tab-riskelysium').hidden`),true);
+ assert.match(await ev(`document.querySelector('#familyChains').textContent`),/Robinhood.*Elysium/);
+ console.log('PASS Elysium risk menus, routing, separate chain balances, Orel ownership and real-only global totals');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}
