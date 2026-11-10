@@ -370,12 +370,13 @@ console.log('PASS complete forecast render');
    const g=await portoTotals();return {capitalNeutral:Math.abs(g.setoran-(g.briefs.reduce((n,b)=>n+b.depositedUsd,0)+(g.box?.principalUsd||0)-100))<.001,extra:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).reduce((n,b)=>n+b.totalUsd,0),owner:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).every(b=>b.owners.length===1&&b.owners[0].id==='orel'),medium:navItems('medium').some(x=>x.name==='Elysium LP'),high:navItems('high').some(x=>x.name==='RISK Elysium')};
  })()`);
  assert.deepEqual(elysiumCheck,{capitalNeutral:true,extra:300,owner:true,medium:true,high:true});
+ await ev(`(async()=>{await switchFund('reborn')})()`);
  for(const id of ['elysium','riskelysium']){
    await ev(`location.hash='#${id}'`);await new Promise(r=>setTimeout(r,200));
    assert.equal(await ev('state.view'),id);
    assert.equal(await ev(`document.querySelector('#tab-${id}').hidden`),false);
  }
- await ev(`location.hash='#reborn/portfolio'`);await new Promise(r=>setTimeout(r,300));
+ await ev(`document.querySelector('#familyChains').innerHTML='';location.hash='#reborn/portfolio'`);await new Promise(r=>setTimeout(r,300));
  assert.equal(await ev(`document.querySelector('#tab-riskelysium').hidden`),true);
  assert.match(await ev(`document.querySelector('#familyChains').textContent`),/Robinhood.*Elysium/);
  console.log('PASS Elysium risk menus, routing, separate chain balances, Orel ownership and real-only global totals');

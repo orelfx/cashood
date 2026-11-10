@@ -5712,6 +5712,8 @@ async function init() {
     if (route.analisa) { showAnalisa(route.fund); return; }
     if (route.fund && route.fund !== state.fund) { switchFund(route.fund).then(() => showTab(route.tab)); return; }
     showTab(route.tab);
+    // A direct entry to a global view may load NAV without rendering fund panels.
+    if (state.nav && state.ledger) renderAll();
   };
   window.addEventListener('hashchange', fromHash);
   fromHash();
@@ -5804,7 +5806,7 @@ async function renderElysium(id){
  const sim=d?.simulation, paper=sim?.quality?.complete&&Date.now()-sim.updatedAt<=15*60000?sim.paper:null;
  setHTML($('#'+id+'Body'),`<section class="card"><div class="card-head"><h2>${esc(meta?.label||'Elysium')}</h2><a href="#${parent}/portfolio">${parent==='reborn'?'Reborn Rich':'No Risk No Ferari'} · Robinhood →</a></div>
  <p>${id==='elysium'?'Mesin masih dry run. Pendanaan nyata milik Orel terpisah dari buku simulasi.':'Cabang Elysium dari No Risk No Ferari. Saldo Robinhood dan Elysium dihitung terpisah.'}</p>
- <div class="stats"><div class="stat"><div class="k">Saldo nyata · Elysium</div><div class="v">${custodyValue(d)}</div></div>
+ <div class="stats wrapfit"><div class="stat"><div class="k">Saldo nyata · Elysium</div><div class="v">${custodyValue(d)}</div></div>
  <div class="stat"><div class="k">Pendanaan Orel yang dicatat</div><div class="v">${d?.funding?.declaredUsd!=null?usd(d.funding.declaredUsd):'Menunggu rekonsiliasi'}</div><div class="n">Modal masuk, bukan nilai pasar saat ini.</div></div></div>
  ${d?.custody?.quality?.complete?'': '<p class="miss">Pembacaan saldo token dan LP belum lengkap. Nilai tidak dianggap nol.</p>'}</section>
  ${id==='elysium'?`<section class="card"><h2>Simulasi · tidak masuk total aset nyata</h2>${paper?`<p>Modal virtual ${usd(paper.capitalUsd)} · ekuitas simulasi ${usd(paper.equityUsd)}</p><p>Untung/rugi simulasi ${usd(paper.netPnlUsd)} · ${paper.openPositions} posisi terbuka</p><p class="hint">${paper.feeEstimated?'Fee simulasi masih estimasi.':''} Diperbarui ${ago(sim.updatedAt)}.</p>`:'<p class="miss">Data simulasi belum tersedia atau sudah kedaluwarsa.</p>'}</section>`:''}`);
