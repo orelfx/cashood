@@ -5790,7 +5790,8 @@ async function loadElysium(id) {
  }
  return null;
 }
-function custodyValue(d){const c=d?.custody;return c?.quality?.complete===true&&Number.isFinite(c.totalUsd)&&Date.now()-c.updatedAt<=15*60000?usd(c.totalUsd):'Belum terverifikasi';}
+function custodyFresh(d){const c=d?.custody;return c?.quality?.complete===true&&Number.isFinite(c.totalUsd)&&Number.isFinite(c.updatedAt)&&c.updatedAt<=Date.now()+60000&&Date.now()-c.updatedAt<=15*60000;}
+function custodyValue(d){return custodyFresh(d)?usd(d.custody.totalUsd):'Belum terverifikasi';}
 function renderFamilyChains(){
  const box=$('#familyChains');if(!box)return;
  const id=state.fund==='reborn'?'elysium':state.fund==='ferari'?'riskelysium':null;
@@ -5803,12 +5804,14 @@ function showElysium(id){showGlobal(id,(state[id]?.label||'Elysium')+' — Casho
 async function renderElysium(id){
  const d=await loadElysium(id);if(state.view!==id)return;
  const meta=state[id], parent=meta?.family||'reborn';
+ const c=custodyFresh(d)?d.custody:null;
  const sim=d?.simulation, paper=sim?.quality?.complete&&Date.now()-sim.updatedAt<=15*60000?sim.paper:null;
  setHTML($('#'+id+'Body'),`<section class="card"><div class="card-head"><h2>${esc(meta?.label||'Elysium')}</h2><a href="#${parent}/portfolio">${parent==='reborn'?'Reborn Rich':'No Risk No Ferari'} · Robinhood →</a></div>
  <p>${id==='elysium'?'Mesin masih dry run. Pendanaan nyata milik Orel terpisah dari buku simulasi.':'Cabang Elysium dari No Risk No Ferari. Saldo Robinhood dan Elysium dihitung terpisah.'}</p>
  <div class="stats wrapfit"><div class="stat"><div class="k">Saldo nyata · Elysium</div><div class="v">${custodyValue(d)}</div></div>
  <div class="stat"><div class="k">Pendanaan Orel yang dicatat</div><div class="v">${d?.funding?.declaredUsd!=null?usd(d.funding.declaredUsd):'Menunggu rekonsiliasi'}</div><div class="n">Modal masuk, bukan nilai pasar saat ini.</div></div></div>
- ${d?.custody?.quality?.complete?'': '<p class="miss">Pembacaan saldo token dan LP belum lengkap. Nilai tidak dianggap nol.</p>'}</section>
+ ${c?'': '<p class="miss">Pembacaan saldo token dan LP belum lengkap atau sudah kedaluwarsa. Nilai tidak dianggap nol.</p>'}</section>
+ ${c?elysiumAssetDetails(c,d.funding):''}
  ${id==='elysium'?`<section class="card"><h2>Simulasi · tidak masuk total aset nyata</h2>${paper?`<p>Modal virtual ${usd(paper.capitalUsd)} · ekuitas simulasi ${usd(paper.equityUsd)}</p><p>Untung/rugi simulasi ${usd(paper.netPnlUsd)} · ${paper.openPositions} posisi terbuka</p><p class="hint">${paper.feeEstimated?'Fee simulasi masih estimasi.':''} Diperbarui ${ago(sim.updatedAt)}.</p>`:'<p class="miss">Data simulasi belum tersedia atau sudah kedaluwarsa.</p>'}</section>`:''}`);
 }
 
@@ -5819,7 +5822,19 @@ async function elysiumBrief(id){
  const owner={id:'orel',name:'Orel',color:'#4ade80',share:100,value:c.totalUsd,deposited:capital,withdrawn:0};
  return {id,label:meta.label,chain:'Elysium',accent:meta.accent,totalUsd:c.totalUsd,depositedUsd:capital??0,pnlUsd:capital==null?null:c.totalUsd-capital,updatedAt:c.updatedAt,risk:meta.risk,paper:false,
   internalTransfer:id==='elysium'&&capital!=null?{owner:'orel',sourceFund:'reborn',sourceEvent:'reborn-orel-transfer-elysium-100-20261110',usd:capital}:null,
-  flows:capital!=null&&d.funding.at?[{at:d.funding.at,usd:capital}]:[],series:d.curve||[],owners:[owner],holders:[owner],openCount:0,closedCount:0,winRate:null,history:[],basisIncomplete:capital==null};
+  flows:capital!=null&&d.funding.at?[{at:d.funding.at,usd:capital}]:[],series:d.curve||[],owners:[owner],holders:[owner],openCount:(c.positions||[]).length,closedCount:0,winRate:null,history:[],basisIncomplete:capital==null};
+}
+
+function elysiumAssetDetails(c,funding){
+ const holdings=c.holdings||[],positions=c.positions||[];
+ return `<section class="card"><div class="card-head"><h2>Isi wallet Elysium</h2><span class="hint">${ago(c.updatedAt)}</span></div>
+ <div class="table-scroll"><table class="mcards"><thead><tr><th>Aset</th><th class="num">Jumlah</th><th class="num">Nilai</th></tr></thead><tbody>
+ <tr><td class="mc-head">HYPE</td><td class="num" data-label="Jumlah">${Number(c.nativeAmount||0).toLocaleString('id-ID',{maximumFractionDigits:6})}</td><td class="num" data-label="Nilai">${usd(c.nativeAmount*c.nativePriceUsd)}</td></tr>
+ ${holdings.map(h=>`<tr><td class="mc-head">${esc(h.symbol)}</td><td class="num" data-label="Jumlah">${Number(h.amount).toLocaleString('id-ID',{maximumFractionDigits:6})}</td><td class="num" data-label="Nilai">${usd(h.usd)}</td></tr>`).join('')}</tbody></table></div>
+ ${funding?.declaredUsd!=null?`<p>Perubahan nilai terhadap modal tercatat: <b class="${cls(c.totalUsd-funding.declaredUsd)}">${signed(c.totalUsd-funding.declaredUsd)}</b></p>`:'<p class="hint">Modal awal belum direkonsiliasi; saldo tidak dianggap sebagai profit.</p>'}
+ </section><section class="card"><h2>Posisi LP nyata · ${positions.length}</h2>
+ ${positions.length?`<div class="table-scroll"><table class="mcards"><thead><tr><th>Posisi</th><th class="num">Nilai pokok</th><th class="num">Fee belum diambil</th><th class="num">Total</th></tr></thead><tbody>${positions.map(p=>`<tr><td class="mc-head">${esc(p.label)} · ${esc(p.kind)}${p.bins?` · ${p.bins} bin`:''}${typeof p.inRange==='boolean'?` · ${p.inRange?'dalam rentang':'di luar rentang'}`:''}</td><td class="num" data-label="Nilai pokok">${usd(p.principalUsd)}</td><td class="num" data-label="Fee belum diambil">${usd(p.feesUsd)}</td><td class="num" data-label="Total">${usd(p.valueUsd)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">Belum ada posisi LP nyata yang terbuka.</p>'}
+ <p class="hint">Nilai token dan LP mengikuti harga pasar saat pembacaan; bukan jaminan hasil penjualan. Hasil dry run berada di buku terpisah.</p></section>`;
 }
 
 function matchedInternalCapital(briefs,only=null){

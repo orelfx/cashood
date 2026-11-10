@@ -8,7 +8,7 @@ test('Elysium simulation never masquerades as investor assets or exposes source 
 });
 test('stale or unhealthy Elysium simulation publishes no fabricated value',()=>{for(const s of [null,{...source,mode:'LIVE'}, {...source,health:{...source.health,status:'DEGRADED'}}])assert.equal(elysiumPaper(s,now).status,'unavailable');assert.equal(elysiumPaper(source,now+16*60000).paper,undefined);});
 test('real Elysium custody requires full valuation on the correct chain',()=>{
- const d={fund:'riskelysium',chainId:99901,updatedAt:now,nativeAmount:2,nativePriceUsd:30,tokenUsd:40,lpUsd:100,complete:true};
+ const d={fund:'riskelysium',chainId:99901,updatedAt:now,nativeAmount:2,nativePriceUsd:30,tokenUsd:40,lpUsd:100,complete:true,holdings:[{symbol:'T',amount:4,priceUsd:10,usd:40}],positions:[{kind:'Uniswap v4',principalUsd:90,feesUsd:10,valueUsd:100}]};
  assert.equal(elysiumCustody(d,now).totalUsd,200);assert.equal(elysiumCustody({...d,complete:false},now).totalUsd,null);assert.throws(()=>elysiumCustody({...d,chainId:4663},now));assert.equal(elysiumCustody({...d,lpUsd:undefined},now).totalUsd,null);
 });
 test('internal funding is eliminated from global contributed capital only when the source withdrawal matches',async()=>{
@@ -20,4 +20,10 @@ test('internal funding is eliminated from global contributed capital only when t
  assert.equal(fn([source,dest]),100);assert.equal(fn([dest]),0);
  assert.equal(fn([source,{internalTransfer:{...dest.internalTransfer,owner:'stefani'}}]),0);
  assert.equal(fn([source,{internalTransfer:{...dest.internalTransfer,usd:101}}]),0);
+});
+test('published asset detail reconciles totals and strips contract identities',()=>{
+ const address='0x'+'a'.repeat(40), d={fund:'elysium',chainId:99901,updatedAt:now,nativeAmount:1,nativePriceUsd:10,tokenUsd:4,lpUsd:6,complete:true,holdings:[{symbol:address,amount:2,priceUsd:2,usd:4,address}],positions:[{kind:'Helios DLMM',principalUsd:5,feesUsd:1,valueUsd:6,bins:3,address}]};
+ const out=elysiumCustody(d,now);assert.equal(out.totalUsd,20);assert.equal(JSON.stringify(out).includes(address),false);assert.equal(out.positions[0].bins,3);
+ assert.equal(elysiumCustody({...d,tokenUsd:5},now).quality.complete,false);
+ assert.equal(elysiumCustody({...d,positions:[]},now).totalUsd,null);
 });

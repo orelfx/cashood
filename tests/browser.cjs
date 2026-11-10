@@ -366,7 +366,7 @@ console.log('PASS complete forecast render');
  console.log('PASS deferred Index and Safe Box display warnings without fabricating initial balances');
  const elysiumCheck=await ev(`(async()=>{
    const at=Date.now();
-   for(const id of ['elysium','riskelysium'])elysiumCache.set(id,{at,data:{fund:id,custody:{updatedAt:at,totalUsd:id==='elysium'?100:200,quality:{complete:true}},funding:{owner:'orel',declaredUsd:id==='elysium'?100:null,at},curve:[{t:at,usd:id==='elysium'?100:200}],simulation:{updatedAt:at,quality:{complete:true},paper:{capitalUsd:1000,equityUsd:1500,netPnlUsd:500,openPositions:0,feeEstimated:true}}}});
+   for(const id of ['elysium','riskelysium'])elysiumCache.set(id,{at,data:{fund:id,custody:{updatedAt:at,totalUsd:id==='elysium'?100:200,nativeAmount:id==='elysium'?1:20,nativePriceUsd:10,holdings:id==='elysium'?[{symbol:'TEST',amount:20,priceUsd:2,usd:40}]:[],positions:id==='elysium'?[{label:'Posisi 1',kind:'Helios DLMM',principalUsd:49,feesUsd:1,valueUsd:50,bins:12}]:[],quality:{complete:true}},funding:{owner:'orel',declaredUsd:id==='elysium'?100:null,at},curve:[{t:at,usd:id==='elysium'?100:200}],simulation:{updatedAt:at,quality:{complete:true},paper:{capitalUsd:1000,equityUsd:1500,netPnlUsd:500,openPositions:0,feeEstimated:true}}}});
    const g=await portoTotals();return {capitalNeutral:Math.abs(g.setoran-(g.briefs.reduce((n,b)=>n+b.depositedUsd,0)+(g.box?.principalUsd||0)-100))<.001,extra:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).reduce((n,b)=>n+b.totalUsd,0),owner:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).every(b=>b.owners.length===1&&b.owners[0].id==='orel'),medium:navItems('medium').some(x=>x.name==='Elysium LP'),high:navItems('high').some(x=>x.name==='RISK Elysium')};
  })()`);
  assert.deepEqual(elysiumCheck,{capitalNeutral:true,extra:300,owner:true,medium:true,high:true});
@@ -375,6 +375,8 @@ console.log('PASS complete forecast render');
    await ev(`location.hash='#${id}'`);await new Promise(r=>setTimeout(r,200));
    assert.equal(await ev('state.view'),id);
    assert.equal(await ev(`document.querySelector('#tab-${id}').hidden`),false);
+   assert.equal(await ev('document.documentElement.scrollWidth<=innerWidth'),true);
+   if(id==='elysium'){const body=await ev('document.querySelector("#elysiumBody").textContent');assert.match(body,/TEST/);assert.match(body,/Posisi LP nyata · 1/);assert.match(body,/Helios DLMM/);assert.match(body,/Fee belum diambil/);}
  }
  await ev(`document.querySelector('#familyChains').innerHTML='';location.hash='#reborn/portfolio'`);await new Promise(r=>setTimeout(r,300));
  assert.equal(await ev(`document.querySelector('#tab-riskelysium').hidden`),true);

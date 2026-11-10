@@ -244,13 +244,21 @@ berada di kelompok No Risk No Ferari (high risk). Kedua cabang memiliki pembacaa
 saldo sendiri pada chain 99901. Alamat hanya berada di `wallet.local.json` yang
 tidak dipublikasikan. Nilai Robinhood tidak ditambah langsung ke NAV cabang Elysium.
 
-`read-elysium-custody.mjs` memakai RPC read-only, memeriksa chain, kesegaran blok,
-harga HYPE, penerimaan ERC20/ERC721/ERC1155/ERC6909, dan jumlah NFT posisi Uniswap
-v4. Pembaca awal memverifikasi wallet yang hanya berisi HYPE. Jika ditemukan
-penerimaan aset lain atau posisi, valuasi total ditahan sampai tersedia adapter
-aset/LP yang sesuai; aset yang belum dinilai tidak dianggap nol. Kegagalan RPC
-atau harga tidak memperbarui hasil observasi terakhir. Hasil lebih dari 15 menit
-tidak masuk total aset dan ditandai sebagai data belum lengkap.
+`read-elysium-custody.mjs` memakai RPC read-only dengan seluruh saldo dipatok pada
+satu blok. Token wallet ditemukan dari log transfer; saldo token yang sudah habis
+tidak ikut dihitung. Posisi Uniswap v4 ditemukan dari NFT dan dicocokkan dengan
+jumlah NFT di kontrak. Helios V1/V2 dibaca dari event Deposited dan getPosition,
+karena posisi DLMM tidak harus berupa NFT. Pokok dihitung dari likuiditas tiap bin;
+fee dibaca melalui eth_call collectFees tanpa mengirim transaksi. Token dinilai
+menggunakan harga spot pool HYPE aktif dengan kedalaman minimal $10; dari beberapa
+pool yang tersedia dipilih kedalaman HYPE terbesar. Ini mark-to-market, bukan
+jaminan nilai likuidasi atau hasil penjualan. Harga HYPE memakai CoinGecko.
+
+Kegagalan sumber, token tanpa harga yang layak, fee yang tidak terbaca, atau klaim
+protokol lain yang belum didukung menahan valuasi total; komponen tersebut tidak
+dianggap nol. Pembaca tidak mempunyai signer dan tidak mengeksekusi transaksi.
+Panggilan RPC diberi jeda untuk membatasi beban endpoint publik. Data lebih dari
+15 menit tidak masuk total aset dan ditandai sebagai belum lengkap.
 
 `sync-elysium.mjs` memisahkan `custody` (nilai nyata) dari `simulation` (mesin paper
 lokal). Modal virtual dan PnL simulasi tidak masuk total aset, modal investor,
