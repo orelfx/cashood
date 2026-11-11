@@ -1,7 +1,7 @@
 {
   "fund": "riskelysium",
   "schemaVersion": 2,
-  "checkedAt": 1794385932342,
+  "checkedAt": 1794386218921,
   "label": "RISK Elysium",
   "family": "ferari",
   "risk": "high",
@@ -9,28 +9,28 @@
     "fund": "riskelysium",
     "chain": "Elysium",
     "chainId": 99901,
-    "checkedAt": 1794385932342,
+    "checkedAt": 1794386218921,
     "realMoney": true,
     "status": "partial",
-    "updatedAt": 1794385901000,
+    "updatedAt": 1794386072000,
     "nativeAmount": 2.0910399423133605,
-    "nativePriceUsd": 71.89,
-    "tokenUsd": 31.899462934829288,
+    "nativePriceUsd": 71.74,
+    "tokenUsd": 32.191654365288976,
     "lpUsd": 0,
     "totalUsd": null,
     "holdings": [
       {
         "symbol": "HELIOS",
         "amount": 203607.5818383259,
-        "priceUsd": 0.00015667129213370345,
-        "usd": 31.899462934829288
+        "priceUsd": 0.00015810636359725878,
+        "usd": 32.191654365288976
       }
     ],
     "positions": [],
     "quality": {
       "complete": false
     },
-    "knownTotalUsd": 182.22432438773677,
+    "knownTotalUsd": 182.20285982684945,
     "unpriced": [
       {
         "symbol": "Montra",
@@ -43,7 +43,43 @@
   "funding": {
     "owner": "orel",
     "declaredUsd": null,
-    "note": "Modal masuk menunggu rekonsiliasi transaksi."
+    "note": "Modal awal sebelum 11 November belum direkonsiliasi. Transfer hari ini sudah dicatat; bukan seluruh saldo dianggap profit.",
+    "events": [
+      {
+        "id": "riskelysium-orel-from-ferari-20261111",
+        "type": "deposit",
+        "owner": "orel",
+        "at": 1794385461000,
+        "usd": 515.79,
+        "sourceFund": "ferari",
+        "sourceEvent": "ferari-orel-to-riskelysium-20261111",
+        "nativeAmount": 7.217261451181915,
+        "nativeSymbol": "HYPE",
+        "note": "Masuk melalui bridge dari 0,25 ETH Ferari. USD mengikuti modal yang keluar dari sumber; jumlah HYPE diverifikasi dari perubahan saldo pada blok penerimaan."
+      },
+      {
+        "id": "riskelysium-orel-to-lp-1hype-20261111",
+        "type": "withdraw",
+        "owner": "orel",
+        "at": 1794385523000,
+        "usd": 72.21,
+        "nativeAmount": 1,
+        "nativeSymbol": "HYPE",
+        "destinationFund": "elysium",
+        "note": "Transfer internal ke Elysium LP. Nilai memakai harga HYPE snapshot terakhir sebelum transfer ($72,21), bukan hasil trading."
+      },
+      {
+        "id": "riskelysium-orel-to-lp-6hype-20261111",
+        "type": "withdraw",
+        "owner": "orel",
+        "at": 1794385548000,
+        "usd": 433.26,
+        "nativeAmount": 6,
+        "nativeSymbol": "HYPE",
+        "destinationFund": "elysium",
+        "note": "Transfer internal ke Elysium LP. Nilai memakai harga HYPE snapshot terakhir sebelum transfer ($72,21), bukan hasil trading."
+      }
+    ]
   },
   "curve": [
     {
