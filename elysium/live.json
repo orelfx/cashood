@@ -1,7 +1,7 @@
 {
   "fund": "elysium",
   "schemaVersion": 2,
-  "checkedAt": 1794431544212,
+  "checkedAt": 1794431841845,
   "label": "Elysium LP",
   "family": "reborn",
   "risk": "medium",
@@ -9,15 +9,15 @@
     "fund": "elysium",
     "chain": "Elysium",
     "chainId": 99901,
-    "checkedAt": 1794431544212,
+    "checkedAt": 1794431841845,
     "realMoney": true,
     "status": "verified",
-    "updatedAt": 1794431454000,
+    "updatedAt": 1794431751000,
     "nativeAmount": 8.348918388200104,
-    "nativePriceUsd": 73.07,
+    "nativePriceUsd": 73.3,
     "tokenUsd": 0,
     "lpUsd": 0,
-    "totalUsd": 610.0554666257816,
+    "totalUsd": 611.9757178550676,
     "holdings": [],
     "positions": [],
     "quality": {
@@ -107,10 +107,6 @@
     {
       "t": 1794344145000,
       "usd": 97.43237517969352
-    },
-    {
-      "t": 1794344749000,
-      "usd": 97.64820212180554
     },
     {
       "t": 1794345346000,
@@ -689,14 +685,14 @@
       "usd": 609.8049990741357
     },
     {
-      "t": 1794431454000,
-      "usd": 610.0554666257816
+      "t": 1794431751000,
+      "usd": 611.9757178550676
     }
   ],
   "activity": {
     "source": "Blockchain Elysium",
     "chainId": 99901,
-    "updatedAt": 1794431534000,
+    "updatedAt": 1794431832000,
     "status": "available",
     "quality": {
       "complete": true
@@ -725,9 +721,9 @@
     "risk": "medium",
     "mode": "paper",
     "realMoney": false,
-    "checkedAt": 1794431544212,
+    "checkedAt": 1794431841845,
     "status": "paper",
-    "updatedAt": 1794431409000,
+    "updatedAt": 1794431738000,
     "quality": {
       "complete": true,
       "estimated": true
@@ -750,7 +746,7 @@
   "engine": {
     "status": "available",
     "source": "VPS Elysium LP",
-    "updatedAt": 1794431409000,
+    "updatedAt": 1794431738000,
     "quality": {
       "complete": true
     },
@@ -768,6 +764,18 @@
     "revertedCount": 0,
     "gasHype": 0,
     "decisions": [
+      {
+        "at": 1794431738000,
+        "mode": "PAPER",
+        "actions": [
+          {
+            "action": "WAIT",
+            "reasons": [
+              "NO_ELIGIBLE_POOL"
+            ]
+          }
+        ]
+      },
       {
         "at": 1794431409000,
         "mode": "PAPER",
@@ -1043,69 +1051,50 @@
             ]
           }
         ]
-      },
-      {
-        "at": 1794423998000,
-        "mode": "PAPER",
-        "actions": [
-          {
-            "action": "WAIT",
-            "reasons": [
-              "NO_ELIGIBLE_POOL"
-            ]
-          }
-        ]
       }
     ],
     "pools": [
       {
         "pair": "BOXA/HYPE",
-        "tvlUsd": 1615.400171538393,
-        "volume1hUsd": 56.362672003283656,
-        "fees24hUsd": 335.17021638925337,
+        "tvlUsd": 1608.130682636425,
+        "volume1hUsd": 56.885218091312524,
+        "fees24hUsd": 319.9240482113841,
         "decision": "REJECTED",
         "reasons": [
-          "CHAIN_STATE_STALE_OR_MISSING",
-          "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "LATEST_SCAN_NOT_USABLE"
+          "VOLUME_1H_TOO_LOW_OR_MISSING"
         ]
       },
       {
         "pair": "HELIOS/HYPE",
-        "tvlUsd": 532.227073981057,
-        "volume1hUsd": 0.4567195916338326,
-        "fees24hUsd": 84.29776091180264,
+        "tvlUsd": 533.0885149138458,
+        "volume1hUsd": 0,
+        "fees24hUsd": 79.96981869230818,
         "decision": "REJECTED",
         "reasons": [
-          "CHAIN_STATE_STALE_OR_MISSING",
           "TVL_TOO_LOW",
-          "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "LATEST_SCAN_NOT_USABLE"
+          "VOLUME_1H_TOO_LOW_OR_MISSING"
         ]
       },
       {
         "pair": "MONTRA/HYPE",
-        "tvlUsd": 187.071506668244,
-        "volume1hUsd": 6.245809124960594,
-        "fees24hUsd": 2.264862167559957,
+        "tvlUsd": 187.59707743713534,
+        "volume1hUsd": 26.828292795198422,
+        "fees24hUsd": 2.453388086907296,
         "decision": "REJECTED",
         "reasons": [
-          "CHAIN_STATE_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "BUNDLED_SUPPLY",
-          "LATEST_SCAN_NOT_USABLE"
+          "BUNDLED_SUPPLY"
         ]
       },
       {
         "pair": "j/off/HYPE",
-        "tvlUsd": 0.8006319625012659,
+        "tvlUsd": 0.8016742591766016,
         "volume1hUsd": 0,
-        "fees24hUsd": 0.7292300083870499,
+        "fees24hUsd": 0.7301793509675315,
         "decision": "REJECTED",
         "reasons": [
-          "CHAIN_STATE_STALE_OR_MISSING",
           "NO_ACTIVE_LIQUIDITY",
           "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
@@ -1114,38 +1103,33 @@
           "TOKEN_AUDIT_FLAGS",
           "HOLDER_CONCENTRATION",
           "DEPLOYER_CONCENTRATION",
-          "TOO_FEW_HOLDERS",
-          "LATEST_SCAN_NOT_USABLE"
+          "TOO_FEW_HOLDERS"
         ]
       },
       {
         "pair": "e/acc/HYPE",
-        "tvlUsd": 6.600367386460774,
+        "tvlUsd": 7.251021819561853,
         "volume1hUsd": 0,
-        "fees24hUsd": 0.3440981725974885,
+        "fees24hUsd": 0.36045140127546405,
         "decision": "REJECTED",
         "reasons": [
-          "CHAIN_STATE_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
-          "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "LATEST_SCAN_NOT_USABLE"
+          "VOLUME_1H_TOO_LOW_OR_MISSING"
         ]
       },
       {
         "pair": "HELIOS/HYPE",
-        "tvlUsd": 0.021312051238588474,
+        "tvlUsd": 0.021356032876632035,
         "volume1hUsd": 0,
-        "fees24hUsd": 0.02131205123850591,
+        "fees24hUsd": 0.02135603287654947,
         "decision": "REJECTED",
         "reasons": [
-          "CHAIN_STATE_STALE_OR_MISSING",
           "NO_ACTIVE_LIQUIDITY",
           "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
-          "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "LATEST_SCAN_NOT_USABLE"
+          "VOLUME_1H_TOO_LOW_OR_MISSING"
         ]
       }
     ],
