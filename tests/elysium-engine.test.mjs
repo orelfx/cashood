@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {engineSnapshot} from '../scripts/lib/elysium-engine.mjs';
+import {assertPublic} from '../scripts/lib/io.mjs';
+const now=1800000000000;
+const input=()=>({cycle:{status:'OK',finishedAt:now/1000},live:{at:now/1000,mode:'LIVE',state:'WAIT',positions:[]}});
+test('live waiting engine has no invented paper executions',()=>{const x=engineSnapshot({...input(),paperCycles:[{asOf:now/1000,decisions:[{action:'WAIT'}]}]},now);assert.equal(x.mode,'LIVE');assert.equal(x.closedCount,0);assert.equal(x.realizedUsd,0);assert.equal(x.winRate,null);assert.equal(x.transactionCount,0);assertPublic(x);});
+test('stale or failed runtime is unavailable',()=>{for(const extra of [{cycle:{status:'ERROR',finishedAt:now/1000}},{live:{at:now/1000-901}},{live:{at:now/1000+61}}])assert.equal(engineSnapshot({...input(),...extra},now).status,'unavailable');});
+test('verified real exits only and incomplete archives do not yield a win rate',()=>{const x=engineSnapshot({...input(),performance:{closed:2,netUsdAtEntryMarks:7},exits:[{accounting:'VERIFIED',positionId:'1',at:now/1000,pair:'HYPE/TOKEN',netUsdAtEntryMark:10},{accounting:'PENDING',positionId:'2',at:now/1000},{accounting:'VERIFIED',at:now/1000,netUsdAtEntryMark:-3}]},now);assert.equal(x.closed.length,1);assert.equal(x.historyComplete,false);assert.equal(x.winRate,null);assert.equal(x.realizedUsd,7);});
+test('source identifiers and journal payloads never enter public output',()=>{const x=engineSnapshot({...input(),completed:{secret:{state:'CONFIRMED',hash:'0x'+'f'.repeat(64),raw:'secret',gasWei:'1000000000000000'}},audit:{pools:[{pair:'TOKEN 0x'+'a'.repeat(40),referenceReasons:[]}]},live:{...input().live,lastExit:{hash:'private'}}},now);assert.equal(x.closedCount,null);assert.equal(x.realizedUsd,null);assert.equal(x.gasHype,.001);assert.ok(!JSON.stringify(x).includes('0x'));assert.ok(!JSON.stringify(x).includes('secret'));assertPublic(x);});

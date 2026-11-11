@@ -17,7 +17,7 @@ for(const fund of ['elysium','riskelysium']){
  if(custody.quality.complete && (!previous.points.length || custody.updatedAt>previous.points.at(-1).t))previous.points=downsample([...previous.points,{t:custody.updatedAt,usd:custody.totalUsd}],now);
  atomicJSON(navFile,previous);
  const snapshot={fund,schemaVersion:2,checkedAt:now,label:cfg.label,family:cfg.family,risk:cfg.risk,custody,
-  funding:cfg.funding,curve:previous.points,...(fund==='elysium'?{simulation:elysiumPaper(source,now)}:{})};
+  funding:cfg.funding,curve:previous.points,activity:readJSON(resolve(data,fund,'activity.local.json')),...(fund==='elysium'?{simulation:elysiumPaper(source,now),engine:readJSON(resolve(data,fund,'engine.local.json'))}:{})};
  assertPublic(snapshot);atomicJSON(resolve(data,fund,'live.json'),snapshot);
 }
 release();

@@ -410,6 +410,14 @@ console.log('PASS complete forecast render');
    return {analysis,readout,previous,investor,bot,hash:location.hash,about:document.querySelector('#riskelysiumBody').textContent,overflow:document.documentElement.scrollWidth>innerWidth};
  })()`);
  assert.equal(dashboard.analysis,true);assert.match(dashboard.readout,/saldo nyata saat itu/);assert.match(dashboard.investor,/Riwayat perpindahan modal/);assert.match(dashboard.investor,/Pembagian kepemilikan/);assert.match(dashboard.bot,/Simulasi/);assert.equal(dashboard.hash,'#riskelysium/tentang');assert.match(dashboard.about,/Kelengkapan sumber/);assert.equal(dashboard.overflow,false);
+ const connected=await ev(`(async()=>{
+ const at=Date.now(),d=elysiumCache.get('elysium').data;
+ d.engine={status:'available',quality:{complete:true},updatedAt:at,mode:'LIVE',state:'WAIT',reason:'NATIVE_DEPTH_TOO_LOW',openCount:0,closedCount:0,realizedUsd:0,winRate:null,closed:[],historyComplete:true,transactionCount:0,revertedCount:0,pools:[],decisions:[],note:'Jurnal VPS'};
+ d.activity={status:'available',quality:{complete:true},updatedAt:at,transactionCount:1,indexedOutgoing:1,gasHype:.001,coverage:'Cakupan uji',transactions:[{at,kind:'Interaksi token',status:'confirmed',outgoing:true,gasHype:.001,nativeBlockChange:-1,movements:[{symbol:'TOKEN',amount:20,direction:'in'}]}],positions:[{label:'LP 1',kind:'Helios DLMM',state:'Tidak lagi dimiliki'}]};
+ location.hash='#elysium/portfolio';await new Promise(r=>setTimeout(r,100));await renderElysium('elysium');const portfolio=document.querySelector('#elysiumBody').textContent;
+ location.hash='#elysium/bot';await new Promise(r=>setTimeout(r,100));await renderElysium('elysium');return {portfolio,bot:document.querySelector('#elysiumBody').textContent};
+ })()`);
+ assert.match(connected.portfolio,/Riwayat aktivitas wallet/);assert.match(connected.portfolio,/Tidak lagi dimiliki/);assert.match(connected.portfolio,/Interaksi token/);assert.match(connected.bot,/Mesin Elysium LP · LIVE/);assert.match(connected.bot,/Kedalaman likuiditas/);
  console.log('PASS Elysium fund tabs, chart controls, investor ledger, paper separation and mobile navigation');
  console.log('PASS Elysium risk menus, routing, partial holdings stay visible and real-only totals');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');

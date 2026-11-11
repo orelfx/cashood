@@ -26,6 +26,8 @@ run_snapshot scripts/sync-binance.mjs
 run_snapshot scripts/sync-staking.mjs
 run_snapshot scripts/sync-grr.mjs
 run_snapshot scripts/read-elysium-custody.mjs
+run_snapshot scripts/read-elysium-engine.mjs
+run_snapshot scripts/read-elysium-chain-history.mjs
 run_snapshot scripts/sync-elysium.mjs
 # Buku paper devil greed: bot-nya menaruh berkas di kotak masuk; diimpor kalau ada.
 run_paper() {
