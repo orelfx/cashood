@@ -272,3 +272,7 @@ Transaksi Meridian 10 November 2026 tercatat 20 SOL keluar dan 14,984 SOL masuk,
 hanya mengubah unit Orel. Valuasi USD menggunakan harga dan NAV snapshot terakhir
 sebelum transaksi, dengan waktu referensi dicantumkan pada event. Bukti transaksi
 serta salinan konfigurasi sebelum perubahan disimpan privat di server audit.
+
+Elysium partial valuation: priced HYPE/token/LP details and unpriced token amounts remain visible when an asset cannot be priced. `custody.knownTotalUsd` is a clearly labeled subtotal, never substituted for `totalUsd`, included in AUM, or used as a complete PnL/curve observation. Stale partial observations are hidden using the same 15-minute freshness limit. Home and portfolio keep a missing fund row visible.
+
+Elysium funding supports dated deposit/withdrawal events and matching source references, including onward transfers through RISK Elysium. The 11 November 2026 Ferari withdrawal (0.25 ETH, $515.79 at the preceding snapshot) is Orel-only; RISK received 7.217261451181915 HYPE, then sent 1 + 6 HYPE to Elysium LP ($72.21 + $433.26 using the preceding HYPE mark). LP's recorded capital is $605.47 including the prior $100. RISK's earlier capital remains unknown; its recorded net transfer is not presented as its entire cost basis. Internal transfers are eliminated from consolidated contributed capital by matching source events, including when source valuation is temporarily incomplete.

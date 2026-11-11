@@ -10,13 +10,17 @@ export function rawValue(raw,decimals,price){
  return numeric(Number(raw)/10**decimals*price);
 }
 export async function valueElysiumInventory({inventory,owner,read,nativePriceUsd}){
- const holdings=[],positions=[],problems=[];const meta=new Map();
+ const holdings=[],positions=[],problems=[],unpriced=[];const meta=new Map();
  const token=async address=>{address=lower(address);if(!meta.has(address))meta.set(address,Promise.resolve(address===NATIVE?{decimals:18,symbol:'HYPE',priceUsd:nativePriceUsd}:read.token(address)));return meta.get(address);};
  const value=async(address,raw)=>{if(BigInt(raw)===0n)return 0;const m=await token(address);return rawValue(raw,m.decimals,m.priceUsd);};
  const attempt=async(kind,job)=>{try{await job();}catch{problems.push(kind);}};
  for(const address of [...new Set(inventory.tokens.map(lower))])await attempt('token belum dapat dinilai',async()=>{
   const amount=await read.balance(address,owner);if(amount===0n)return;
-  const m=await token(address),usd=rawValue(amount,m.decimals,m.priceUsd);
+  let m;try{m=await token(address);}catch(e){
+   const detail=read.metadata?await read.metadata(address).catch(()=>null):null;
+   unpriced.push({symbol:detail?.symbol||'Token belum dikenal',amount:detail?numeric(Number(amount)/10**detail.decimals):null});throw e;
+  }
+  const usd=rawValue(amount,m.decimals,m.priceUsd);
   holdings.push({symbol:m.symbol,amount:numeric(Number(amount)/10**m.decimals),priceUsd:m.priceUsd,usd});
  });
  let verifiedV4=0;
@@ -43,5 +47,5 @@ export async function valueElysiumInventory({inventory,owner,read,nativePriceUsd
  });
  for(const receipt of inventory.other)await attempt('klaim token nonstandar belum dapat dinilai',async()=>{if(await read.claimBalance(receipt,owner)!==0n)throw Error('Unsupported active claim');});
  const tokenUsd=holdings.reduce((n,h)=>n+h.usd,0),lpUsd=positions.reduce((n,p)=>n+p.valueUsd,0);
- return {complete:!problems.length,tokenUsd:problems.length?null:tokenUsd,lpUsd:problems.length?null:lpUsd,knownTokenUsd:tokenUsd,knownLpUsd:lpUsd,holdings,positions,problems:[...new Set(problems)]};
+ return {complete:!problems.length,tokenUsd:problems.length?null:tokenUsd,lpUsd:problems.length?null:lpUsd,knownTokenUsd:tokenUsd,knownLpUsd:lpUsd,holdings,positions,unpriced,problems:[...new Set(problems)]};
 }

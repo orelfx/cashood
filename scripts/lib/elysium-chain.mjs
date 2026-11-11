@@ -55,7 +55,7 @@ export async function elysiumReader({client,viem,root,blockNumber,nativePriceUsd
   if(!best)throw Error('No liquid HYPE price source');
   const out={decimals,symbol:String(symbol).slice(0,80),priceUsd:best.priceUsd};prices.set(address,out);return out;
  }
- return {discover,read:{token,balance:(a,o)=>read(a,erc20,'balanceOf',[o]),nftCount:(a,o)=>read(a,nft,'balanceOf',[o]),
+ return {discover,read:{token,metadata:async a=>({decimals:Number(await read(a,erc20,'decimals')),symbol:await read(a,erc20,'symbol')}),balance:(a,o)=>read(a,erc20,'balanceOf',[o]),nftCount:(a,o)=>read(a,nft,'balanceOf',[o]),
   nftOwner:async(a,id)=>{try{return await read(a,nft,'ownerOf',[id]);}catch(e){if(e.cause?.data?.errorName==='ERC721NonexistentToken'||/NOT_MINTED|owner query for nonexistent|invalid token ID/i.test(e.cause?.reason||''))return null;throw e;}},
   v4:id=>paced(()=>getPositionPnl({tokenId:id,blockNumber})),
   heliosPosition:(a,id)=>read(a,bin,'getPosition',[id]),

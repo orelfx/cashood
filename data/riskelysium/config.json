@@ -9,6 +9,42 @@
   "funding": {
     "owner": "orel",
     "declaredUsd": null,
-    "note": "Modal masuk menunggu rekonsiliasi transaksi."
+    "note": "Modal awal sebelum 11 November belum direkonsiliasi. Transfer hari ini sudah dicatat; bukan seluruh saldo dianggap profit.",
+    "events": [
+      {
+        "id": "riskelysium-orel-from-ferari-20261111",
+        "type": "deposit",
+        "owner": "orel",
+        "at": 1794385461000,
+        "usd": 515.79,
+        "sourceFund": "ferari",
+        "sourceEvent": "ferari-orel-to-riskelysium-20261111",
+        "nativeAmount": 7.217261451181915,
+        "nativeSymbol": "HYPE",
+        "note": "Masuk melalui bridge dari 0,25 ETH Ferari. USD mengikuti modal yang keluar dari sumber; jumlah HYPE diverifikasi dari perubahan saldo pada blok penerimaan."
+      },
+      {
+        "id": "riskelysium-orel-to-lp-1hype-20261111",
+        "type": "withdraw",
+        "owner": "orel",
+        "at": 1794385523000,
+        "usd": 72.21,
+        "nativeAmount": 1,
+        "nativeSymbol": "HYPE",
+        "destinationFund": "elysium",
+        "note": "Transfer internal ke Elysium LP. Nilai memakai harga HYPE snapshot terakhir sebelum transfer ($72,21), bukan hasil trading."
+      },
+      {
+        "id": "riskelysium-orel-to-lp-6hype-20261111",
+        "type": "withdraw",
+        "owner": "orel",
+        "at": 1794385548000,
+        "usd": 433.26,
+        "nativeAmount": 6,
+        "nativeSymbol": "HYPE",
+        "destinationFund": "elysium",
+        "note": "Transfer internal ke Elysium LP. Nilai memakai harga HYPE snapshot terakhir sebelum transfer ($72,21), bukan hasil trading."
+      }
+    ]
   }
 }

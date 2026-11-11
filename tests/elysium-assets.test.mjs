@@ -11,3 +11,7 @@ test('NFT count mismatch and active unknown claims defer the total',async()=>{co
 test('Uniswap fee errors and another owner’s bins do not masquerade as this wallet assets',async()=>{const read=fixture(),v4=read.v4;read.v4=async()=>({...await v4(),feesError:'missing'});assert.equal((await run(read)).complete,false);read.v4=v4;read.heliosPosition=async()=>({owner:T,liquidity:[100n]});const d=await run(read);assert.equal(d.positions.length,1);assert.equal(d.complete,true);});
 test('raw unit conversion validates decimals, negative amounts and non-finite prices',()=>{assert.equal(rawValue(1234567n,6,2),2.469134);for(const args of [[-1n,18,1],[1n,-1,1],[1n,18,Infinity],[1n,18,0]])assert.throws(()=>rawValue(...args));});
 test('repeated discovery logs cannot duplicate token or LP values',async()=>{const inv={...inventory,nfts:[...inventory.nfts,...inventory.nfts],helios:[...inventory.helios,...inventory.helios]};assert.deepEqual(await run(fixture(),inv),await run());});
+test('unpriceable tokens retain their actual amount and symbol without an invented USD value',async()=>{
+ const read=fixture();read.token=async()=>{throw Error('no market');};read.metadata=async()=>({symbol:'UNPRICED',decimals:6});
+ const d=await run(read,{tokens:[T],nfts:[],helios:[],other:[]});assert.equal(d.complete,false);assert.deepEqual(d.unpriced,[{symbol:'UNPRICED',amount:3}]);assert.equal(d.tokenUsd,null);
+});

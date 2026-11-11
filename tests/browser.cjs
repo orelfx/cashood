@@ -366,7 +366,7 @@ console.log('PASS complete forecast render');
  console.log('PASS deferred Index and Safe Box display warnings without fabricating initial balances');
  const elysiumCheck=await ev(`(async()=>{
    const at=Date.now();
-   for(const id of ['elysium','riskelysium'])elysiumCache.set(id,{at,data:{fund:id,custody:{updatedAt:at,totalUsd:id==='elysium'?100:200,nativeAmount:id==='elysium'?1:20,nativePriceUsd:10,holdings:id==='elysium'?[{symbol:'TEST',amount:20,priceUsd:2,usd:40}]:[],positions:id==='elysium'?[{label:'Posisi 1',kind:'Helios DLMM',principalUsd:49,feesUsd:1,valueUsd:50,bins:12}]:[],quality:{complete:true}},funding:{owner:'orel',declaredUsd:id==='elysium'?100:null,at},curve:[{t:at,usd:id==='elysium'?100:200}],simulation:{updatedAt:at,quality:{complete:true},paper:{capitalUsd:1000,equityUsd:1500,netPnlUsd:500,openPositions:0,feeEstimated:true}}}});
+   for(const id of ['elysium','riskelysium'])elysiumCache.set(id,{at,data:{fund:id,custody:{updatedAt:at,totalUsd:id==='elysium'?100:200,nativeAmount:id==='elysium'?1:20,nativePriceUsd:10,holdings:id==='elysium'?[{symbol:'TEST',amount:20,priceUsd:2,usd:40}]:[],positions:id==='elysium'?[{label:'Posisi 1',kind:'Helios DLMM',principalUsd:49,feesUsd:1,valueUsd:50,bins:12}]:[],quality:{complete:true}},funding:{owner:'orel',declaredUsd:id==='elysium'?100:null,at,sourceFund:'reborn',sourceEvent:'reborn-orel-transfer-elysium-100-20261110'},curve:[{t:at,usd:id==='elysium'?100:200}],simulation:{updatedAt:at,quality:{complete:true},paper:{capitalUsd:1000,equityUsd:1500,netPnlUsd:500,openPositions:0,feeEstimated:true}}}});
    const g=await portoTotals();return {capitalNeutral:Math.abs(g.setoran-(g.briefs.reduce((n,b)=>n+b.depositedUsd,0)+(g.box?.principalUsd||0)-100))<.001,extra:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).reduce((n,b)=>n+b.totalUsd,0),owner:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).every(b=>b.owners.length===1&&b.owners[0].id==='orel'),medium:navItems('medium').some(x=>x.name==='Elysium LP'),high:navItems('high').some(x=>x.name==='RISK Elysium')};
  })()`);
  assert.deepEqual(elysiumCheck,{capitalNeutral:true,extra:300,owner:true,medium:true,high:true});
@@ -376,12 +376,23 @@ console.log('PASS complete forecast render');
    assert.equal(await ev('state.view'),id);
    assert.equal(await ev(`document.querySelector('#tab-${id}').hidden`),false);
    assert.equal(await ev('document.documentElement.scrollWidth<=innerWidth'),true);
-   if(id==='elysium'){const body=await ev('document.querySelector("#elysiumBody").textContent');assert.match(body,/TEST/);assert.match(body,/Posisi LP nyata · 1/);assert.match(body,/Helios DLMM/);assert.match(body,/Fee belum diambil/);}
+   if(id==='elysium'){const body=await ev('document.querySelector("#elysiumBody").textContent');assert.match(body,/TEST/);assert.match(body,/Posisi LP terbaca · 1/);assert.match(body,/Helios DLMM/);assert.match(body,/Fee belum diambil/);}
  }
  await ev(`document.querySelector('#familyChains').innerHTML='';location.hash='#reborn/portfolio'`);await new Promise(r=>setTimeout(r,300));
  assert.equal(await ev(`document.querySelector('#tab-riskelysium').hidden`),true);
  assert.match(await ev(`document.querySelector('#familyChains').textContent`),/Robinhood.*Elysium/);
- console.log('PASS Elysium risk menus, routing, separate chain balances, Orel ownership and real-only global totals');
+ const partialCheck=await ev(`(async()=>{
+   const at=Date.now(),d=elysiumCache.get('riskelysium').data;
+   d.custody={updatedAt:at,status:'partial',totalUsd:null,knownTotalUsd:52,nativeAmount:5,nativePriceUsd:10,holdings:[{symbol:'HELIOS',amount:2,priceUsd:1,usd:2}],positions:[],unpriced:[{symbol:'UNPRICED',amount:200000}],quality:{complete:false}};
+   elysiumCache.set('riskelysium',{at,data:d});
+   showElysium('riskelysium');await renderElysium('riskelysium');
+   const detail=document.querySelector('#riskelysiumBody').textContent;
+   showGlobal('home','Cashood');await renderHome();
+   const home=document.querySelector('#homeAum').textContent;
+   return {detail,home,excluded:(await portoTotals()).missing.includes('riskelysium')};
+ })()`);
+ assert.match(partialCheck.detail,/HELIOS/);assert.match(partialCheck.detail,/UNPRICED/);assert.match(partialCheck.detail,/Harga belum tersedia/);assert.match(partialCheck.home,/RISK Elysium/);assert.match(partialCheck.home,/sebagian/);assert.equal(partialCheck.excluded,true);
+ console.log('PASS Elysium risk menus, routing, partial holdings stay visible and real-only totals');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{
   if(ws)ws.close();try{process.kill(-chrome.pid,'SIGTERM');}catch{}await new Promise(r=>{if(chrome.exitCode!==null)r();else chrome.once('exit',r);});await new Promise(r=>setTimeout(r,500));for(let i=0;i<10;i++){try{fs.rmSync(dir,{recursive:true,force:true,maxRetries:3,retryDelay:100});break;}catch(e){if(i===9)throw e;await new Promise(r=>setTimeout(r,200));}}

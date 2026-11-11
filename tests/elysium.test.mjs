@@ -27,3 +27,17 @@ test('published asset detail reconciles totals and strips contract identities',(
  assert.equal(elysiumCustody({...d,tokenUsd:5},now).quality.complete,false);
  assert.equal(elysiumCustody({...d,positions:[]},now).totalUsd,null);
 });
+test('fresh priced subset remains readable without claiming a complete balance or profit',()=>{
+ const d={fund:'riskelysium',chainId:99901,updatedAt:now,nativeAmount:2,nativePriceUsd:30,tokenUsd:null,lpUsd:null,knownTokenUsd:4,knownLpUsd:0,complete:false,holdings:[{symbol:'HELIOS',amount:2,priceUsd:2,usd:4}],positions:[],unpriced:[{symbol:'Unknown',amount:200000,address:'private'}],problems:['no price']};
+ const out=elysiumCustody(d,now);assert.equal(out.status,'partial');assert.equal(out.totalUsd,null);assert.equal(out.knownTotalUsd,64);assert.equal(out.quality.complete,false);assert.equal(out.unpriced[0].amount,200000);assert.equal(JSON.stringify(out).includes('private'),false);
+ assert.equal(elysiumCustody(d,now+16*60000).knownTotalUsd,undefined);
+ assert.equal(elysiumCustody({...d,knownTokenUsd:5},now).knownTotalUsd,undefined);
+});
+test('multiple internal deposits match unique source withdrawals even while source pricing is incomplete',async()=>{
+ const {readFileSync}=await import('node:fs'),{runInNewContext}=await import('node:vm');const app=readFileSync(new URL('../assets/app.js',import.meta.url),'utf8');
+ const events=[{id:'one',owner:'orel',type:'withdraw',usd:72.21},{id:'six',owner:'orel',type:'withdraw',usd:433.26}];
+ const context={elysiumCache:new Map([['riskelysium',{data:{funding:{events}}}]])};
+ const fn=runInNewContext(app.slice(app.indexOf('function matchedInternalCapital('))+';matchedInternalCapital',context);
+ const dest={internalTransfers:events.map(e=>({owner:e.owner,sourceFund:'riskelysium',sourceEvent:e.id,usd:e.usd}))};
+ assert.ok(Math.abs(fn([dest])-505.47)<1e-8);assert.ok(Math.abs(fn([dest,dest])-505.47)<1e-8);
+});
