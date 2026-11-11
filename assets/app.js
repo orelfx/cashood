@@ -5455,6 +5455,7 @@ async function renderPemegang() {
   for (const b of g.briefs) {
     for (const o of b.holders || b.owners) add(o.id, o.name, o.color, { fund: b.label, accent: b.accent, share: o.share, value: o.value,
       modal: o.deposited == null ? null : Number(o.deposited) || 0, out: Number(o.withdrawn) || 0, exited: o.value < 0.5 && o.share < 0.01 });
+    if(b.basisIncomplete)for(const o of b.holders||b.owners){const p=people.get(o.id||o.name);if(p&&!p.noModal.includes(b.label))p.noModal.push(b.label);}
   }
   for (const o of g.box?.owners || []) {
     add(o.id, o.name, null, { fund: state.safebox?.label || 'Safe Box', accent: state.safebox?.accent || '#2dd4bf', share: Number(o.sharePct) || 0,
