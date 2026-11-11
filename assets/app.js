@@ -5478,12 +5478,12 @@ async function renderPemegang() {
       return `<article class="inv">
         <div class="inv-head"><span class="inv-av" style="--c:${p.color || '#94a3b8'}">${esc(p.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '?')}</span>
           <div class="inv-id"><div class="prod-name">${esc(p.name)}</div><div class="prod-sub">${active.length ? `${active.length} produk · ${total ? pct((p.value / total) * 100, 1) : '—'} dari seluruh aset` : 'sudah keluar dari semua produk'}</div></div>
-          <div class="inv-tot"><b>${usd(p.value, 0)}</b><span class="${cls(pnl)}">${signed(pnl)}</span></div></div>
+          <div class="inv-tot"><b>${usd(p.value, 0)}</b><span class="${p.noModal.length?'dim':cls(pnl)}">${p.noModal.length?'Belum lengkap':signed(pnl)}</span></div></div>
         <div class="inv-rows">${p.rows.sort((a, b) => b.value - a.value).map((r) => `<div class="inv-row">
           <span class="who"><span class="chip" style="background:${r.accent}"></span>${esc(r.fund)}</span>
           <span class="inv-share"><i style="width:${Math.min(100, r.share)}%;background:${r.accent}"></i></span>
           ${r.exited ? '<span class="num dim">keluar</span><span class="num dim">—</span>' : `<span class="num">${pct(r.share, 1)}</span><span class="num"><b>${usd(r.value, 0)}</b></span>`}</div>`).join('')}</div>
-        <div class="inv-foot">modal ${usd(p.modal, 0)}${p.out > 0 ? ` · sudah ditarik ${usd(p.out, 0)}` : ''}${p.noModal.length ? ` · ${esc(p.noModal.join(', '))}: modal belum tercatat, tidak dihitung untung/rugi` : ''}</div></article>`;
+        <div class="inv-foot">modal ${usd(p.modal, 0)}${p.out > 0 ? ` · sudah ditarik ${usd(p.out, 0)}` : ''}${p.noModal.length ? ` · ${esc(p.noModal.join(', '))}: modal awal belum lengkap; untung/rugi gabungan ditunda` : ''}</div></article>`;
     }).join('')}</div>`);
 }
 

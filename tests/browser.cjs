@@ -370,7 +370,7 @@ console.log('PASS complete forecast render');
    const g=await portoTotals();return {capitalNeutral:Math.abs(g.setoran-(g.briefs.reduce((n,b)=>n+b.depositedUsd,0)+(g.box?.principalUsd||0)-100))<.001,extra:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).reduce((n,b)=>n+b.totalUsd,0),owner:g.briefs.filter(b=>['elysium','riskelysium'].includes(b.id)).every(b=>b.owners.length===1&&b.owners[0].id==='orel'),medium:navItems('medium').some(x=>x.name==='Elysium LP'),high:navItems('high').some(x=>x.name==='RISK Elysium')};
  })()`);
  assert.deepEqual(elysiumCheck,{capitalNeutral:true,extra:300,owner:true,medium:true,high:true});
- await ev(`(async()=>{showGlobal('pemegang','Pemegang');await renderPemegang();})()`);assert.match(await ev(`document.querySelector('#pemegangBody').textContent`),/RISK Elysium/);
+ await ev(`(async()=>{showGlobal('pemegang','Pemegang');await renderPemegang();})()`);assert.match(await ev(`document.querySelector('#pemegangBody').textContent`),/RISK Elysium/);assert.match(await ev(`document.querySelector('#pemegangBody').textContent`),/Belum lengkap/);
  await ev(`(async()=>{await switchFund('reborn')})()`);
  for(const id of ['elysium','riskelysium']){
    await ev(`location.hash='#${id}'`);await new Promise(r=>setTimeout(r,200));
