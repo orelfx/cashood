@@ -14,3 +14,8 @@ test('range retains preceding baseline, sorts and deduplicates without importing
  const d={curve:[{t:now,usd:105},{t,usd:100},{t,usd:100}],funding:{events:[{at:t-1,type:'deposit',usd:100}]}};
  const p=perf(d,'24h',now);assert.equal(p.points.length,2);assert.equal(p.delta,5);
 });
+test('compressed hourly history remains readable while longer outages remain gaps',()=>{
+ const old=now-2*86400000;
+ assert.equal(perf({curve:[{t:old,usd:100},{t:old+3600000,usd:102}]},'all',now).delta,2);
+ assert.equal(perf({curve:[{t:old,usd:100},{t:old+3*3600000,usd:102}]},'all',now).delta,null);
+});

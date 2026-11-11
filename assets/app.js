@@ -5868,8 +5868,11 @@ function elysiumPerformance(d,range='all',now=Date.now()){
  let start=all.findIndex(p=>p.t>=cutoff);if(start<0)start=all.length;if(start>0)start--;
  const raw=all.slice(start),first=raw[0];
  const points=raw.map(p=>({...p,adjusted:p.usd-events.filter(e=>e.at>first.t&&e.at<=p.t).reduce((n,e)=>n+(e.type==='withdraw'?-e.usd:e.usd),0)}));
- const continuous=points.length>1&&points.every((p,i)=>!i||p.t-points[i-1].t<=20*60000);
+ const continuous=points.length>1&&points.every((p,i)=>!i||p.t-points[i-1].t<=elysiumGapLimit(points[i-1],now));
  return {points,continuous,delta:continuous?points.at(-1).adjusted-points[0].usd:null,percent:continuous&&points[0].usd>0?(points.at(-1).adjusted/points[0].usd-1)*100:null};
+}
+function elysiumGapLimit(point,now=Date.now()){
+ const age=now-point.t;return age>=7*86400000?2*86400000:age>=86400000?2*3600000:20*60000;
 }
 function elysiumSummary(d,id){
  const events=elysiumFundingEvents(d?.funding),capital=d?.funding?.declaredUsd;
@@ -5889,8 +5892,8 @@ function elysiumChart(d,id,view){
  if(pts.length>1){
   const W=720,H=240,L=14,R=98,T=18,B=32,first=pts[0],last=pts.at(-1),vs=pts.map(p=>p.adjusted),min=Math.min(...vs),max=Math.max(...vs),pad=(max-min)*.12||1;
   const x=t=>L+(t-first.t)/Math.max(1,last.t-first.t)*(W-L-R),y=v=>T+(max+pad-v)/(max-min+2*pad)*(H-T-B);
-  const path=pts.map((p,i)=>`${!i||p.t-pts[i-1].t>20*60000?'M':'L'}${x(p.t).toFixed(1)},${y(p.adjusted).toFixed(1)}`).join(' ');
-  const groups=[];for(const p of pts){if(!groups.length||p.t-groups.at(-1).at(-1).t>20*60000)groups.push([]);groups.at(-1).push(p);}
+  const path=pts.map((p,i)=>`${!i||p.t-pts[i-1].t>elysiumGapLimit(pts[i-1])?'M':'L'}${x(p.t).toFixed(1)},${y(p.adjusted).toFixed(1)}`).join(' ');
+  const groups=[];for(const p of pts){if(!groups.length||p.t-groups.at(-1).at(-1).t>elysiumGapLimit(groups.at(-1).at(-1)))groups.push([]);groups.at(-1).push(p);}
   const area=groups.filter(g=>g.length>1).map(g=>`<path d="M${x(g[0].t)},${H-B} ${g.map(p=>'L'+x(p.t)+','+y(p.adjusted)).join(' ')} L${x(g.at(-1).t)},${H-B} Z" fill="url(#elysium-fill-${id})"/>`).join('');
   chart=`<div class="chart-wrap"><svg data-elysium-chart viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik nilai aset Elysium disesuaikan arus kas, waktu WIB"><defs><linearGradient id="elysium-fill-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${perf.delta>=0?'#4ade80':'#f87171'}" stop-opacity=".22"/><stop offset="1" stop-color="${perf.delta>=0?'#4ade80':'#f87171'}" stop-opacity="0"/></linearGradient></defs>${area}${[max,(max+min)/2,min].map(v=>`<line class="g-grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="g-lbl" x="${W-R+8}" y="${y(v)+4}">${esc(usdText(v,0))}</text>`).join('')}<path d="${path}" fill="none" stroke="${perf.delta==null?'#94a3b8':perf.delta>=0?'#4ade80':'#f87171'}" stroke-width="2.5" stroke-linejoin="round"/>${[first,last].map((p,i)=>`<text class="g-lbl" x="${x(p.t)}" y="${H-6}" text-anchor="${i?'end':'start'}">${esc(sbWib(p.t))}</text>`).join('')}</svg></div><input class="elysium-point" data-elysium-point type="range" min="0" max="${pts.length-1}" value="${pts.length-1}" aria-label="Pilih waktu pembacaan aset"><p data-elysium-readout class="hint" aria-live="polite"></p>`;
  }
@@ -5902,10 +5905,10 @@ function elysiumCalendar(d,view){
  for(let n=1;n<=count;n++){
   const key=view.month+'-'+String(n).padStart(2,'0'),start=Date.parse(key+'T00:00:00+07:00'),end=start+86400000;
   const inDay=points.filter(p=>p.t>=start&&p.t<end),prior=points.filter(p=>p.t<start).at(-1);
-  const day=prior&&start-prior.t<=20*60000?[prior,...inDay]:inDay;
-  const valid=day.length>1&&day.every((p,i)=>!i||p.t-day[i-1].t<=20*60000);
+  const day=prior&&start-prior.t<=elysiumGapLimit(prior)?[prior,...inDay]:inDay;
+  const valid=day.length>1&&day.every((p,i)=>!i||p.t-day[i-1].t<=elysiumGapLimit(day[i-1]));
   const delta=valid?day.at(-1).usd-day[0].usd-events.filter(e=>e.at>day[0].t&&e.at<=day.at(-1).t).reduce((n,e)=>n+(e.type==='withdraw'?-e.usd:e.usd),0):null;
-  const full=valid&&day[0].t<=start&&day.at(-1).t>=end-20*60000;
+  const full=valid&&day[0].t<=start&&day.at(-1).t>=end-elysiumGapLimit(day.at(-1));
   days.push({key,n,delta,valid,full,day});
  }
  const selected=days.find(x=>x.key===view.day),render=days.map(x=>`<button class="cell ${x.delta==null?'void':cls(x.delta)}" data-elysium-day="${x.key}" ${x.key>today?'disabled':''} aria-pressed="${view.day===x.key}"><span class="d">${x.n}</span><span class="a">${x.delta==null?'—':signed(x.delta,0)}</span><span class="c">${x.key>today?'':x.delta==null?'Belum lengkap':x.full?'Perubahan aset':'Rentang teramati'}</span></button>`).join('');
