@@ -393,6 +393,24 @@ console.log('PASS complete forecast render');
    return {detail,home,excluded:(await portoTotals()).missing.includes('riskelysium')};
  })()`);
  assert.match(partialCheck.detail,/HELIOS/);assert.match(partialCheck.detail,/UNPRICED/);assert.match(partialCheck.detail,/Harga belum tersedia/);assert.match(partialCheck.home,/RISK Elysium/);assert.match(partialCheck.home,/sebagian/);assert.equal(partialCheck.excluded,true);
+ const dashboard=await ev(`(async()=>{
+   const at=Date.now(),row=elysiumCache.get('elysium');row.at=at;row.data.curve=[{t:at-1200000,usd:90},{t:at-600000,usd:95},{t:at,usd:100}];
+   location.hash='#elysium/analys';await new Promise(r=>setTimeout(r,100));await renderElysium('elysium');
+   const analysis=Boolean(document.querySelector('#elysiumBody [data-elysium-chart]'));
+   document.querySelector('#elysiumBody [data-elysium-range="all"]').click();await new Promise(r=>setTimeout(r,50));
+   const slider=document.querySelector('#elysiumBody [data-elysium-point]');slider.value='0';slider.dispatchEvent(new Event('input',{bubbles:true}));
+   const readout=document.querySelector('#elysiumBody [data-elysium-readout]').textContent;
+   document.querySelector('#elysiumBody [data-elysium-month="-1"]').click();await new Promise(r=>setTimeout(r,50));
+   const previous=elysiumViews.get('elysium').month;
+   location.hash='#elysium/investor';await new Promise(r=>setTimeout(r,100));await renderElysium('elysium');
+   const investor=document.querySelector('#elysiumBody').textContent;
+   document.querySelector('#elysiumBody [data-elysium-tab="bot"]').click();await new Promise(r=>setTimeout(r,100));await renderElysium('elysium');
+   const bot=document.querySelector('#elysiumBody').textContent;
+   location.hash='#riskelysium/tentang';await new Promise(r=>setTimeout(r,100));await renderElysium('riskelysium');
+   return {analysis,readout,previous,investor,bot,hash:location.hash,about:document.querySelector('#riskelysiumBody').textContent,overflow:document.documentElement.scrollWidth>innerWidth};
+ })()`);
+ assert.equal(dashboard.analysis,true);assert.match(dashboard.readout,/saldo nyata saat itu/);assert.match(dashboard.investor,/Riwayat perpindahan modal/);assert.match(dashboard.investor,/Pembagian kepemilikan/);assert.match(dashboard.bot,/Simulasi/);assert.equal(dashboard.hash,'#riskelysium/tentang');assert.match(dashboard.about,/Kelengkapan sumber/);assert.equal(dashboard.overflow,false);
+ console.log('PASS Elysium fund tabs, chart controls, investor ledger, paper separation and mobile navigation');
  console.log('PASS Elysium risk menus, routing, partial holdings stay visible and real-only totals');
  assert.deepEqual(errors,[]);console.log('PASS no uncaught browser exceptions');
  }finally{

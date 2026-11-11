@@ -5804,21 +5804,26 @@ function renderFamilyChains(){
  setHTML(box,`<section class="card"><div class="card-head"><h2>Saldo per jaringan</h2><a href="#${id}">${esc(state[id]?.label||'Elysium')} →</a></div><p>Robinhood: <b>${usd(state.nav?.totalUsd)}</b> · Elysium: <span data-elysium-balance>memuat…</span></p><p class="hint">Pencatatan tiap jaringan terpisah. Hasil simulasi tidak menambah saldo nyata.</p></section>`);
  loadElysium(id).then(d=>{if(state.fund===family&&box.querySelector('[data-elysium-balance]'))box.querySelector('[data-elysium-balance]').textContent=custodyValue(d);});
 }
-function showElysium(id){showGlobal(id,(state[id]?.label||'Elysium')+' — Cashood');renderElysium(id).catch(()=>{if(state.view===id)setHTML($('#'+id+'Body'),'<p class="miss">Data Elysium belum tersedia.</p>');});}
+function showElysium(id){
+ const parts=location.hash.slice(1).split('/'),tab=parts[0]===id&&ELYSIUM_TABS.some(([key])=>key===parts[1])?parts[1]:'portfolio';
+ const view=elysiumViews.get(id)||{range:'24h',month:new Date(Date.now()+7*3600e3).toISOString().slice(0,7)};view.tab=tab;elysiumViews.set(id,view);
+ showGlobal(id,(state[id]?.label||'Elysium')+' — Cashood');history.replaceState(null,'','#'+id+'/'+tab);
+ renderElysium(id).catch(()=>{if(state.view===id)setHTML($('#'+id+'Body'),'<p class="miss">Data Elysium belum tersedia.</p>');});
+}
 async function renderElysium(id){
- const d=await loadElysium(id);if(state.view!==id)return;
- const meta=state[id], parent=meta?.family||'reborn';
- const c=custodyReadable(d)?d.custody:null;
- const recorded=elysiumFundingEvents(d?.funding),netRecorded=recorded.reduce((n,e)=>n+(e.type==='withdraw'?-e.usd:e.usd),0);
- const sim=d?.simulation, paper=sim?.quality?.complete&&Date.now()-sim.updatedAt<=15*60000?sim.paper:null;
- setHTML($('#'+id+'Body'),`<section class="card"><div class="card-head"><h2>${esc(meta?.label||'Elysium')}</h2><a href="#${parent}/portfolio">${parent==='reborn'?'Reborn Rich':'No Risk No Ferari'} · Robinhood →</a></div>
- <p>${id==='elysium'?'Mesin masih dry run. Pendanaan nyata milik Orel terpisah dari buku simulasi.':'Cabang Elysium dari No Risk No Ferari. Saldo Robinhood dan Elysium dihitung terpisah.'}</p>
- <div class="stats wrapfit"><div class="stat"><div class="k">Saldo nyata · Elysium</div><div class="v">${custodyValue(d)}</div></div>
- <div class="stat"><div class="k">${d?.funding?.declaredUsd!=null?'Pendanaan Orel yang dicatat':'Transfer bersih yang tercatat'}</div><div class="v">${d?.funding?.declaredUsd!=null?usd(d.funding.declaredUsd):recorded.length?usd(netRecorded):'Belum tercatat'}</div><div class="n">${d?.funding?.declaredUsd!=null?'Modal masuk, bukan nilai pasar saat ini.':'Modal awal sebelum transfer belum direkonsiliasi; angka ini bukan seluruh modal.'}</div></div></div>
- ${custodyFresh(d)?'': '<p class="miss">'+(c?'Sebagian aset belum memiliki harga terverifikasi. Subtotal di atas belum masuk total aset global; rincian yang terbaca tetap ditampilkan.':'Pembacaan saldo belum tersedia atau sudah kedaluwarsa. Nilai tidak dianggap nol.')+'</p>'}</section>
- ${c?elysiumAssetDetails(c,d.funding):''}
- ${elysiumFundingDetails(d?.funding)}
- ${id==='elysium'?`<section class="card"><h2>Simulasi · tidak masuk total aset nyata</h2>${paper?`<p>Modal virtual ${usd(paper.capitalUsd)} · ekuitas simulasi ${usd(paper.equityUsd)}</p><p>Untung/rugi simulasi ${usd(paper.netPnlUsd)} · ${paper.openPositions} posisi terbuka</p><p class="hint">${paper.feeEstimated?'Fee simulasi masih estimasi.':''} Diperbarui ${ago(sim.updatedAt)}.</p>`:'<p class="miss">Data simulasi belum tersedia atau sudah kedaluwarsa.</p>'}</section>`:''}`);
+ const view=elysiumViews.get(id)||{tab:'portfolio',range:'24h',month:new Date(Date.now()+7*3600e3).toISOString().slice(0,7)};elysiumViews.set(id,view);const epoch=view.epoch=(view.epoch||0)+1;
+ const d=await loadElysium(id);if(state.view!==id||epoch!==view.epoch)return;
+ const meta=state[id],parent=meta?.family||'reborn',c=custodyReadable(d)?d.custody:null;
+ const header=`<div class="elysium-status"><span><i class="live-dot"></i> ${esc(meta?.label||'Elysium')} · Elysium</span><span>${c?'Diperbarui '+ago(c.updatedAt):'Menunggu pembaruan saldo'}</span><span>${custodyFresh(d)?'Saldo token + LP terverifikasi':c?'Sebagian aset belum memiliki harga':'Data belum lengkap'}</span></div><nav class="tabs elysium-tabs" aria-label="Halaman dana ${esc(meta?.label||id)}">${ELYSIUM_TABS.map(([key,label])=>`<button data-elysium-tab="${key}" class="${view.tab===key?'on':''}" aria-current="${view.tab===key?'page':'false'}">${label}</button>`).join('')}</nav>`;
+ const family=`<section class="card"><div class="card-head"><h2>Saldo per jaringan</h2><a href="#${parent}/portfolio">${parent==='reborn'?'Reborn Rich':'No Risk No Ferari'} · Robinhood →</a></div><p>Saldo nyata · Elysium: <b>${custodyValue(d)}</b></p><p class="hint">Saldo tiap jaringan terpisah. ${id==='elysium'?'Pendanaan nyata Orel terpisah dari buku simulasi.':'Sumber saat ini membaca wallet dan posisi LP nyata.'}</p>${custodyFresh(d)?'':'<p class="miss">'+(c?'Subtotal aset yang berhasil dinilai; aset tanpa harga belum termasuk. Subtotal ini belum masuk total aset global.':'Saldo belum tersedia atau sudah kedaluwarsa; tidak dianggap nol.')+'</p>'}</section>`;
+ const assets=c?elysiumAssetDetails(c,d.funding):'<section class="card"><h2>Isi wallet dan posisi LP</h2><p class="miss">Menunggu pembacaan saldo yang layak. Data lama tidak ditampilkan sebagai saldo saat ini.</p></section>';
+ let body='';
+ if(view.tab==='portfolio')body=family+elysiumSummary(d,id)+elysiumOwnership(d,id)+assets+elysiumChart(d,id,view)+elysiumRealHistory(d)+elysiumCalendar(d,view);
+ else if(view.tab==='investor')body=elysiumSummary(d,id)+elysiumOwnership(d,id)+elysiumFundingDetails(d?.funding);
+ else if(view.tab==='analys')body=elysiumSummary(d,id)+elysiumChart(d,id,view)+elysiumCalendar(d,view)+elysiumRealHistory(d);
+ else if(view.tab==='bot')body=elysiumBot(d,id)+assets;
+ else body=`<section class="card"><h2>Tentang ${esc(meta?.label||'Elysium')}</h2><p>${id==='elysium'?'Cabang Elysium dari Reborn Rich dengan pendanaan nyata milik Orel. Buku simulasi dipisahkan dari nilai wallet.':'Cabang Elysium dari No Risk No Ferari. Alamat yang sama pada dua jaringan tetap memiliki saldo yang berbeda.'}</p><h3>Cara membaca hasil</h3><p>Nilai sekarang mencakup token dan posisi LP yang terverifikasi. Untung/rugi aset memerlukan modal awal serta seluruh arus kas. Grafik dan kalender menyesuaikan transfer yang tercatat; keduanya berbeda dari profit transaksi tertutup.</p><h3>Kelengkapan sumber</h3><p>Saldo dibaca dari blockchain Elysium. Pembacaan token dan LP mengikuti snapshot yang sama, dengan harga pasar yang tersedia. Token tanpa harga ditampilkan jumlahnya. Data lebih dari 15 menit tidak dianggap saldo terkini. Riwayat transaksi tertutup dan pembagian profit belum tersedia di sumber halaman ini.</p><h3>Risiko</h3><p>Harga token, likuiditas, biaya, dan nilai posisi LP dapat berubah. Saldo yang terverifikasi bukan jaminan nilai saat dijual. Situs hanya membaca data dan tidak memindahkan dana.</p></section>`+elysiumFundingDetails(d?.funding);
+ setHTML($('#'+id+'Body'),header+body);wireElysiumDashboard(id,d,view);
 }
 
 async function elysiumBrief(id){
@@ -5854,6 +5859,78 @@ function elysiumFundingDetails(funding){
  const events=elysiumFundingEvents(funding);if(!events.length)return '';
  return `<section class="card"><h2>Riwayat perpindahan modal</h2><p class="hint">${esc(funding.note||'Transfer internal tidak dihitung sebagai profit.')}</p><div class="table-scroll"><table class="mcards"><thead><tr><th>Waktu</th><th>Keterangan</th><th class="num">Nilai pembukuan</th></tr></thead><tbody>${events.map(e=>`<tr><td class="mc-head">${esc(sbWib(e.at))}</td><td data-label="Keterangan">${e.type==='withdraw'?'Keluar ke':'Masuk dari'} ${esc(state[e.destinationFund||e.sourceFund]?.label||state.funds.find(f=>f.id===(e.destinationFund||e.sourceFund))?.label||'pendanaan Orel')}${e.nativeAmount?' · '+Number(e.nativeAmount).toLocaleString('id-ID',{maximumFractionDigits:6})+' '+esc(e.nativeSymbol):''}</td><td class="num" data-label="Nilai pembukuan">${e.type==='withdraw'?'−':'+'}${usd(e.usd)}</td></tr>`).join('')}</tbody></table></div></section>`;
 }
+const elysiumViews=new Map();
+const ELYSIUM_TABS=[['portfolio','Portofolio'],['investor','Data investor'],['analys','Analys'],['bot','Bot'],['tentang','Tentang']];
+function elysiumPerformance(d,range='all',now=Date.now()){
+ const events=elysiumFundingEvents(d?.funding).filter(e=>Number.isFinite(e.at)&&Number.isFinite(e.usd));
+ const all=[...new Map((d?.curve||[]).filter(p=>Number.isFinite(p.t)&&Number.isFinite(p.usd)&&p.usd>=0&&p.t<=now).map(p=>[p.t,p])).values()].sort((a,b)=>a.t-b.t);
+ const cutoff=range==='24h'?now-86400000:range==='7d'?now-7*86400000:-Infinity;
+ let start=all.findIndex(p=>p.t>=cutoff);if(start<0)start=all.length;if(start>0)start--;
+ const raw=all.slice(start),first=raw[0];
+ const points=raw.map(p=>({...p,adjusted:p.usd-events.filter(e=>e.at>first.t&&e.at<=p.t).reduce((n,e)=>n+(e.type==='withdraw'?-e.usd:e.usd),0)}));
+ const continuous=points.length>1&&points.every((p,i)=>!i||p.t-points[i-1].t<=20*60000);
+ return {points,continuous,delta:continuous?points.at(-1).adjusted-points[0].usd:null,percent:continuous&&points[0].usd>0?(points.at(-1).adjusted/points[0].usd-1)*100:null};
+}
+function elysiumSummary(d,id){
+ const events=elysiumFundingEvents(d?.funding),capital=d?.funding?.declaredUsd;
+ const deposit=events.filter(e=>e.type==='deposit').reduce((n,e)=>n+e.usd,0),out=events.filter(e=>e.type==='withdraw').reduce((n,e)=>n+e.usd,0);
+ const pnl=custodyFresh(d)&&Number.isFinite(capital)?d.custody.totalUsd+out-capital:null;
+ const tile=(label,value,note,color='')=>`<div class="stat"><div class="k">${label}</div><div class="v ${color}">${value}</div><div class="n">${note}</div></div>`;
+ return `<div class="stats elysium-summary">${tile('Nilai sekarang',custodyValue(d),custodyFresh(d)?'Token + posisi LP nyata':'Subtotal / data belum lengkap')}${tile('Modal masuk',Number.isFinite(capital)?usd(capital):usd(deposit),'Setoran tercatat milik Orel'+(capital==null?' · modal awal belum lengkap':''))}${tile('Sudah dipindahkan',usd(out),'Transfer keluar yang tercatat; bukan pembagian profit')}${tile('Untung / rugi',pnl==null?'Belum lengkap':signed(pnl),pnl==null?'Menunggu saldo dan modal lengkap':pct(pnl/capital*100)+' dari modal · perubahan nilai aset',pnl==null?'dim':cls(pnl))}</div>`;
+}
+function elysiumOwnership(d,id){
+ const complete=custodyFresh(d),capital=d?.funding?.declaredUsd,out=elysiumFundingEvents(d?.funding).filter(e=>e.type==='withdraw').reduce((n,e)=>n+e.usd,0);
+ const pnl=complete&&Number.isFinite(capital)?d.custody.totalUsd+out-capital:null;
+ return `<section class="card"><div class="card-head"><h2>Pembagian kepemilikan</h2><span class="hint">Pendanaan tercatat · 1 pemilik</span></div><div class="elysium-ownership"><div class="donut-box"><svg viewBox="0 0 200 200" role="img" aria-label="Orel memiliki 100 persen dana"><circle cx="100" cy="100" r="78" fill="none" stroke="${state[id]?.accent||'#4ade80'}" stroke-width="26"/></svg><div class="donut-center"><div class="donut-val">100%</div><div class="donut-lbl">Orel</div></div></div><div class="table-scroll"><table class="mcards"><thead><tr><th>Pemilik</th><th>Porsi</th><th>Modal tercatat</th><th>Nilai sekarang</th><th>Untung / rugi</th></tr></thead><tbody><tr><td class="mc-head">Orel</td><td data-label="Porsi">100%</td><td data-label="Modal tercatat">${Number.isFinite(capital)?usd(capital):'Modal awal belum lengkap'}</td><td data-label="Nilai sekarang">${custodyValue(d)}</td><td data-label="Untung / rugi" class="${pnl==null?'dim':cls(pnl)}">${pnl==null?'Belum lengkap':signed(pnl)}</td></tr></tbody></table></div></div><p class="hint">Kepemilikan cabang Elysium terpisah dari pemilik dana Robinhood. Nilai simulasi tidak menjadi saham investor. Profit yang telah dibagikan belum tersedia di sumber ini.</p></section>`;
+}
+function elysiumChart(d,id,view){
+ const perf=elysiumPerformance(d,view.range),pts=perf.points;
+ let chart='<p class="miss">Belum ada cukup pembacaan lengkap untuk grafik. Saldo parsial tidak dijadikan titik saldo penuh.</p>';
+ if(pts.length>1){
+  const W=720,H=240,L=14,R=98,T=18,B=32,first=pts[0],last=pts.at(-1),vs=pts.map(p=>p.adjusted),min=Math.min(...vs),max=Math.max(...vs),pad=(max-min)*.12||1;
+  const x=t=>L+(t-first.t)/Math.max(1,last.t-first.t)*(W-L-R),y=v=>T+(max+pad-v)/(max-min+2*pad)*(H-T-B);
+  const path=pts.map((p,i)=>`${!i||p.t-pts[i-1].t>20*60000?'M':'L'}${x(p.t).toFixed(1)},${y(p.adjusted).toFixed(1)}`).join(' ');
+  const groups=[];for(const p of pts){if(!groups.length||p.t-groups.at(-1).at(-1).t>20*60000)groups.push([]);groups.at(-1).push(p);}
+  const area=groups.filter(g=>g.length>1).map(g=>`<path d="M${x(g[0].t)},${H-B} ${g.map(p=>'L'+x(p.t)+','+y(p.adjusted)).join(' ')} L${x(g.at(-1).t)},${H-B} Z" fill="url(#elysium-fill-${id})"/>`).join('');
+  chart=`<div class="chart-wrap"><svg data-elysium-chart viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik nilai aset Elysium disesuaikan arus kas, waktu WIB"><defs><linearGradient id="elysium-fill-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${perf.delta>=0?'#4ade80':'#f87171'}" stop-opacity=".22"/><stop offset="1" stop-color="${perf.delta>=0?'#4ade80':'#f87171'}" stop-opacity="0"/></linearGradient></defs>${area}${[max,(max+min)/2,min].map(v=>`<line class="g-grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="g-lbl" x="${W-R+8}" y="${y(v)+4}">${esc(usdText(v,0))}</text>`).join('')}<path d="${path}" fill="none" stroke="${perf.delta==null?'#94a3b8':perf.delta>=0?'#4ade80':'#f87171'}" stroke-width="2.5" stroke-linejoin="round"/>${[first,last].map((p,i)=>`<text class="g-lbl" x="${x(p.t)}" y="${H-6}" text-anchor="${i?'end':'start'}">${esc(sbWib(p.t))}</text>`).join('')}</svg></div><input class="elysium-point" data-elysium-point type="range" min="0" max="${pts.length-1}" value="${pts.length-1}" aria-label="Pilih waktu pembacaan aset"><p data-elysium-readout class="hint" aria-live="polite"></p>`;
+ }
+ return `<section class="card"><div class="card-head"><h2>Grafik nilai aset</h2><div class="seg">${[['24h','24 jam'],['7d','7 hari'],['all','Semua']].map(([v,l])=>`<button data-elysium-range="${v}" class="${view.range===v?'on':''}" aria-pressed="${view.range===v}">${l}</button>`).join('')}</div></div><p class="${perf.delta==null?'dim':cls(perf.delta)}">${perf.delta==null?'Perubahan belum dapat dihitung untuk rentang ini':signed(perf.delta)+' · '+pct(perf.percent)} <span class="hint">di rentang pembacaan</span></p>${chart}<p class="hint">Setoran dan penarikan tercatat sudah disesuaikan. Ini perubahan nilai aset, bukan profit transaksi yang ditutup. Celah data tidak disambung. ${pts.length?'Pembacaan lengkap terakhir: '+esc(sbWib(pts.at(-1).t))+'.':''} Konversi mengikuti mata uang pilihan dan kurs tampilan saat ini.</p></section>`;
+}
+function elysiumCalendar(d,view){
+ const date=new Date(view.month+'-01T00:00:00Z'),year=date.getUTCFullYear(),month=date.getUTCMonth(),count=new Date(Date.UTC(year,month+1,0)).getUTCDate(),today=new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
+ const points=elysiumPerformance(d).points,events=elysiumFundingEvents(d?.funding),days=[];
+ for(let n=1;n<=count;n++){
+  const key=view.month+'-'+String(n).padStart(2,'0'),start=Date.parse(key+'T00:00:00+07:00'),end=start+86400000;
+  const inDay=points.filter(p=>p.t>=start&&p.t<end),prior=points.filter(p=>p.t<start).at(-1);
+  const day=prior&&start-prior.t<=20*60000?[prior,...inDay]:inDay;
+  const valid=day.length>1&&day.every((p,i)=>!i||p.t-day[i-1].t<=20*60000);
+  const delta=valid?day.at(-1).usd-day[0].usd-events.filter(e=>e.at>day[0].t&&e.at<=day.at(-1).t).reduce((n,e)=>n+(e.type==='withdraw'?-e.usd:e.usd),0):null;
+  const full=valid&&day[0].t<=start&&day.at(-1).t>=end-20*60000;
+  days.push({key,n,delta,valid,full,day});
+ }
+ const selected=days.find(x=>x.key===view.day),render=days.map(x=>`<button class="cell ${x.delta==null?'void':cls(x.delta)}" data-elysium-day="${x.key}" ${x.key>today?'disabled':''} aria-pressed="${view.day===x.key}"><span class="d">${x.n}</span><span class="a">${x.delta==null?'—':signed(x.delta,0)}</span><span class="c">${x.key>today?'':x.delta==null?'Belum lengkap':x.full?'Perubahan aset':'Rentang teramati'}</span></button>`).join('');
+ const detail=selected?selected.delta==null?'Data tanggal ini belum cukup atau terputus; tidak dianggap rugi atau nol.':`${sbWib(selected.day[0].t)} → ${sbWib(selected.day.at(-1).t)} · ${signedText(selected.delta)} setelah penyesuaian arus kas.`:'Pilih tanggal untuk melihat rentang pembacaannya.';
+ return `<section class="card"><h2>Kalender perubahan nilai aset</h2><p class="hint">Angka berasal dari snapshot aset nyata setelah arus kas tercatat disesuaikan. Bukan kalender profit transaksi. Hari tanpa data lengkap ditandai, bukan diberi profit nol.</p><div class="cal-head"><button class="btn ghost" data-elysium-month="-1" aria-label="Bulan sebelumnya">‹</button><strong>${M_SHORT[month]} ${year}</strong><button class="btn ghost" data-elysium-month="1" aria-label="Bulan berikutnya" ${view.month>=today.slice(0,7)?'disabled':''}>›</button></div><div class="cal-dow">${['MIN','SEN','SEL','RAB','KAM','JUM','SAB'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cal-grid">${'<div></div>'.repeat(date.getUTCDay())}${render}</div><p class="hint" aria-live="polite">${esc(detail)}</p></section>`;
+}
+function elysiumRealHistory(d){
+ const c=custodyReadable(d)?d.custody:null;
+ return `<section class="card"><h2>Riwayat profit transaksi nyata</h2><div class="stats wrapfit">${[['Profit terkunci','Belum tersedia'],['Win rate','Belum tersedia'],['Posisi ditutup','Belum tersedia'],['Posisi LP terbaca',c?String((c.positions||[]).length):'Belum tersedia']].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div><p class="hint">Sumber saat ini memverifikasi saldo dan posisi yang masih dipegang. Buku transaksi tertutup belum terhubung, sehingga profit terkunci, win rate, dan jumlah penutupan belum dapat dihitung. Simulasi ditampilkan terpisah di tab Bot.</p></section>`;
+}
+function elysiumBot(d,id){
+ const sim=d?.simulation,valid=sim?.quality?.complete&&Number.isFinite(sim.updatedAt)&&sim.updatedAt<=Date.now()+60000&&Date.now()-sim.updatedAt<=15*60000,p=valid?sim.paper:null;
+ if(id==='riskelysium')return `<section class="card"><h2>Status bot RISK Elysium</h2><p>Wallet nyata · pembacaan saja</p><p class="hint">Saldo dan posisi di jaringan Elysium dipantau. Status mesin trading dan riwayat eksekusi belum terhubung ke halaman ini; saldo wallet bukan bukti bahwa bot sedang aktif.</p></section>`;
+ return `<section class="card"><h2>Simulasi · tidak masuk total aset nyata</h2><p>${p?'Buku dry run tersedia · diperbarui '+ago(sim.updatedAt):'Data simulasi belum tersedia atau sudah kedaluwarsa.'}</p>${p?`<div class="stats wrapfit">${[['Modal virtual',usd(p.capitalUsd)],['Ekuitas simulasi',usd(p.equityUsd)],['Untung / rugi simulasi',signed(p.netPnlUsd)],['Posisi terbuka',p.openPositions],['Profit direalisasi simulasi',signed(p.realizedPnlUsd)],['Fee simulasi',usd(p.feesUsd)]].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div><p class="hint">Kas ${usd(p.cashUsd)} · pokok posisi ${usd(p.principalUsd)} · biaya ${usd(p.costsUsd)}. ${p.feeEstimated?'Fee masih estimasi.':''}</p>`:''}<p class="hint">Buku simulasi terpisah dari dana nyata Orel. Halaman ini tidak mengaktifkan trading atau mengubah batas risiko mesin.</p></section>`;
+}
+function wireElysiumDashboard(id,d,view){
+ const root=$('#'+id+'Body');
+ root.querySelectorAll('[data-elysium-tab]').forEach(b=>b.onclick=()=>{location.hash=id+'/'+b.dataset.elysiumTab;});
+ root.querySelectorAll('[data-elysium-range]').forEach(b=>b.onclick=()=>{view.range=b.dataset.elysiumRange;renderElysium(id);});
+ root.querySelectorAll('[data-elysium-month]').forEach(b=>b.onclick=()=>{const x=new Date(view.month+'-01T00:00:00Z');x.setUTCMonth(x.getUTCMonth()+Number(b.dataset.elysiumMonth));view.month=x.toISOString().slice(0,7);view.day=null;renderElysium(id);});
+ root.querySelectorAll('[data-elysium-day]').forEach(b=>b.onclick=()=>{view.day=b.dataset.elysiumDay;renderElysium(id);});
+ const input=root.querySelector('[data-elysium-point]'),output=root.querySelector('[data-elysium-readout]');
+ if(input&&output){const points=elysiumPerformance(d,view.range).points;const update=()=>{const p=points[Number(input.value)];output.textContent=sbWib(p.t)+' · saldo nyata saat itu '+usdText(p.usd,2)+' · setelah penyesuaian arus kas '+usdText(p.adjusted,2);};input.oninput=update;const svg=root.querySelector('[data-elysium-chart]');svg.onpointermove=ev=>{if(ev.pointerType==='touch'&&!ev.buttons)return;const rect=svg.getBoundingClientRect(),t=points[0].t+Math.max(0,Math.min(1,((ev.clientX-rect.left)/rect.width*720-14)/(720-14-98)))*(points.at(-1).t-points[0].t);let index=0;for(let i=1;i<points.length;i++)if(Math.abs(points[i].t-t)<Math.abs(points[index].t-t))index=i;input.value=String(index);update();};update();}
+}
+
 function matchedInternalCapital(briefs,only=null){
  const seen=new Set();
  return (only?[only]:briefs).reduce((total,b)=>{

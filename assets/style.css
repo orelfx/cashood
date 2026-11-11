@@ -1615,3 +1615,24 @@ tr.gs-foreign td { opacity: .5; }
 .gs-off { border-style: dashed !important; }
 @media (max-width: 640px) { .gs-events li { grid-template-columns: 1fr; gap: 2px; } }
 .stat .v > span.dim:only-child { font: 500 13px var(--sans); }
+
+/* Elysium uses the same fund sections with its independent custody ledger. */
+.elysium-status { display:flex; flex-wrap:wrap; gap:12px 24px; border:1px solid var(--line); border-radius:12px; padding:14px; color:var(--muted); font-size:12px; }
+.elysium-status .live-dot { display:inline-block; }
+.elysium-tabs { margin-bottom:16px; }
+.elysium-summary { margin:16px 0; grid-template-columns:repeat(4,minmax(0,1fr)); }
+.elysium-summary .v { font-size:clamp(17px,2.2vw,26px); overflow-wrap:anywhere; }
+.elysium-ownership { display:grid; grid-template-columns:220px minmax(0,1fr); gap:24px; align-items:center; }
+.elysium-ownership .donut-box svg { width:200px; height:200px; }
+.elysium-point { width:100%; accent-color:var(--accent); }
+[data-elysium-day] { background:transparent; text-align:left; color:var(--text); cursor:pointer; }
+[data-elysium-day].pos { background:rgba(74,222,128,.1); border-color:rgba(74,222,128,.25); }
+[data-elysium-day].neg { background:rgba(248,113,113,.1); border-color:rgba(248,113,113,.25); }
+[data-elysium-day][aria-pressed="true"] { outline:2px solid var(--accent); }
+@media(max-width:680px) {
+ .elysium-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .elysium-ownership { grid-template-columns:minmax(0,1fr); gap:12px; }
+ [data-elysium-day] { min-width:0; padding:5px 3px; }
+ [data-elysium-day] .a { font-size:9px; overflow-wrap:anywhere; }
+ [data-elysium-day] .c { font-size:8px; }
+}
