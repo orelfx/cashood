@@ -1,7 +1,7 @@
 {
   "fund": "elysium",
   "schemaVersion": 2,
-  "checkedAt": 1794479247589,
+  "checkedAt": 1794479549001,
   "label": "Elysium LP",
   "family": "reborn",
   "risk": "medium",
@@ -9,15 +9,15 @@
     "fund": "elysium",
     "chain": "Elysium",
     "chainId": 99901,
-    "checkedAt": 1794479247589,
+    "checkedAt": 1794479549001,
     "realMoney": true,
     "status": "verified",
-    "updatedAt": 1794479193000,
+    "updatedAt": 1794479482000,
     "nativeAmount": 8.348918388200104,
-    "nativePriceUsd": 71.8,
+    "nativePriceUsd": 71.77,
     "tokenUsd": 0,
     "lpUsd": 0,
-    "totalUsd": 599.4523402727675,
+    "totalUsd": 599.2018727211215,
     "holdings": [],
     "positions": [],
     "quality": {
@@ -735,12 +735,16 @@
     {
       "t": 1794479193000,
       "usd": 599.4523402727675
+    },
+    {
+      "t": 1794479482000,
+      "usd": 599.2018727211215
     }
   ],
   "activity": {
     "source": "Blockchain Elysium",
     "chainId": 99901,
-    "updatedAt": 1794479237000,
+    "updatedAt": 1794479538000,
     "status": "available",
     "quality": {
       "complete": true
@@ -769,19 +773,32 @@
     "risk": "medium",
     "mode": "paper",
     "realMoney": false,
-    "checkedAt": 1794479247589,
-    "status": "unavailable",
-    "updatedAt": null,
+    "checkedAt": 1794479549001,
+    "status": "paper",
+    "updatedAt": 1794479528000,
     "quality": {
-      "complete": false,
+      "complete": true,
       "estimated": true
     },
-    "note": "Data simulasi belum tersedia atau sudah kedaluwarsa. Saldo nyata terpisah."
+    "paper": {
+      "capitalUsd": 1000,
+      "equityUsd": 1000,
+      "cashUsd": 1000,
+      "principalUsd": 0,
+      "netPnlUsd": 0,
+      "realizedPnlUsd": 0,
+      "unrealizedPnlUsd": 0,
+      "feesUsd": 0,
+      "costsUsd": 0,
+      "openPositions": 0,
+      "feeEstimated": true
+    },
+    "note": "Hasil simulasi; tidak termasuk dalam total aset nyata atau saham investor."
   },
   "engine": {
     "status": "available",
     "source": "VPS Elysium LP",
-    "updatedAt": 1794479114000,
+    "updatedAt": 1794479528000,
     "quality": {
       "complete": true
     },
@@ -799,6 +816,18 @@
     "revertedCount": 0,
     "gasHype": 0,
     "decisions": [
+      {
+        "at": 1794479528000,
+        "mode": "PAPER",
+        "actions": [
+          {
+            "action": "WAIT",
+            "reasons": [
+              "NO_ELIGIBLE_POOL"
+            ]
+          }
+        ]
+      },
       {
         "at": 1794479114000,
         "mode": "PAPER",
@@ -1074,38 +1103,27 @@
             ]
           }
         ]
-      },
-      {
-        "at": 1794469636000,
-        "mode": "PAPER",
-        "actions": [
-          {
-            "action": "WAIT",
-            "reasons": [
-              "NO_ELIGIBLE_POOL"
-            ]
-          }
-        ]
       }
     ],
     "pools": [
       {
         "pair": "BOXA/HYPE",
-        "tvlUsd": 1387.9157992424362,
-        "volume1hUsd": 17.252701851069848,
-        "fees24hUsd": 9.426348501726913,
+        "tvlUsd": 1376.462230671081,
+        "volume1hUsd": 21.40801537371575,
+        "fees24hUsd": 9.405095551560011,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
+          "NATIVE_BINS_STALE_OR_MISSING",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
           "LATEST_SCAN_NOT_USABLE"
         ]
       },
       {
         "pair": "HELIOS/HYPE",
-        "tvlUsd": 451.6987236267001,
+        "tvlUsd": 450.6448533133681,
         "volume1hUsd": 0,
-        "fees24hUsd": 7.187965189369085,
+        "fees24hUsd": 6.302174334224815,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
@@ -1119,12 +1137,13 @@
       },
       {
         "pair": "MONTRA/HYPE",
-        "tvlUsd": 152.2468725327001,
-        "volume1hUsd": 5.251025719012677,
-        "fees24hUsd": 3.1009092557068842,
+        "tvlUsd": 153.4263363761459,
+        "volume1hUsd": 1.964095363161482,
+        "fees24hUsd": 3.110456815467641,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
+          "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
@@ -1134,12 +1153,13 @@
       },
       {
         "pair": "e/acc/HYPE",
-        "tvlUsd": 5.942730847074529,
+        "tvlUsd": 6.06320258745014,
         "volume1hUsd": 0,
-        "fees24hUsd": 0.008528133410940088,
+        "fees24hUsd": 0.00868222396121204,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
+          "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
@@ -1165,7 +1185,7 @@
       },
       {
         "pair": "BLOB/HYPE",
-        "tvlUsd": 3.612001400982449,
+        "tvlUsd": 3.608106786638195,
         "volume1hUsd": 0,
         "fees24hUsd": 0,
         "decision": "REJECTED",
