@@ -1,7 +1,7 @@
 {
   "fund": "elysium",
   "schemaVersion": 2,
-  "checkedAt": 1794506848774,
+  "checkedAt": 1794507146984,
   "label": "Elysium LP",
   "family": "reborn",
   "risk": "medium",
@@ -9,10 +9,10 @@
     "fund": "elysium",
     "chain": "Elysium",
     "chainId": 99901,
-    "checkedAt": 1794506848774,
+    "checkedAt": 1794507146984,
     "realMoney": true,
     "status": "verified",
-    "updatedAt": 1794506773000,
+    "updatedAt": 1794507087000,
     "nativeAmount": 8.348918388200104,
     "nativePriceUsd": 71.22,
     "tokenUsd": 0,
@@ -759,12 +759,16 @@
     {
       "t": 1794506773000,
       "usd": 594.6099676076115
+    },
+    {
+      "t": 1794507087000,
+      "usd": 594.6099676076115
     }
   ],
   "activity": {
     "source": "Blockchain Elysium",
     "chainId": 99901,
-    "updatedAt": 1794506838000,
+    "updatedAt": 1794507136000,
     "status": "available",
     "quality": {
       "complete": true
@@ -793,7 +797,7 @@
     "risk": "medium",
     "mode": "paper",
     "realMoney": false,
-    "checkedAt": 1794506848774,
+    "checkedAt": 1794507146984,
     "status": "unavailable",
     "updatedAt": null,
     "quality": {
@@ -805,7 +809,7 @@
   "engine": {
     "status": "available",
     "source": "VPS Elysium LP",
-    "updatedAt": 1794506607000,
+    "updatedAt": 1794507013000,
     "quality": {
       "complete": true
     },
@@ -823,6 +827,18 @@
     "revertedCount": 0,
     "gasHype": 0,
     "decisions": [
+      {
+        "at": 1794507013000,
+        "mode": "PAPER",
+        "actions": [
+          {
+            "action": "WAIT",
+            "reasons": [
+              "NO_ELIGIBLE_POOL"
+            ]
+          }
+        ]
+      },
       {
         "at": 1794506606000,
         "mode": "PAPER",
@@ -1098,29 +1114,18 @@
             ]
           }
         ]
-      },
-      {
-        "at": 1794497197000,
-        "mode": "PAPER",
-        "actions": [
-          {
-            "action": "WAIT",
-            "reasons": [
-              "NO_ELIGIBLE_POOL"
-            ]
-          }
-        ]
       }
     ],
     "pools": [
       {
         "pair": "BOXA/HYPE",
-        "tvlUsd": 1298.040026258495,
+        "tvlUsd": 1290.5046977983593,
         "volume1hUsd": 0,
-        "fees24hUsd": 4.627715137527063,
+        "fees24hUsd": 4.404299215047228,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
+          "NATIVE_BINS_STALE_OR_MISSING",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
           "LATEST_SCAN_NOT_USABLE"
@@ -1128,12 +1133,13 @@
       },
       {
         "pair": "MONTRA/HYPE",
-        "tvlUsd": 165.7694036167303,
-        "volume1hUsd": 0,
-        "fees24hUsd": 3.5099696549697423,
+        "tvlUsd": 170.12505501307032,
+        "volume1hUsd": 3.671759920614133,
+        "fees24hUsd": 3.6202568494323026,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
+          "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
@@ -1143,9 +1149,9 @@
       },
       {
         "pair": "HELIOS/HYPE",
-        "tvlUsd": 385.9053599318963,
+        "tvlUsd": 387.13029889421114,
         "volume1hUsd": 0,
-        "fees24hUsd": 0.038131492424991864,
+        "fees24hUsd": 0.0382565292740951,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
@@ -1159,7 +1165,7 @@
       },
       {
         "pair": "99901/HYPE",
-        "tvlUsd": 0.26319350961291516,
+        "tvlUsd": 0.2638685566772794,
         "volume1hUsd": 0,
         "fees24hUsd": 1.5989926641417627e-7,
         "decision": "REJECTED",
@@ -1179,12 +1185,13 @@
       },
       {
         "pair": "e/acc/HYPE",
-        "tvlUsd": 4.126038913335929,
+        "tvlUsd": 4.851047006104738,
         "volume1hUsd": 0,
         "fees24hUsd": 0,
         "decision": "REJECTED",
         "reasons": [
           "CHAIN_STATE_STALE_OR_MISSING",
+          "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
