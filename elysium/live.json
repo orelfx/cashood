@@ -1,7 +1,7 @@
 {
   "fund": "elysium",
   "schemaVersion": 2,
-  "checkedAt": 1794470244752,
+  "checkedAt": 1794470551147,
   "label": "Elysium LP",
   "family": "reborn",
   "risk": "medium",
@@ -9,15 +9,15 @@
     "fund": "elysium",
     "chain": "Elysium",
     "chainId": 99901,
-    "checkedAt": 1794470244752,
+    "checkedAt": 1794470551147,
     "realMoney": true,
     "status": "verified",
-    "updatedAt": 1794470147000,
+    "updatedAt": 1794470499000,
     "nativeAmount": 8.348918388200104,
-    "nativePriceUsd": 71.39,
+    "nativePriceUsd": 71.37,
     "tokenUsd": 0,
     "lpUsd": 0,
-    "totalUsd": 596.0292837336054,
+    "totalUsd": 595.8623053658415,
     "holdings": [],
     "positions": [],
     "quality": {
@@ -723,12 +723,16 @@
     {
       "t": 1794470147000,
       "usd": 596.0292837336054
+    },
+    {
+      "t": 1794470499000,
+      "usd": 595.8623053658415
     }
   ],
   "activity": {
     "source": "Blockchain Elysium",
     "chainId": 99901,
-    "updatedAt": 1794470235000,
+    "updatedAt": 1794470541000,
     "status": "available",
     "quality": {
       "complete": true
@@ -757,19 +761,32 @@
     "risk": "medium",
     "mode": "paper",
     "realMoney": false,
-    "checkedAt": 1794470244752,
-    "status": "unavailable",
-    "updatedAt": null,
+    "checkedAt": 1794470551147,
+    "status": "paper",
+    "updatedAt": 1794470463000,
     "quality": {
-      "complete": false,
+      "complete": true,
       "estimated": true
     },
-    "note": "Data simulasi belum tersedia atau sudah kedaluwarsa. Saldo nyata terpisah."
+    "paper": {
+      "capitalUsd": 1000,
+      "equityUsd": 1000,
+      "cashUsd": 1000,
+      "principalUsd": 0,
+      "netPnlUsd": 0,
+      "realizedPnlUsd": 0,
+      "unrealizedPnlUsd": 0,
+      "feesUsd": 0,
+      "costsUsd": 0,
+      "openPositions": 0,
+      "feeEstimated": true
+    },
+    "note": "Hasil simulasi; tidak termasuk dalam total aset nyata atau saham investor."
   },
   "engine": {
     "status": "available",
     "source": "VPS Elysium LP",
-    "updatedAt": 1794470044000,
+    "updatedAt": 1794470463000,
     "quality": {
       "complete": true
     },
@@ -787,6 +804,18 @@
     "revertedCount": 0,
     "gasHype": 0,
     "decisions": [
+      {
+        "at": 1794470462000,
+        "mode": "PAPER",
+        "actions": [
+          {
+            "action": "WAIT",
+            "reasons": [
+              "NO_ELIGIBLE_POOL"
+            ]
+          }
+        ]
+      },
       {
         "at": 1794470043000,
         "mode": "PAPER",
@@ -1062,67 +1091,63 @@
             ]
           }
         ]
-      },
-      {
-        "at": 1794461193000,
-        "mode": "PAPER",
-        "actions": [
-          {
-            "action": "WAIT",
-            "reasons": [
-              "NO_ELIGIBLE_POOL"
-            ]
-          }
-        ]
       }
     ],
     "pools": [
       {
         "pair": "HELIOS/HYPE",
-        "tvlUsd": 446.2675876589319,
+        "tvlUsd": 444.90211875005906,
         "volume1hUsd": 0,
-        "fees24hUsd": 14.019323360478126,
+        "fees24hUsd": 13.035995685270182,
         "decision": "REJECTED",
         "reasons": [
+          "CHAIN_STATE_STALE_OR_MISSING",
           "NO_ACTIVE_LIQUIDITY",
           "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
-          "VOLUME_1H_TOO_LOW_OR_MISSING"
+          "VOLUME_1H_TOO_LOW_OR_MISSING",
+          "LATEST_SCAN_NOT_USABLE"
         ]
       },
       {
         "pair": "BOXA/HYPE",
-        "tvlUsd": 1370.5294593928388,
-        "volume1hUsd": 14.86337814223365,
-        "fees24hUsd": 10.49656513762167,
+        "tvlUsd": 1385.3978199148285,
+        "volume1hUsd": 25.560972236885878,
+        "fees24hUsd": 9.508591420888257,
         "decision": "REJECTED",
         "reasons": [
-          "VOLUME_1H_TOO_LOW_OR_MISSING"
+          "CHAIN_STATE_STALE_OR_MISSING",
+          "VOLUME_1H_TOO_LOW_OR_MISSING",
+          "LATEST_SCAN_NOT_USABLE"
         ]
       },
       {
         "pair": "MONTRA/HYPE",
-        "tvlUsd": 159.3500537698177,
-        "volume1hUsd": 3.3720149085623676,
-        "fees24hUsd": 3.1729385790502747,
+        "tvlUsd": 158.86074948906833,
+        "volume1hUsd": 1.202684316725683,
+        "fees24hUsd": 3.170846279410613,
         "decision": "REJECTED",
         "reasons": [
+          "CHAIN_STATE_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "BUNDLED_SUPPLY"
+          "BUNDLED_SUPPLY",
+          "LATEST_SCAN_NOT_USABLE"
         ]
       },
       {
         "pair": "e/acc/HYPE",
-        "tvlUsd": 5.2552946279935835,
+        "tvlUsd": 5.196536865932656,
         "volume1hUsd": 0,
-        "fees24hUsd": 0.013943634015420514,
+        "fees24hUsd": 0.0138247255683818,
         "decision": "REJECTED",
         "reasons": [
+          "CHAIN_STATE_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
-          "VOLUME_1H_TOO_LOW_OR_MISSING"
+          "VOLUME_1H_TOO_LOW_OR_MISSING",
+          "LATEST_SCAN_NOT_USABLE"
         ]
       },
       {
@@ -1132,27 +1157,31 @@
         "fees24hUsd": 0,
         "decision": "REJECTED",
         "reasons": [
+          "CHAIN_STATE_STALE_OR_MISSING",
           "NO_ACTIVE_LIQUIDITY",
           "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "POOL_FEES_MISSING_OR_ZERO"
+          "POOL_FEES_MISSING_OR_ZERO",
+          "LATEST_SCAN_NOT_USABLE"
         ]
       },
       {
         "pair": "BLOB/HYPE",
-        "tvlUsd": 3.622994546277666,
+        "tvlUsd": 3.544402367923536,
         "volume1hUsd": 0,
         "fees24hUsd": 0,
         "decision": "REJECTED",
         "reasons": [
+          "CHAIN_STATE_STALE_OR_MISSING",
           "NO_ACTIVE_LIQUIDITY",
           "NATIVE_BINS_STALE_OR_MISSING",
           "TVL_TOO_LOW",
           "VOLUME_24H_TOO_LOW",
           "VOLUME_1H_TOO_LOW_OR_MISSING",
-          "POOL_FEES_MISSING_OR_ZERO"
+          "POOL_FEES_MISSING_OR_ZERO",
+          "LATEST_SCAN_NOT_USABLE"
         ]
       }
     ],
