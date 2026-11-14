@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "df2957f5-9582-4353-8884-42e9080ab06e",
-  "updatedAt": 1794661943957,
-  "generatedAt": "2026-11-14 20:12 WIB",
+  "generation": "1c8382ae-c588-43d6-8227-16ab7766b184",
+  "updatedAt": 1794662316510,
+  "generatedAt": "2026-11-14 20:18 WIB",
   "usdIdr": null,
   "totalUsd": 880.0147922742536,
   "nativeSymbol": "SOL",
@@ -1379,12 +1379,12 @@
     "pnlUsd": -119.98520772574636,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1794661943957,
+    "heartbeatAt": 1794662316510,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 12.82,
-    "lastScanAt": 1794661902000,
+    "lastScanAt": 1794662141000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1405,13 +1405,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "41",
+        "v": "43",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "41134",
-        "n": "587 aktif"
+        "n": "588 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1421,9 +1421,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1794661943957,
+      "lastDecisionAt": 1794662316510,
       "lastAction": "keputusan",
-      "lastReason": "HAPPYRAT [degen]: Dilewati: harga sudah -28% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      "lastReason": "RAMBO [mid]: Dilewati karena red flag: likuiditas cuma 2.5% dari market cap."
     }
   },
   "strategy": {
@@ -1442,7 +1442,7 @@
       ],
       [
         "Wallet dipantau",
-        "41134 · 587 aktif"
+        "41134 · 588 aktif"
       ],
       [
         "Cadangan kas",
@@ -1503,16 +1503,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 41134,
-      "active": 587,
-      "passive": 40547,
+      "active": 588,
+      "passive": 40546,
       "trusted": 0,
       "promising": 9,
       "byLabel": [
         {
           "key": "smart",
           "total": 24436,
-          "active": 555,
-          "passive": 23881
+          "active": 556,
+          "passive": 23880
         },
         {
           "key": "bot",
@@ -1664,6 +1664,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1794662031914,
+        "symbol": "RAMBO",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 2.5% dari market cap."
+      },
+      {
+        "at": 1794662011830,
+        "symbol": "DYC",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          },
+          {
+            "type": "bundler",
+            "count": 267,
+            "note": "bundler pegang 30.3%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 10.4%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.1%"
+          },
+          {
+            "type": "wash",
+            "count": null,
+            "note": "volume 1 jam 9x likuiditas"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
       {
         "at": 1794661700486,
         "symbol": "HAPPYRAT",
@@ -2400,26 +2447,6 @@
           "smart": 1
         },
         "reason": "Dilewati karena red flag: insider/entrapment pegang 23%."
-      },
-      {
-        "at": 1793775222735,
-        "symbol": "XTX",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 69%."
-      },
-      {
-        "at": 1793774986354,
-        "symbol": "STARMIND",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: dev masih pegang 79.31%."
       }
     ],
     "reasonStats": {
@@ -2430,7 +2457,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 34,
+        "red_flag": 36,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2480,7 +2507,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1794661978100,
+    "generatedAt": 1794662382406,
     "trades": {
       "count": 156,
       "wins": 63,
