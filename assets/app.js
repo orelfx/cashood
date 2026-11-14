@@ -4999,7 +4999,7 @@ async function renderGrowth(g, paper = []) {
       // Titik baru-baru ini (≤48 jam) yang jaraknya >3 jam dari t berarti deretnya
       // sempat putus: nilainya tidak diketahui, bukan sama dengan titik terakhir
       // sebelum putus (RISK Elysium 10–14 Nov terbaca −31% dalam 24 jam).
-      if (at && !b.frozen && now - t <= 48 * 3600e3 && t - at.t > 3 * 3600e3 && series[i].some((p) => p.t > t)) at = null;
+      if (at && !b.frozen && now - t <= 48 * 3600e3 && t - at.t > 3 * 3600e3 && (series[i].some((p) => p.t > t) || at === series[i].at(-1))) at = null;
       return { id: b.id, name: b.label, color: b.accent, known: latest || Boolean(at), usd: latest ? b.totalUsd : (at ? at.usd + flowsAfter(b.flows, at.t) : 0) };   // arus kas sesudah titik itu diamati
     });
     // Safe Box: nilai di titik t = saldo sekarang − bunga harian yang masuk sesudah t
