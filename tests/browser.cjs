@@ -392,7 +392,7 @@ console.log('PASS complete forecast render');
    const home=document.querySelector('#homeAum').textContent;
    return {detail,home,excluded:(await portoTotals()).missing.includes('riskelysium')};
  })()`);
- assert.match(partialCheck.detail,/HELIOS/);assert.match(partialCheck.detail,/UNPRICED/);assert.match(partialCheck.detail,/Harga belum tersedia/);assert.match(partialCheck.home,/RISK Elysium/);assert.match(partialCheck.home,/sebagian/);assert.equal(partialCheck.excluded,true);
+ assert.match(partialCheck.detail,/HELIOS/);assert.match(partialCheck.detail,/UNPRICED/);assert.match(partialCheck.detail,/Harga belum tersedia/);assert.match(partialCheck.home,/RISK Elysium/);assert.match(partialCheck.home,/token tanpa harga dihitung \$0/);assert.equal(partialCheck.excluded,false);
  const dashboard=await ev(`(async()=>{
    const at=Date.now(),row=elysiumCache.get('elysium');row.at=at;row.data.curve=[{t:at-1200000,usd:90},{t:at-600000,usd:95},{t:at,usd:100}];
    location.hash='#elysium/analys';await new Promise(r=>setTimeout(r,100));await renderElysium('elysium');
