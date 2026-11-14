@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "80dc656e-4346-4855-9961-d45e701ef273",
-  "updatedAt": 1794666894633,
-  "generatedAt": "2026-11-14 21:34 WIB",
+  "generation": "a37f7739-258b-4dcb-ac0a-3d8c33f56111",
+  "updatedAt": 1794667215724,
+  "generatedAt": "2026-11-14 21:40 WIB",
   "usdIdr": null,
   "totalUsd": 880.0147922742536,
   "nativeSymbol": "SOL",
@@ -1379,12 +1379,12 @@
     "pnlUsd": -119.98520772574636,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1794666894633,
+    "heartbeatAt": 1794667215724,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 12.82,
-    "lastScanAt": 1794666849000,
+    "lastScanAt": 1794667012000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1405,7 +1405,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "59",
+        "v": "61",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1421,9 +1421,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1794666894633,
+      "lastDecisionAt": 1794667215724,
       "lastAction": "keputusan",
-      "lastReason": "RAMBO [mid]: Dilewati karena red flag: likuiditas cuma 2.5% dari market cap."
+      "lastReason": "RAMBO [mid]: Dilewati karena red flag: likuiditas cuma 2.4% dari market cap."
     }
   },
   "strategy": {
@@ -1664,6 +1664,26 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1794667044935,
+        "symbol": "RAMBO",
+        "action": "skip",
+        "basket": "mid",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma 2.4% dari market cap."
+      },
+      {
+        "at": 1794667029360,
+        "symbol": "VI",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -36% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1794666439663,
         "symbol": "RAMBO",
@@ -2414,72 +2434,17 @@
           }
         ],
         "reason": "Dilewati karena red flag: mint authority belum dilepas."
-      },
-      {
-        "at": 1794634837948,
-        "symbol": "RAM",
-        "action": "exit",
-        "basket": "low",
-        "wallets": {
-          "smart": 5,
-          "bot": 1
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 13,
-            "note": "13 wallet blacklist kita ikut membeli (tidak dihitung)"
-          },
-          {
-            "type": "bundler",
-            "count": 1000,
-            "note": "bundler pegang 39.5%"
-          },
-          {
-            "type": "rat",
-            "count": 6,
-            "note": "insider/entrapment pegang 13.4%"
-          },
-          {
-            "type": "sniper",
-            "count": null,
-            "note": "sniper awal masih pegang 22.4%"
-          },
-          {
-            "type": "wash",
-            "count": null,
-            "note": "volume 1 jam 34x likuiditas"
-          }
-        ],
-        "reason": "Keluar (rug): Likuiditas anjlok lebih dari 70% saat posisi rugi, keluar darurat setelah 240,0 jam. Hasil -99,7%."
-      },
-      {
-        "at": 1794634788863,
-        "symbol": "TTWO",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 2
-        },
-        "flags": [
-          {
-            "type": "blacklist",
-            "count": 5,
-            "note": "5 wallet blacklist kita ikut membeli (tidak dihitung)"
-          }
-        ],
-        "reason": "Dilewati karena red flag: mint authority belum dilepas."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 4,
+        "below_entry": 5,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 51,
+        "red_flag": 52,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2529,7 +2494,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1794667093060,
+    "generatedAt": 1794667358378,
     "trades": {
       "count": 156,
       "wins": 63,
