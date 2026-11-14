@@ -1,7 +1,7 @@
 {
   "fund": "elysium",
   "schemaVersion": 2,
-  "checkedAt": 1794695306565,
+  "checkedAt": 1794695575634,
   "label": "Elysium LP",
   "family": "reborn",
   "risk": "medium",
@@ -9,15 +9,15 @@
     "fund": "elysium",
     "chain": "Elysium",
     "chainId": 99901,
-    "checkedAt": 1794695306565,
+    "checkedAt": 1794695575634,
     "realMoney": true,
     "status": "verified",
-    "updatedAt": 1794695251000,
+    "updatedAt": 1794695468000,
     "nativeAmount": 8.348918388200104,
-    "nativePriceUsd": 63.28,
+    "nativePriceUsd": 63.31,
     "tokenUsd": 0,
     "lpUsd": 0,
-    "totalUsd": 528.3195556053026,
+    "totalUsd": 528.5700231569487,
     "holdings": [],
     "positions": [],
     "quality": {
@@ -975,12 +975,16 @@
     {
       "t": 1794695251000,
       "usd": 528.3195556053026
+    },
+    {
+      "t": 1794695468000,
+      "usd": 528.5700231569487
     }
   ],
   "activity": {
     "source": "Blockchain Elysium",
     "chainId": 99901,
-    "updatedAt": 1794695295000,
+    "updatedAt": 1794695565000,
     "status": "available",
     "quality": {
       "complete": true
@@ -1009,19 +1013,32 @@
     "risk": "medium",
     "mode": "paper",
     "realMoney": false,
-    "checkedAt": 1794695306565,
-    "status": "unavailable",
-    "updatedAt": null,
+    "checkedAt": 1794695575634,
+    "status": "paper",
+    "updatedAt": 1794695544000,
     "quality": {
-      "complete": false,
+      "complete": true,
       "estimated": true
     },
-    "note": "Data simulasi belum tersedia atau sudah kedaluwarsa. Saldo nyata terpisah."
+    "paper": {
+      "capitalUsd": 1000,
+      "equityUsd": 1000,
+      "cashUsd": 1000,
+      "principalUsd": 0,
+      "netPnlUsd": 0,
+      "realizedPnlUsd": 0,
+      "unrealizedPnlUsd": 0,
+      "feesUsd": 0,
+      "costsUsd": 0,
+      "openPositions": 0,
+      "feeEstimated": true
+    },
+    "note": "Hasil simulasi; tidak termasuk dalam total aset nyata atau saham investor."
   },
   "engine": {
     "status": "available",
     "source": "VPS Elysium LP",
-    "updatedAt": 1794695086000,
+    "updatedAt": 1794695544000,
     "quality": {
       "complete": true
     },
@@ -1039,6 +1056,18 @@
     "revertedCount": 0,
     "gasHype": 0,
     "decisions": [
+      {
+        "at": 1794695544000,
+        "mode": "PAPER",
+        "actions": [
+          {
+            "action": "WAIT",
+            "reasons": [
+              "NO_ELIGIBLE_POOL"
+            ]
+          }
+        ]
+      },
       {
         "at": 1794695085000,
         "mode": "PAPER",
@@ -1305,18 +1334,6 @@
       },
       {
         "at": 1794683717000,
-        "mode": "PAPER",
-        "actions": [
-          {
-            "action": "WAIT",
-            "reasons": [
-              "NO_ELIGIBLE_POOL"
-            ]
-          }
-        ]
-      },
-      {
-        "at": 1794683230000,
         "mode": "PAPER",
         "actions": [
           {
