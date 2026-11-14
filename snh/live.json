@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "10e90782-c412-4113-a551-a55b4a3c1cdf",
-  "updatedAt": 1794651156130,
-  "generatedAt": "2026-11-14 17:12 WIB",
+  "generation": "d3328fd4-c14c-4b1e-b347-61e77d749a35",
+  "updatedAt": 1794651515495,
+  "generatedAt": "2026-11-14 17:18 WIB",
   "usdIdr": null,
   "totalUsd": 880.0147922742536,
   "nativeSymbol": "SOL",
@@ -1379,12 +1379,12 @@
     "pnlUsd": -119.98520772574636,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1794651156130,
+    "heartbeatAt": 1794651515495,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 12.82,
-    "lastScanAt": 1794650985000,
+    "lastScanAt": 1794651392000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1405,7 +1405,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "23",
+        "v": "25",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1421,9 +1421,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1794651156130,
+      "lastDecisionAt": 1794651515495,
       "lastAction": "keputusan",
-      "lastReason": "Peggy [degen]: Dilewati karena red flag: bundler pegang 27% supply."
+      "lastReason": "LMT [low]: Dilewati karena red flag: mint authority belum dilepas."
     }
   },
   "strategy": {
@@ -1664,6 +1664,48 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1794651239303,
+        "symbol": "LMT",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: mint authority belum dilepas."
+      },
+      {
+        "at": 1794651227690,
+        "symbol": "NN",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "bundler",
+            "count": 133,
+            "note": "bundler pegang 2.9%"
+          },
+          {
+            "type": "rat",
+            "count": null,
+            "note": "insider/entrapment pegang 5.3%"
+          },
+          {
+            "type": "sniper",
+            "count": 1,
+            "note": "sniper awal masih pegang 0.0%"
+          },
+          {
+            "type": "fresh",
+            "count": 171,
+            "note": "5.6% holder wallet baru"
+          }
+        ],
+        "reason": "Dilewati: solo_test: isolated virtual capital."
+      },
       {
         "at": 1794650478091,
         "symbol": "Peggy",
@@ -2300,26 +2342,6 @@
         "basket": null,
         "wallets": {},
         "reason": "Dilewati: harga token tidak tersedia saat keputusan."
-      },
-      {
-        "at": 1793770577879,
-        "symbol": "NIO",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -20% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1793770525333,
-        "symbol": "Other",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -40% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
       }
     ],
     "reasonStats": {
@@ -2330,7 +2352,7 @@
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 18,
+        "red_flag": 20,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2380,7 +2402,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1794651187848,
+    "generatedAt": 1794651568933,
     "trades": {
       "count": 156,
       "wins": 63,
