@@ -14,7 +14,10 @@ for(const fund of ['elysium','riskelysium']){
  const custody=elysiumCustody({...observed,fund,chainId:observed.chainId??99901},now);
  const navFile=resolve(data,fund,'nav.local.json');
  const previous=readJSON(navFile,{points:[]});
- if(custody.quality.complete && (!previous.points.length || custody.updatedAt>previous.points.at(-1).t))previous.points=downsample([...previous.points,{t:custody.updatedAt,usd:custody.totalUsd}],now);
+ // Saldo sebagian (token tanpa harga dihitung $0) juga dicatat, sama seperti di Total aset;
+ // dulu kurva berhenti total begitu ada satu token tanpa harga.
+ const value=custody.quality.complete?custody.totalUsd:custody.status==='partial'&&Number.isFinite(custody.knownTotalUsd)?custody.knownTotalUsd:null;
+ if(value!=null && (!previous.points.length || custody.updatedAt>previous.points.at(-1).t))previous.points=downsample([...previous.points,{t:custody.updatedAt,usd:value,...(custody.quality.complete?{}:{partial:true})}],now);
  atomicJSON(navFile,previous);
  const snapshot={fund,schemaVersion:2,checkedAt:now,label:cfg.label,family:cfg.family,risk:cfg.risk,custody,
   funding:cfg.funding,curve:previous.points,activity:readJSON(resolve(data,fund,'activity.local.json')),...(fund==='elysium'?{simulation:elysiumPaper(source,now),engine:readJSON(resolve(data,fund,'engine.local.json'))}:{})};
