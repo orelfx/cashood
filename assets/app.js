@@ -5186,7 +5186,7 @@ async function renderHome() {
   const box = g.box;
 
   // ── total aset + alokasi ──
-  const parts = [...g.briefs.map((b) => ({ id: b.id, name: b.label, color: b.accent, usd: b.totalUsd, late: b.late ? b.updatedAt : null })),
+  const parts = [...g.briefs.map((b) => ({ id: b.id, name: b.label, color: b.accent, usd: b.totalUsd, late: b.late ? b.updatedAt : null, note: b.partialNote || null })),
     ...(box ? [{ id: 'safebox', name: state.safebox.label, color: state.safebox.accent, usd: g.simpanan }] : [])]
     .filter((p) => p.usd > 0).sort((a, b) => b.usd - a.usd);
   const pnlPct = g.setoran ? (g.untung / g.setoran) * 100 : 0;
@@ -5202,7 +5202,7 @@ async function renderHome() {
     <div class="alloc">${parts.map((p) => `<i style="width:${g.total ? (p.usd / g.total) * 100 : 0}%;background:${p.color}" title="${esc(p.name)}"></i>`).join('')}</div>
     <ul class="alloc-legend">${parts.map((p) => `<li>
       <span class="chip" style="background:${p.color}"></span>
-      <span class="leg-l"><span class="nm">${esc(p.name)}</span><span class="leg-w">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'} dari total${p.late ? ` · data terakhir ${esc(sbWib(p.late))}` : ''}</span></span>
+      <span class="leg-l"><span class="nm">${esc(p.name)}</span><span class="leg-w">${g.total ? pct((p.usd / g.total) * 100, 1) : '—'} dari total${p.late ? ` · data terakhir ${esc(sbWib(p.late))}` : ''}${p.note ? ` · ${esc(p.note)}` : ''}</span></span>
       <span class="leg-r"><span class="v">${usd(p.usd, 0)}</span><span class="leg-chg" data-leg="${esc(p.id)}"></span></span></li>`).join('')}</ul>
     ${g.missing.map(id=>`<div class="aum-row"><a href="#${['elysium','riskelysium'].includes(id)?id:id+'/portfolio'}">${esc(state[id]?.label||state.funds.find(f=>f.id===id)?.label||id)}</a><span>${['elysium','riskelysium'].includes(id)?esc(custodyValue(elysiumCache.get(id)?.data)):'Menunggu pembaruan'}</span></div>`).join('')}
     <div class="aum-foot">diperbarui ${ago(tua)} · tidak termasuk dana simulasi</div>`);
@@ -5827,8 +5827,12 @@ async function renderElysium(id){
 }
 
 async function elysiumBrief(id){
- const d=await loadElysium(id),c=d?.custody,meta=state[id];
- if(!meta||!custodyFresh(d))return null;
+ const d=await loadElysium(id),c0=d?.custody,meta=state[id];
+ if(!meta||!custodyReadable(d))return null;
+ // Saldo sebagian (ada token tanpa harga pasar): bagian yang sudah bernilai tetap
+ // dijumlahkan ke Total aset, ditandai di barisnya; token tanpa harga dihitung $0.
+ // Dulu seluruh dana dikeluarkan dan total beranda ditandai "sebagian".
+ const partial=!custodyFresh(d),c=partial?{...c0,totalUsd:c0.knownTotalUsd}:c0;
  const capital=d.funding?.declaredUsd??null;
  const events=elysiumFundingEvents(d.funding);
  const deposits=events.filter(e=>e.type==='deposit').reduce((n,e)=>n+e.usd,0);
@@ -5836,7 +5840,8 @@ async function elysiumBrief(id){
  const owner={id:'orel',name:'Orel',color:'#4ade80',share:100,value:c.totalUsd,deposited:deposits,withdrawn:withdrawals};
  return {id,label:meta.label,chain:'Elysium',accent:meta.accent,totalUsd:c.totalUsd,depositedUsd:deposits,pnlUsd:capital==null?null:c.totalUsd+withdrawals-capital,updatedAt:c.updatedAt,risk:meta.risk,paper:false,cfg:{events},
   internalTransfers:events.filter(e=>e.type==='deposit'&&e.sourceFund&&e.sourceEvent).map(e=>({owner:e.owner,sourceFund:e.sourceFund,sourceEvent:e.sourceEvent,usd:e.usd})),
-  flows:events.map(e=>({at:e.at,usd:e.type==='withdraw'?-e.usd:e.usd})),series:d.curve||[],owners:[owner],holders:[owner],openCount:(c.positions||[]).length,closedCount:0,winRate:null,history:[],basisIncomplete:capital==null};
+  flows:events.map(e=>({at:e.at,usd:e.type==='withdraw'?-e.usd:e.usd})),series:d.curve||[],owners:[owner],holders:[owner],openCount:(c.positions||[]).length,closedCount:0,winRate:null,history:[],basisIncomplete:capital==null,
+  partialNote:partial?`${(c0.unpriced||[]).length||c0.unresolvedCount||'ada'} token tanpa harga dihitung $0`:null};
 }
 
 function elysiumAssetDetails(c,funding){
