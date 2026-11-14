@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "33449c88-2b3f-4d98-9fc4-77294689a1c4",
-  "updatedAt": 1794647378814,
-  "generatedAt": "2026-11-14 16:09 WIB",
+  "generation": "e6bc5fa3-f948-4e0b-b83a-92c407ba7a4e",
+  "updatedAt": 1794647682457,
+  "generatedAt": "2026-11-14 16:14 WIB",
   "usdIdr": null,
   "totalUsd": 880.0147922742536,
   "nativeSymbol": "SOL",
@@ -1379,7 +1379,7 @@
     "pnlUsd": -119.98520772574636,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1794647378814,
+    "heartbeatAt": 1794647682457,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
@@ -1405,13 +1405,13 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "17",
+        "v": "18",
         "n": "24 jam · 0 diveto LLM"
       },
       {
         "k": "Wallet dipantau",
         "v": "41126",
-        "n": "585 aktif"
+        "n": "584 aktif"
       },
       {
         "k": "Buka · tutup",
@@ -1421,9 +1421,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1794647378814,
+      "lastDecisionAt": 1794647682457,
       "lastAction": "keputusan",
-      "lastReason": "mihao [?]: Dilewati: harga token tidak tersedia saat keputusan."
+      "lastReason": "birdball [degen]: Dilewati: harga sudah -58% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1442,7 +1442,7 @@
       ],
       [
         "Wallet dipantau",
-        "41126 · 585 aktif"
+        "41126 · 584 aktif"
       ],
       [
         "Cadangan kas",
@@ -1503,16 +1503,16 @@
   "copyTrade": {
     "wallets": {
       "tracked": 41126,
-      "active": 585,
-      "passive": 40541,
+      "active": 584,
+      "passive": 40542,
       "trusted": 0,
       "promising": 8,
       "byLabel": [
         {
           "key": "smart",
           "total": 24437,
-          "active": 553,
-          "passive": 23884
+          "active": 552,
+          "passive": 23885
         },
         {
           "key": "bot",
@@ -1664,6 +1664,23 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1794647535308,
+        "symbol": "birdball",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 1,
+            "note": "1 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati: harga sudah -58% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
       {
         "at": 1794636253592,
         "symbol": "mihao",
@@ -2308,22 +2325,12 @@
           }
         ],
         "reason": "Dilewati: biaya beli lalu jual 8,0% terlalu mahal (likuiditas tipis, batas 6%)."
-      },
-      {
-        "at": 1793769971747,
-        "symbol": "CPU",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: bundler pegang 74.2% supply."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 0,
+        "below_entry": 1,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
@@ -2378,7 +2385,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1794647589249,
+    "generatedAt": 1794647995118,
     "trades": {
       "count": 156,
       "wins": 63,
