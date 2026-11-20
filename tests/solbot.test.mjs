@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -139,4 +139,20 @@ test('solbot: kiriman rusak sesudah data sah → angka terakhir dipertahankan (s
   assert.equal(d.status, 'stale');
   assert.equal(d.equityUsd, ok.equityUsd);
   assert.equal(d.asOf, ok.asOf);
+});
+
+test('solbot: setoran yang dicatat Cashood (flows-extra.json) masuk modal sampai bot mencatatnya sendiri', () => {
+  const extra = { flows: [{ t: iso(20), type: 'deposit', usd: 100, sol: 1, note: 'pindahan dana Orel' }] };
+  const withExtra = (src) => { const dir = mkdtempSync(join(tmpdir(), 'solbot-')); mkdirSync(join(dir, 'data', 'solbot'), { recursive: true }); writeFileSync(join(dir, 'data', 'solbot', 'flows-extra.json'), JSON.stringify(extra)); return run(src, NOW, dir); };
+  const d = withExtra(source({ equity_usd: 196.3, capital_in_usd: 107, net_pnl_usd: 89.3, net_pnl_pct: 83.46 }));
+  assert.equal(d.flows.length, 1);
+  assert.equal(d.netFlowUsd, 100);
+  assert.equal(d.capitalInUsd, 207);
+  assert.equal(d.botNetPnlUsd, -10.7);
+  assert.equal(d.botNetPnlPct, -5.17);
+  // Bot sudah mengirim setoran yang sama → catatan Cashood dilewati, tidak dihitung dua kali.
+  const e = withExtra(source({ equity_usd: 196.3, capital_in_usd: 207, net_pnl_usd: -10.7, net_pnl_pct: -5.17, flows: [{ t: iso(19), type: 'deposit', usd: 98.5 }] }));
+  assert.equal(e.flows.length, 1);
+  assert.equal(e.netFlowUsd, 98.5);
+  assert.equal(e.capitalInUsd, 207);
 });

@@ -112,8 +112,16 @@ const closedStat = (list) => {
 const startUsd = r2(src.start_capital_usd), equityUsd = r2(src.equity_usd);
 // Field tambahan (opsional, aditif di v1): arus dana, biaya, untung terealisasi.
 // Nama field t/usd/sol (spesifikasi) atau at/amount_usd/amount_sol (yang dikirim bot) sama-sama diterima.
-const flows = arr(src.flows).map((f) => ({ t: time(f.t ?? f.at), usd: r2(f.usd ?? f.amount_usd), sol: r4(f.sol ?? f.amount_sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null, note: text(f.note, 200) }))
-  .filter((f) => f.t && f.usd != null && f.type).sort((a, b) => a.t - b.t);
+const flowRow = (f) => ({ t: time(f.t ?? f.at), usd: r2(f.usd ?? f.amount_usd), sol: r4(f.sol ?? f.amount_sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null, note: text(f.note, 200) });
+const botFlows = arr(src.flows).map(flowRow).filter((f) => f.t && f.usd != null && f.type);
+// Transfer antar-dana yang dicatat dari sisi Cashood (data/solbot/flows-extra.json) karena bot
+// belum mencatatnya. Begitu bot mengirim arus yang sama (±3 jam, nilai ±10%), catatan Cashood dilewati.
+let extraFile = null;
+try { extraFile = JSON.parse(readFileSync(resolve(DIR, 'flows-extra.json'), 'utf8')); } catch {}
+const extraFlows = arr(extraFile?.flows).map(flowRow).filter((f) => f.t && f.usd != null && f.type)
+  .filter((e) => !botFlows.some((b) => b.type === e.type && Math.abs(b.t - e.t) <= 3 * 3600e3 && Math.abs(Math.abs(b.usd) - Math.abs(e.usd)) <= 0.1 * Math.abs(e.usd)));
+const extraNetUsd = extraFlows.reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0);
+const flows = [...botFlows, ...extraFlows].sort((a, b) => a.t - b.t);
 const netFlowUsd = flows.length ? r2(flows.reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0)) : 0;
 const basisUsd = startUsd > 0 ? r2(startUsd + netFlowUsd) : null;   // modal awal + setoran − penarikan
 const st = src.stats && typeof src.stats === 'object' ? src.stats : {};
@@ -121,6 +129,12 @@ const st = src.stats && typeof src.stats === 'object' ? src.stats : {};
 const day = curve.length ? curve.filter((p) => p.t <= asOf - 20 * 3600e3).at(-1) : null;
 const flows24 = flows.filter((f) => day && f.t > day.t).reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0);
 
+function botPnl() {
+  const cap = r2(src.capital_in_usd), pnl = r2(src.net_pnl_usd);
+  if (!extraFlows.length) return { capitalInUsd: cap, botNetPnlUsd: pnl, botNetPnlPct: r2(src.net_pnl_pct) };
+  const capitalInUsd = cap == null ? null : r2(cap + extraNetUsd), botNetPnlUsd = pnl == null ? null : r2(pnl - extraNetUsd);
+  return { capitalInUsd, botNetPnlUsd, botNetPnlPct: capitalInUsd > 0 && botNetPnlUsd != null ? r2((botNetPnlUsd / capitalInUsd) * 100) : null };
+}
 const snapshot = {
   fund: 'solbot', status: late ? 'stale' : 'ok', ...(late ? { reason: 'Data tertunda' } : {}), schema: SCHEMA, realMoney: true,
   mode, haltReason: text(src.halt_reason, 200),
@@ -133,7 +147,7 @@ const snapshot = {
   basisUsd, netFlowUsd, flows,
   change24hUsd: day && equityUsd != null ? r2(equityUsd - day.usd - flows24) : null,
   change24hPct: day && day.usd > 0 && equityUsd != null ? r2(((equityUsd - flows24) / day.usd - 1) * 100) : null,
-  capitalInUsd: r2(src.capital_in_usd), botNetPnlUsd: r2(src.net_pnl_usd), botNetPnlPct: r2(src.net_pnl_pct),
+  ...botPnl(),
   realizedPnlUsd: r2(src.realized_pnl_usd), unrealizedPnlUsd: r2(src.unrealized_pnl_usd), feesUsd: r2(src.fees_usd),
   strategy: text(src.strategy, 300),
   totals: { trades: num(st.trades_total), wins: num(st.wins), losses: num(st.losses), winRatePct: r2(st.win_rate_pct), bestPct: r2(st.best_trade_pct), worstPct: r2(st.worst_trade_pct), avgHoldMin: r2(st.avg_hold_min) },

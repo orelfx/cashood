@@ -25,7 +25,22 @@ test('November 11 bridge and onward HYPE transfers preserve Orel-only ownership 
  const before=Core.buildLedger(f,{before:e.at}),after=Core.buildLedger(f,{before:e.at+1});
  for(const o of before.owners){const p=after.owners.find(x=>x.id===o.id);if(o.id!=='orel')assert.equal(p.units,o.units);}
  const incoming=r.funding.events.find(x=>x.sourceEvent===e.id);assert.equal(incoming.usd,e.usd);
- const outgoing=r.funding.events.filter(x=>x.type==='withdraw');assert.equal(outgoing.reduce((n,x)=>n+x.nativeAmount,0),7);
+ const outgoing=r.funding.events.filter(x=>x.type==='withdraw'&&x.destinationFund==='elysium');assert.equal(outgoing.reduce((n,x)=>n+x.nativeAmount,0),7);
  for(const out of outgoing){const dest=lp.funding.events.find(x=>x.sourceEvent===out.id);assert.equal(dest.usd,out.usd);assert.equal(dest.owner,'orel');assert.equal(dest.at,out.at);}
  assert.equal(lp.funding.declaredUsd,605.47);assert.equal(r.funding.declaredUsd,null);
+});
+test('November 20: Elysium, RISK Elysium, Reborn and Ferari move to SolBot as Orel-only internal transfers',()=>{
+ const rb=require('../data/reborn/config.json'),f=require('../data/ferari/config.json'),r=require('../data/riskelysium/config.json'),lp=require('../data/elysium/config.json');
+ const ids=['reborn-orel-dari-elysium-20261120','reborn-orel-ke-ferari-20261120'];
+ for(const [cfg,list] of [[rb,ids],[f,['ferari-orel-dari-riskelysium-20261120','ferari-orel-dari-reborn-20261120','ferari-orel-ke-solbot-20261120']]])
+  for(const id of list){const e=cfg.events.find(x=>x.id===id);assert.ok(e,id);assert.equal(e.owner,'orel');
+   const before=Core.buildLedger(cfg,{before:e.at}),after=Core.buildLedger(cfg,{before:e.at+1});
+   const price=(L)=>e.navBefore/L.totalUnits;
+   for(const o of before.owners){const p=after.owners.find(x=>x.id===o.id);if(o.id!=='orel')assert.equal(p.units,o.units);}
+   const post=after.totalUnits?(e.navBefore+(e.type==='deposit'?e.usd:-e.usd))/after.totalUnits:price(before);assert.ok(Math.abs(post-price(before))<1e-6,id+' keeps unit price');}
+ assert.equal(rb.events.find(x=>x.id===ids[1]).usd-rb.events.find(x=>x.id===ids[0]).usd,789.05);
+ assert.equal(f.events.find(x=>x.id==='ferari-orel-dari-reborn-20261120').usd,rb.events.find(x=>x.id===ids[1]).usd);
+ assert.equal(r.funding.events.find(x=>x.id==='riskelysium-orel-ke-ferari-20261120').nativeAmount,2.08904);
+ assert.equal(lp.funding.events.find(x=>x.id==='elysium-orel-ke-reborn-20261120').nativeAmount,8.34692);
+ const sb=require('../data/solbot/flows-extra.json').flows;assert.equal(sb.length,1);assert.equal(sb[0].type,'deposit');assert.ok(sb[0].usd<1903.14);
 });
