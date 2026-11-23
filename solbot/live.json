@@ -1,23 +1,26 @@
 {
   "fund": "solbot",
-  "status": "stale",
-  "reason": "Data tertunda",
+  "status": "stopped",
+  "stopped": {
+    "at": 1795251720000,
+    "note": "Dinonaktifkan Orel; sekarang mode manual. Sisa saldo ±$1.130,79 dipindah Orel. Rugi bot sebelumnya tetap tercatat sebagai hasil bot."
+  },
   "schema": "devil-greed-live-solana/v1",
   "realMoney": true,
   "mode": "HALTED",
   "haltReason": "Nov 19:34 WIB pause: unconfirmed manual SOL out 18:48/18:55, waiting Orel (sec_pause_1117)",
   "asOf": 1795251716000,
   "startedAt": 1792404993000,
-  "checkedAt": 1795450089846,
+  "checkedAt": 1795450431481,
   "startCapitalUsd": 107.03,
   "startCapitalSol": 1.0162,
   "solPriceUsd": 67.1,
-  "cashUsd": 1130.79,
-  "equityUsd": 1130.79,
+  "cashUsd": 0,
+  "equityUsd": 0,
   "changeUsd": -1604.31,
-  "changePct": -58.66,
-  "basisUsd": 2735.1,
-  "netFlowUsd": 2628.07,
+  "changePct": -100,
+  "basisUsd": 1604.31,
+  "netFlowUsd": 1497.28,
   "flows": [
     {
       "t": 1792411392000,
@@ -102,13 +105,20 @@
       "sol": 2,
       "type": "withdraw",
       "note": "SOL ditarik Orel dari wallet SolBot (bukan trade)."
+    },
+    {
+      "t": 1795251720000,
+      "usd": 1130.79,
+      "sol": 16.85,
+      "type": "withdraw",
+      "note": "Sisa saldo SolBot dipindah Orel saat bot dinonaktifkan (mode manual). Nilai = ekuitas terakhir yang dikirim bot; jam pastinya tidak terbaca."
     }
   ],
   "change24hUsd": -21.44,
   "change24hPct": -14.47,
-  "capitalInUsd": 2686.12,
+  "capitalInUsd": 1555.33,
   "botNetPnlUsd": -1555.33,
-  "botNetPnlPct": -57.9,
+  "botNetPnlPct": -100,
   "realizedPnlUsd": -332.18,
   "unrealizedPnlUsd": 0,
   "feesUsd": 23.09,
@@ -3002,6 +3012,10 @@
     {
       "t": 1795251716000,
       "usd": 1130.79
+    },
+    {
+      "t": 1795251720000,
+      "usd": 0
     }
   ],
   "positions": [],
