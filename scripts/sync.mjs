@@ -328,7 +328,7 @@ const worst = history.reduce((a, r) => (a == null || r.usd < a.usd ? r : a), nul
 // dipegang — lalu saldonya dibaca satu per satu; harga diambil dari DexScreener
 // yang gratis dan tanpa kunci. Semuanya dibatasi: token yang diperiksa dibatasi
 // jumlahnya, dan kegagalan apa pun di sini tidak boleh menjatuhkan snapshot.
-const extra = [];
+const extra = [], unpricedExtra = [];
 try {
   const client = getClient();
   const seen = new Set([NATIVE, USDG.toLowerCase(), WETH.toLowerCase()]);
@@ -360,7 +360,9 @@ try {
       const pair = (j.pairs || []).find((x) => String(x.baseToken?.address || '').toLowerCase() === h.token);
       if (pair) { unit = Number(pair.priceUsd) || null; symbol = pair.baseToken?.symbol || symbol; }
     } catch { throw new Error('Harga token tambahan tidak tersedia'); }
-    if (unit == null) throw new Error('Token bersaldo belum mempunyai harga');
+    // Token sisa yang pasarnya sudah hilang (tanpa pair di DexScreener) dihitung $0 dan
+    // dicatat, bukan menghentikan seluruh snapshot Reborn Rich (macet 23 Nov 2026).
+    if (unit == null) { unpricedExtra.push(symbol); continue; }
     const value = h.amount * unit;
     if (value != null && value >= 0.5) extra.push({ symbol, amount: h.amount, price: unit, usd: value });
   }
@@ -505,6 +507,7 @@ const snapshot = {
 };
 
 snapshot.performanceInput = { closes: closed.map((r) => ({ netUsd: Number(r.netUsd), netPct: Number(r.netPct) * 100, closedAt: Number(r.closedAt), holdMinutes: r.openedAt && r.closedAt ? Math.round((r.closedAt - r.openedAt) / 60000) : null, symbol: r.symbol || null })), flatBand: 0.5 };
+if (unpricedExtra.length) snapshot.quality = { ...(snapshot.quality || {}), reasons: [...(snapshot.quality?.reasons || []), `${unpricedExtra.length} token sisa tanpa harga pasar dihitung $0`] };
 saveSnapshot(OUT, snapshot, cfgTreasury);
 atomicJSON(FEES_OUT, { updatedAt: snapshot.updatedAt, positions: feeBook });
 console.log(`[cashood] total=$${snapshot.totalUsd} positions=${positions.length} treasury=$${treasuryUsd} complete=${snapshot.quality.complete}`);

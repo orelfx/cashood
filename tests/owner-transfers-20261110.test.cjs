@@ -42,5 +42,15 @@ test('November 20: Elysium, RISK Elysium, Reborn and Ferari move to SolBot as Or
  assert.equal(f.events.find(x=>x.id==='ferari-orel-dari-reborn-20261120').usd,rb.events.find(x=>x.id===ids[1]).usd);
  assert.equal(r.funding.events.find(x=>x.id==='riskelysium-orel-ke-ferari-20261120').nativeAmount,2.08904);
  assert.equal(lp.funding.events.find(x=>x.id==='elysium-orel-ke-reborn-20261120').nativeAmount,8.34692);
- const sb=require('../data/solbot/flows-extra.json').flows;assert.equal(sb.length,1);assert.equal(sb[0].type,'deposit');assert.ok(sb[0].usd<1903.14);
+ const sb=require('../data/solbot/flows-extra.json').flows.find(x=>x.t==='2026-11-20T15:38:00Z');assert.equal(sb.type,'deposit');assert.ok(sb.usd<1903.14);
+});
+test('November 23: 1,000 USDG from Reborn to Meridian comes out of and goes into Orel units only',()=>{
+ const rb=require('../data/reborn/config.json'),m=require('../data/meridian/config.json');
+ for(const [cfg,id] of [[rb,'reborn-orel-ke-meridian-20261123'],[m,'meridian-orel-dari-reborn-20261123']]){
+  const e=cfg.events.find(x=>x.id===id);assert.ok(e,id);assert.equal(e.owner,'orel');
+  const before=Core.buildLedger(cfg,{before:e.at}),after=Core.buildLedger(cfg,{before:e.at+1});
+  for(const o of before.owners){const p=after.owners.find(x=>x.id===o.id);if(o.id!=='orel')assert.equal(p.units,o.units);}
+  const pre=e.navBefore/before.totalUnits,post=(e.navBefore+(e.type==='deposit'?e.usd:-e.usd))/after.totalUnits;assert.ok(Math.abs(post-pre)<1e-6,id);}
+ const out=rb.events.find(x=>x.id==='reborn-orel-ke-meridian-20261123').usd,inn=m.events.find(x=>x.id==='meridian-orel-dari-reborn-20261123').usd;
+ assert.equal(out,1000);assert.ok(inn<out&&inn>950,'bridge cost only');
 });
