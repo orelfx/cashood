@@ -156,3 +156,19 @@ test('solbot: setoran yang dicatat Cashood (flows-extra.json) masuk modal sampai
   assert.equal(e.netFlowUsd, 98.5);
   assert.equal(e.capitalInUsd, 207);
 });
+
+test('solbot: dinonaktifkan pemilik → ekuitas 0, sisa saldo jadi penarikan, tidak "tertunda" walau datanya lama', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'solbot-'));
+  mkdirSync(join(dir, 'data', 'solbot'), { recursive: true });
+  const stopT = new Date(NOW - 60e3).toISOString();   // sesudah as_of bot (2 menit sebelum NOW)
+  writeFileSync(join(dir, 'data', 'solbot', 'flows-extra.json'), JSON.stringify({
+    stopped: { at: stopT, note: 'dinonaktifkan, mode manual' },
+    flows: [{ t: stopT, type: 'withdraw', usd: 96.3, note: 'sisa saldo dipindah' }],
+  }));
+  const d = run(source({ positions: [], equity_usd: 96.3, capital_in_usd: 107, net_pnl_usd: -10.7 }), NOW + 10 * 24 * 3600e3, dir);
+  assert.equal(d.status, 'stopped');
+  assert.equal(d.equityUsd, 0);
+  assert.equal(d.equityCurve.at(-1).usd, 0);
+  assert.equal(d.capitalInUsd, 10.7);
+  assert.equal(d.botNetPnlUsd, -10.7);
+});

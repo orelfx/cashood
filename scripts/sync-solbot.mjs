@@ -73,8 +73,16 @@ if (!asOf) waiting('waiting', 'Data belum lengkap (as_of kosong)');
 const mode = MODES.includes(String(src.mode).toUpperCase()) ? String(src.mode).toUpperCase() : null;
 // Umur dinilai dari as_of milik bot, bukan dari waktu berkas ditarik.
 // Lewat 15 menit tetap diolah, tapi ditandai 'stale'; lewat 7 hari tanpa angka.
-const late = now - asOf > STALE_MS;
-if (now - asOf > KEEP_MS) waiting('stale', 'Data tertunda', { asOf, mode });
+// Catatan dari sisi Cashood: arus dana yang belum dicatat bot, dan penghentian SolBot oleh pemilik.
+let extraFile = null;
+try { extraFile = JSON.parse(readFileSync(resolve(DIR, 'flows-extra.json'), 'utf8')); } catch {}
+// SolBot dinonaktifkan Orel (mode manual, 23 Nov 2026): sisa saldo dipindah dan dicatat sebagai
+// penarikan, ekuitas jadi 0 sesudah titik itu. Kiriman lama tidak lagi dianggap "tertunda".
+// Kalau bot kembali mengirim data sesudah tanggal berhenti, catatan berhenti diabaikan.
+const stopAt = time(extraFile?.stopped?.at);
+const stopped = stopAt && asOf <= stopAt ? { at: stopAt, note: text(extraFile.stopped.note, 300) } : null;
+const late = !stopped && now - asOf > STALE_MS;
+if (!stopped && now - asOf > KEEP_MS) waiting('stale', 'Data tertunda', { asOf, mode });
 
 // Kategori market cap dari bot: degen < $200 rb, low $200 rb – $30 jt.
 const sleeve = (v) => { const t = String(v ?? '').toLowerCase().trim(); return ['degen', 'low'].includes(t) ? t : text(v, 16); };
@@ -109,15 +117,14 @@ const closedStat = (list) => {
   const wins = graded.filter((c) => c.pnlUsd > 0).length;
   return { count: list.length, wins, losses: graded.filter((c) => c.pnlUsd < 0).length, winRatePct: graded.length ? r2((wins / graded.length) * 100) : null, pnlUsd: r2(graded.reduce((t, c) => t + c.pnlUsd, 0)) };
 };
-const startUsd = r2(src.start_capital_usd), equityUsd = r2(src.equity_usd);
+if (stopped) curve.push({ t: stopped.at, usd: 0 });
+const startUsd = r2(src.start_capital_usd), equityUsd = stopped ? 0 : r2(src.equity_usd);
 // Field tambahan (opsional, aditif di v1): arus dana, biaya, untung terealisasi.
 // Nama field t/usd/sol (spesifikasi) atau at/amount_usd/amount_sol (yang dikirim bot) sama-sama diterima.
 const flowRow = (f) => ({ t: time(f.t ?? f.at), usd: r2(f.usd ?? f.amount_usd), sol: r4(f.sol ?? f.amount_sol), type: ['deposit', 'withdraw'].includes(String(f.type).toLowerCase()) ? String(f.type).toLowerCase() : null, note: text(f.note, 200) });
 const botFlows = arr(src.flows).map(flowRow).filter((f) => f.t && f.usd != null && f.type);
 // Transfer antar-dana yang dicatat dari sisi Cashood (data/solbot/flows-extra.json) karena bot
 // belum mencatatnya. Begitu bot mengirim arus yang sama (±3 jam, nilai ±10%), catatan Cashood dilewati.
-let extraFile = null;
-try { extraFile = JSON.parse(readFileSync(resolve(DIR, 'flows-extra.json'), 'utf8')); } catch {}
 const extraFlows = arr(extraFile?.flows).map(flowRow).filter((f) => f.t && f.usd != null && f.type)
   .filter((e) => !botFlows.some((b) => b.type === e.type && Math.abs(b.t - e.t) <= 3 * 3600e3 && Math.abs(Math.abs(b.usd) - Math.abs(e.usd)) <= 0.1 * Math.abs(e.usd)));
 const extraNetUsd = extraFlows.reduce((t, f) => t + (f.type === 'withdraw' ? -Math.abs(f.usd) : Math.abs(f.usd)), 0);
@@ -131,16 +138,19 @@ const flows24 = flows.filter((f) => day && f.t > day.t).reduce((t, f) => t + (f.
 
 function botPnl() {
   const cap = r2(src.capital_in_usd), pnl = r2(src.net_pnl_usd);
-  if (!extraFlows.length) return { capitalInUsd: cap, botNetPnlUsd: pnl, botNetPnlPct: r2(src.net_pnl_pct) };
-  const capitalInUsd = cap == null ? null : r2(cap + extraNetUsd), botNetPnlUsd = pnl == null ? null : r2(pnl - extraNetUsd);
+  if (!extraFlows.length && !stopped) return { capitalInUsd: cap, botNetPnlUsd: pnl, botNetPnlPct: r2(src.net_pnl_pct) };
+  // Bot menghitung untung = ekuitasnya − modal. Kalau SolBot sudah dinonaktifkan, ekuitas bot itu
+  // sudah dipindah (tercatat sebagai penarikan), jadi ekuitas bot dikeluarkan dari hitungannya.
+  const left = stopped ? num(src.equity_usd) || 0 : 0;
+  const capitalInUsd = cap == null ? null : r2(cap + extraNetUsd), botNetPnlUsd = pnl == null ? null : r2(pnl - extraNetUsd - left);
   return { capitalInUsd, botNetPnlUsd, botNetPnlPct: capitalInUsd > 0 && botNetPnlUsd != null ? r2((botNetPnlUsd / capitalInUsd) * 100) : null };
 }
 const snapshot = {
-  fund: 'solbot', status: late ? 'stale' : 'ok', ...(late ? { reason: 'Data tertunda' } : {}), schema: SCHEMA, realMoney: true,
+  fund: 'solbot', status: stopped ? 'stopped' : late ? 'stale' : 'ok', ...(late ? { reason: 'Data tertunda' } : {}), ...(stopped ? { stopped } : {}), schema: SCHEMA, realMoney: true,
   mode, haltReason: text(src.halt_reason, 200),
   asOf, startedAt: time(src.started_at), checkedAt: now,
   startCapitalUsd: startUsd, startCapitalSol: r4(src.start_capital_sol), solPriceUsd: r2(src.sol_price_usd),
-  cashUsd: r2(src.cash_usd), equityUsd,
+  cashUsd: stopped ? 0 : r2(src.cash_usd), equityUsd,
   // Untung/rugi terhadap modal bersih (modal awal + setoran − penarikan).
   changeUsd: basisUsd > 0 && equityUsd != null ? r2(equityUsd - basisUsd) : null,
   changePct: basisUsd > 0 && equityUsd != null ? r2((equityUsd / basisUsd - 1) * 100) : null,

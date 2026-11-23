@@ -4117,8 +4117,9 @@ function paintGmsol() {
 const SOLBOT_STALE_MS = 15 * 60e3;
 const SOLBOT_KEEP_MS = 7 * 24 * 3600e3;
 // Angka SolBot boleh tampil kalau ada; telat >15 menit = angka terakhir, ditandai.
-const solbotUsable = (d) => !!d && ['ok', 'stale'].includes(d.status) && !!d.asOf && d.equityUsd != null && Date.now() - d.asOf <= SOLBOT_KEEP_MS;
-const solbotLate = (d) => !d?.asOf || d.status !== 'ok' || Date.now() - d.asOf > SOLBOT_STALE_MS;
+// 'stopped' = dinonaktifkan pemilik (sisa saldo sudah dipindah): tetap tampil berapa pun umurnya, bukan "tertunda".
+const solbotUsable = (d) => !!d && d.equityUsd != null && (d.status === 'stopped' || (['ok', 'stale'].includes(d.status) && !!d.asOf && Date.now() - d.asOf <= SOLBOT_KEEP_MS));
+const solbotLate = (d) => d?.status !== 'stopped' && (!d?.asOf || d.status !== 'ok' || Date.now() - d.asOf > SOLBOT_STALE_MS);
 const solbotView = { month: '', page: 0, hours: 24, profit: 'cal', calMonth: '', last: null, chart: null };
 let solbotEpoch = 0, solbotTimer = null;
 function showSolbot() {
@@ -4306,7 +4307,7 @@ function paintSolbot(d) {
   const nClosed = d.totals?.trades ?? (d.closedTrades || []).length;
   const chart = solbotChartSvg(d);
   const flowsTxt = (d.flows || []).map((f) => ` + ${f.type === 'withdraw' ? 'tarik' : 'setor'} ${usd(Math.abs(f.usd))}`).join('');
-  const lateNote = solbotLate(d) ? `<p class="miss" role="status"><b>Kiriman data bot tertunda.</b> Angka di bawah adalah data terakhir dari bot: ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}). Halaman kembali live otomatis begitu data baru masuk.</p>` : '';
+  const lateNote = d.status === 'stopped' ? `<p class="miss" role="status"><b>SolBot dinonaktifkan</b> (${esc(sbWib(d.stopped?.at))}). ${esc(d.stopped?.note || '')} Angka bot di bawah adalah data terakhir sebelum dinonaktifkan.</p>` : solbotLate(d) ? `<p class="miss" role="status"><b>Kiriman data bot tertunda.</b> Angka di bawah adalah data terakhir dari bot: ${esc(sbWib(d.asOf))} (${esc(ago(d.asOf))}). Halaman kembali live otomatis begitu data baru masuk.</p>` : '';
   setHTML(body, `${lateNote}<section class="card sb-hero">
       ${SOLBOT_HEAD}<span class="sb-mode ${modeCls}"><i></i>${modeTxt}</span></div>
       ${d.mode === 'HALTED' || d.haltReason ? `<p class="sb-halt" role="alert"><b>Bot dihentikan${d.mode === 'HALTED' ? '' : ' (catatan)'}:</b> ${esc(d.haltReason || 'alasan tidak dilaporkan')}</p>` : ''}
@@ -5322,9 +5323,9 @@ async function renderHome() {
     const win = t.winRatePct ?? real.winRatePct;
     return `<a class="prod" href="#solbot" style="--c:${f.accent}">
       <div class="prod-top">${iconTile('zap', f.accent)}
-        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${d ? esc(MODE[d.mode] || 'status tidak dikenal') : 'menunggu data'}</div></div>
+        <div class="prod-id"><div class="prod-name">${esc(f.label)}</div><div class="prod-sub">${esc(f.chain || 'Solana')} · ${d?.status === 'stopped' ? 'nonaktif · mode manual' : d ? esc(MODE[d.mode] || 'status tidak dikenal') : 'menunggu data'}</div></div>
         ${d?.change24hPct == null ? '' : `<span class="chg ${d.change24hPct >= 0 ? 'up' : 'down'}">${d.change24hPct >= 0 ? '▲' : '▼'} ${pct(Math.abs(d.change24hPct), 2)}<small>24 jam</small></span>`}</div>
-      <p class="prod-desc">${esc(f.blurb || '')}</p>
+      <p class="prod-desc">${esc(d?.status === 'stopped' ? (d.stopped?.note || f.blurb || '') : (f.blurb || ''))}</p>
       <div class="prod-nums">
         <div><span class="k">Ekuitas</span><span class="v">${d?.equityUsd == null ? '—' : usd(d.equityUsd, 0)}</span></div>
         <div><span class="k">Untung / rugi</span><span class="v ${cls(d?.changeUsd ?? 0)}">${d?.changeUsd == null ? '—' : `${signed(d.changeUsd)}<small>${s1(d.changePct)}</small>`}</span></div>
