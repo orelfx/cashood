@@ -1,9 +1,9 @@
 {
   "fund": "snh",
   "schemaVersion": 2,
-  "generation": "7ad30ae7-d612-4cd1-90a1-2fad990f254d",
-  "updatedAt": 1795674264638,
-  "generatedAt": "2026-11-26 13:24 WIB",
+  "generation": "d42aefdd-7ba1-4c74-9aeb-7cf21eb675fc",
+  "updatedAt": 1795674567994,
+  "generatedAt": "2026-11-26 13:29 WIB",
   "usdIdr": null,
   "totalUsd": 880.0147922742536,
   "nativeSymbol": "SOL",
@@ -1380,12 +1380,12 @@
     "pnlUsd": -119.98520772574636,
     "paused": false,
     "startedAt": 1791176825000,
-    "heartbeatAt": 1795674264638,
+    "heartbeatAt": 1795674567994,
     "status": "running",
     "healthy": true,
     "peakUsd": 1009.4192993139767,
     "drawdownPct": 12.82,
-    "lastScanAt": 1795673761000,
+    "lastScanAt": 1795674369000,
     "lead": "SnipeHunt adalah buku paper dengan modal kertas $1.000 — bukan uang sungguhan, bukan dana investor, dan bukan LP. Angkanya diimpor apa adanya dari catatan paper.",
     "tiles": [
       {
@@ -1406,7 +1406,7 @@
       },
       {
         "k": "Sinyal wallet",
-        "v": "16",
+        "v": "20",
         "n": "24 jam · 0 diveto LLM"
       },
       {
@@ -1422,9 +1422,9 @@
     ],
     "llm": {
       "model": "MiniMax-M2.7",
-      "lastDecisionAt": 1795674264638,
+      "lastDecisionAt": 1795674567994,
       "lastAction": "keputusan",
-      "lastReason": "SpaceXCoin [degen]: Dilewati karena red flag: bundler pegang 34% supply."
+      "lastReason": "ANSEM [degen]: Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
     }
   },
   "strategy": {
@@ -1659,6 +1659,53 @@
       ]
     },
     "decisions": [
+      {
+        "at": 1795674392325,
+        "symbol": "ANSEM",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -24% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1795674388776,
+        "symbol": "Elonmas",
+        "action": "skip",
+        "basket": "low",
+        "wallets": {
+          "smart": 1
+        },
+        "flags": [
+          {
+            "type": "blacklist",
+            "count": 2,
+            "note": "2 wallet blacklist kita ikut membeli (tidak dihitung)"
+          }
+        ],
+        "reason": "Dilewati karena red flag: insider/entrapment pegang 23%."
+      },
+      {
+        "at": 1795674373869,
+        "symbol": "Duet",
+        "action": "skip",
+        "basket": "degen",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati: harga sudah -60% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
+      },
+      {
+        "at": 1795674343280,
+        "symbol": "ME",
+        "action": "skip",
+        "basket": "big",
+        "wallets": {
+          "smart": 1
+        },
+        "reason": "Dilewati karena red flag: likuiditas cuma $247987."
+      },
       {
         "at": 1795673771301,
         "symbol": "SpaceXCoin",
@@ -2296,57 +2343,17 @@
           "smart": 1
         },
         "reason": "Dilewati: harga sudah -21% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1794694961886,
-        "symbol": "WASTED",
-        "action": "skip",
-        "basket": "mid",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati: harga sudah -18% di bawah harga beli wallet yang diikuti (batas −15%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1794692846405,
-        "symbol": "HAPPY",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "bot": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 36%."
-      },
-      {
-        "at": 1794690565155,
-        "symbol": "TRUMP P",
-        "action": "skip",
-        "basket": "degen",
-        "wallets": {
-          "bot": 1
-        },
-        "reason": "Dilewati: harga sudah -84% di bawah harga beli wallet yang diikuti (batas −20%). Mereka sedang rugi; itu dump yang sedang berjalan, bukan pullback."
-      },
-      {
-        "at": 1794687801574,
-        "symbol": "chudhaos",
-        "action": "skip",
-        "basket": "low",
-        "wallets": {
-          "smart": 1
-        },
-        "reason": "Dilewati karena red flag: insider/entrapment pegang 27%."
       }
     ],
     "reasonStats": {
       "skip": {
         "chase": 0,
-        "below_entry": 1,
+        "below_entry": 3,
         "no_pullback": 0,
         "wallet_left": 0,
         "breakdown": 0,
         "liq_drop": 0,
-        "red_flag": 14,
+        "red_flag": 16,
         "round_trip_cost": 0,
         "basket_full": 0,
         "slippage": 0,
@@ -2396,7 +2403,7 @@
   },
   "costsShareUsd": 0,
   "performance": {
-    "generatedAt": 1795674487748,
+    "generatedAt": 1795674773336,
     "trades": {
       "count": 156,
       "wins": 63,
